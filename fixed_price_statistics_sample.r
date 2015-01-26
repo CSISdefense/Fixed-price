@@ -63,6 +63,8 @@ sample.SumofObligatedAmount<-subset(sample.SumofObligatedAmount,select=-c(StartF
 
 rm(sample.criteria)
 
+#These are a hold over from doing samples with different criteria.
+
 # sample.SumOfbaseandexercisedoptionsvalue.gte.2007<-sample.criteria[sample(nrow(sample.criteria)
 #                                                               , size=15000
 #                                                               , prob=abs(sample.criteria$SumOfbaseandexercisedoptionsvalue)
@@ -356,5 +358,226 @@ sample.SumofObligatedAmount <-read.csv(
 # )
 # 
 
+
+
+# 
+# #"defense_SumofObligatedAmount_SumOfbaseandexercisedoptionsvalue_StartFiscal_Year_exercisedweighted"
+# 
+# SpentvExpected<-qplot(log10(SumofObligatedAmount)
+#                       ,log10(SumOfbaseandexercisedoptionsvalue)
+#                       ,data=sample.SumofObligatedAmount
+#                       ,color=IsIDV
+# )+geom_abline(slope=1)+geom_abline(slope=1,intercept=3)+facet_wrap(StartFiscal_Year~IsIDV)
+# 
+# png(
+#   paste(Path
+#         
+#         ,"defense_SumofObligatedAmount_SumOfbaseandexercisedoptionsvalue_StartFiscal_Year_obligationweighted"
+#         ,".png"
+#         , sep=""
+#   )
+#   , width=6#VAR.width
+#   , height=6#VAR.height
+#   , units='in'
+#   , res=300
+# )
+# 
+# print(SpentvExpected)
+# 
+# if (!(dev.cur()[[1]]==1)){
+#   dev.off()
+# }
+# 
+# #"defense_SumofObligatedAmount_Sumofbaseandalloptionsvalue_StartFiscal_Year_obligationweighted"
+# SpentvExpected<-qplot(log10(SumofObligatedAmount)
+#                       ,log10(Sumofbaseandalloptionsvalue)
+#                       ,data=sample.SumofObligatedAmount
+#                       ,color=IsIDV
+# )+geom_abline(slope=1)+geom_abline(slope=1,intercept=3)+facet_wrap(StartFiscal_Year~IsIDV)
+# 
+# 
+# png(
+#   paste(Path
+#         
+#         ,"defense_SumofObligatedAmount_Sumofbaseandalloptionsvalue_StartFiscal_Year_obligationweighted"
+#         ,".png"
+#         , sep=""
+#   )
+#   , width=6#VAR.width
+#   , height=6#VAR.height
+#   , units='in'
+#   , res=300
+# )
+# 
+# print(SpentvExpected)
+# 
+# if (!(dev.cur()[[1]]==1)){
+#   dev.off()
+# }
+# 
+# 
+# 
+# #"defense_SumofObligatedAmount_SumOfbaseandexercisedoptionsvalue_StartFiscal_Year_exercisedweighted"
+# SpentvExpected<-qplot(log10(SumofObligatedAmount)
+#                       ,log10(SumOfbaseandexercisedoptionsvalue)
+#                       ,data=sample.SumOfbaseandexercisedoptionsvalue
+#                       ,color=IsIDV
+# )+geom_abline(slope=1)+geom_abline(slope=1,intercept=3)+facet_wrap(StartFiscal_Year~IsIDV)
+# 
+# 
+# png(
+#   paste(Path
+#         
+#         ,"defense_SumofObligatedAmount_SumOfbaseandexercisedoptionsvalue_StartFiscal_Year_exercisedweighted"
+#         ,".png"
+#         , sep=""
+#   )
+#   , width=6#VAR.width
+#   , height=6#VAR.height
+#   , units='in'
+#   , res=300
+# )
+# 
+# print(SpentvExpected)
+# 
+# if (!(dev.cur()[[1]]==1)){
+#   dev.off()
+# }
+# 
+# 
+# #"defense_SumofObligatedAmount_Sumofbaseandalloptionsvalue_StartFiscal_Year_allweighted"
+# SpentvExpected<-qplot(log10(SumofObligatedAmount)
+#                       ,log10(Sumofbaseandalloptionsvalue)
+#                       ,data=massive.data[sample(nrow(massive.data), size=15000, prob=abs(massive.data$Sumofbaseandalloptionsvalue)),]
+#                       ,color=IsIDV
+# )+geom_abline(slope=1)+geom_abline(slope=1,intercept=3)+facet_wrap(StartFiscal_Year~IsIDV)
+# 
+# 
+# png(
+#   paste(Path
+#         
+#         ,"defense_SumofObligatedAmount_Sumofbaseandalloptionsvalue_StartFiscal_Year_allweighted"
+#         ,".png"
+#         , sep=""
+#   )
+#   , width=6#VAR.width
+#   , height=6#VAR.height
+#   , units='in'
+#   , res=300
+# )
+# 
+# print(SpentvExpected)
+# 
+# if (!(dev.cur()[[1]]==1)){
+#   dev.off()
+# }
+
+#System equipment code
+
+
+systemequipmentlist <-read.csv(
+        paste(Path,"Lookups\\Lookup_CSIScontractIDforIdentifiedSystemEquipment.csv",sep=""),
+        header=TRUE, sep=",", dec=".", strip.white=TRUE, 
+        na.strings="NULL",
+        stringsAsFactors=FALSE
+)
+
+systemequipmentlist<-read_and_join(Path,"LOOKUP_systemequipmentcode.csv",systemequipmentlist)
+
+systemequipmentlist<-subset(systemequipmentlist,SystemEquipmentInSample=TRUE
+                            
+)
+
+systemequipmentlist<-subset(systemequipmentlist,select=-c(Unseperated
+                                                          ,systemequipmentcodeText
+                                                          ,systemequipmentshorttext
+                                                          ,SystemEquipmentInSample
+)
+)
+
+massive.data <-read.csv(
+        paste(Path,"data\\defense_contract_contractdiscretization.csv",sep=""),
+        header=TRUE, sep=",", dec=".", strip.white=TRUE, 
+        na.strings="NULL",
+        stringsAsFactors=FALSE
+)
+
+
+
+systemequipmentlist<-join(
+        systemequipmentlist,
+        massive.data,
+        match="first"
+)
+
+rm(massive.data)
+
+
+
+
+CSIScontractID.delta <-read.csv(
+        paste(Path,"data\\defense_contract_SP_ContractModificationDeltaCustomer.csv",sep=""),
+        header=TRUE, sep=",", dec=".", strip.white=TRUE, 
+        na.strings="NULL",
+        stringsAsFactors=FALSE
+)
+
+# CSIScontractID.systemequipmentcode<-subset(CSIScontractID.delta,!is.na(systemequipmentcode))
+
+
+systemequipmentlist<-join(
+        systemequipmentlist,
+        CSIScontractID.delta,
+        match="first"
+)
+
+
+rm(CSIScontractID.delta)  
+
+CSIScontractID.lookup <-read.csv(
+        paste(Path,"lookups\\contract_CSIScontractID.csv",sep=""),
+        header=TRUE, sep=",", dec=".", strip.white=TRUE, 
+        na.strings="NULL",
+        stringsAsFactors=FALSE
+)
+
+# CSIScontractID.lookup<=subset(CSIScontractID.lookup,select=-c(systemequipmentcode))
+
+systemequipmentlist<-join(
+        systemequipmentlist,
+        CSIScontractID.lookup,
+        match="first"
+)
+
+rm(CSIScontractID.lookup)
+
+CSIScontractOutcomeID.lookup <-read.csv(
+        paste(Path,"data\\Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv",sep=""),
+        header=TRUE, sep=",", dec=".", strip.white=TRUE, 
+        na.strings="NULL",
+        stringsAsFactors=FALSE
+)
+
+colnames(CSIScontractOutcomeID.lookup)[colnames(CSIScontractOutcomeID.lookup)=="ï..CSIScontractID"]<-"CSIScontractID"
+systemequipmentlist<-join(
+        systemequipmentlist,
+        CSIScontractOutcomeID.lookup,
+        match="first"
+)
+
+rm(CSIScontractOutcomeID.lookup)
+
+
+write.table(systemequipmentlist
+            ,file=paste(Path,"data\\defense_contract_CSIScontractID_"
+                        #                         ,sample.size
+                        ,"_systemEquipmentCode.csv"
+                        ,sep=""
+            )
+            #   ,header=TRUE
+            , sep=","
+            , row.names=FALSE
+            , append=FALSE
+)
 
 
