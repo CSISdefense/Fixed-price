@@ -10,19 +10,27 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r}
+require(ggplot2)
+setwd("K:\\Development\\Fixed-price")
 contract.sample <-read.csv(
   paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
   header=TRUE, sep=",", dec=".", strip.white=TRUE, 
   na.strings=c("NULL","NA"),
   stringsAsFactors=FALSE
 )
-summary(contract.sample)
+View(contract.sample)
+summary(contract.sample[,c("isAnyRnD1to5","obligatedAmountRnD1to5","firstSignedDateRnD1to5")])
+
 ```
 
 You can also embed plots, for example:
 
 ```{r, echo=FALSE}
-plot(cars)
+ggplot(
+        data=contract.sample
+        ,aes_string(x=contract$isAnyRnD1to5)
+        
+        )+geom_bar()
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

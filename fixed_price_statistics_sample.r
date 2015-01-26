@@ -18,7 +18,11 @@ options(warn=1)
 
 # debug(apply_lookups)
 # debug(CreateDuration)
+
+
+
 #*************************************Lookup Files*****************************************************
+setwd("K:\\Development\\Fixed-price")
 Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 # Path<-"~\\FPDS\\R scripts and data\\"
 # Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
@@ -29,8 +33,6 @@ source(paste(Path,"helper.r",sep=""))
 source(paste(Path,"lookups.r",sep=""))
 source(paste(Path,"helper.r",sep=""))
 source(paste(Path,"statistics_aggregators.r",sep=""))
-
-
 
 options(error=recover)
 options(warn=1)
@@ -44,8 +46,6 @@ sample.criteria <-read.csv(
   na.strings=c("NULL","NA"),
   stringsAsFactors=FALSE
 )
-
-
 
 sample.size<-15000
 #Drop contracts starting before the study period
@@ -74,116 +74,47 @@ rm(sample.criteria)
 #                                                         , prob=abs(sample.criteria$Sumofbaseandalloptionsvalue)
 # ),]
 
-massive.data <-read.csv(
-  paste(Path,"data\\defense_contract_contractdiscretization.csv",sep=""),
-  header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-  na.strings="NULL",
-  stringsAsFactors=FALSE
+
+#data\\defense_contract_contractdiscretization.csv
+sample.SumofObligatedAmount<-read_and_join(Path
+                                           ,"defense_contract_contractdiscretization.csv"
+                                           ,sample.SumofObligatedAmount
+                                           ,"data\\"
 )
 
-massive.data$SumOfbaseandexercisedoptionsvalue<-FactorToNumber(massive.data$SumOfbaseandexercisedoptionsvalue)
-sample.SumofObligatedAmount<-join(
-  sample.SumofObligatedAmount,
-  massive.data,
-  match="first"
-)
+#CSIScontractID
+sample.SumofObligatedAmount<-read_and_join(Path
+              ,"contract_CSIScontractID.csv"
+              ,sample.SumofObligatedAmount
+              ,"lookups\\"
+              )
 
-rm(massive.data)
+# # CSIScontractID.systemequipmentcode<-subset(CSIScontractID.lookup,!is.na(systemequipmentcode))
 
-
-
-CSIScontractID.lookup <-read.csv(
-  paste(Path,"lookups\\contract_CSIScontractID.csv",sep=""),
-  header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-  na.strings="NULL",
-  stringsAsFactors=FALSE
-)
-
-# CSIScontractID.systemequipmentcode<-subset(CSIScontractID.lookup,!is.na(systemequipmentcode))
-
-
-sample.SumofObligatedAmount<-join(
-  sample.SumofObligatedAmount,
-  CSIScontractID.lookup,
-  match="first"
+#defense_contract_SP_ContractModificationDeltaCustomer.csv
+sample.SumofObligatedAmount<-read_and_join(Path
+                                           ,"defense_contract_SP_ContractModificationDeltaCustomer.csv"
+                                           ,sample.SumofObligatedAmount
+                                           ,"data\\"
 )
 
 
-# sample.SumOfbaseandexercisedoptionsvalue.gte.2007<-join(
-#   sample.SumOfbaseandexercisedoptionsvalue.gte.2007,
-#   CSIScontractID.lookup,
-#   match="first"
-# )
-# 
-# sample.Sumofbaseandalloptionsvalue.gte.2007<-join(
-#   sample.Sumofbaseandalloptionsvalue.gte.2007,
-#   CSIScontractID.lookup,
-#   match="first"
-# )
 
-
-rm(CSIScontractID.lookup)      
-
-
-
-
-CSIScontractID.delta <-read.csv(
-  paste(Path,"data\\defense_contract_SP_ContractModificationDeltaCustomer.csv",sep=""),
-  header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-  na.strings="NULL",
-  stringsAsFactors=FALSE
-)
-
-# CSIScontractID.systemequipmentcode<-subset(CSIScontractID.delta,!is.na(systemequipmentcode))
-
-
-sample.SumofObligatedAmount<-join(
-  sample.SumofObligatedAmount,
-  CSIScontractID.delta,
-  match="first"
+#"data\\Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv"
+sample.SumofObligatedAmount<-read_and_join(Path
+                                           ,"Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv"
+                                           ,sample.SumofObligatedAmount
+                                           ,"data\\"
 )
 
 
-# sample.SumOfbaseandexercisedoptionsvalue.gte.2007<-join(
-#   sample.SumOfbaseandexercisedoptionsvalue.gte.2007,
-#   CSIScontractID.delta,
-#   match="first"
-# )
-# 
-# sample.Sumofbaseandalloptionsvalue.gte.2007<-join(
-#   sample.Sumofbaseandalloptionsvalue.gte.2007,
-#   CSIScontractID.delta,
-#   match="first"
-# )
-
-
-rm(CSIScontractID.delta)  
-
-CSIScontractOutcomeID.lookup <-read.csv(
-  paste(Path,"data\\Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv",sep=""),
-  header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-  na.strings="NULL",
-  stringsAsFactors=FALSE
+#lookups\\contract_CSIScontractID.csv
+sample.SumofObligatedAmount<-read_and_join(Path
+                                           ,"contract_CSIScontractID.csv"
+                                           ,sample.SumofObligatedAmount
+                                           ,"lookups\\"
 )
 
-# CSIScontractOutcomeID.systemequipmentcode<-subset(CSIScontractOutcomeID.lookup,!is.na(systemequipmentcode))
-
-colnames(CSIScontractOutcomeID.lookup)[colnames(CSIScontractOutcomeID.lookup)=="ï..CSIScontractID"]<-"CSIScontractID"
-sample.SumofObligatedAmount<-join(
-  sample.SumofObligatedAmount,
-  CSIScontractOutcomeID.lookup,
-  match="first"
-)
-
-rm(CSIScontractOutcomeID.lookup)
-
-
-CSIScontractCompVeh.lookup <-read.csv(
-  paste(Path,"data\\defense_contract_SP_ContractUnmodifiedCompetitionvehicleCustomer.csv",sep=""),
-  header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-  na.strings="NULL",
-  stringsAsFactors=FALSE
-)
 
 sample.SumofObligatedAmount <-subset(sample.SumofObligatedAmount ,select=-c(IsSomeCompetition
                                                                             , IsFullAndOpen
@@ -193,30 +124,37 @@ sample.SumofObligatedAmount <-subset(sample.SumofObligatedAmount ,select=-c(IsSo
 #                                                                             ,multipleorsingleawardidc
 #                                                                             ,AwardOrIDVcontractactiontype
 )
-                                     )
+                                    )
 
 
-# CSIScontractOutcomeID.systemequipmentcode<-subset(CSIScontractCompVeh.lookup,!is.na(systemequipmentcode))
-
-sample.SumofObligatedAmount<-join(
-  sample.SumofObligatedAmount,
-  CSIScontractCompVeh.lookup,
-  match="first"
+#lookups\\contract_CSIScontractID.csv
+sample.SumofObligatedAmount<-read_and_join(Path
+                                           ,"defense_contract_SP_ContractUnmodifiedCompetitionvehicleCustomer.csv"
+                                           ,sample.SumofObligatedAmount
+                                           ,"data\\"
+)
+ 
+sample.SumofObligatedAmount <-read.csv(
+  paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
+  header=TRUE, sep=",", dec=".", strip.white=TRUE, 
+  na.strings=c("NULL","NA"),
+  stringsAsFactors=FALSE
 )
 
-rm(CSIScontractCompVeh.lookup)
-# 
-# sample.SumofObligatedAmount <-read.csv(
-#   paste(Path,"data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
-#   header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-#   na.strings=c("NULL","NA"),
-#   stringsAsFactors=FALSE
-# )
+#defense_Contract_SP_ContractDetailsR&DCustomer.csv
+sample.SumofObligatedAmount<-read_and_join(Path
+                                           ,"defense_Contract_SP_ContractDetailsR&DCustomer.csv"
+                                           ,sample.SumofObligatedAmount
+                                           ,"data\\"
+)
+
+
+
 
 
 
 write.table(sample.SumofObligatedAmount
-            ,file=paste(Path,"data\\defense_contract_CSIScontractID_sample_"
+            ,file=paste("data\\defense_contract_CSIScontractID_sample_"
                         ,sample.size
                         ,"_SumofObligatedAmount.csv"
                         ,sep=""
@@ -309,12 +247,12 @@ write.table(sample.SumofObligatedAmount.gte.2007.isCompeted
             , append=FALSE
 )
 
-sample.SumofObligatedAmount <-read.csv(
-  paste(Path,"data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
-  header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-  na.strings=c("NULL","NA"),
-  stringsAsFactors=FALSE
-)
+# sample.SumofObligatedAmount <-read.csv(
+#   paste(Path,"data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
+#   header=TRUE, sep=",", dec=".", strip.white=TRUE, 
+#   na.strings=c("NULL","NA"),
+#   stringsAsFactors=FALSE
+# )
 
 # debug(fixed.price.statistics)
 # debug(apply_lookups)
@@ -495,77 +433,37 @@ systemequipmentlist<-subset(systemequipmentlist,select=-c(Unseperated
 )
 )
 
-massive.data <-read.csv(
-        paste(Path,"data\\defense_contract_contractdiscretization.csv",sep=""),
-        header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-        na.strings="NULL",
-        stringsAsFactors=FALSE
+
+#defense_contract_contractdiscretization.csv
+systemequipmentlist<-read_and_join(Path
+                                   ,"defense_contract_contractdiscretization.csv"
+                                   ,sample.SumofObligatedAmount
+                                   ,"data\\"
 )
 
 
 
-systemequipmentlist<-join(
-        systemequipmentlist,
-        massive.data,
-        match="first"
-)
-
-rm(massive.data)
-
-
-
-
-CSIScontractID.delta <-read.csv(
-        paste(Path,"data\\defense_contract_SP_ContractModificationDeltaCustomer.csv",sep=""),
-        header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-        na.strings="NULL",
-        stringsAsFactors=FALSE
-)
-
-# CSIScontractID.systemequipmentcode<-subset(CSIScontractID.delta,!is.na(systemequipmentcode))
-
-
-systemequipmentlist<-join(
-        systemequipmentlist,
-        CSIScontractID.delta,
-        match="first"
+#defense_contract_SP_ContractModificationDeltaCustomer.csv
+systemequipmentlist<-read_and_join(Path
+                                   ,"defense_contract_SP_ContractModificationDeltaCustomer.csv"
+                                   ,sample.SumofObligatedAmount
+                                   ,"data\\"
 )
 
 
-rm(CSIScontractID.delta)  
-
-CSIScontractID.lookup <-read.csv(
-        paste(Path,"lookups\\contract_CSIScontractID.csv",sep=""),
-        header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-        na.strings="NULL",
-        stringsAsFactors=FALSE
+#lookups\\contract_CSIScontractID.csv"
+systemequipmentlist<-read_and_join(Path
+                                   ,"contract_CSIScontractID.csv"
+                                   ,sample.SumofObligatedAmount
+                                   ,"lookups\\"
 )
 
-# CSIScontractID.lookup<=subset(CSIScontractID.lookup,select=-c(systemequipmentcode))
-
-systemequipmentlist<-join(
-        systemequipmentlist,
-        CSIScontractID.lookup,
-        match="first"
+#data\\Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv"
+systemequipmentlist<-read_and_join(Path
+                                           ,"Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv"
+                                           ,sample.SumofObligatedAmount
+                                           ,"data\\"
 )
-
-rm(CSIScontractID.lookup)
-
-CSIScontractOutcomeID.lookup <-read.csv(
-        paste(Path,"data\\Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv",sep=""),
-        header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-        na.strings="NULL",
-        stringsAsFactors=FALSE
-)
-
-colnames(CSIScontractOutcomeID.lookup)[colnames(CSIScontractOutcomeID.lookup)=="ï..CSIScontractID"]<-"CSIScontractID"
-systemequipmentlist<-join(
-        systemequipmentlist,
-        CSIScontractOutcomeID.lookup,
-        match="first"
-)
-
-rm(CSIScontractOutcomeID.lookup)
 
 
 write.table(systemequipmentlist
@@ -579,5 +477,3 @@ write.table(systemequipmentlist
             , row.names=FALSE
             , append=FALSE
 )
-
-
