@@ -15,22 +15,50 @@ setwd("K:\\Development\\Fixed-price")
 contract.sample <-read.csv(
   paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
   header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-  na.strings=c("NULL","NA"),
+  na.strings=c("NULL","NA",""),
   stringsAsFactors=FALSE
 )
 View(contract.sample)
 summary(contract.sample[,c("isAnyRnD1to5","obligatedAmountRnD1to5","firstSignedDateRnD1to5")])
+contract.sample$firstSignedDateRnD1to5<-strptime(contract.sample$firstSignedDateRnD1to5,"%Y-%m-%d")
+contract.sample$MinOfEffectiveDate<-strptime(contract.sample$MinOfEffectiveDate,"%Y-%m-%d")
+contract.sample<-subset(contract.sample,isAnyRnD1to5==1)
+contract.sample$isAnyRnD1to5<-factor(contract.sample$isAnyRnD1to5,levels=c(0,1),labels=c("No R&D1-5","Any R&D1-5"))
+contract.sample$UnmodifiedRnD1to5<-factor(contract.sample$UnmodifiedRnD1to5
+                                          ,levels=c(0,1),labels=c("Other Start\nOr Blank","Starts R&D1-5"))
+contract.sample$UnmodifiedRnD1to5<-addNA(contract.sample$UnmodifiedRnD1to5,ifany=TRUE)
+levels(contract.sample$UnmodifiedRnD1to5)[is.na(levels(contract.sample$UnmodifiedRnD1to5))] <- "Other Start\nOr Blank"
+
+
+contract.sample$simplearea<-addNA(contract.sample$simplearea,ifany=TRUE)
+levels(contract.sample$simplearea)[is.na(levels(contract.sample$simplearea))] <- "Unlabeled\nor Mixed"
 
 ```
 
 You can also embed plots, for example:
 
-```{r, echo=FALSE}
+```{r VersusSimpleArea, echo=FALSE}
 ggplot(
         data=contract.sample
-        ,aes_string(x=contract$isAnyRnD1to5)
-        
-        )+geom_bar()
+        ,aes_string(x="simplearea")
+        )+geom_bar(binwidth=1)+facet_wrap("UnmodifiedRnD1to5")
 ```
+
+
+```{r VersusUnmodified, echo=FALSE}
+ggplot(
+        data=contract.sample
+        ,aes_string(x="simplearea")
+        )+geom_bar(binwidth=1)+facet_wrap("UnmodifiedRnD1to5")
+```
+
+
+```{r VersusDate, echo=FALSE}
+ggplot(
+        data=contract.sample
+        ,aes_string(x="simplearea")
+        )+geom_bar(binwidth=1)+facet_wrap("UnmodifiedRnD1to5")
+```
+
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
