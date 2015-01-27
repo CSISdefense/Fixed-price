@@ -133,13 +133,14 @@ sample.SumofObligatedAmount<-read_and_join(Path
                                            ,sample.SumofObligatedAmount
                                            ,"data\\"
 )
- 
-sample.SumofObligatedAmount <-read.csv(
-  paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
-  header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-  na.strings=c("NULL","NA"),
-  stringsAsFactors=FALSE
-)
+
+#Use this to add just a single file
+# sample.SumofObligatedAmount <-read.csv(
+#   paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
+#   header=TRUE, sep=",", dec=".", strip.white=TRUE, 
+#   na.strings=c("NULL","NA"),
+#   stringsAsFactors=FALSE
+# )
 
 #defense_Contract_SP_ContractDetailsR&DCustomer.csv
 sample.SumofObligatedAmount<-read_and_join(Path
@@ -148,7 +149,8 @@ sample.SumofObligatedAmount<-read_and_join(Path
                                            ,"data\\"
 )
 
-
+# subset(sample.SumofObligatedAmount,select=-c("isAnyRnD1to5","obligatedAmountRnD1to5","firstSignedDateRnD1to5","UnmodifiedRnD1to5"))
+# sample.SumofObligatedAmount<-sample.SumofObligatedAmount[,!names(sample.SumofObligatedAmount) %in% c("isAnyRnD1to5","obligatedAmountRnD1to5","firstSignedDateRnD1to5","UnmodifiedRnD1to5")]
 
 
 
@@ -171,7 +173,7 @@ combined.MCC<-fixed.price.statistics(Path
 )
 
 write.table(combined.MCC
-            ,file=paste(Path,"data\\defense_office_MajorCommandID_sample_"
+            ,file=paste("data\\defense_office_MajorCommandID_sample_"
                         ,sample.size
                         ,"_SumofObligatedAmount.csv"
                         ,sep=""
@@ -188,7 +190,7 @@ sample.SumofObligatedAmount.gte.2007<-subset(sample.SumofObligatedAmount,StartFi
                                       
 
 write.table(sample.SumofObligatedAmount.gte.2007
-            ,file=paste(Path,"data\\defense_contract_CSIScontractID_sample_"
+            ,file=paste("data\\defense_contract_CSIScontractID_sample_"
                         ,sample.size
                         ,"_SumofObligatedAmount_gte_2007.csv"
                         ,sep=""
@@ -205,7 +207,7 @@ combined.MCC<-fixed.price.statistics(Path
 )
 
 write.table(combined.MCC
-            ,file=paste(Path,"data\\defense_office_MajorCommandID_sample_"
+            ,file=paste("data\\defense_office_MajorCommandID_sample_"
                         ,sample.size
                         ,"_SumofObligatedAmount_gte_2007.csv"
                         ,sep=""
@@ -221,7 +223,7 @@ rm(combined.MCC)
 sample.SumofObligatedAmount.IsCompeted<-subset(sample.SumofObligatedAmount,IsSomeCompetition==1)
 
 write.table(sample.SumofObligatedAmount.IsCompeted
-            ,file=paste(Path,"data\\defense_contract_CSIScontractID_sample_"
+            ,file=paste("data\\defense_contract_CSIScontractID_sample_"
                         ,sample.size
                         ,"_SumofObligatedAmount_IsCompeted.csv"
                         ,sep=""
@@ -236,7 +238,7 @@ sample.SumofObligatedAmount.gte.2007.isCompeted<-subset(sample.SumofObligatedAmo
 
 
 write.table(sample.SumofObligatedAmount.gte.2007.isCompeted
-            ,file=paste(Path,"data\\defense_contract_CSIScontractID_sample_"
+            ,file=paste("data\\defense_contract_CSIScontractID_sample_"
                         ,sample.size
                         ,"_SumofObligatedAmount_gte_2007_isCompeted.csv"
                         ,sep=""
