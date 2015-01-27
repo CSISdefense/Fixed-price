@@ -12,8 +12,8 @@ For this study we are looking at whether a contract includes the first five phas
 
 ```{r setup, echo=FALSE}
 require(ggplot2)
-setwd("K:\\Development\\Fixed-price")
-# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+# setwd("K:\\Development\\Fixed-price")
+setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
 contract.sample <-read.csv(
         paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
         header=TRUE, sep=",", dec=".", strip.white=TRUE, 
