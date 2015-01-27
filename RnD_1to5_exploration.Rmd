@@ -2,7 +2,9 @@
 title: "DoD Fixed-Price Study"
 author: "Greg Sanders"
 date: "Tuesday, January 13, 2015"
-output: html_document
+output:
+  html_document:
+    fig_caption: yes
 ---
 
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, the move from being a research and development (R&D) contract and the like to a product contract requires deliberate consideration. As an important added factor, for the fixed-price study, we are only considering information that contracting officer knew going in. This is an attempt to avoid having our independent variables influenced by contract performance. For example, a standard of 50% R&D content by value would be influenced by whether the R&D portion of the project took longer than expected.
@@ -12,8 +14,8 @@ For this study we are looking at whether a contract includes the first five phas
 
 ```{r setup, echo=TRUE}
 require(ggplot2)
-setwd("K:\\Development\\Fixed-price")
-# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+# setwd("K:\\Development\\Fixed-price")
+setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
 contract.sample <-read.csv(
         paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
         header=TRUE, sep=",", dec=".", strip.white=TRUE, 
