@@ -54,10 +54,32 @@ ggplot(
 
 
 ```{r VersusDate, echo=FALSE}
+contract.sample$isRnD1to5byStart[contract.sample$firstSignedDateRnD1to5<=contract.sample$MinOfEffectiveDate]<-TRUE
+contract.sample$isRnD1to5byStart[contract.sample$firstSignedDateRnD1to5>contract.sample$MinOfEffectiveDate]<-FALSE
+contract.sample$isRnD1to5byStart<-factor(contract.sample$isRnD1to5byStart,levels=c(TRUE,FALSE),labels=c("R&D1-5 by Start","No R&D1-5 by Start"))
 ggplot(
         data=contract.sample
-        ,aes_string(x="simplearea")
+        ,aes_string(x="isRnD1to5byStart")
         )+geom_bar(binwidth=1)+facet_wrap("UnmodifiedRnD1to5")
+```
+
+
+```{r Quad, echo=FALSE}
+ggplot(
+        data=contract.sample
+        ,aes_string(x="isRnD1to5byStart")
+        )+geom_bar(binwidth=1)+facet_grid(UnmodifiedRnD1to5~simplearea)
+```
+
+
+
+
+```{r QuadValue, echo=FALSE}
+ggplot(
+        data=contract.sample
+        ,aes_string(x="isRnD1to5byStart",weight="SumofObligatedAmount")
+        
+        )+geom_bar(binwidth=1)+facet_grid(UnmodifiedRnD1to5~simplearea)
 ```
 
 
