@@ -85,7 +85,7 @@ If we assume all contracts that are exclusively R&D(1-5,7), when labeled, then t
 
 
 * The biggest problem appears to be those contracts whose first entry is not labeled. However, the vast majority of those contracts are 95%-100% R&D(1-5), which should make classifying them fairly easy. 
-* Those contracts that start as non-R&D are consistently below 50% R&D(1-5) with a noteable exception in the 95% to 100% range. Capturing those should be simple.
+* Those contracts that start as non-R&D are consistently below 50% R&D(1-5) with a notable exception in the 95% to 100% range. Capturing those should be simple.
 * Those contracts that start R&D(1-5) but have less than 50% of dollars in that category might be false positives.
 
 ```{r VersusDate, echo=TRUE}
@@ -112,7 +112,7 @@ ggplot(
 
 ```
 
-If we include all contracts that either are labeled as R&D(1-5) in their unmodified version or before their effective date, then the sensitivity of the test improves by either standard without noteably reducing the specificity.
+If we include all contracts that either are labeled as R&D(1-5) in their unmodified version or before their effective date, then the sensitivity of the test improves by either standard without notably reducing the specificity.
 
 
 ```{r JointStandard, echo=TRUE}
