@@ -116,17 +116,6 @@ sample.SumofObligatedAmount<-read_and_join(Path
 )
 
 
-sample.SumofObligatedAmount <-subset(sample.SumofObligatedAmount ,select=-c(IsSomeCompetition
-                                                                            , IsFullAndOpen
-#                                                                             ,IsOnlyOneSource
-#                                                                             ,IsFollowonToCompetedAction
-#                                                                             ,numberofoffersreceived
-#                                                                             ,multipleorsingleawardidc
-#                                                                             ,AwardOrIDVcontractactiontype
-)
-                                    )
-
-
 #lookups\\contract_CSIScontractID.csv
 sample.SumofObligatedAmount<-read_and_join(Path
                                            ,"defense_contract_SP_ContractUnmodifiedCompetitionvehicleCustomer.csv"
@@ -135,12 +124,28 @@ sample.SumofObligatedAmount<-read_and_join(Path
 )
 
 #Use this to add just a single file
-# sample.SumofObligatedAmount <-read.csv(
-#   paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
-#   header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-#   na.strings=c("NULL","NA"),
-#   stringsAsFactors=FALSE
+sample.SumofObligatedAmount <-read.csv(
+  paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
+  header=TRUE, sep=",", dec=".", strip.white=TRUE, 
+  na.strings=c("NULL","NA"),
+  stringsAsFactors=FALSE
+)
+
+
+# 
+# sample.SumofObligatedAmount <-subset(sample.SumofObligatedAmount ,select=-c(NumberOfOffersReceived
+#                                                                             ,IsFullAndOpen
+#                                                                             ,IsSomeCompetition
+# #                                                                             ,ObligatedAmountIsSomeCompetition
+#                                                                             ,IsOnlyOneSource
+#                                                                             ,IsFollowonToCompetedAction
+#                                                                             ,multipleorsingleawardidc
+#                                                                             ,addmultipleorsingawardidc
+#                                                                             ,AwardOrIDVcontractactiontype
 # )
+# )
+
+
 
 #defense_Contract_SP_ContractDetailsR&DCustomer.csv
 sample.SumofObligatedAmount<-read_and_join(Path
