@@ -1,0 +1,324 @@
+---
+title: "DoD Fixed-Price Study: Procedural Competition classification"
+author: "Greg Sanders"
+date: "Tuesday, January 13, 2015"
+output:
+  html_document:
+    keep_md: yes
+---
+
+Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
+
+##Studying Competitive  contracts in the sample.
+One important factor for this study is whether a contract was available for competition. Unlike other CSIS work, we are not considering the numbers of offers received, as that is a dependent variable for the purposes of this study.
+
+```{r setup, echo = TRUE}
+require(ggplot2)
+require(stringr)
+require(plyr)
+options(error=recover)
+setwd("K:\\Development\\Fixed-price")
+# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
+# Path<-"~\\FPDS\\R scripts and data\\"
+source(paste(Path,"lookups.r",sep=""))
+
+contract.sample  <- read.csv(
+    paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv", sep = ""),
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = FALSE
+    )
+
+contract.sample$pIsSomeCompetition <- contract.sample$ObligatedAmountIsSomeCompetition/contract.sample$ObligatedAmount
+contract.sample$pIsSomeCompetition[is.na(contract.sample$ObligatedAmountIsSomeCompetition)] <- 0
+
+# statutoryexceptiontofairopportunity
+# extentcompeted        '
+# UnmodifiedNumberOfOffersReceived
+# IsFullAndOpen
+# IsSomeCompetition        
+# IsOnlyOneSource
+# IsFollowonToCompetedAction
+# numberofoffersreceived
+
+contract.sample$firstSignedDateRnD1to5 <- strptime(contract.sample$firstSignedDateRnD1to5, "%Y-%m-%d")
+contract.sample$MinOfEffectiveDate <- strptime(contract.sample$MinOfEffectiveDate, "%Y-%m-%d")
+contract.sample<-apply_lookups(Path,contract.sample)
+# 
+# 
+# ggplot(
+#     data = subset(contract.sample),
+#     aes_string(x = "statutoryexceptiontofairopportunity"),
+#     main = "Distribution by statutory exception to fair opportunity"
+#     ) +
+#     geom_bar()
+# 
+# 
+# ggplot(
+#     data = subset(contract.sample),
+#     aes_string(x = "statutoryexceptiontofairopportunity"),
+#     main = "Distribution by statutory exception to fair opportunity"
+#     ) +
+#     geom_bar()
+# 
+# ggplot(
+#     data = subset(contract.sample),
+#     aes_string(x = "extentcompeted"),
+#     main = "Distribution by extent competed"
+#     ) +
+#     geom_bar() #+binwidth = 0.05 + 
+# #     facet_grid( statutoryexceptiontofairopportunity ~ .,
+# #                 scales = "free_y",
+# #                 space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+# ObligatedAmountIsSomeCompetition
+
+ggplot(
+    data = subset(contract.sample),
+    aes_string(x = "IsOnlyOneSource"),
+    main = "Distribution by is full and open"
+    ) +
+    geom_bar(binwidth=1)
+# +     facet_grid( IsFullAndOpen ~ .,
+#               scales = "free_y",
+#               space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+
+ggplot(
+    data = contract.sample,
+    aes_string(x = "pIsSomeCompetition"),
+    main = "Distribution by is full and open"
+    ) +
+    geom_bar(binwidth=0.05)+     
+        facet_grid(  UnmodifiedIsSomeCompetition ~ .,
+              scales = "free_y",
+              space = "free_y") + scale_y_continuous(expand = c(0,500)) +
+         theme(strip.text.y  = element_text(angle = 360)
+          )
+
+ggplot(
+    data = subset(contract.sample),
+    aes_string(x = "IsOnlyOneSource"),
+    main = "Distribution by is full and open"
+    ) +
+    geom_bar(binwidth=1)
+# +     facet_grid( IsFullAndOpen ~ .,
+#               scales = "free_y",
+#               space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+
+
+ggplot(
+    data = subset(contract.sample),
+    aes_string(x = "IsSomeCompetition",fill="UnmodifiedIsSomeCompetition"),
+    main = "Distribution by is full and open"
+    ) +
+    geom_bar(binwidth=1)
+# +     facet_grid( IsFullAndOpen ~ .,
+#               scales = "free_y",
+#               space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+
+
+ggplot(
+    data = subset(contract.sample),
+    aes_string(x = "UnmodifiedIsSomeCompetition"),
+    main = "Distribution by is some competition"
+    ) +
+    geom_bar(binwidth=1)+     
+        facet_grid( . ~  IsSomeCompetition,
+              scales = "free_y",
+              space = "free_y") + scale_y_continuous(expand = c(0,500)) +
+         theme(strip.text.y  = element_text(angle = 360)
+          )
+
+
+```
+
+The distribution of the number of offers received. For the chart below, we've cut out the instances where more than one hundred offers were received. Notably if the competition and no competition categries are combined, the distribution is fully exponential. That is still largely true for competed entries, although it the number receiving single offer competition is lower than the number receiving competition with multiple offers.
+
+```{r UnmodifiedNumOffers}
+ggplot(
+    data = subset(contract.sample,UnmodifiedNumberOfOffersReceived<100),
+    aes_string(x = "UnmodifiedNumberOfOffersReceived"),
+    main = "Distribution by Number Of Offers Received (1 to 100)"
+    ) +
+    geom_bar(binwidth = 1)
+# + 
+#     facet_grid( IsSomeCompetition ~ .,
+#                 scales = "free_y",
+#                 space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+
+
+ggplot(
+    data = subset(contract.sample,UnmodifiedNumberOfOffersReceived<100),
+    aes_string(x = "UnmodifiedNumberOfOffersReceived"),
+    main = "Distribution by Number Of Offers Received (1 to 100)"
+    ) +
+    geom_bar(binwidth = 1) + 
+    facet_grid( IsSomeCompetition ~ .,
+                scales = "free_y",
+                space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+
+ggplot(
+    data = subset(contract.sample,NumberOfOffersReceived<100),
+    aes_string(x = "UnmodifiedNumberOfOffersReceived"),
+    main = "Distribution by Number Of Offers Received (1 to 100)"
+    ) +
+    geom_bar(binwidth = 1)
+# + 
+#     facet_grid( IsSomeCompetition ~ .,
+#                 scales = "free_y",
+#                 space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+
+ggplot(
+    data = subset(contract.sample,NumberOfOffersReceived<100),
+    aes_string(x = "UnmodifiedNumberOfOffersReceived"),
+    main = "Distribution by Number Of Offers Received (1 to 100)"
+    ) +
+    geom_bar(binwidth = 1) + 
+    facet_grid( IsSomeCompetition ~ .,
+                scales = "free_y",
+                space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+
+
+```
+
+
+
+Number of offers received and unmodified number of offers received appear to be the same. That's probably a mistake.
+
+
+```{r NumOffers}
+ggplot(
+    data = subset(contract.sample,numberofoffersreceived<100),
+    aes_string(x = "numberofoffersreceived"),
+    main = "Distribution by Unmodified Number Of Offers Received (1 to 100)"
+    ) +
+    geom_bar(binwidth = 1)+     facet_grid( IsSomeCompetition ~ .,
+                                            scales = "free_y",
+                                            space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+
+
+```
+
+
+
+#     facet_grid( UnmodifiedRnD1to5 ~ .,
+#                 scales = "free_y",
+#                 space = "free_y") + scale_y_continuous(expand = c(0,50)) +
+#     theme(strip.text.y  = element_text(angle = 360)
+#           )
+
+
+fiftysens <- nrow(contract.sample[contract.sample$pRnD1to5 >= 0.5 &
+(contract.sample$UnmodifiedRnD1to5 == "Starts R&D1-5"), ])/
+nrow(contract.sample[contract.sample$pRnD1to5 >= 0.5, ])
+
+
+fiftyspec <- nrow(contract.sample[contract.sample$pRnD1to5<0.5 &
+!(contract.sample$UnmodifiedRnD1to5 == "Starts R&D1-5"), ]) /
+nrow(contract.sample[contract.sample$pRnD1to5<0.5, ])
+
+RnDsens <- nrow(contract.sample[contract.sample$simplearea == "R&D" &
+(contract.sample$UnmodifiedRnD1to5 == "Starts R&D1-5"), ]) /
+nrow(contract.sample[contract.sample$simplearea == "R&D", ])
+
+
+RnDspec <- nrow(contract.sample[contract.sample$simplearea != "R&D" &
+!(contract.sample$UnmodifiedRnD1to5=="Starts R&D1-5"), ]) /
+nrow(contract.sample[contract.sample$simplearea != "R&D", ])
+
+nrow(contract.sample[contract.sample$pRnD1to5 >= 0.5, ])
+
+
+```
+
+Based on this first analysis, it appears that labeling an R&D(1-5) contract by its first element works for at least 90% of cases. 
+
+If we assume all contracts with 50% or more R&D(1-5) content by value are true R&D(1-5) contracts then the sensitivity (or true positive rate) is `r fiftysens` and the specificity (or true negative rate) is `r fiftyspec`.
+
+If we assume all contracts that are exclusively R&D(1-5,7), when labeled, then the sensitivity (or true positive rate) is `r RnDsens` and the specificity (or true negative rate) is `r RnDspec`.
+
+
+* The biggest problem appears to be those contracts whose first entry is not labeled. However, the vast majority of those contracts are 95%-100% R&D(1-5), which should make classifying them fairly easy. 
+* Those contracts that start as non-R&D are consistently below 50% R&D(1-5) with a notable exception in the 95% to 100% range. Capturing those should be simple.
+* Those contracts that start R&D(1-5) but have less than 50% of dollars in that category might be false positives.
+
+```{r VersusDate, echo=TRUE}
+contract.sample$isRnD1to5byStart <- NA
+contract.sample$isRnD1to5byStart[contract.sample$firstSignedDateRnD1to5 <= 
+                                     contract.sample$MinOfEffectiveDate] <- TRUE
+contract.sample$isRnD1to5byStart[contract.sample$firstSignedDateRnD1to5 > 
+                                     contract.sample$MinOfEffectiveDate] <- FALSE
+contract.sample$isRnD1to5byStart[is.na(contract.sample$firstSignedDateRnD1to5)] <- FALSE
+contract.sample$isRnD1to5byStart <- factor(contract.sample$isRnD1to5byStart,
+                                           levels = c(TRUE,FALSE),
+                                           labels = c("R&D1-5 by Eff. Date","No R&D1-5 by Eff. Date")
+                                           )
+
+ggplot(
+    data=subset(contract.sample,isAnyRnD1to5 == "Any R&D1-5")
+    ,aes_string(x = "pRnD1to5")
+    )+geom_bar(binwidth = 0.05) + facet_grid(UnmodifiedRnD1to5~isRnD1to5byStart,
+                                             scales = "free_y",
+                                             space = "free_y") +
+    scale_y_continuous(expand=c(0,50))+
+    theme(strip.text.y = element_text(angle = 360)
+          )
+
+```
+
+If we include all contracts that either are labeled as R&D(1-5) in their unmodified version or before their effective date, then the sensitivity of the test improves by either standard without notably reducing the specificity.
+
+
+```{r JointStandard, echo=TRUE}
+
+contract.sample$isInitialRnD1to5 <- NA
+contract.sample$isInitialRnD1to5[!(contract.sample$UnmodifiedRnD1to5 == "Starts R&D1-5" |
+                                       contract.sample$isRnD1to5byStart == "R&D1-5 by Eff. Date ")] <- FALSE
+contract.sample$isInitialRnD1to5[contract.sample$UnmodifiedRnD1to5 == "Starts R&D1-5"] <- TRUE
+contract.sample$isInitialRnD1to5[contract.sample$isRnD1to5byStart == "R&D1-5 by Eff. Date"] <- TRUE
+contract.sample$isInitialRnD1to5 <- factor(contract.sample$isInitialRnD1to5,
+                                           levels = c(TRUE,FALSE),
+                                           labels = c("R&D1-5 by Eff. Date\nor Unmodidified R&D1-5"
+                                                      ,"No R&D1-5 by Eff. Date\nnor Unmodidified R&D1-5")
+                                           )
+
+
+ggplot(
+    data=subset(contract.sample,isAnyRnD1to5 == "Any R&D1-5"),
+    aes_string(x = "pRnD1to5"))+
+    geom_bar(binwidth = 0.05)+
+    facet_grid(isInitialRnD1to5~., 
+               scales = "free_y",
+               space = "free_y")+
+    scale_y_continuous(expand = c(0,50))+
+    theme(strip.text.y = element_text(angle = 360)
+          )
+
+
+
+fiftysens <- nrow(contract.sample[contract.sample$isInitialRnD1to5 ==
+                                      "R&D1-5 by Eff. Date\nor Unmodidified R&D1-5" & 
+                                      contract.sample$pRnD1to5 >= 0.5, ]) /
+    nrow(contract.sample[contract.sample$pRnD1to5 >= 0.5, ])
+
+fiftyspec <- nrow(contract.sample[contract.sample$isInitialRnD1to5 == 
+                                      "No R&D1-5 by Eff. Date\nnor Unmodidified R&D1-5" &
+                                      contract.sample$pRnD1to5<0.5, ]) /
+    nrow(contract.sample[contract.sample$pRnD1to5<0.5, ])
+
+RnDsens <- nrow(contract.sample[contract.sample$isInitialRnD1to5 == 
+                                    "R&D1-5 by Eff. Date\nor Unmodidified R&D1-5" & 
+                                    contract.sample$simplearea == "R&D", ]) /
+    nrow(contract.sample[contract.sample$simplearea == "R&D", ])
+
+
+RnDspec <- nrow(contract.sample[contract.sample$isInitialRnD1to5 == 
+                                    "No R&D1-5 by Eff. Date\nnor Unmodidified R&D1-5" &
+                                    contract.sample$simplearea != "R&D", ]) /
+    nrow(contract.sample[contract.sample$simplearea != "R&D", ])
+
+
+```
+If we assume all contracts with 50% or more R&D(1-5) content by value are true R&D(1-5) contracts then the sensitivity (or true positive rate) is `r fiftysens` and the specificity (or true negative rate) is `r fiftyspec`.
+
+If we assume all contracts that are exclusively R&D(1-5,7), when labeled, then the sensitivity (or true positive rate) is `r RnDsens` and the specificity (or true negative rate) is `r RnDspec`.
