@@ -13,3 +13,14 @@ In service of determining where fixed price contracts are more and less appropri
 This capability to evaluate outcomes breaks new ground for what can be done with open source procurement research. The study will then correlate these data with additional variables, including product or service category, DoD contracting offices at the major command level, and a range of contract characteristics. This will provide DoD and the public with a deeper understanding of how fixed price contracts can be most effectively used and where current contracting does and does not align with these findings. This will be especially relevant as defense investment budgets continue to decline. 
 
 This study is being undertaking with the sponsorship of the Washington Headquarters Service and the preliminary reserach will be submitted to the  Naval Postgraduate School’s 12th Annual Acquisition Research Symposium in 2015. 
+
+## Work Plan
+
+This project will utilize three dependent variables to measure whether a contract is suitable for a fixed pricing mechanism, the latter two representing a significant capability developed by this contract that will be broadly useful for future quantitative open source procurement researchers: single-offer competition, contract termination, and costly change orders.as discussed in the intro-duction.
+
+The study will then cross-reference these outcomes with independent variables, including major DoD contracting office by major command, product or service type, initial contract size, initial contract duration, extent of competition, and contract vehicle, to evaluate what contract charac-teristics are correlated with the best outcomes. Reflecting the findings of the Performance of the Defense Acquisition System, the classification used for contract vehicle will include whether a contract is undefinitized. This in-depth, data-driven study will thus result in easy to apply find-ings to aid in identifying when fixed priced contracts are best used and highlight those areas where DoD is over- or under-using this pricing mechanism.
+
+The research effort will draw upon three primary sources:
+1	Federal Procurement Data System (FPDS): The FPDS is a publicly available database of every unclassified government contract, with millions of entries each year.  Each entry has extensive data on the vendors, contract type, competition, place of performance, and a variety of other topics as mandated by Congress.  
+2	Government Accountability Office and Inspector General reports:  Reports by watchdog agencies will be used to confirm that the CSIS methodology is correctly cate-gorizing terminations and costly overruns for a subset of covered contracts.
+3	Selected Acquisition Reports and DoD Budget Materials: As with category 2, these sources will aid in the validation of categorizing terminations and costly overruns for ma-jor defense acquisition programs.
