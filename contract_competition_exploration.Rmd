@@ -7,144 +7,103 @@ output:
     keep_md: yes
 ---
 
+```{r hiddensetup, echo = FALSE}
+require(ggplot2)
+require(stringr)
+require(plyr)
+options(error=recover)
+setwd("K:\\Development\\Fixed-price")
+# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
+# Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
+source(paste(Path,"lookups.r",sep=""))
+
+```
+
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
 
 ##Studying Competitive  contracts in the sample.
 One important factor for this study is whether a contract was available for competition. Unlike other CSIS work, we are not considering the numbers of offers received, as that is a dependent variable for the purposes of this study.
 
 ```{r setup, echo = TRUE}
-require(ggplot2)
-require(stringr)
-require(plyr)
-options(error=recover)
-# setwd("K:\\Development\\Fixed-price")
-setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
-# Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
-Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
-source(paste(Path,"lookups.r",sep=""))
-
 contract.sample  <- read.csv(
     paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
-    stringsAsFactors = FALSE
+    stringsAsFactors = TRUE
     )
 
+#These will probably be moved into apply_lookups at some point
 contract.sample$pIsSomeCompetition <- contract.sample$ObligatedAmountIsSomeCompetition/contract.sample$ObligatedAmount
 contract.sample$pIsSomeCompetition[is.na(contract.sample$ObligatedAmountIsSomeCompetition)] <- 0
-
-# statutoryexceptiontofairopportunity
-# extentcompeted        '
-# UnmodifiedNumberOfOffersReceived
-# IsFullAndOpen
-# IsSomeCompetition        
-# IsOnlyOneSource
-# IsFollowonToCompetedAction
-# numberofoffersreceived
-
-contract.sample$firstSignedDateRnD1to5 <- strptime(contract.sample$firstSignedDateRnD1to5, "%Y-%m-%d")
 contract.sample$MinOfEffectiveDate <- strptime(contract.sample$MinOfEffectiveDate, "%Y-%m-%d")
 contract.sample<-apply_lookups(Path,contract.sample)
-# 
-# 
-# ggplot(
-#     data = subset(contract.sample),
-#     aes_string(x = "statutoryexceptiontofairopportunity"),
-#     main = "Distribution by statutory exception to fair opportunity"
-#     ) +
-#     geom_bar()
-# 
-# 
-# ggplot(
-#     data = subset(contract.sample),
-#     aes_string(x = "statutoryexceptiontofairopportunity"),
-#     main = "Distribution by statutory exception to fair opportunity"
-#     ) +
-#     geom_bar()
-# 
-# ggplot(
-#     data = subset(contract.sample),
-#     aes_string(x = "extentcompeted"),
-#     main = "Distribution by extent competed"
-#     ) +
-#     geom_bar() #+binwidth = 0.05 + 
-# #     facet_grid( statutoryexceptiontofairopportunity ~ .,
-# #                 scales = "free_y",
-# #                 space = "free_y") + scale_y_continuous(expand = c(0,50)) 
-# ObligatedAmountIsSomeCompetition
-
-ggplot(
-    data = subset(contract.sample),
-    aes_string(x = "IsOnlyOneSource"),
-    main = "Distribution by is full and open"
-    ) +
-    geom_bar(binwidth=1)
-# +     facet_grid( IsFullAndOpen ~ .,
-#               scales = "free_y",
-#               space = "free_y") + scale_y_continuous(expand = c(0,50)) 
-
-ggplot(
-    data = contract.sample,
-    aes_string(x = "pIsSomeCompetition"),
-    main = "Distribution by is full and open"
-    ) +
-    geom_bar(binwidth=0.05)+     
-        facet_grid(  UnmodifiedIsSomeCompetition ~ .,
-              scales = "free_y",
-              space = "free_y") + scale_y_continuous(expand = c(0,500)) +
-         theme(strip.text.y  = element_text(angle = 360)
-          )
-
-ggplot(
-    data = subset(contract.sample),
-    aes_string(x = "IsOnlyOneSource"),
-    main = "Distribution by is full and open"
-    ) +
-    geom_bar(binwidth=1)
-# +     facet_grid( IsFullAndOpen ~ .,
-#               scales = "free_y",
-#               space = "free_y") + scale_y_continuous(expand = c(0,50)) 
-
-
-ggplot(
-    data = subset(contract.sample),
-    aes_string(x = "IsSomeCompetition",fill="UnmodifiedIsSomeCompetition"),
-    main = "Distribution by is full and open"
-    ) +
-    geom_bar(binwidth=1)
-# +     facet_grid( IsFullAndOpen ~ .,
-#               scales = "free_y",
-#               space = "free_y") + scale_y_continuous(expand = c(0,50)) 
-
-
-ggplot(
-    data = subset(contract.sample),
-    aes_string(x = "UnmodifiedIsSomeCompetition"),
-    main = "Distribution by is some competition"
-    ) +
-    geom_bar(binwidth=1)+     
-        facet_grid( . ~  IsSomeCompetition,
-              scales = "free_y",
-              space = "free_y") + scale_y_continuous(expand = c(0,500)) +
-         theme(strip.text.y  = element_text(angle = 360)
-          )
-
-
 ```
+FPDS classifies competition using two variables: "Extent Competed" and "Statutory Exception To Fair Opportunity"
+
+The latter is prefered for certain types of indefinite delivery vehicles and the former is used in the remaining cases. In those cases where the preferred variable is not available, CSIS imputes whether competition occured using the other variable. The split between the two variables is mandated by regulation, but is not particularly analytically interested, so we combined them for simplicity.
+
+###IsSomeCompetition
+Is Some Competition is a binary variable, true if competitive procedures were used, false if they were not. Unlabeled cases are classified as NAs.
+
+* UnmodifiedIsSomeCompetition is the classification given by the first record for the contract (`r sprintf("%1.2f%%",nrow(subset(contract.sample,UnmodifiedIsSomeCompetition=="Unlabeled")) /nrow(contract.sample)*100)` missing data).
+* IsSomeCompetition is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,IsSomeCompetition=="Mixed or \nUnlabeled")) /nrow(contract.sample)*100)` missing data).
+  1. A contract which is sometimes classified as competed and never classified as uncompeted is categorized as competed. 
+  2. A contract which is sometimes classified as uncompeted and never classified as competed is categorized as uncompeted.
+  3. A contract which was always unlabeled is categorized as Mixed or Unlabeled.
+  4. A contract which was classified as both competed and uncompeted in different modifications is categorized as Mixed or Unlabeled.
+* pIsSomeCompetition is dollar value of all transactions that were labeled as competed divided the contracts total obligations. 
+
+Reassuringly, as is shown below, even when IsSomeCompetition is has a mixed or unlabeled value, the most frequently occuring values are those that are almost never classified as competed or consistently classified as competed.
+
+```{r overallvars, echo = TRUE}
+summary(subset(contract.sample,select=c(statutoryexceptiontofairopportunity,
+                                extentcompeted,
+                                 UnmodifiedIsSomeCompetition,
+                                IsSomeCompetition,
+                                pIsSomeCompetition
+                                ))
+        )
+
+
+ggplot(
+    data = subset(contract.sample,IsSomeCompetition=="Mixed or \nUnlabeled"),
+    aes_string(x = "pIsSomeCompetition"),
+    main = "Distribution by percent of dollars with some competition for mixed and unlabeled contracts."
+    ) +
+    geom_bar(binwidth=0.05)
+```
+
+##Variables describing competition
+The next set of variables are relevant when competition is present, as measured by IsSomeCompetition
+```{r competitiosetup, echo = TRUE}
+competed.sample<-subset(contract.sample,IsSomeCompetition=="Comp.")
+```
+There are two variables of concern: The Number of Offers received and whether or not a contract experienced full and open competition. 
+
+###Number of Offers Received
+This variable is particularly important, as single-offer competition (IsSomeCompetition=1 and NumberOfOfferesReceived=1)  is a dependent variable in two ongoing CSIS studies.
+
+* UnmodifiedNumberOfOffersReceived reports the Number of Offers received according to the first reported transaction under a contract (`r sprintf("%1.2f%%",nrow(subset(competed.sample,is.na(UnmodifiedNumberOfOffersReceived)|UnmodifiedNumberOfOffersReceived==0)) /nrow(competed.sample)*100)` missing data, far too high, there must be a SQL mistake).
+* NumberOfOffersReceived reports the Number of Offers received for the entire contract. Ignoring missing values, CSIS will checks if only a single whole number is reported. If so, that is the value reported. Otherwise the value is NA. (`r sprintf("%1.2f%%",nrow(subset(competed.sample,is.na(NumberOfOffersReceived)|NumberOfOffersReceived==0)) /nrow(competed.sample)*100)` missing data).
 
 The distribution of the number of offers received. For the chart below, we've cut out the instances where more than one hundred offers were received. Notably if the competition and no competition categries are combined, the distribution is fully exponential. That is still largely true for competed entries, although it the number receiving single offer competition is lower than the number receiving competition with multiple offers.
 
-```{r UnmodifiedNumOffers}
+
+```{r numoffers, echo = TRUE}
 ggplot(
     data = subset(contract.sample,UnmodifiedNumberOfOffersReceived<100),
     aes_string(x = "UnmodifiedNumberOfOffersReceived"),
     main = "Distribution by Number Of Offers Received (1 to 100)"
     ) +
     geom_bar(binwidth = 1)
-# + 
-#     facet_grid( IsSomeCompetition ~ .,
-#                 scales = "free_y",
-#                 space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+
+
+summary(subset(contract.sample,select=c(UnmodifiedNumberOfOffersReceived,
+                                NumberOfOffersReceived
+                                )
+               ,IsSomeCompetition=="Comp.")
+        )
 
 
 ggplot(
@@ -159,7 +118,7 @@ ggplot(
 
 ggplot(
     data = subset(contract.sample,NumberOfOffersReceived<100),
-    aes_string(x = "UnmodifiedNumberOfOffersReceived"),
+    aes_string(x = "NumberOfOffersReceived"),
     main = "Distribution by Number Of Offers Received (1 to 100)"
     ) +
     geom_bar(binwidth = 1)
@@ -170,7 +129,7 @@ ggplot(
 
 ggplot(
     data = subset(contract.sample,NumberOfOffersReceived<100),
-    aes_string(x = "UnmodifiedNumberOfOffersReceived"),
+    aes_string(x = "NumberOfOffersReceived"),
     main = "Distribution by Number Of Offers Received (1 to 100)"
     ) +
     geom_bar(binwidth = 1) + 
@@ -181,24 +140,123 @@ ggplot(
 
 ```
 
+###Full and Open Competition
+IsFullAndOpen is a categorization of competition that means that any vendor believing themselves capable of meeting the requirements could put in an offer. This category is only available for contracts classified using Extent Competed. Contracts using the fair opportunity standard have already limited potential competitor.
 
+* UnmodifiedIsFullAndOpen is the classification given by the first record for the contract (`r sprintf("%1.2f%%",nrow(subset(competed.sample,is.na(UnmodifiedIsFullAndOpen))) /nrow(contract.sample)*100)` missing data).
+* IsFullAndOpen is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(competed.sample,IsFullAndOpen=="Unlabeled")) /nrow(competed.sample)*100)` missing data).
+  1. A contract which is sometimes classified as full and open and is otherwise unlabeled is classified as full and open. 
+  2. A contract which is sometimes classified as not full and open and is otherwise unlabeled is classified as not full and open.
+  3. A contract which was always unlabeled is categorized as Unlabeled.
+  4. A contract which was classified as both full and open and not in different modifications is categorized as Unlabeled.
 
-Number of offers received and unmodified number of offers received appear to be the same. That's probably a mistake.
-
-
-```{r NumOffers}
-ggplot(
-    data = subset(contract.sample,numberofoffersreceived<100),
-    aes_string(x = "numberofoffersreceived"),
-    main = "Distribution by Unmodified Number Of Offers Received (1 to 100)"
-    ) +
-    geom_bar(binwidth = 1)+     facet_grid( IsSomeCompetition ~ .,
-                                            scales = "free_y",
-                                            space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+```{r IfFullAndOpen, echo = TRUE}
+summary(subset(competed.sample,select=c(UnmodifiedIsFullAndOpen,
+                                IsFullAndOpen
+                                )
+        )
+        )
 
 
 ```
 
 
 
+##Variables describing why competition did not take place.
+The next set of variables are relevant when competition is present, as measured by IsSomeCompetition
+```{r nocompetitionsetup, echo = TRUE}
+uncompeted.sample<-subset(contract.sample,IsSomeCompetition=="No Comp.")
+```
+There are two variables of concern: The Number of Offers received and whether or not a contract experienced full and open competition. 
 
+###Number of Offers Received
+Numbers of offers is worth a brief investigation because of its importance and a known data abnormality. Sometimes uncompeted contracts report more than one offer. In other CSIS reports, this is handled by treating IsSomeCompetition as unlabeled due to the contradiction. The definition of the two variables is the same above.
+
+* UnmodifiedNumberOfOffersReceived reports multiple offers on uncompeted contracts `r sprintf("%1.2f%%",nrow(subset(uncompeted.sample,UnmodifiedNumberOfOffersReceived>1)) /nrow(uncompeted.sample)*100)` of the time.
+* NumberOfOffersReceived reports the multiple offers on uncompeted contracts `r sprintf("%1.2f%%",nrow(subset(uncompeted.sample,NumberOfOffersReceived>1)) /nrow(uncompeted.sample)*100)` of the time.
+
+
+###Only one source exceptions
+IsOnlyOneSource is an explaination for not competing a contract, namely that there were no alternative sources available. This category is only available for both contracts classified using the extent comepted or the statuatory exception to the fair opportunity field. In the former case, the classification is made using the Reason NOt Competed field.  (Note, rerun this)
+
+* UnmodifiedIsOnlyOneSource is the classification given by the first record for the contract (`r sprintf("%1.2f%%",nrow(subset(uncompeted.sample,is.na(UnmodifiedIsOnlyOneSource))) /nrow(uncompeted.sample)*100)` missing data).
+* IsOnlyOneSource is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(uncompeted.sample,IsOnlyOneSource=="Unlabeled")) /nrow(uncompeted.sample)*100)` missing data).
+  1. A contract which is sometimes classified as only one source and is otherwise unlabeled is classified as full and open. 
+  2. A contract which is sometimes classified as another exemption is otherwise unlabeled is classified as not full and open.
+  3. A contract which was always unlabeled is categorized as Unlabeled.
+  4. A contract which was classified as both only one source and not another exemption is categorized as Unlabeled.
+
+
+```{r isonlyoneoffer, echo = TRUE}
+#No competition
+summary(subset(uncompeted.sample,select=c(
+                                UnmodifiedIsOnlyOneSource,
+                                IsOnlyOneSource
+                                )
+               )
+        )
+
+
+```
+###Follow on to competed action
+IsFollowonToCompetedAction is an alternate explaination for not competing a contract, namely that there was a prior competition. It seems underused in practice. It is a subset of contracts with only one source but does not include contracts that were labeled as follow-ons without note as to their competed status. This category comes up under all three vairables, extentcompeted/reasonnotcompeted and statuatory exception to fair competition (note, rerun due to table update, also include extent competed value).
+
+* UnmodifiedIsFollowonToCompetedAction is the classification given by the first record for the contract (`r sprintf("%1.2f%%",nrow(subset(uncompeted.sample,is.na(UnmodifiedIsFollowonToCompetedAction))) /nrow(uncompeted.sample)*100)` missing data).
+* IsFollowonToCompetedAction is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(uncompeted.sample,is.na(IsFollowonToCompetedAction))) /nrow(uncompeted.sample)*100)` missing data).
+  1. A contract which is sometimes classified as a follow on to a competed action and is otherwise unlabeled is classified as full and open. 
+  2. A contract which is sometimes classified as another exemption is otherwise unlabeled is classified as not full and open.
+  3. A contract which was always unlabeled is categorized as Unlabeled.
+  4. A contract which was classified as both only one source and not another exemption is categorized as Unlabeled.
+
+
+```{r followontocompetedaction, echo = TRUE}
+#No competition
+summary(subset(uncompeted.sample,select=c(
+                                UnmodifiedIsFollowonToCompetedAction,
+                                IsFollowonToCompetedAction
+                                )
+               )
+        )
+
+
+```
+
+
+```{r remaining, echo = FALSE}
+#Graphs I made earlier that I'm not presently using.
+# ggplot(
+#     data = subset(contract.sample),
+#     aes_string(x = "IsSomeCompetition",fill="UnmodifiedIsSomeCompetition"),
+#     main = "Distribution by is full and open"
+#     ) +
+#     geom_bar(binwidth=1)
+# # +     facet_grid( IsFullAndOpen ~ .,
+# #               scales = "free_y",
+# #               space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+# 
+# 
+# ggplot(
+#     data = subset(contract.sample),
+#     aes_string(x = "UnmodifiedIsSomeCompetition"),
+#     main = "Distribution by is some competition"
+#     ) +
+#     geom_bar(binwidth=1)+     
+#         facet_grid( . ~  IsSomeCompetition,
+#               scales = "free_y",
+#               space = "free_y") + scale_y_continuous(expand = c(0,500)) +
+#          theme(strip.text.y  = element_text(angle = 360)
+#           )
+# 
+# ggplot(
+#     data = subset(contract.sample,NumberOfOffersReceived<100),
+#     aes_string(x = "NumberOfOffersReceived"),
+#     main = "Distribution by Number Of Offers Received (1 to 100)"
+#     ) +
+#     geom_bar(binwidth = 1)+     facet_grid( IsSomeCompetition ~ .,
+#                                             scales = "free_y",
+#                                             space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+# 
+# 
+# nrow(contract.sample[is.na(contract.sample$UnmodifiedNumberOfOffersReceived),])
+
+```
