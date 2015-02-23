@@ -116,32 +116,33 @@ sample.SumofObligatedAmount<-read_and_join(Path
 )
 
 
-#lookups\\contract_CSIScontractID.csv
+#data\\defense_contract_SP_ContractUnmodifiedCompetitionvehicleCustomer.csv
 sample.SumofObligatedAmount<-read_and_join(Path
                                            ,"defense_contract_SP_ContractUnmodifiedCompetitionvehicleCustomer.csv"
                                            ,sample.SumofObligatedAmount
                                            ,"data\\"
 )
-
-#Use this to add just a single file
-sample.SumofObligatedAmount <-read.csv(
-  paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
-  header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-  na.strings=c("NULL","NA"),
-  stringsAsFactors=FALSE
-)
-
-
 # 
-# sample.SumofObligatedAmount <-subset(sample.SumofObligatedAmount ,select=-c(NumberOfOffersReceived
-#                                                                             ,IsFullAndOpen
-#                                                                             ,IsSomeCompetition
-# #                                                                             ,ObligatedAmountIsSomeCompetition
-#                                                                             ,IsOnlyOneSource
-#                                                                             ,IsFollowonToCompetedAction
-#                                                                             ,multipleorsingleawardidc
-#                                                                             ,addmultipleorsingawardidc
-#                                                                             ,AwardOrIDVcontractactiontype
+# #Use this to add just a single file
+# sample.SumofObligatedAmount <-read.csv(
+#   paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
+#   header=TRUE, sep=",", dec=".", strip.white=TRUE, 
+#   na.strings=c("NULL","NA"),
+#   stringsAsFactors=FALSE
+# )
+# 
+# 
+# 
+# sample.SumofObligatedAmount <-subset(sample.SumofObligatedAmount,select=-c(
+#     NumberOfOffersReceived,
+# IsFullAndOpen,
+# IsSomeCompetition,
+# ObligatedAmountIsSomeCompetition,
+# IsOnlyOneSource,
+# IsFollowonToCompetedAction
+# # MultipleOrSingleAwardIDC,
+# # AddMultipleOrSingleAwardIDC,
+# # AwardOrIDVcontractActionType
 # )
 # )
 

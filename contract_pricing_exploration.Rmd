@@ -1,0 +1,71 @@
+---
+title: "DoD Fixed-Price Study: Contract Pricing classification"
+author: "Greg Sanders"
+date: "Tuesday, January 13, 2015"
+output:
+  html_document:
+    keep_md: yes
+---
+
+```{r hiddensetup, echo = FALSE}
+require(ggplot2)
+require(stringr)
+require(plyr)
+options(error=recover)
+setwd("K:\\Development\\Fixed-price")
+# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
+# Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
+source(paste(Path,"lookups.r",sep=""))
+
+```
+
+Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start.
+
+
+##Studying Pricing Mechanism of contracts in the sample.
+One of CSIS's studies is directly focused on pricing mechansisms, specifically fixed-price versus alternatives.
+
+```{r setup, echo = TRUE}
+contract.sample  <- read.csv(
+    paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv", sep = ""),
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+
+#These will probably be moved into apply_lookups at some point
+# contract.sample$pIsSomeCompetition <- contract.sample$ObligatedAmountIsSomeCompetition/contract.sample$ObligatedAmount
+# contract.sample$pIsSomeCompetition[is.na(contract.sample$ObligatedAmountIsSomeCompetition)] <- 0
+contract.sample$MinOfEffectiveDate <- strptime(contract.sample$MinOfEffectiveDate, "%Y-%m-%d")
+contract.sample<-apply_lookups(Path,contract.sample)
+```
+FPDS classifies competition using one variables: "Type of Contract Pricing" listed here as Pricing.Mechanism.Code.
+
+###Pricing.Mechanism.Code
+Is Fixed Price is a binary variable, true if all varieties of fixed-price contracts,  competitive procedures were used, false if they were not. Unlabeled cases are classified as NAs.
+
+* UnmodifiedIsSomeCompetition is the classification given by the first record for the contract (`r sprintf("%1.2f%%",nrow(subset(contract.sample,UnmodifiedIsSomeCompetition=="Unlabeled")) /nrow(contract.sample)*100)` missing data).
+* IsSomeCompetition is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,IsSomeCompetition=="Mixed or \nUnlabeled")) /nrow(contract.sample)*100)` missing data).
+  1. A contract which is sometimes classified as competed and never classified as uncompeted is categorized as competed. 
+  2. A contract which is sometimes classified as uncompeted and never classified as competed is categorized as uncompeted.
+  3. A contract which was always unlabeled is categorized as Mixed or Unlabeled.
+  4. A contract which was classified as both competed and uncompeted in different modifications is categorized as Combination or Unlabeled.
+* pIsSomeCompetition is dollar value of all transactions that were labeled as competed divided the contracts total obligations. 
+
+```{r overallvars, echo = TRUE}
+summary(subset(contract.sample,select=c(Pricing.Mechanism.Code,
+                                IsFixedPrice,
+                                IsCostBased,
+                                IsIncentive
+                                ))
+        )
+
+
+ggplot(
+    data = subset(contract.sample,IsSomeCompetition=="Mixed or \nUnlabeled"),
+    aes_string(x = "pIsSomeCompetition"),
+    main = "Distribution by percent of dollars with some competition for mixed and unlabeled contracts."
+    ) +
+    geom_bar(binwidth=0.05)
+```

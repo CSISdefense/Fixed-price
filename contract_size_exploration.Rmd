@@ -1,0 +1,58 @@
+---
+title: 'DoD Fixed-Price Study: Contract Duration Classification'
+author: "Greg Sanders"
+date: "Tuesday, January 13, 2015"
+output:
+  html_document:
+    keep_md: yes
+    toc: yes
+---
+
+```{r hiddensetup, echo = FALSE}
+require(ggplot2)
+require(stringr)
+require(plyr)
+options(error=recover)
+setwd("K:\\Development\\Fixed-price")
+# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
+# Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
+source(paste(Path,"lookups.r",sep=""))
+
+```
+
+Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
+
+##Studying contract vehicle within the sample.
+Describe contract vehicle here.
+
+```{r setup, echo = TRUE}
+contract.sample  <- read.csv(
+    paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv", sep = ""),
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+
+#These will probably be moved into apply_lookups at some point
+contract.sample<-apply_lookups(Path,contract.sample)
+```
+Describe source variables in FPDS here.
+
+###IsIDV
+Is IDV is a binary variable, true if the contract is an indefinite delivery vehicle (IDV), false if it a definitive contract or a purchase order. Unlabeled cases are classified as NAs.
+
+* IsIDV is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(IsIDV))) /nrow(contract.sample)*100)` missing data).
+  
+```{r overallvars, echo = TRUE}
+summary(subset(contract.sample,select=c(ObligatedAmount,
+                                SumOfUnmodifiedobligatedAmount,
+                                SumOfUnmodifiedbaseandalloptionsvalue,
+                                SumOfUnmodifiedbaseandexercisedoptionsvalue,
+                                SumofObligatedAmount,
+                                SumOfbaseandexercisedoptionsvalue,
+                                Sumofbaseandalloptionsvalue,                                
+                                ))
+        )
+names(contract.sample)
+```
