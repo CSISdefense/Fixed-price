@@ -23,8 +23,22 @@ source(paste(Path,"lookups.r",sep=""))
 
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
 
-##Studying contract vehicle within the sample.
-Describe contract vehicle here.
+##Studying contract duration within the sample.
+Initial contract duration is a new characteristic for CSIS.  The duration is calculated by comparing the earliest *effective date* to *current completion date.*  The current date was used rather than the *ultimate complete date* because the later is often unlabeled.  
+
+#Methodological Notes on Contract Period of Performance
+
+*Signed date* of the unmodified contract is used as a criteria for inclusion because the fiscal year used for reporting, and thus presumably certification, is based on *signed date* and not *effective date*.  CSIS may refine this methodology based on consultation with experts and further study of that data.  For greater transparency, considered alternatives have been listed with each period of performance value below: 
+
+**The contract start date** is the earliest *effective date* reported under the contract.
+* Alternatives include using *signed date* or using the unmodified contract values rather than the earliest values throughout the contract.
+
+**The contract end date** is the *current completion date* of the most recently signed contract modification.
+* *Ultimate completion date* is one alternative and is based on the theoretical maximum period of performance if all options were exercised.
+* *Last date to order* is only available for indefinite delivery vehicles and refers to the start and not the end date of a delivery order, but it is another possible alternative.
+* Finally, the modification with the most recent *signed date* could be replaced by the modification with the most recent *effect date* or instead the dates furthest in the future could be chosen.  
+
+**Completed contracts** have a contract end date in FY2013 or have been marked as closed and/or terminated. 
 
 ```{r setup, echo = TRUE}
 contract.sample  <- read.csv(
@@ -37,20 +51,5 @@ contract.sample  <- read.csv(
 #These will probably be moved into apply_lookups at some point
 contract.sample<-apply_lookups(Path,contract.sample)
 ```
-Describe source variables in FPDS here.
 
-###IsIDV
-Is IDV is a binary variable, true if the contract is an indefinite delivery vehicle (IDV), false if it a definitive contract or a purchase order. Unlabeled cases are classified as NAs.
 
-* IsIDV is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(IsIDV))) /nrow(contract.sample)*100)` missing data).
-  
-```{r overallvars, echo = TRUE}
-summary(subset(contract.sample,select=c(contractactiontype,
-                                multipleorsingleawardidc,
-                                IsIDV,
-                                addmultipleorsingawardidc,
-                                AwardOrIDVcontractactiontype
-                                ))
-        )
-
-```
