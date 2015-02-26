@@ -24,7 +24,8 @@ Contracts are classified using a mix of numerical and categorical variables. Whi
 
 
 ##Studying Pricing Mechanism of contracts in the sample.
-One of CSIS's studies is directly focused on pricing mechansisms, specifically fixed-price versus alternatives.
+
+One of CSIS's studies is directly focused on pricing mechansisms, specifically fixed-price versus alternatives.  The alternatives being cost based or mixed.  The contract pricing variable is defined by whether or not the contract is fixed price, cost based or mixed.  We measure the variable by determining whether or not a contract is 95% or higher fixed price or cost based.  Otherwise the contract is defined as mixed.  
 
 ```{r setup, echo = TRUE}
 contract.sample  <- read.csv(
