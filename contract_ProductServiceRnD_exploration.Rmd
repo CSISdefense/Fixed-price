@@ -38,16 +38,3 @@ contract.sample  <- read.csv(
 #These will probably be moved into apply_lookups at some point
 contract.sample<-apply_lookups(Path,contract.sample)
 ```
-Describe source variables in FPDS here. #??
-
-###IsIDV ??
-Is IDV is a binary variable, true if the contract is an indefinite delivery vehicle (IDV), false if it a definitive contract or a purchase order. Unlabeled cases are classified as NAs.
-
-* simplearea is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(simplearea))) /nrow(contract.sample)*100)` missing data).
-  
-```{r overallvars, echo = TRUE}
-summary(subset(contract.sample,select=c(simplearea
-                                ))
-        )
-
-```
