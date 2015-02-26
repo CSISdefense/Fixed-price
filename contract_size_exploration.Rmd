@@ -1,5 +1,5 @@
 ---
-title: 'DoD Fixed-Price Study: Contract Duration Classification'
+title: 'DoD Fixed-Price Study: Contract Size'
 author: "Greg Sanders"
 date: "Tuesday, January 13, 2015"
 output:
@@ -21,10 +21,15 @@ source(paste(Path,"lookups.r",sep=""))
 
 ```
 
-Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
+Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occurred after contract start.
 
-##Studying contract vehicle within the sample.
-Describe contract vehicle here.
+**Contract Size**
+For the purpose of this report, a contract refers to either an award with a unique procurement identifier or an IDV with a unique pairing of a delivery order procurement identifier and a referenced IDV procurement identifier.  Contracts were classified on the basis of total expenditures for the fiscal year in question.  Groupings are in nominal dollars because many regulatory thresholds are not adjusted for inflation; as a result, smaller contracts will be slightly overrepresented in recent years.  Unlike some prior reports, de-obligations are excluded rather than being grouped with contracts under $250,000.
+
+**Methodological notes:**
+Initial contract size is not calculated in the same methods as Size of Contracts for other CSIS reports.  Instead, size of contract is determined using the base and all options value amount of the original unmodified transaction for the contract.
+
+
 
 ```{r setup, echo = TRUE}
 contract.sample  <- read.csv(
@@ -37,10 +42,6 @@ contract.sample  <- read.csv(
 #These will probably be moved into apply_lookups at some point
 contract.sample<-apply_lookups(Path,contract.sample)
 ```
-Describe source variables in FPDS here.
-
-###IsIDV
-Is IDV is a binary variable, true if the contract is an indefinite delivery vehicle (IDV), false if it a definitive contract or a purchase order. Unlabeled cases are classified as NAs.
 
 * IsIDV is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(IsIDV))) /nrow(contract.sample)*100)` missing data).
   
