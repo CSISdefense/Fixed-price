@@ -26,7 +26,7 @@ Contracts are classified using a mix of numerical and categorical variables. Whi
 ##Studying contract duration within the sample.
 Initial contract duration is a new characteristic for CSIS.  The duration is calculated by comparing the earliest *effective date* to *current completion date.*  The current date was used rather than the *ultimate complete date* because the later is often unlabeled.  
 
-#Methodological Notes on Contract Period of Performance
+##Methodological Notes on Contract Period of Performance
 
 *Signed date* of the unmodified contract is used as a criteria for inclusion because the fiscal year used for reporting, and thus presumably certification, is based on *signed date* and not *effective date*.  CSIS may refine this methodology based on consultation with experts and further study of that data.  For greater transparency, considered alternatives have been listed with each period of performance value below: 
 
