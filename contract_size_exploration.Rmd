@@ -43,17 +43,42 @@ contract.sample  <- read.csv(
 contract.sample<-apply_lookups(Path,contract.sample)
 ```
 
-* IsIDV is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(IsIDV))) /nrow(contract.sample)*100)` missing data).
-  
+* ObligatedAmount is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(ObligatedAmount)|ObligatedAmount==0)) /nrow(contract.sample)*100)` missing data).
+* UnmodifiedContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(UnmodifiedContractBaseAndAllOptionsValue)|UnmodifiedContractBaseAndAllOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
+* UnmodifiedContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(UnmodifiedContractBaseAndExercisedOptionsValue)|UnmodifiedContractBaseAndExercisedOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
+* ContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(ContractBaseAndAllOptionsValue)|ContractBaseAndAllOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
+* ContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(ContractBaseAndExercisedOptionsValue)|ContractBaseAndExercisedOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
+
 ```{r overallvars, echo = TRUE}
 summary(subset(contract.sample,select=c(ObligatedAmount,
-                                SumOfUnmodifiedobligatedAmount,
-                                SumOfUnmodifiedbaseandalloptionsvalue,
-                                SumOfUnmodifiedbaseandexercisedoptionsvalue,
-                                SumofObligatedAmount,
-                                SumOfbaseandexercisedoptionsvalue,
-                                Sumofbaseandalloptionsvalue,                                
+                                UnmodifiedContractObligatedAmount,
+                                UnmodifiedContractBaseAndAllOptionsValue,
+                                UnmodifiedContractBaseAndExercisedOptionsValue,
+                                ContractBaseAndAllOptionsValue,
+                                ContractBaseAndExercisedOptionsValue                        
                                 ))
         )
-names(contract.sample)
+
+#Reading in 2007 and later sample.
+list.files(path="data")
+contract.sample  <- read.csv(
+    "data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount_gte_2007.csv",
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+
+#These will probably be moved into apply_lookups at some point
+contract.sample<-apply_lookups(Path,contract.sample)
+
 ```
+
+After switching to the 2007+ sample, the missing data problem is largely eliminated.
+* ObligatedAmount is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(ObligatedAmount)|ObligatedAmount==0)) /nrow(contract.sample)*100)` missing data).
+* UnmodifiedContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(UnmodifiedContractBaseAndAllOptionsValue)|UnmodifiedContractBaseAndAllOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
+* UnmodifiedContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(UnmodifiedContractBaseAndExercisedOptionsValue)|UnmodifiedContractBaseAndExercisedOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
+* ContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(ContractBaseAndAllOptionsValue)|ContractBaseAndAllOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
+* ContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(ContractBaseAndExercisedOptionsValue)|ContractBaseAndExercisedOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
+
+
+
