@@ -28,7 +28,7 @@ Tuesday, January 13, 2015
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occurred after contract start.
 
 ##Contract Ceiling
-For the purpose of this report, a contract refers to either an award with a unique procurement identifier or an IDV with a unique pairing of a delivery order procurement identifier and a referenced IDV procurement identifier. Groupings are in nominal dollars because many regulatory thresholds are not adjusted for inflation; as a result, smaller contracts will be slightly overrepresented in recent years. Initial contract size is not calculated in the same methods as Size of Contracts for other CSIS reports.  Instead, size of contract is determined using the base and all options value amount of the original unmodified transaction for the contract.
+For the purpose of this report, a contract refers to either an award with a unique procurement identifier or an IDV with a unique pairing of a delivery order procurement identifier and a referenced IDV procurement identifier. Groupings are in nominal dollars because many regulatory thresholds are not adjusted for inflation; as a result, smaller contracts will be slightly overrepresented in recent years. Initial contract size is not calculated using the same methods as Size of Contracts for other CSIS reports.  Instead, size of contract is determined using the **Base and All Options value** amount of the original unmodified transaction for the contract.
 
 
 
@@ -70,9 +70,9 @@ ContractWeighted<-apply_lookups(Path,ContractWeighted)
 ```
 
 ##Due to missing contract ceiling data, we have limited the dataset to  fiscal year 2007 and beyond.
-When using the Base and All Options value, or the Base and Exercised options value, it quickly becomes apparent that the values are not reliably filled in. Below, the logarithm of each variable is used because there is huge variability in the ceilings for contracts, using the logarithm puts the emphasis on the difference between a $1,000,000 vs. $10,000,000 contract ceiling rather than between $1,000,000 and $2,000,000. 
+When using the Base and All Options value, or the Base and Exercised options value, it quickly becomes apparent that the values are not reliably given. Below, the logarithm of each variable is used because there is huge variability in the ceilings for contracts.  Using the logarithm puts the emphasis on the difference between a $1,000,000 vs. $10,000,000 contract ceiling rather than between $1,000,000 and $2,000,000 by measuring the change as a percent.  This way all the different levels of contract ceilings are measured on one scale.     
 
-Another noteworthy phenomoenon in these graphs is the steady decline in number of contracts form year to year. That is because the sample is limited to completed contracts. Contracts with longer duration are thus excluded from later years because they are ongoing.
+Another noteworthy phenomoenon in these graphs is the steady decline in number of contracts form year to year. This is because the sample is limited to completed contracts. Contracts with longer duration are thus excluded from later years because they are ongoing and have not been completed yet.
 
 
 
@@ -103,9 +103,9 @@ ggplot(
 ContractWeighted<-subset(ContractWeighted, StartFiscal_Year>=2007)
 ```
 
-After removing the missing or zero rates for the Unmodified and Total Contract values becomes quite manageable.
+After removing the missing or zero rates for the Unmodified and Total Contract values the variable becomes quite manageable.
 
-* ObligatedAmount is a classification for the entirity of the contract  (0.00% missing data) This complete absence of missing data and contracts with deobligations as their total value is one result of using a sample weighted by ObligatedAmount.
+* ObligatedAmount is a classification for the entirity of the contract  (0.00% missing data).  One result of using a sample weighted by ObligatedAmount is the complete absense of missing data and contracts with deobligations as their total value. 
 * UnmodifiedContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (0.24% missing data).
 * UnmodifiedContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (0.26% missing data).
 * ContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (0.00% missing data).
@@ -155,7 +155,7 @@ summary(subset(ContractWeighted,select=c(ObligatedAmount,
 ```
 ##Comparing a weighted and unweighted sample
 
-All of the analysis thus far has been done with a set of 15,000 contracts which were selected using a random sampling weighted by their total value. Thus a contract obligating $1,000,000 would be 10 times more likely to be included than a contract obligation $100,000. Because the Bayesian Network analysis will include the entire population of completed contracts started in 2007 and after, initial network studies are conducted using a 100,000 contract sample that was selected without weighting. 
+All of the analysis thus far has been done with a set of 15,000 contracts which were selected using a random sample weighted by their total value. Thus a contract obligating $1,000,000 would be 10 times more likely to be included than a contract obligation $100,000. Because the Bayesian Network analysis will include the entire population of completed contracts started in 2007 and after, initial network studies are conducted using a 100,000 unweighted contract sample. 
 
 
 ```r
@@ -229,7 +229,7 @@ summary(subset(ContractUnweighted,select=c(
 ##                                 NA's   :31
 ```
 
-Looking at our key ceiling variable, the differences are striking. Taking the mean of UnmodifiedContractObligatedAmount the weighted sample reports 2.5377019\times 10^{7}  while the unweighted reports 1.4005035\times 10^{5}. This is also reflected in the histograms below. Note that the unweighted histogram is highly skewed on the left side. The large drop off is likely explained by the minimum reporting threshold for FPDS, which runs between $2,500 and $3,000 during the post-2007 period.
+Looking at our key ceiling variable, the differences are striking. Taking the mean of UnmodifiedContractObligatedAmount the weighted sample reports 2.5377019 &times; 10^7^   while the unweighted reports 1.4005035 &times; 10^5^. This is also reflected in the histograms below. Note that the unweighted histogram is highly skewed on the left side. The large drop off is likely explained by the minimum reporting threshold for FPDS, which runs between $2,500 and $3,000 during the post-2007 period.
 
 
 ```r
@@ -312,7 +312,7 @@ formatC(UnweightedQuantile25kPlus, format="d", big.mark=',')
 ##    "41,000"    "75,211"   "195,381"   "696,860" "1,801,029"
 ```
 
-However, a quick analysis finds that  though that cut off removes the bulk of the contracts, the top quartile still comes in below the mean of the weighted sample 2.5377019\times 10^{7}. Even the 90th and 95th quantile of the unweighted sample with cut off still doesn't reach that mean.
+However, a quick analysis finds that though a cut off removes the bulk of the contracts, the top quartile still comes in below the mean of the weighted sample 2.5377019 &times; 10^7^. Even the 90th and 95th quantile of the unweighted sample with cut off still doesn't reach that mean.
 
 ##Applying Weighted Quartiles to the Unweighted sample
 Thus, applying a weighted quartile to the unweighted sample and ultimately the full data set appears to be a better way to study acquisition issues of interest. The weighted sample does show that there is still enough contracts (1898 out of 133) to meet the minimum threshholds for analysis. 
