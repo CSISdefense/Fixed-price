@@ -1,5 +1,5 @@
 ---
-title: 'DoD Fixed-Price Study: Contract Size'
+title: 'DoD Fixed-Price Study: Contract Ceiling'
 author: "Greg Sanders"
 date: "Tuesday, January 13, 2015"
 output:
@@ -12,6 +12,7 @@ output:
 require(ggplot2)
 require(stringr)
 require(plyr)
+require(Hmisc)
 options(error=recover)
 setwd("K:\\Development\\Fixed-price")
 # setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
@@ -23,16 +24,14 @@ source(paste(Path,"lookups.r",sep=""))
 
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occurred after contract start.
 
-**Contract Size**
-For the purpose of this report, a contract refers to either an award with a unique procurement identifier or an IDV with a unique pairing of a delivery order procurement identifier and a referenced IDV procurement identifier.  Contracts were classified on the basis of total expenditures for the fiscal year in question.  Groupings are in nominal dollars because many regulatory thresholds are not adjusted for inflation; as a result, smaller contracts will be slightly overrepresented in recent years.  Unlike some prior reports, de-obligations are excluded rather than being grouped with contracts under $250,000.
-
-**Methodological notes:**
-Initial contract size is not calculated in the same methods as Size of Contracts for other CSIS reports.  Instead, size of contract is determined using the base and all options value amount of the original unmodified transaction for the contract.
+##Contract Ceiling
+For the purpose of this report, a contract refers to either an award with a unique procurement identifier or an IDV with a unique pairing of a delivery order procurement identifier and a referenced IDV procurement identifier. Groupings are in nominal dollars because many regulatory thresholds are not adjusted for inflation; as a result, smaller contracts will be slightly overrepresented in recent years. Initial contract size is not calculated in the same methods as Size of Contracts for other CSIS reports.  Instead, size of contract is determined using the base and all options value amount of the original unmodified transaction for the contract.
 
 
 
-```{r setup, echo = TRUE}
-contract.sample  <- read.csv(
+
+```{r setup15000, echo = TRUE}
+ContractWeighted  <- read.csv(
     paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
@@ -40,17 +39,44 @@ contract.sample  <- read.csv(
     )
 
 #These will probably be moved into apply_lookups at some point
-contract.sample<-apply_lookups(Path,contract.sample)
+ContractWeighted<-apply_lookups(Path,ContractWeighted)
 ```
 
-* ObligatedAmount is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(ObligatedAmount)|ObligatedAmount==0)) /nrow(contract.sample)*100)` missing data).
-* UnmodifiedContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(UnmodifiedContractBaseAndAllOptionsValue)|UnmodifiedContractBaseAndAllOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
-* UnmodifiedContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(UnmodifiedContractBaseAndExercisedOptionsValue)|UnmodifiedContractBaseAndExercisedOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
-* ContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(ContractBaseAndAllOptionsValue)|ContractBaseAndAllOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
-* ContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(ContractBaseAndExercisedOptionsValue)|ContractBaseAndExercisedOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
+##Due to missing contract ceiling data, we have limited the dataset to  fiscal year 2007 and beyond.
+When using the Base and All Options value, or the Base and Exercised options value, it quickly becomes apparent that the values are not reliably filled in. Below, the logarithm of each variable is used because there is huge variability in the ceilings for contracts, using the logarithm puts the emphasis on the difference between a $1,000,000 vs. $10,000,000 contract ceiling rather than between $1,000,000 and $2,000,000. 
+
+Another noteworthy phenomoenon in these graphs is the steady decline in number of contracts form year to year. That is because the sample is limited to completed contracts. Contracts with longer duration are thus excluded from later years because they are ongoing.
+
+
+```{r 2007_demonstration, echo=TRUE}
+ggplot(
+    data = ContractWeighted,
+    aes_string(x = "UnmodifiedContractBaseAndAllOptionsValue+1"),
+    ) + scale_x_log10()+
+    geom_bar(binwidth=0.25)+ 
+    facet_wrap( "StartFiscal_Year") 
+
+ggplot(
+    data = ContractWeighted, 
+    aes_string(x = "UnmodifiedContractBaseAndExercisedOptionsValue+1"),
+    ) + scale_x_log10()+
+    geom_bar(binwidth=0.25)+ 
+    facet_wrap( "StartFiscal_Year") 
+
+#Remove earlier entries.
+ContractWeighted<-subset(ContractWeighted, StartFiscal_Year>=2007)
+```
+
+After removing the missing or zero rates for the Unmodified and Total Contract values becomes quite manageable.
+
+* ObligatedAmount is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(ContractWeighted,is.na(ObligatedAmount)|ObligatedAmount==0)) /nrow(ContractWeighted)*100)` missing data) This complete absence of missing data and contracts with deobligations as their total value is one result of using a sample weighted by ObligatedAmount.
+* UnmodifiedContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(ContractWeighted,is.na(UnmodifiedContractBaseAndAllOptionsValue)|UnmodifiedContractBaseAndAllOptionsValue==0)) /nrow(ContractWeighted)*100)` missing data).
+* UnmodifiedContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(ContractWeighted,is.na(UnmodifiedContractBaseAndExercisedOptionsValue)|UnmodifiedContractBaseAndExercisedOptionsValue==0)) /nrow(ContractWeighted)*100)` missing data).
+* ContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(ContractWeighted,is.na(ContractBaseAndAllOptionsValue)|ContractBaseAndAllOptionsValue==0)) /nrow(ContractWeighted)*100)` missing data).
+* ContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(ContractWeighted,is.na(ContractBaseAndExercisedOptionsValue)|ContractBaseAndExercisedOptionsValue==0)) /nrow(ContractWeighted)*100)` missing data).
 
 ```{r overallvars, echo = TRUE}
-summary(subset(contract.sample,select=c(ObligatedAmount,
+summary(subset(ContractWeighted,select=c(ObligatedAmount,
                                 UnmodifiedContractObligatedAmount,
                                 UnmodifiedContractBaseAndAllOptionsValue,
                                 UnmodifiedContractBaseAndExercisedOptionsValue,
@@ -59,26 +85,109 @@ summary(subset(contract.sample,select=c(ObligatedAmount,
                                 ))
         )
 
-#Reading in 2007 and later sample.
-list.files(path="data")
-contract.sample  <- read.csv(
-    "data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount_gte_2007.csv",
+
+
+
+```
+##Comparing a weighted and unweighted sample
+
+All of the analysis thus far has been done with a set of 15,000 contracts which were selected using a random sampling weighted by their total value. Thus a contract obligating $1,000,000 would be 10 times more likely to be included than a contract obligation $100,000. Because the Bayesian Network analysis will include the entire population of completed contracts started in 2007 and after, initial network studies are conducted using a 100,000 contract sample that was selected without weighting. 
+
+```{r setup100000, echo = TRUE}
+ContractUnweighted  <- read.csv(
+    paste("data\\defense_contract_CSIScontractID_sample_100000_SumofObligatedAmount.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
     stringsAsFactors = TRUE
     )
 
 #These will probably be moved into apply_lookups at some point
-contract.sample<-apply_lookups(Path,contract.sample)
+ContractUnweighted<-apply_lookups(Path,ContractUnweighted)
+
+summary(subset(ContractUnweighted,select=c(
+#     ObligatedAmount,
+                                UnmodifiedContractObligatedAmount,
+                                UnmodifiedContractBaseAndAllOptionsValue,
+                                UnmodifiedContractBaseAndExercisedOptionsValue,
+                                ContractBaseAndAllOptionsValue,
+                                ContractBaseAndExercisedOptionsValue                        
+                                ))
+        )
+```
+
+Looking at our key ceiling variable, the differences are striking. Taking the mean of UnmodifiedContractObligatedAmount the weighted sample reports `r mean(ContractWeighted$UnmodifiedContractObligatedAmount)`  while the unweighted reports `r mean(ContractUnweighted$UnmodifiedContractObligatedAmount)`. This is also reflected in the histograms below. Note that the unweighted histogram is highly skewed on the left side. The large drop off is likely explained by the minimum reporting threshold for FPDS, which runs between $2,500 and $3,000 during the post-2007 period.
+
+```{r compareplots, echo = TRUE}
+UnweightedQuantile<-quantile(ContractUnweighted$UnmodifiedContractBaseAndAllOptionsValue,c(0.25,0.5,0.75))
+formatC(UnweightedQuantile, format="d", big.mark=',')
+ContractUnweighted$UnweightedQuartile<-cut2(ContractUnweighted$UnmodifiedContractBaseAndAllOptionsValue,cuts=UnweightedQuantile)
+
+
+ggplot(
+    data = ContractUnweighted,
+    aes_string(x = "UnmodifiedContractBaseAndAllOptionsValue+1",
+               fill = "UnweightedQuartile")
+    ) +     geom_bar(binwidth=0.25)  + scale_x_log10()
+
+
+WeightedQuantile<-quantile(ContractWeighted$UnmodifiedContractBaseAndAllOptionsValue,c(0.25,0.5,0.75))
+formatC(WeightedQuantile, format="d", big.mark=',')
+ContractWeighted$WeightedQuartile<-cut2(ContractWeighted$UnmodifiedContractBaseAndAllOptionsValue,
+                                         cuts=WeightedQuantile)
+
+
+ggplot(
+    data = ContractWeighted, 
+    aes_string(x = "UnmodifiedContractBaseAndAllOptionsValue+1",
+               fill = "WeightedQuartile")
+    ) +     geom_bar(binwidth=0.25) + scale_x_log10()
+
+
 
 ```
 
-After switching to the 2007+ sample, the missing data problem is largely eliminated.
-* ObligatedAmount is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(ObligatedAmount)|ObligatedAmount==0)) /nrow(contract.sample)*100)` missing data).
-* UnmodifiedContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(UnmodifiedContractBaseAndAllOptionsValue)|UnmodifiedContractBaseAndAllOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
-* UnmodifiedContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(UnmodifiedContractBaseAndExercisedOptionsValue)|UnmodifiedContractBaseAndExercisedOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
-* ContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(ContractBaseAndAllOptionsValue)|ContractBaseAndAllOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
-* ContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(contract.sample,is.na(ContractBaseAndExercisedOptionsValue)|ContractBaseAndExercisedOptionsValue==0)) /nrow(contract.sample)*100)` missing data).
+
+The difference extends to the quantiles, the 25th quantile for the weighted sample starts well beyond the 75th quantile for the unweighted sample (specifically the first quantile for the weighted data is the `r ecdf(ContractUnweighted$UnmodifiedContractBaseAndAllOptionsValue)(WeightedQuantile)[1]*100` percentile for the unwieghted). From an acquisition management perspective, the weighted quartile is more interesting. This can be seen when applying the unwieghted quartiles to the weighted sample. The vast majority of the weighted contracts sample, and thus the vast majority of the contract spending, falls in the fourth unweighted quartile. The other three quartiles tell us a great deal about small contracts but relatively little about where the Department of Defense is spending its money.
 
 
+```{r weightedsampleunweightedfill, echo = TRUE}
+
+ContractWeighted$UnweightedQuartile<-cut2(ContractWeighted$UnmodifiedContractBaseAndAllOptionsValue,cuts=UnweightedQuantile)
+
+
+
+ggplot(
+    data = ContractWeighted, 
+    aes_string(x = "UnmodifiedContractBaseAndAllOptionsValue+1",
+               fill="UnweightedQuartile")
+    
+    ) +geom_bar(binwidth=0.1)+scale_x_log10()
+```
+
+One way to address this discrepency would be to include a minimum cutoff for inclusion. For example, prior to 2004 FPDS did not mandate reporting of contracts with less than $25,000 in obligation. That cut off removes only `r ecdf(ContractWeighted$UnmodifiedContractBaseAndAllOptionsValue)(25000)*100`% of value in the weighted sample despite accounting for `r ecdf(ContractUnweighted$UnmodifiedContractBaseAndAllOptionsValue)(25000)*100`%.
+
+```{r cutoffquantile, echo = TRUE}
+UnweightedQuantile25kPlus<-quantile(ContractUnweighted$UnmodifiedContractBaseAndAllOptionsValue[ContractUnweighted$UnmodifiedContractBaseAndAllOptionsValue>25000],c(0.25,0.5,0.75, 0.9,0.95))
+formatC(UnweightedQuantile25kPlus, format="d", big.mark=',')
+```
+
+However, a quick analysis finds that  though that cut off removes the bulk of the contracts, the top quartile still comes in below the mean of the weighted sample `r mean(ContractWeighted$UnmodifiedContractObligatedAmount)`. Even the 90th and 95th quantile of the unweighted sample with cut off still doesn't reach that mean.
+
+##Applying Weighted Quartiles to the Unweighted sample
+Thus, applying a weighted quartile to the unweighted sample and ultimately the full data set appears to be a better way to study acquisition issues of interest. The weighted sample does show that there is still enough contracts (`r length(ContractWeighted$WeightedQuartile[ContractWeighted$WeightedQuartile=="[2.32e+07,3.67e+10]"])` out of `r length(ContractWeighted)`) to meet the minimum threshholds for analysis. 
+
+The downside, as shown below, is that this greatly reduces the statistical power of the analysis by grouping the vast majority of contracts in the first weighted quartile. However, this reduction in power reflects the inherent limit of the data set. Millions of small contracts can only tell us so much about the thousands of large contracts.
+```{r unweightedsampleweightedfill, echo = TRUE}
+ContractUnweighted$WeightedQuartile<-cut2(ContractUnweighted$UnmodifiedContractBaseAndAllOptionsValue,cuts=WeightedQuantile)
+
+
+ggplot(
+    data = ContractUnweighted, 
+    aes_string(x = "UnmodifiedContractBaseAndAllOptionsValue+1",
+               fill="WeightedQuartile") 
+    
+    ) +geom_bar(binwidth=0.1)+ scale_x_log10()
+
+
+```
 

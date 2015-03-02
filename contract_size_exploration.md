@@ -1,4 +1,4 @@
-# DoD Fixed-Price Study: Contract Size
+# DoD Fixed-Price Study: Contract Ceiling
 Greg Sanders  
 Tuesday, January 13, 2015  
 
@@ -7,21 +7,35 @@ Tuesday, January 13, 2015
 ## Loading required package: ggplot2
 ## Loading required package: stringr
 ## Loading required package: plyr
+## Loading required package: Hmisc
+## Loading required package: grid
+## Loading required package: lattice
+## Loading required package: survival
+## Loading required package: splines
+## Loading required package: Formula
+## 
+## Attaching package: 'Hmisc'
+## 
+## The following objects are masked from 'package:plyr':
+## 
+##     is.discrete, summarize
+## 
+## The following objects are masked from 'package:base':
+## 
+##     format.pval, round.POSIXt, trunc.POSIXt, units
 ```
 
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occurred after contract start.
 
-**Contract Size**
-For the purpose of this report, a contract refers to either an award with a unique procurement identifier or an IDV with a unique pairing of a delivery order procurement identifier and a referenced IDV procurement identifier.  Contracts were classified on the basis of total expenditures for the fiscal year in question.  Groupings are in nominal dollars because many regulatory thresholds are not adjusted for inflation; as a result, smaller contracts will be slightly overrepresented in recent years.  Unlike some prior reports, de-obligations are excluded rather than being grouped with contracts under $250,000.
+##Contract Ceiling
+For the purpose of this report, a contract refers to either an award with a unique procurement identifier or an IDV with a unique pairing of a delivery order procurement identifier and a referenced IDV procurement identifier. Groupings are in nominal dollars because many regulatory thresholds are not adjusted for inflation; as a result, smaller contracts will be slightly overrepresented in recent years. Initial contract size is not calculated in the same methods as Size of Contracts for other CSIS reports.  Instead, size of contract is determined using the base and all options value amount of the original unmodified transaction for the contract.
 
-**Methodological notes:**
-Initial contract size is not calculated in the same methods as Size of Contracts for other CSIS reports.  Instead, size of contract is determined using the base and all options value amount of the original unmodified transaction for the contract.
 
 
 
 
 ```r
-contract.sample  <- read.csv(
+ContractWeighted  <- read.csv(
     paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
@@ -29,7 +43,7 @@ contract.sample  <- read.csv(
     )
 
 #These will probably be moved into apply_lookups at some point
-contract.sample<-apply_lookups(Path,contract.sample)
+ContractWeighted<-apply_lookups(Path,ContractWeighted)
 ```
 
 ```
@@ -40,30 +54,66 @@ contract.sample<-apply_lookups(Path,contract.sample)
 ```
 
 ```
-## Warning in apply_lookups(Path, contract.sample): NaNs produced
+## Warning in apply_lookups(Path, ContractWeighted): NaNs produced
 ```
 
 ```
-## Warning in apply_lookups(Path, contract.sample): NaNs produced
+## Warning in apply_lookups(Path, ContractWeighted): NaNs produced
 ```
 
 ```
-## Warning in apply_lookups(Path, contract.sample): NaNs produced
+## Warning in apply_lookups(Path, ContractWeighted): NaNs produced
 ```
 
 ```
-## Warning in apply_lookups(Path, contract.sample): NaNs produced
+## Warning in apply_lookups(Path, ContractWeighted): NaNs produced
 ```
 
-* ObligatedAmount is a classification for the entirity of the contract  (0.00% missing data).
-* UnmodifiedContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (45.59% missing data).
-* UnmodifiedContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (45.83% missing data).
-* ContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (44.51% missing data).
-* ContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (44.61% missing data).
+##Due to missing contract ceiling data, we have limited the dataset to  fiscal year 2007 and beyond.
+When using the Base and All Options value, or the Base and Exercised options value, it quickly becomes apparent that the values are not reliably filled in. Below, the logarithm of each variable is used because there is huge variability in the ceilings for contracts, using the logarithm puts the emphasis on the difference between a $1,000,000 vs. $10,000,000 contract ceiling rather than between $1,000,000 and $2,000,000. 
+
+Another noteworthy phenomoenon in these graphs is the steady decline in number of contracts form year to year. That is because the sample is limited to completed contracts. Contracts with longer duration are thus excluded from later years because they are ongoing.
+
 
 
 ```r
-summary(subset(contract.sample,select=c(ObligatedAmount,
+ggplot(
+    data = ContractWeighted,
+    aes_string(x = "UnmodifiedContractBaseAndAllOptionsValue+1"),
+    ) + scale_x_log10()+
+    geom_bar(binwidth=0.25)+ 
+    facet_wrap( "StartFiscal_Year") 
+```
+
+![](contract_size_exploration_files/figure-html/2007_demonstration-1.png) 
+
+```r
+ggplot(
+    data = ContractWeighted, 
+    aes_string(x = "UnmodifiedContractBaseAndExercisedOptionsValue+1"),
+    ) + scale_x_log10()+
+    geom_bar(binwidth=0.25)+ 
+    facet_wrap( "StartFiscal_Year") 
+```
+
+![](contract_size_exploration_files/figure-html/2007_demonstration-2.png) 
+
+```r
+#Remove earlier entries.
+ContractWeighted<-subset(ContractWeighted, StartFiscal_Year>=2007)
+```
+
+After removing the missing or zero rates for the Unmodified and Total Contract values becomes quite manageable.
+
+* ObligatedAmount is a classification for the entirity of the contract  (0.00% missing data) This complete absence of missing data and contracts with deobligations as their total value is one result of using a sample weighted by ObligatedAmount.
+* UnmodifiedContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (0.24% missing data).
+* UnmodifiedContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (0.26% missing data).
+* ContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (0.00% missing data).
+* ContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (0.00% missing data).
+
+
+```r
+summary(subset(ContractWeighted,select=c(ObligatedAmount,
                                 UnmodifiedContractObligatedAmount,
                                 UnmodifiedContractBaseAndAllOptionsValue,
                                 UnmodifiedContractBaseAndExercisedOptionsValue,
@@ -74,218 +124,212 @@ summary(subset(contract.sample,select=c(ObligatedAmount,
 ```
 
 ```
-##  ObligatedAmount      UnmodifiedContractObligatedAmount
-##  Min.   :-1.924e+08   Min.   : -20050105               
-##  1st Qu.: 1.049e+06   1st Qu.:    341632               
-##  Median : 6.994e+06   Median :   2350480               
-##  Mean   : 7.333e+07   Mean   :  21253161               
-##  3rd Qu.: 3.613e+07   3rd Qu.:  11800000               
-##  Max.   : 2.341e+10   Max.   :1895207544               
+##  ObligatedAmount     UnmodifiedContractObligatedAmount
+##  Min.   :2.250e+03   Min.   :0.000e+00                
+##  1st Qu.:9.731e+05   1st Qu.:5.000e+05                
+##  Median :6.245e+06   Median :3.043e+06                
+##  Mean   :5.085e+07   Mean   :2.538e+07                
+##  3rd Qu.:3.075e+07   3rd Qu.:1.461e+07                
+##  Max.   :9.134e+09   Max.   :1.895e+09                
 ##  UnmodifiedContractBaseAndAllOptionsValue
 ##  Min.   :0.000e+00                       
-##  1st Qu.:0.000e+00                       
-##  Median :8.760e+04                       
-##  Mean   :3.903e+07                       
-##  3rd Qu.:6.899e+06                       
+##  1st Qu.:7.753e+05                       
+##  Median :4.942e+06                       
+##  Mean   :6.285e+07                       
+##  3rd Qu.:2.315e+07                       
 ##  Max.   :3.673e+10                       
 ##  UnmodifiedContractBaseAndExercisedOptionsValue
 ##  Min.   :0.000e+00                             
-##  1st Qu.:0.000e+00                             
-##  Median :7.938e+04                             
-##  Mean   :3.026e+07                             
-##  3rd Qu.:5.235e+06                             
+##  1st Qu.:6.724e+05                             
+##  Median :4.013e+06                             
+##  Mean   :4.814e+07                             
+##  3rd Qu.:1.867e+07                             
 ##  Max.   :3.673e+10                             
 ##  ContractBaseAndAllOptionsValue ContractBaseAndExercisedOptionsValue
-##  Min.   :-3.055e+07             Min.   :-3.055e+07                  
-##  1st Qu.: 0.000e+00             1st Qu.: 0.000e+00                  
-##  Median : 1.367e+05             Median : 1.283e+05                  
-##  Mean   : 7.246e+07             Mean   : 6.453e+07                  
-##  3rd Qu.: 9.998e+06             3rd Qu.: 9.484e+06                  
-##  Max.   : 1.418e+11             Max.   : 1.418e+11
+##  Min.   :2.250e+03              Min.   :2.250e+03                   
+##  1st Qu.:1.013e+06              1st Qu.:9.895e+05                   
+##  Median :6.888e+06              Median :6.610e+06                   
+##  Mean   :1.136e+08              Mean   :1.003e+08                   
+##  3rd Qu.:3.456e+07              3rd Qu.:3.248e+07                   
+##  Max.   :1.418e+11              Max.   :1.418e+11
 ```
+##Comparing a weighted and unweighted sample
+
+All of the analysis thus far has been done with a set of 15,000 contracts which were selected using a random sampling weighted by their total value. Thus a contract obligating $1,000,000 would be 10 times more likely to be included than a contract obligation $100,000. Because the Bayesian Network analysis will include the entire population of completed contracts started in 2007 and after, initial network studies are conducted using a 100,000 contract sample that was selected without weighting. 
+
 
 ```r
-names(contract.sample)
-```
-
-```
-##   [1] "systemequipmentcode"                                
-##   [2] "MajorCommandID"                                     
-##   [3] "SubCustomer"                                        
-##   [4] "Customer"                                           
-##   [5] "Contracting.Agency.ID"                              
-##   [6] "CSIScontractID"                                     
-##   [7] "Unmodifiedmultipleorsingleawardidc"                 
-##   [8] "LastSignedLastDateToOrder"                          
-##   [9] "LastUltimateCompletionDate"                         
-##  [10] "LastCurrentCompletionDate"                          
-##  [11] "SumOfnumberOfActions"                               
-##  [12] "Action.Obligation"                                  
-##  [13] "ContractBaseAndExercisedOptionsValue"               
-##  [14] "ContractBaseAndAllOptionsValue"                     
-##  [15] "StartFiscal_Year"                                   
-##  [16] "maxoffiscal_year"                                   
-##  [17] "IsIDV"                                              
-##  [18] "idvpiid"                                            
-##  [19] "piid"                                               
-##  [20] "ContractLabelID"                                    
-##  [21] "hyphenatedIDVpiid"                                  
-##  [22] "CSISidvpiidID"                                      
-##  [23] "IsPerformanceBasedLogistics"                        
-##  [24] "ContractingOfficeID"                                
-##  [25] "FundingAgencyID"                                    
-##  [26] "FundingOfficeID"                                    
-##  [27] "Pricing.Mechanism.Code"                             
-##  [28] "statutoryexceptiontofairopportunity"                
-##  [29] "extentcompeted"                                     
-##  [30] "IsCostBased"                                        
-##  [31] "IsFixedPrice"                                       
-##  [32] "IsIncentive"                                        
-##  [33] "contractactiontype"                                 
-##  [34] "ObligatedAmount"                                    
-##  [35] "MinOfEffectiveDate"                                 
-##  [36] "MaxOfEffectiveDate"                                 
-##  [37] "ChangeOrderObligatedAmount"                         
-##  [38] "ChangeOrderBaseAndExercisedOptionsValue"            
-##  [39] "ChangeOrderBaseAndAllOptionsValue"                  
-##  [40] "NewWorkObligatedAmount"                             
-##  [41] "NewWorkBaseAndExercisedOptionsValue"                
-##  [42] "NewWorkBaseAndAllOptionsValue"                      
-##  [43] "UnmodifiedContractObligatedAmount"                  
-##  [44] "UnmodifiedContractBaseAndExercisedOptionsValue"     
-##  [45] "UnmodifiedContractBaseAndAllOptionsValue"           
-##  [46] "IsClosed"                                           
-##  [47] "IsModified"                                         
-##  [48] "IsTerminated"                                       
-##  [49] "SumOfisChangeOrder"                                 
-##  [50] "MaxOfisChangeOrder"                                 
-##  [51] "SumOfisNewWork"                                     
-##  [52] "MaxOfisNewWork"                                     
-##  [53] "UnmodifiedCurrentCompletionDate"                    
-##  [54] "UnmodifiedUltimateCompletionDate"                   
-##  [55] "UnmodifiedLastDateToOrder"                          
-##  [56] "SimpleArea"                                         
-##  [57] "isAnyRnD1to5"                                       
-##  [58] "obligatedAmountRnD1to5"                             
-##  [59] "firstSignedDateRnD1to5"                             
-##  [60] "UnmodifiedRnD1to5"                                  
-##  [61] "Indefinite.Delivery.Contract"                       
-##  [62] "multipleorsingleawardidc"                           
-##  [63] "addmultipleorsingawardidc"                          
-##  [64] "AwardOrIDVcontractactiontype"                       
-##  [65] "UnmodifiedNumberOfOffersReceived"                   
-##  [66] "UnmodifiedIsFullAndOpen"                            
-##  [67] "UnmodifiedIsSomeCompetition"                        
-##  [68] "UnmodifiedIsOnlyOneSource"                          
-##  [69] "UnmodifiedIsFollowonToCompetedAction"               
-##  [70] "Unmodifiedaddmultipleorsingawardidc"                
-##  [71] "UnmodifiedAwardOrIDVcontractactiontype"             
-##  [72] "NumberOfOffersReceived"                             
-##  [73] "IsFullAndOpen"                                      
-##  [74] "IsSomeCompetition"                                  
-##  [75] "ObligatedAmountIsSomeCompetition"                   
-##  [76] "IsOnlyOneSource"                                    
-##  [77] "IsFollowonToCompetedAction"                         
-##  [78] "MultipleOrSingleAwardIDC"                           
-##  [79] "AddMultipleOrSingleAwardIDC"                        
-##  [80] "AwardOrIDVcontractActionType"                       
-##  [81] "Contracting.Department.ID"                          
-##  [82] "Contracting.Agency.Name"                            
-##  [83] "CSIS.Name"                                          
-##  [84] "Summarized.Agency"                                  
-##  [85] "SubCustomer.sum"                                    
-##  [86] "SubCustomer.detail"                                 
-##  [87] "SubCustomer.component"                              
-##  [88] "Subcustomer.Obsolete"                               
-##  [89] "MajorCommandCode"                                   
-##  [90] "ContractingOfficeCode"                              
-##  [91] "AgencyID"                                           
-##  [92] "MajorCommandName"                                   
-##  [93] "MCC_StartFiscal_Year"                               
-##  [94] "MCC_EndFiscal_Year"                                 
-##  [95] "ContractingOfficeName"                              
-##  [96] "DepartmentID"                                       
-##  [97] "Unseperated"                                        
-##  [98] "systemequipmentcodeText"                            
-##  [99] "systemequipmentshorttext"                           
-## [100] "SystemEquipmentIn2000Sample"                        
-## [101] "SystemEquipmentIn2007Sample"                        
-## [102] "UnmodifiedNumberOfOffersSummary"                    
-## [103] "LogOfAction.Obligation"                             
-## [104] "pNewWorkVsContractObligatedAmount"                  
-## [105] "pChangeOrderVsContractObligatedAmount"              
-## [106] "LogOfContractBaseAndAllOptionsValue"                
-## [107] "pNewWorkVsContractBaseAndAllOptionsValue"           
-## [108] "pChangeOrderVsContractBaseAndAllOptionsValue"       
-## [109] "LogOfContractBaseAndExercisedOptionsValue"          
-## [110] "pNewWorkVsContractBaseAndExercised"                 
-## [111] "pChangeOrderVsContractBaseAndExercised"             
-## [112] "LogOfUnmodifiedContractObligatedAmount"             
-## [113] "pUnmodifiedContractObligated"                       
-## [114] "pNewWorkVsUnmodifiedObligatedAmount"                
-## [115] "pChangeOrderVsUnmodifiedObligatedAmount"            
-## [116] "LogOfUnmodifiedContractBaseAndAllOptionsValue"      
-## [117] "SizeOfUnmodifiedContractBaseAndAll"                 
-## [118] "pUnmodifiedContractBaseAndAll"                      
-## [119] "pNewWorkVsUnmodifiedBaseAndAll"                     
-## [120] "pChangeOrderVsUnmodifiedBaseAndAll"                 
-## [121] "LogOfUnmodifiedContractBaseAndExercisedOptionsValue"
-## [122] "pUnmodifiedContractBaseAndExercised"                
-## [123] "pNewWorkVsUnmodifiedBaseAndExercised"               
-## [124] "pChangeOrderVsUnmodifiedBaseAndExercised"           
-## [125] "Graph"                                              
-## [126] "CurrentMonths"                                      
-## [127] "CategoryOfCurrentMonths"                            
-## [128] "UnmodifiedMonths"                                   
-## [129] "CategoryOfUnmodifiedMonths"                         
-## [130] "UnmodifiedCompetition"                              
-## [131] "UnmodifiedVehicle"
-```
-
-```r
-#Reading in 2007 and later sample.
-list.files(path="data")
-```
-
-```
-##  [1] "defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv"                    
-##  [2] "defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount_gte_2007.csv"           
-##  [3] "defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount_gte_2007_isCompeted.csv"
-##  [4] "defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount_IsCompeted.csv"         
-##  [5] "defense_contract_CSIScontractID_sample_systemEquipmentCode.csv"                           
-##  [6] "defense_contract_CSIScontractID_sample_systemEquipmentCode_gte_2007.csv"                  
-##  [7] "defense_contract_CSIScontractID_sample_systemEquipmentCode_IsCompeted.csv"                
-##  [8] "defense_contract_CSIScontractID_sample15000_sample.Sumofbaseandalloptionsvalue.csv"       
-##  [9] "defense_contract_CSIScontractID_sample15000_SumOfbaseandexercisedoptionsvalue.csv"        
-## [10] "defense_contract_CSIScontractID_sample15000_SumofObligatedAmount.csv"                     
-## [11] "defense_contract_CSIScontractID_systemEquipmentCode.csv"                                  
-## [12] "defense_office_MajorCommandID_sample_15000_SumofObligatedAmount.csv"                      
-## [13] "defense_office_MajorCommandID_sample_15000_SumofObligatedAmount_gte_2007.csv"
-```
-
-```r
-contract.sample  <- read.csv(
-    "data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount_gte_2007.csv",
+ContractUnweighted  <- read.csv(
+    paste("data\\defense_contract_CSIScontractID_sample_100000_SumofObligatedAmount.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
     stringsAsFactors = TRUE
     )
 
 #These will probably be moved into apply_lookups at some point
-contract.sample<-apply_lookups(Path,contract.sample)
+ContractUnweighted<-apply_lookups(Path,ContractUnweighted)
 ```
 
 ```
-## Joining by: Contracting.Agency.ID
-## Joining by: SubCustomer, Customer
-## Joining by: MajorCommandID
-## Joining by: systemequipmentcode
+## Warning in apply_lookups(Path, ContractUnweighted): NaNs produced
 ```
 
+```
+## Warning in apply_lookups(Path, ContractUnweighted): NaNs produced
+```
 
-* ObligatedAmount is a classification for the entirity of the contract  (0.00% missing data).
-* UnmodifiedContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (0.24% missing data).
-* UnmodifiedContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (0.26% missing data).
-* ContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (0.00% missing data).
-* ContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (0.00% missing data).
+```
+## Warning in apply_lookups(Path, ContractUnweighted): NaNs produced
+```
+
+```r
+summary(subset(ContractUnweighted,select=c(
+#     ObligatedAmount,
+                                UnmodifiedContractObligatedAmount,
+                                UnmodifiedContractBaseAndAllOptionsValue,
+                                UnmodifiedContractBaseAndExercisedOptionsValue,
+                                ContractBaseAndAllOptionsValue,
+                                ContractBaseAndExercisedOptionsValue                        
+                                ))
+        )
+```
+
+```
+##  UnmodifiedContractObligatedAmount
+##  Min.   :        0                
+##  1st Qu.:     4770                
+##  Median :    10796                
+##  Mean   :   140050                
+##  3rd Qu.:    35449                
+##  Max.   :499558096                
+##                                   
+##  UnmodifiedContractBaseAndAllOptionsValue
+##  Min.   :0.000e+00                       
+##  1st Qu.:4.869e+03                       
+##  Median :1.112e+04                       
+##  Mean   :6.945e+06                       
+##  3rd Qu.:3.745e+04                       
+##  Max.   :7.255e+10                       
+##                                          
+##  UnmodifiedContractBaseAndExercisedOptionsValue
+##  Min.   :0.000e+00                             
+##  1st Qu.:4.838e+03                             
+##  Median :1.095e+04                             
+##  Mean   :3.447e+05                             
+##  3rd Qu.:3.626e+04                             
+##  Max.   :8.819e+09                             
+##                                                
+##  ContractBaseAndAllOptionsValue ContractBaseAndExercisedOptionsValue
+##  Min.   :-9.936e+05             Min.   :-9.936e+05                  
+##  1st Qu.: 4.762e+03             1st Qu.: 4.745e+03                  
+##  Median : 1.095e+04             Median : 1.085e+04                  
+##  Mean   : 7.138e+06             Mean   : 5.194e+05                  
+##  3rd Qu.: 3.730e+04             3rd Qu.: 3.659e+04                  
+##  Max.   : 7.255e+10             Max.   : 1.764e+10                  
+##                                 NA's   :31
+```
+
+Looking at our key ceiling variable, the differences are striking. Taking the mean of UnmodifiedContractObligatedAmount the weighted sample reports 2.5377019\times 10^{7}  while the unweighted reports 1.4005035\times 10^{5}. This is also reflected in the histograms below. Note that the unweighted histogram is highly skewed on the left side. The large drop off is likely explained by the minimum reporting threshold for FPDS, which runs between $2,500 and $3,000 during the post-2007 period.
+
+
+```r
+UnweightedQuantile<-quantile(ContractUnweighted$UnmodifiedContractBaseAndAllOptionsValue,c(0.25,0.5,0.75))
+formatC(UnweightedQuantile, format="d", big.mark=',')
+```
+
+```
+##      25%      50%      75% 
+##  "4,869" "11,125" "37,452"
+```
+
+```r
+ContractUnweighted$UnweightedQuartile<-cut2(ContractUnweighted$UnmodifiedContractBaseAndAllOptionsValue,cuts=UnweightedQuantile)
+
+
+ggplot(
+    data = ContractUnweighted,
+    aes_string(x = "UnmodifiedContractBaseAndAllOptionsValue+1",
+               fill = "UnweightedQuartile")
+    ) +     geom_bar(binwidth=0.25)  + scale_x_log10()
+```
+
+![](contract_size_exploration_files/figure-html/compareplots-1.png) 
+
+```r
+WeightedQuantile<-quantile(ContractWeighted$UnmodifiedContractBaseAndAllOptionsValue,c(0.25,0.5,0.75))
+formatC(WeightedQuantile, format="d", big.mark=',')
+```
+
+```
+##          25%          50%          75% 
+##    "775,286"  "4,942,210" "23,154,046"
+```
+
+```r
+ContractWeighted$WeightedQuartile<-cut2(ContractWeighted$UnmodifiedContractBaseAndAllOptionsValue,
+                                         cuts=WeightedQuantile)
+
+
+ggplot(
+    data = ContractWeighted, 
+    aes_string(x = "UnmodifiedContractBaseAndAllOptionsValue+1",
+               fill = "WeightedQuartile")
+    ) +     geom_bar(binwidth=0.25) + scale_x_log10()
+```
+
+![](contract_size_exploration_files/figure-html/compareplots-2.png) 
+
+
+The difference extends to the quantiles, the 25th quantile for the weighted sample starts well beyond the 75th quantile for the unweighted sample (specifically the first quantile for the weighted data is the 97.128 percentile for the unwieghted). From an acquisition management perspective, the weighted quartile is more interesting. This can be seen when applying the unwieghted quartiles to the weighted sample. The vast majority of the weighted contracts sample, and thus the vast majority of the contract spending, falls in the fourth unweighted quartile. The other three quartiles tell us a great deal about small contracts but relatively little about where the Department of Defense is spending its money.
+
+
+
+```r
+ContractWeighted$UnweightedQuartile<-cut2(ContractWeighted$UnmodifiedContractBaseAndAllOptionsValue,cuts=UnweightedQuantile)
+
+
+
+ggplot(
+    data = ContractWeighted, 
+    aes_string(x = "UnmodifiedContractBaseAndAllOptionsValue+1",
+               fill="UnweightedQuartile")
+    
+    ) +geom_bar(binwidth=0.1)+scale_x_log10()
+```
+
+![](contract_size_exploration_files/figure-html/weightedsampleunweightedfill-1.png) 
+
+One way to address this discrepency would be to include a minimum cutoff for inclusion. For example, prior to 2004 FPDS did not mandate reporting of contracts with less than $25,000 in obligation. That cut off removes only 3.4123847% of value in the weighted sample despite accounting for 68.447%.
+
+
+```r
+UnweightedQuantile25kPlus<-quantile(ContractUnweighted$UnmodifiedContractBaseAndAllOptionsValue[ContractUnweighted$UnmodifiedContractBaseAndAllOptionsValue>25000],c(0.25,0.5,0.75, 0.9,0.95))
+formatC(UnweightedQuantile25kPlus, format="d", big.mark=',')
+```
+
+```
+##         25%         50%         75%         90%         95% 
+##    "41,000"    "75,211"   "195,381"   "696,860" "1,801,029"
+```
+
+However, a quick analysis finds that  though that cut off removes the bulk of the contracts, the top quartile still comes in below the mean of the weighted sample 2.5377019\times 10^{7}. Even the 90th and 95th quantile of the unweighted sample with cut off still doesn't reach that mean.
+
+##Applying Weighted Quartiles to the Unweighted sample
+Thus, applying a weighted quartile to the unweighted sample and ultimately the full data set appears to be a better way to study acquisition issues of interest. The weighted sample does show that there is still enough contracts (1898 out of 133) to meet the minimum threshholds for analysis. 
+
+The downside, as shown below, is that this greatly reduces the statistical power of the analysis by grouping the vast majority of contracts in the first weighted quartile. However, this reduction in power reflects the inherent limit of the data set. Millions of small contracts can only tell us so much about the thousands of large contracts.
+
+```r
+ContractUnweighted$WeightedQuartile<-cut2(ContractUnweighted$UnmodifiedContractBaseAndAllOptionsValue,cuts=WeightedQuantile)
+
+
+ggplot(
+    data = ContractUnweighted, 
+    aes_string(x = "UnmodifiedContractBaseAndAllOptionsValue+1",
+               fill="WeightedQuartile") 
+    
+    ) +geom_bar(binwidth=0.1)+ scale_x_log10()
+```
+
+![](contract_size_exploration_files/figure-html/unweightedsampleweightedfill-1.png) 
 

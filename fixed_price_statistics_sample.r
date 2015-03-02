@@ -24,6 +24,7 @@ options(warn=1)
 #*************************************Lookup Files*****************************************************
 setwd("K:\\Development\\Fixed-price")
 Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
+set.seed(1)
 # Path<-"~\\FPDS\\R scripts and data\\"
 # Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
 
@@ -47,16 +48,16 @@ sample.criteria <-read.csv(
   stringsAsFactors=FALSE
 )
 
-sample.size<-15000
+sample.size<-100000
 #Drop contracts starting before the study period
 sample.criteria$LastCurrentCompletionDate<-strptime(sample.criteria$LastCurrentCompletionDate,"%Y-%m-%d") 
 # as.Date(sample.criteria$LastCurrentCompletionDate)
-sample.criteria<-subset(sample.criteria,StartFiscal_Year>=2000 & (LastCurrentCompletionDate<=strptime("2013-09-30","%Y-%m-%d") | IsClosed==1))
+sample.criteria<-subset(sample.criteria,StartFiscal_Year>=2007 & (LastCurrentCompletionDate<=strptime("2013-09-30","%Y-%m-%d") | IsClosed==1))
 View(sample.criteria)                        
 
 sample.SumofObligatedAmount<-sample.criteria[sample(nrow(sample.criteria)
-                                                 , size=15000
-                                                 , prob=abs(sample.criteria$SumofObligatedAmount)
+                                                 , size=sample.size
+#                                                  , prob=abs(sample.criteria$SumofObligatedAmount)
 ),]
 
 sample.SumofObligatedAmount<-subset(sample.SumofObligatedAmount,select=-c(StartFiscal_Year,SumofObligatedAmount,IsClosed))
@@ -80,14 +81,15 @@ sample.SumofObligatedAmount<-read_and_join(Path
                                            ,"defense_contract_contractdiscretization.csv"
                                            ,sample.SumofObligatedAmount
                                            ,"data\\"
+                                           ,by="CSIScontractID"
 )
 
 #CSIScontractID
-sample.SumofObligatedAmount<-read_and_join(Path
-              ,"contract_CSIScontractID.csv"
-              ,sample.SumofObligatedAmount
-              ,"lookups\\"
-              )
+# sample.SumofObligatedAmount<-read_and_join(Path
+#               ,"contract_CSIScontractID.csv"
+#               ,sample.SumofObligatedAmount
+#               ,"lookups\\"
+#               )
 
 # # CSIScontractID.systemequipmentcode<-subset(CSIScontractID.lookup,!is.na(systemequipmentcode))
 
@@ -96,8 +98,17 @@ sample.SumofObligatedAmount<-read_and_join(Path
                                            ,"defense_contract_SP_ContractModificationDeltaCustomer.csv"
                                            ,sample.SumofObligatedAmount
                                            ,"data\\"
+                                           ,by="CSIScontractID"
 )
 
+
+#defense_contract_SP_ContractLocationCustomer.csv
+sample.SumofObligatedAmount<-read_and_join(Path
+                                           ,"defense_contract_SP_ContractLocationCustomer.csv"
+                                           ,sample.SumofObligatedAmount
+                                           ,"data\\"
+                                           ,by="CSIScontractID"
+)
 
 
 #"data\\Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv"
@@ -105,15 +116,17 @@ sample.SumofObligatedAmount<-read_and_join(Path
                                            ,"Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv"
                                            ,sample.SumofObligatedAmount
                                            ,"data\\"
+                                           ,by="CSIScontractID"
 )
 
 
 #lookups\\contract_CSIScontractID.csv
-sample.SumofObligatedAmount<-read_and_join(Path
-                                           ,"contract_CSIScontractID.csv"
-                                           ,sample.SumofObligatedAmount
-                                           ,"lookups\\"
-)
+# sample.SumofObligatedAmount<-read_and_join(Path
+#                                            ,"contract_CSIScontractID.csv"
+#                                            ,sample.SumofObligatedAmount
+#                                            ,"lookups\\"
+#                                            ,by="CSIScontractID"
+# )
 
 
 #data\\defense_contract_SP_ContractUnmodifiedCompetitionvehicleCustomer.csv
@@ -121,6 +134,7 @@ sample.SumofObligatedAmount<-read_and_join(Path
                                            ,"defense_contract_SP_ContractUnmodifiedCompetitionvehicleCustomer.csv"
                                            ,sample.SumofObligatedAmount
                                            ,"data\\"
+                                           ,by="CSIScontractID"
 )
 # 
 # #Use this to add just a single file
@@ -153,6 +167,7 @@ sample.SumofObligatedAmount<-read_and_join(Path
                                            ,"defense_Contract_SP_ContractDetailsR&DCustomer.csv"
                                            ,sample.SumofObligatedAmount
                                            ,"data\\"
+                                           ,by="CSIScontractID"
 )
 
 # subset(sample.SumofObligatedAmount,select=-c("isAnyRnD1to5","obligatedAmountRnD1to5","firstSignedDateRnD1to5","UnmodifiedRnD1to5"))
@@ -163,8 +178,16 @@ sample.SumofObligatedAmount<-read_and_join(Path
                                            ,"defense_contract_SP_ContractCompetitionVehicleCustomer.csv"
                                            ,sample.SumofObligatedAmount
                                            ,"data\\"
+                                           ,by="CSIScontractID"
 )
 
+#defense_contract_SP_ContractPricingCustomer
+sample.SumofObligatedAmount<-read_and_join(Path
+                                           ,"defense_contract_SP_ContractPricingCustomer.csv"
+                                           ,sample.SumofObligatedAmount
+                                           ,"data\\"
+                                           ,by="CSIScontractID"
+)
 
 
 write.table(sample.SumofObligatedAmount
@@ -178,88 +201,88 @@ write.table(sample.SumofObligatedAmount
             , row.names=FALSE
             , append=FALSE
 )
-
-combined.MCC<-fixed.price.statistics(Path
-                                     ,sample.SumofObligatedAmount
-                                     ,"MajorCommandID"
-)
-
-write.table(combined.MCC
-            ,file=paste("data\\defense_office_MajorCommandID_sample_"
-                        ,sample.size
-                        ,"_SumofObligatedAmount.csv"
-                        ,sep=""
-            )
-            #   ,header=TRUE
-            , sep=","
-            , row.names=FALSE
-            , append=FALSE
-)
-rm(combined.MCC)
-
-
-sample.SumofObligatedAmount.gte.2007<-subset(sample.SumofObligatedAmount,StartFiscal_Year>=2007)
-                                      
-
-write.table(sample.SumofObligatedAmount.gte.2007
-            ,file=paste("data\\defense_contract_CSIScontractID_sample_"
-                        ,sample.size
-                        ,"_SumofObligatedAmount_gte_2007.csv"
-                        ,sep=""
-            )
-            #   ,header=TRUE
-            , sep=","
-            , row.names=FALSE
-            , append=FALSE
-)
-
-combined.MCC<-fixed.price.statistics(Path
-                                     ,sample.SumofObligatedAmount.gte.2007
-                                     ,"MajorCommandID"
-)
-
-write.table(combined.MCC
-            ,file=paste("data\\defense_office_MajorCommandID_sample_"
-                        ,sample.size
-                        ,"_SumofObligatedAmount_gte_2007.csv"
-                        ,sep=""
-            )
-            #   ,header=TRUE
-            , sep=","
-            , row.names=FALSE
-            , append=FALSE
-)
-rm(combined.MCC)
-
-
-sample.SumofObligatedAmount.IsCompeted<-subset(sample.SumofObligatedAmount,IsSomeCompetition==1)
-
-write.table(sample.SumofObligatedAmount.IsCompeted
-            ,file=paste("data\\defense_contract_CSIScontractID_sample_"
-                        ,sample.size
-                        ,"_SumofObligatedAmount_IsCompeted.csv"
-                        ,sep=""
-            )
-            #   ,header=TRUE
-            , sep=","
-            , row.names=FALSE
-            , append=FALSE
-)
-
-sample.SumofObligatedAmount.gte.2007.isCompeted<-subset(sample.SumofObligatedAmount.gte.2007,IsSomeCompetition==1)
-
-
-write.table(sample.SumofObligatedAmount.gte.2007.isCompeted
-            ,file=paste("data\\defense_contract_CSIScontractID_sample_"
-                        ,sample.size
-                        ,"_SumofObligatedAmount_gte_2007_isCompeted.csv"
-                        ,sep=""
-            )
-            #   ,header=TRUE
-            , sep=","
-            , row.names=FALSE
-            , append=FALSE
-)
+# 
+# combined.MCC<-fixed.price.statistics(Path
+#                                      ,sample.SumofObligatedAmount
+#                                      ,"MajorCommandID"
+# )
+# 
+# write.table(combined.MCC
+#             ,file=paste("data\\defense_office_MajorCommandID_sample_"
+#                         ,sample.size
+#                         ,"_SumofObligatedAmount.csv"
+#                         ,sep=""
+#             )
+#             #   ,header=TRUE
+#             , sep=","
+#             , row.names=FALSE
+#             , append=FALSE
+# )
+# rm(combined.MCC)
+# 
+# 
+# sample.SumofObligatedAmount.gte.2007<-subset(sample.SumofObligatedAmount,StartFiscal_Year>=2007)
+#                                       
+# 
+# write.table(sample.SumofObligatedAmount.gte.2007
+#             ,file=paste("data\\defense_contract_CSIScontractID_sample_"
+#                         ,sample.size
+#                         ,"_SumofObligatedAmount_gte_2007.csv"
+#                         ,sep=""
+#             )
+#             #   ,header=TRUE
+#             , sep=","
+#             , row.names=FALSE
+#             , append=FALSE
+# )
+# 
+# combined.MCC<-fixed.price.statistics(Path
+#                                      ,sample.SumofObligatedAmount.gte.2007
+#                                      ,"MajorCommandID"
+# )
+# 
+# write.table(combined.MCC
+#             ,file=paste("data\\defense_office_MajorCommandID_sample_"
+#                         ,sample.size
+#                         ,"_SumofObligatedAmount_gte_2007.csv"
+#                         ,sep=""
+#             )
+#             #   ,header=TRUE
+#             , sep=","
+#             , row.names=FALSE
+#             , append=FALSE
+# )
+# rm(combined.MCC)
+# 
+# 
+# sample.SumofObligatedAmount.IsCompeted<-subset(sample.SumofObligatedAmount,IsSomeCompetition==1)
+# 
+# write.table(sample.SumofObligatedAmount.IsCompeted
+#             ,file=paste("data\\defense_contract_CSIScontractID_sample_"
+#                         ,sample.size
+#                         ,"_SumofObligatedAmount_IsCompeted.csv"
+#                         ,sep=""
+#             )
+#             #   ,header=TRUE
+#             , sep=","
+#             , row.names=FALSE
+#             , append=FALSE
+# )
+# 
+# sample.SumofObligatedAmount.gte.2007.isCompeted<-subset(sample.SumofObligatedAmount.gte.2007,IsSomeCompetition==1)
+# 
+# 
+# write.table(sample.SumofObligatedAmount.gte.2007.isCompeted
+#             ,file=paste("data\\defense_contract_CSIScontractID_sample_"
+#                         ,sample.size
+#                         ,"_SumofObligatedAmount_gte_2007_isCompeted.csv"
+#                         ,sep=""
+#             )
+#             #   ,header=TRUE
+#             , sep=","
+#             , row.names=FALSE
+#             , append=FALSE
+# )
 
 # sample.SumofObligatedAmount <-read.csv(
 #   paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
@@ -425,69 +448,69 @@ write.table(sample.SumofObligatedAmount.gte.2007.isCompeted
 # }
 
 #System equipment code
-
-
-systemequipmentlist <-read.csv(
-        paste(Path,"Lookups\\Lookup_CSIScontractIDforIdentifiedSystemEquipment.csv",sep=""),
-        header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-        na.strings="NULL",
-        stringsAsFactors=FALSE
-)
-
-systemequipmentlist<-read_and_join(Path,"LOOKUP_systemequipmentcode.csv",systemequipmentlist)
-
-systemequipmentlist<-subset(systemequipmentlist,SystemEquipmentInSample=TRUE
-                            
-)
-
-systemequipmentlist<-subset(systemequipmentlist,select=-c(Unseperated
-                                                          ,systemequipmentcodeText
-                                                          ,systemequipmentshorttext
-                                                          ,SystemEquipmentInSample
-)
-)
-
-
-#defense_contract_contractdiscretization.csv
-systemequipmentlist<-read_and_join(Path
-                                   ,"defense_contract_contractdiscretization.csv"
-                                   ,sample.SumofObligatedAmount
-                                   ,"data\\"
-)
-
-
-
-#defense_contract_SP_ContractModificationDeltaCustomer.csv
-systemequipmentlist<-read_and_join(Path
-                                   ,"defense_contract_SP_ContractModificationDeltaCustomer.csv"
-                                   ,sample.SumofObligatedAmount
-                                   ,"data\\"
-)
-
-
-#lookups\\contract_CSIScontractID.csv"
-systemequipmentlist<-read_and_join(Path
-                                   ,"contract_CSIScontractID.csv"
-                                   ,sample.SumofObligatedAmount
-                                   ,"lookups\\"
-)
-
-#data\\Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv"
-systemequipmentlist<-read_and_join(Path
-                                           ,"Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv"
-                                           ,sample.SumofObligatedAmount
-                                           ,"data\\"
-)
-
-
-write.table(systemequipmentlist
-            ,file=paste(Path,"data\\defense_contract_CSIScontractID_"
-                        #                         ,sample.size
-                        ,"_systemEquipmentCode.csv"
-                        ,sep=""
-            )
-            #   ,header=TRUE
-            , sep=","
-            , row.names=FALSE
-            , append=FALSE
-)
+# 
+# 
+# systemequipmentlist <-read.csv(
+#         paste(Path,"Lookups\\Lookup_CSIScontractIDforIdentifiedSystemEquipment.csv",sep=""),
+#         header=TRUE, sep=",", dec=".", strip.white=TRUE, 
+#         na.strings="NULL",
+#         stringsAsFactors=FALSE
+# )
+# 
+# systemequipmentlist<-read_and_join(Path,"LOOKUP_systemequipmentcode.csv",systemequipmentlist)
+# 
+# systemequipmentlist<-subset(systemequipmentlist,SystemEquipmentInSample=TRUE
+#                             
+# )
+# 
+# systemequipmentlist<-subset(systemequipmentlist,select=-c(Unseperated
+#                                                           ,systemequipmentcodeText
+#                                                           ,systemequipmentshorttext
+#                                                           ,SystemEquipmentInSample
+# )
+# )
+# 
+# 
+# #defense_contract_contractdiscretization.csv
+# systemequipmentlist<-read_and_join(Path
+#                                    ,"defense_contract_contractdiscretization.csv"
+#                                    ,sample.SumofObligatedAmount
+#                                    ,"data\\"
+# )
+# 
+# 
+# 
+# #defense_contract_SP_ContractModificationDeltaCustomer.csv
+# systemequipmentlist<-read_and_join(Path
+#                                    ,"defense_contract_SP_ContractModificationDeltaCustomer.csv"
+#                                    ,sample.SumofObligatedAmount
+#                                    ,"data\\"
+# )
+# 
+# 
+# #lookups\\contract_CSIScontractID.csv"
+# systemequipmentlist<-read_and_join(Path
+#                                    ,"contract_CSIScontractID.csv"
+#                                    ,sample.SumofObligatedAmount
+#                                    ,"lookups\\"
+# )
+# 
+# #data\\Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv"
+# systemequipmentlist<-read_and_join(Path
+#                                            ,"Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv"
+#                                            ,sample.SumofObligatedAmount
+#                                            ,"data\\"
+# )
+# 
+# 
+# write.table(systemequipmentlist
+#             ,file=paste(Path,"data\\defense_contract_CSIScontractID_"
+#                         #                         ,sample.size
+#                         ,"_systemEquipmentCode.csv"
+#                         ,sep=""
+#             )
+#             #   ,header=TRUE
+#             , sep=","
+#             , row.names=FALSE
+#             , append=FALSE
+# )
