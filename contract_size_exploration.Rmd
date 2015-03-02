@@ -25,7 +25,7 @@ source(paste(Path,"lookups.r",sep=""))
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occurred after contract start.
 
 ##Contract Ceiling
-For the purpose of this report, a contract refers to either an award with a unique procurement identifier or an IDV with a unique pairing of a delivery order procurement identifier and a referenced IDV procurement identifier. Groupings are in nominal dollars because many regulatory thresholds are not adjusted for inflation; as a result, smaller contracts will be slightly overrepresented in recent years. Initial contract size is not calculated in the same methods as Size of Contracts for other CSIS reports.  Instead, size of contract is determined using the base and all options value amount of the original unmodified transaction for the contract.
+For the purpose of this report, a contract refers to either an award with a unique procurement identifier or an IDV with a unique pairing of a delivery order procurement identifier and a referenced IDV procurement identifier. Groupings are in nominal dollars because many regulatory thresholds are not adjusted for inflation; as a result, smaller contracts will be slightly overrepresented in recent years. Initial contract size is not calculated in the same methods as Size of Contracts for other CSIS reports.  Instead, size of contract is determined using the **Base and All Options value** amount of the original unmodified transaction for the contract.
 
 
 
@@ -45,7 +45,7 @@ ContractWeighted<-apply_lookups(Path,ContractWeighted)
 ##Due to missing contract ceiling data, we have limited the dataset to  fiscal year 2007 and beyond.
 When using the Base and All Options value, or the Base and Exercised options value, it quickly becomes apparent that the values are not reliably filled in. Below, the logarithm of each variable is used because there is huge variability in the ceilings for contracts, using the logarithm puts the emphasis on the difference between a $1,000,000 vs. $10,000,000 contract ceiling rather than between $1,000,000 and $2,000,000. 
 
-Another noteworthy phenomoenon in these graphs is the steady decline in number of contracts form year to year. That is because the sample is limited to completed contracts. Contracts with longer duration are thus excluded from later years because they are ongoing.
+Another noteworthy phenomoenon in these graphs is the steady decline in number of contracts form year to year. This is because the sample is limited to completed contracts. Contracts with longer duration are thus excluded from later years because they are ongoing and have not been completed yet.
 
 
 ```{r 2007_demonstration, echo=TRUE}
@@ -67,9 +67,9 @@ ggplot(
 ContractWeighted<-subset(ContractWeighted, StartFiscal_Year>=2007)
 ```
 
-After removing the missing or zero rates for the Unmodified and Total Contract values becomes quite manageable.
+After removing the missing or zero rates for the Unmodified and Total Contract values the variable becomes quite manageable.
 
-* ObligatedAmount is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(ContractWeighted,is.na(ObligatedAmount)|ObligatedAmount==0)) /nrow(ContractWeighted)*100)` missing data) This complete absence of missing data and contracts with deobligations as their total value is one result of using a sample weighted by ObligatedAmount.
+* ObligatedAmount is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(ContractWeighted,is.na(ObligatedAmount)|ObligatedAmount==0)) /nrow(ContractWeighted)*100)` missing data)  One result of using a sample weighted by ObligatedAmount is the complete absense of missing data and contracts with deobligations as their total value. 
 * UnmodifiedContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(ContractWeighted,is.na(UnmodifiedContractBaseAndAllOptionsValue)|UnmodifiedContractBaseAndAllOptionsValue==0)) /nrow(ContractWeighted)*100)` missing data).
 * UnmodifiedContractBaseAndExercisedOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(ContractWeighted,is.na(UnmodifiedContractBaseAndExercisedOptionsValue)|UnmodifiedContractBaseAndExercisedOptionsValue==0)) /nrow(ContractWeighted)*100)` missing data).
 * ContractBaseAndAllOptionsValue is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(ContractWeighted,is.na(ContractBaseAndAllOptionsValue)|ContractBaseAndAllOptionsValue==0)) /nrow(ContractWeighted)*100)` missing data).
@@ -91,7 +91,7 @@ summary(subset(ContractWeighted,select=c(ObligatedAmount,
 ```
 ##Comparing a weighted and unweighted sample
 
-All of the analysis thus far has been done with a set of 15,000 contracts which were selected using a random sampling weighted by their total value. Thus a contract obligating $1,000,000 would be 10 times more likely to be included than a contract obligation $100,000. Because the Bayesian Network analysis will include the entire population of completed contracts started in 2007 and after, initial network studies are conducted using a 100,000 contract sample that was selected without weighting. 
+All of the analysis thus far has been done with a set of 15,000 contracts which were selected using a random sample weighted by their total value. Thus a contract obligating $1,000,000 would be 10 times more likely to be included than a contract obligation $100,000. Because the Bayesian Network analysis will include the entire population of completed contracts started in 2007 and after, initial network studies are conducted using a 100,000 unweighted contract sample. 
 
 ```{r setup100000, echo = TRUE}
 ContractUnweighted  <- read.csv(
@@ -171,10 +171,10 @@ UnweightedQuantile25kPlus<-quantile(ContractUnweighted$UnmodifiedContractBaseAnd
 formatC(UnweightedQuantile25kPlus, format="d", big.mark=',')
 ```
 
-However, a quick analysis finds that  though that cut off removes the bulk of the contracts, the top quartile still comes in below the mean of the weighted sample `r mean(ContractWeighted$UnmodifiedContractObligatedAmount)`. Even the 90th and 95th quantile of the unweighted sample with cut off still doesn't reach that mean.
+However, a quick analysis finds that  though a cut off removes the bulk of the contracts, the top quartile still comes in below the mean of the weighted sample `r mean(ContractWeighted$UnmodifiedContractObligatedAmount)`. Even the 90th and 95th quantile of the unweighted sample with cut off still doesn't reach that mean.
 
 ##Applying Weighted Quartiles to the Unweighted sample
-Thus, applying a weighted quartile to the unweighted sample and ultimately the full data set appears to be a better way to study acquisition issues of interest. The weighted sample does show that there is still enough contracts (`r length(ContractWeighted$WeightedQuartile[ContractWeighted$WeightedQuartile=="[2.32e+07,3.67e+10]"])` out of `r length(ContractWeighted)`) to meet the minimum threshholds for analysis. 
+Thus, applying a weighted quartile to the unweighted sample and ultimately the full data set appears to be a better way to study acquisition issues of interest. The weighted sample does show that there is still enough contracts (`r length(ContractWeighted$WeightedQuartile[ContractWeighted$WeightedQuartile=="[2.32e+07,3.67e+10]"])` out of `r nrow(ContractWeighted)`) to meet the minimum threshholds for analysis. 
 
 The downside, as shown below, is that this greatly reduces the statistical power of the analysis by grouping the vast majority of contracts in the first weighted quartile. However, this reduction in power reflects the inherent limit of the data set. Millions of small contracts can only tell us so much about the thousands of large contracts.
 ```{r unweightedsampleweightedfill, echo = TRUE}
