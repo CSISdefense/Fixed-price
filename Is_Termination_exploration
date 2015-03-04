@@ -1,9 +1,5 @@
----
-title: 'Dod Fixed-Price Study: Is Terminated exploration'
-author: "Samantha Cohen"
-date: "Wednesday, March 04, 2015"
-output: html_document
----
+ 'Dod Fixed-Price Study: Is Terminated exploration'
+============================================================================
 
 ```{r echo = TRUE}
 ##install.packages("ggplot2")
