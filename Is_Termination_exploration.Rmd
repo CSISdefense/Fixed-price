@@ -1,4 +1,4 @@
- 'Dod Fixed-Price Study: Is Terminated exploration'
+ Dod Fixed-Price Study: Is Terminated exploration
 ============================================================================
 
 ```{r echo = TRUE}
