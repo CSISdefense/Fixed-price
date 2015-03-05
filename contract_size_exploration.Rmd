@@ -40,6 +40,19 @@ ContractWeighted  <- read.csv(
 
 #These will probably be moved into apply_lookups at some point
 ContractWeighted<-apply_lookups(Path,ContractWeighted)
+
+
+ContractComplete  <- read.csv(
+    paste(Path,"data\\Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv", sep = ""),
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+
+ContractComplete<-subset(ContractComplete,SumOfUnmodifiedbaseandalloptionsvalue>0 & !is.na(SumOfUnmodifiedbaseandalloptionsvalue))
+MeanBaseAndAll<-mean(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)
+sdBaseAndAll<-sd(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)
+summary(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)
 ```
 
 ##Due to missing contract ceiling data, we have limited the dataset to  fiscal year 2007 and beyond.

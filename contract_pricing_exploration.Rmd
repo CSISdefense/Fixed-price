@@ -63,8 +63,8 @@ summary(subset(contract.sample,select=c(Pricing.Mechanism.Code,
 
 
 ggplot(
-    data = subset(contract.sample,IsSomeCompetition=="Mixed or \nUnlabeled"),
-    aes_string(x = "pIsSomeCompetition"),
+    data = contract.sample
+    aes_string(x = "pIsFixedPrice"),
     main = "Distribution by percent of dollars with some competition for mixed and unlabeled contracts."
     ) +
     geom_bar(binwidth=0.05)
