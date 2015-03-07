@@ -7,6 +7,22 @@ Tuesday, January 13, 2015
 ## Loading required package: ggplot2
 ## Loading required package: stringr
 ## Loading required package: plyr
+## Loading required package: Hmisc
+## Loading required package: grid
+## Loading required package: lattice
+## Loading required package: survival
+## Loading required package: splines
+## Loading required package: Formula
+## 
+## Attaching package: 'Hmisc'
+## 
+## The following objects are masked from 'package:plyr':
+## 
+##     is.discrete, summarize
+## 
+## The following objects are masked from 'package:base':
+## 
+##     format.pval, round.POSIXt, trunc.POSIXt, units
 ```
 
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
@@ -16,58 +32,194 @@ Describe contract vehicle here.
 
 
 ```r
-contract.sample  <- read.csv(
-    paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv", sep = ""),
+ContractSample  <- read.csv(
+    paste("data\\defense_contract_CSIScontractID_sample_100000_SumofObligatedAmount.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
     stringsAsFactors = TRUE
     )
 
 #These will probably be moved into apply_lookups at some point
-contract.sample<-apply_lookups(Path,contract.sample)
+
+ContractSample$pIsFixedPrice <- ContractSample$ObligatedAmountIsFixedPrice/ContractSample$SumofObligatedAmount
+ContractSample$pIsFixedPrice[is.nan(ContractSample$ObligatedAmountIsFixedPrice)|is.na(ContractSample$ObligatedAmountIsFixedPrice)] <- 0
+
+ContractSample$pIsCostBased <- ContractSample$ObligatedAmountIsCostBased/ContractSample$SumofObligatedAmount
+ContractSample$pIsCostBased[is.nan(ContractSample$ObligatedAmountIsCostBased)|is.na(ContractSample$ObligatedAmountIsCostBased)] <- 0
+
+ContractSample$pIsCombination <- ContractSample$ObligatedAmountIsCombination/ContractSample$SumofObligatedAmount
+ContractSample$pIsCombination[is.nan(ContractSample$ObligatedAmountIsCombination)|is.na(ContractSample$ObligatedAmountIsCombination)] <- 0
+
+ContractSample$pIsInternational <- ContractSample$ObligatedAmountIsInternational/ContractSample$SumofObligatedAmount
+ContractSample$pIsInternational[is.na(ContractSample$ObligatedAmountIsInternational)] <- 0
+
+ContractSample$AnyInternational<-factor(ContractSample$AnyInternational,
+                                        exclude=NULL,
+                                        levels=c(0,1,NA),
+                                        labels=c("Just U.S.","Any\nInternational","Unlabeled")
+                                        )
+
+
+
+ContractSample$UnmodifiedDays<-as.numeric(difftime(strptime(ContractSample$UnmodifiedCurrentCompletionDate,"%Y-%m-%d")
+                                                     , strptime(ContractSample$MinOfEffectiveDate,"%Y-%m-%d")
+                                                     , unit="days"
+        ))+1
+
+                               
+ContractSample<-apply_lookups(Path,ContractSample)
 ```
 
 ```
-## Joining by: Contracting.Agency.ID
-## Joining by: SubCustomer, Customer
-## Joining by: MajorCommandID
-## Joining by: systemequipmentcode
+## Joining by: ProductOrServiceArea
+## Joining by: PlatformPortfolio
 ```
 
 ```
-## Warning in apply_lookups(Path, contract.sample): NaNs produced
+## Warning in apply_lookups(Path, ContractSample): NaNs produced
 ```
 
 ```
-## Warning in apply_lookups(Path, contract.sample): NaNs produced
+## Warning in apply_lookups(Path, ContractSample): NaNs produced
 ```
 
 ```
-## Warning in apply_lookups(Path, contract.sample): NaNs produced
+## Warning in apply_lookups(Path, ContractSample): NaNs produced
+```
+
+```r
+summary(subset(ContractSample,select=c(UnmodifiedIsSomeCompetition,
+                                IsIDV,
+                                IsFixedPrice,
+                                IsCostBased,
+                                UnmodifiedIsFullAndOpen,
+                                ##Number connected
+                                AnyInternational,
+                                SimpleArea,
+                                UnmodifiedContractBaseAndAllOptionsValue,
+                                UnmodifiedDays,
+                                UnmodifiedNumberOfOffersReceived
+                                ))
+        )
 ```
 
 ```
-## Warning in apply_lookups(Path, contract.sample): NaNs produced
+##  UnmodifiedIsSomeCompetition     IsIDV       
+##  Comp.    :69509             Min.   :0.0000  
+##  No Comp. :26449             1st Qu.:1.0000  
+##  Unlabeled: 4042             Median :1.0000  
+##                              Mean   :0.7563  
+##                              3rd Qu.:1.0000  
+##                              Max.   :1.0000  
+##                                              
+##                      IsFixedPrice    IsCostBased   
+##  Fixed Price               :76949   Min.   :0.000  
+##  Other                     :15506   1st Qu.:0.000  
+##  Combination \nor Unlabeled: 7545   Median :0.000  
+##                                     Mean   :0.165  
+##                                     3rd Qu.:0.000  
+##                                     Max.   :1.000  
+##                                     NA's   :7525   
+##       UnmodifiedIsFullAndOpen           AnyInternational
+##  Full & Open      :38004      Just U.S.         :82203  
+##  Not Full \n& Open:57973      Any\nInternational:13787  
+##  Unlabeled        : 4023      Unlabeled         : 4010  
+##                                                         
+##                                                         
+##                                                         
+##                                                         
+##               SimpleArea    UnmodifiedContractBaseAndAllOptionsValue
+##  Products          :45247   Min.   :0.000e+00                       
+##  Services          :45037   1st Qu.:2.310e+05                       
+##  R&D               : 5427   Median :1.185e+06                       
+##  Mixed or Unlabeled: 4289   Mean   :4.744e+07                       
+##                             3rd Qu.:4.800e+06                       
+##                             Max.   :3.363e+12                       
+##                                                                     
+##  UnmodifiedDays    UnmodifiedNumberOfOffersReceived
+##  Min.   :    1.0   Min.   :  1.00                  
+##  1st Qu.:   61.0   1st Qu.:  1.00                  
+##  Median :  221.0   Median :  2.00                  
+##  Mean   :  315.9   Mean   :  4.97                  
+##  3rd Qu.:  366.0   3rd Qu.:  5.00                  
+##  Max.   :19772.0   Max.   :999.00                  
+##  NA's   :4010      NA's   :60397
 ```
 Describe source variables in FPDS here.
 
 ###Limiting the sample.
 
-Because this model analyzes the number of offers on competed contracts, the first step is eliminating contracts that were not competed. This is done using the UnmodifiedIsSomeCompetetion field (see [competition exploration](contract_competition_exploration.md) for variable details). This variable has an unlabeled rate of 33.49%. As is done throughout the model, if all labeled values for the contract have are consistent, then that value is used to fill in for the blanks.
+Because this model analyzes the number of offers on competed contracts, the first step is eliminating contracts that were not competed. This is done using the UnmodifiedIsSomeCompetetion field (see [competition exploration](contract_competition_exploration.md) for variable details). This variable has an unlabeled rate of 4.04%. As is done throughout the model, if all labeled values for the contract have are consistent, then that value is used to fill in for the blanks.
 
 
 ```r
 #Impute missing values when labeled entries have a consistent value.
-NAisSomeCompetition<-contract.sample$UnmodifiedIsSomeCompetition=="Unlabeled"&contract.sample$IsSomeCompetition!="Mixed or \nUnlabeled"
-contract.sample$UnmodifiedIsSomeCompetition[NAisSomeCompetition]<-contract.sample$IsSomeCompetition[NAisSomeCompetition]
+NAisSomeCompetition<-ContractSample$UnmodifiedIsSomeCompetition=="Unlabeled"&ContractSample$IsSomeCompetition!="Mixed or \nUnlabeled"
+ContractSample$UnmodifiedIsSomeCompetition[NAisSomeCompetition]<-ContractSample$IsSomeCompetition[NAisSomeCompetition]
 rm(NAisSomeCompetition)
 ```
 
-After imputed, UnmodifiedIsSomeCompetition has a 3.64% missing data rate. This variable can now be used to narrow the sample.
+After imputed, UnmodifiedIsSomeCompetition has a 4.04% missing data rate. This variable can now be used to narrow the sample.
 
 
 ```r
-contract.sample<-contract.sample[contract.sample$UnmodifiedIsSomeCompetition=="Comp.",]
+ContractSample<-ContractSample[ContractSample$UnmodifiedIsSomeCompetition=="Comp.",]
+summary(subset(ContractSample,select=c(UnmodifiedIsSomeCompetition,
+                                IsIDV,
+                                IsFixedPrice,
+                                IsCostBased,
+                                UnmodifiedIsFullAndOpen,
+                                ##Number connected
+                                AnyInternational,
+                                SimpleArea,
+                                UnmodifiedContractBaseAndAllOptionsValue,
+                                UnmodifiedDays,
+                                UnmodifiedNumberOfOffersReceived
+                                ))
+        )
+```
+
+```
+##  UnmodifiedIsSomeCompetition     IsIDV       
+##  Comp.    :69509             Min.   :0.0000  
+##  No Comp. :    0             1st Qu.:1.0000  
+##  Unlabeled:    0             Median :1.0000  
+##                              Mean   :0.7663  
+##                              3rd Qu.:1.0000  
+##                              Max.   :1.0000  
+##                                              
+##                      IsFixedPrice    IsCostBased    
+##  Fixed Price               :56325   Min.   :0.0000  
+##  Other                     :11062   1st Qu.:0.0000  
+##  Combination \nor Unlabeled: 2122   Median :0.0000  
+##                                     Mean   :0.1613  
+##                                     3rd Qu.:0.0000  
+##                                     Max.   :1.0000  
+##                                     NA's   :2114    
+##       UnmodifiedIsFullAndOpen           AnyInternational
+##  Full & Open      :38004      Just U.S.         :57399  
+##  Not Full \n& Open:31502      Any\nInternational:12110  
+##  Unlabeled        :    3      Unlabeled         :    0  
+##                                                         
+##                                                         
+##                                                         
+##                                                         
+##               SimpleArea    UnmodifiedContractBaseAndAllOptionsValue
+##  Products          :31948   Min.   :0.000e+00                       
+##  Services          :33236   1st Qu.:1.816e+05                       
+##  R&D               : 4178   Median :9.645e+05                       
+##  Mixed or Unlabeled:  147   Mean   :6.138e+07                       
+##                             3rd Qu.:4.348e+06                       
+##                             Max.   :3.363e+12                       
+##                                                                     
+##  UnmodifiedDays    UnmodifiedNumberOfOffersReceived
+##  Min.   :    1.0   Min.   :  1.00                  
+##  1st Qu.:   36.0   1st Qu.:  2.00                  
+##  Median :  191.0   Median :  3.00                  
+##  Mean   :  287.9   Mean   :  6.45                  
+##  3rd Qu.:  366.0   3rd Qu.:  5.00                  
+##  Max.   :19729.0   Max.   :999.00                  
+##                    NA's   :41620
 ```
 
 
@@ -75,41 +227,105 @@ contract.sample<-contract.sample[contract.sample$UnmodifiedIsSomeCompetition=="C
 Note that these missing data rates are only for competed entries, so they will typically not match the overall unlabeled rates.
 
  * IsIDV is a classification for the entirity of the contract  (0.00% missing data). See [vehicle exploration](contract_vehicle_exploration.md) for more. Since this variable is consistently labeled, it isn't necessary to impute data or seperate out unmodified entries.
- * UnmodifiedIsFullAndOpen is the classification given by the first record for the contract (27.82% missing data). See [exploration on competition](contract_competition_exploration.md) for more.
- * UnmodifiedNumberOfOffersReceived reports the Number of Offers received according to the first reported transaction under a contract (31.43% missing data, far too high, there must be a SQL mistake). See [exploration on competition](contract_competition_exploration.md) for more.
+ * UnmodifiedIsFullAndOpen is the classification given by the first record for the contract (0.00% missing data). See [exploration on competition](contract_competition_exploration.md) for more.
+ * UnmodifiedNumberOfOffersReceived reports the Number of Offers received according to the first reported transaction under a contract (59.88% missing data, far too high, there must be a SQL mistake). See [exploration on competition](contract_competition_exploration.md) for more.
+* simplearea is a classification for the entirity of the contract  ( missing data). See [exploration on product, service, and R&D](contract_ProductServiceRnD_exploration.md) for more.
 
 
 
 
 ```r
-summary(subset(contract.sample,select=c(IsSomeCompetition,
-                                IsIDV
+ContractSample$FixedOrCost[ContractSample$pIsFixedPrice>0  |
+                                      ContractSample$pIsCostBased>0 | 
+                                          ContractSample$pIsCombination>0]<-"Combination \nor Other"
+
+ContractSample$FixedOrCost[ContractSample$pIsFixedPrice>=0.95|(ContractSample$IsFixedPrice=="Fixed Price" & ContractSample$pIsCombination==0)]<-"Fixed-Price"
+ContractSample$FixedOrCost[ContractSample$pIsCostBased>=0.95|(ContractSample$IsCostBased==1 & ContractSample$pIsCombination==0)]<-"Cost-Based"
+ContractSample$FixedOrCost<-factor(ContractSample$FixedOrCost,levels=c("Fixed-Price","Cost-Based","Combination \nor Other"))
+
+ContractSample$AnyInternational[ContractSample$pIsInternational<=0 & 
+                    ContractSample$AnyInternational=="Any\nInternational" &
+                    ContractSample$UnmodifiedIsInternational==0]<-"Just U.S."
+
+NASimpleArea<-ContractSample$SimpleArea=="Mixed or Unlabeled"&!is.na(ContractSample$UnmodifiedSimpleArea)
+ContractSample$SimpleArea[NASimpleArea]<-ContractSample$UnmodifiedSimpleArea[NASimpleArea]
+ContractSample$SimpleArea[ContractSample$SimpleArea=="Mixed or Unlabeled" & ContractSample$pIsProducts>0.5]<-"Products"
+ContractSample$SimpleArea[ContractSample$SimpleArea=="Mixed or Unlabeled" & ContractSample$pIsServices>0.5]<-"Services"
+ContractSample$SimpleArea[ContractSample$SimpleArea=="Mixed or Unlabeled" & ContractSample$pIsRnD>0.5]<-"R&D"
+
+
+roundedcutoffs<-c(15000,100000,1000000,30000000)
+ContractSample$qCeiling<-cut2(ContractSample$UnmodifiedContractBaseAndAllOptionsValue,cuts=roundedcutoffs)
+
+#Impute missing values
+NAisFullAndOpen<-is.na(ContractSample$UnmodifiedIsFullAndOpen)
+ContractSample$UnmodifiedIsFullAndOpen[NAisFullAndOpen]<-ContractSample$IsFullAndOpen[NAisFullAndOpen]
+rm(NAisFullAndOpen)
+
+ContractSample$qDuration<-cut2(ContractSample$UnmodifiedDays,cuts=c(61,221,366))
+
+NAnumberOfOffers<-is.na(ContractSample$UnmodifiedNumberOfOffersReceived)&!is.na(ContractSample$NumberOfOffersReceived)
+ContractSample$UnmodifiedNumberOfOffersReceived[NAnumberOfOffers]<-ContractSample$NumberOfOffersReceived[NAnumberOfOffers]
+rm(NAnumberOfOffers)
+
+summary(subset(ContractSample,select=c(UnmodifiedIsSomeCompetition,
+                                IsIDV,
+                                FixedOrCost,
+                                UnmodifiedIsFullAndOpen,
+                                ##Number connected
+                                AnyInternational,
+                                SimpleArea,
+                                qCeiling,
+                                qDuration,
+                                UnmodifiedNumberOfOffersReceived
                                 ))
         )
 ```
 
 ```
-##             IsSomeCompetition     IsIDV       
-##  Comp.               :9888    Min.   :0.0000  
-##  No Comp.            :   0    1st Qu.:0.0000  
-##  Mixed or \nUnlabeled:   9    Median :1.0000  
-##                               Mean   :0.7277  
-##                               3rd Qu.:1.0000  
-##                               Max.   :1.0000
-```
-
-```r
-#Impute missing values
-NAisFullAndOpen<-is.na(contract.sample$UnmodifiedIsFullAndOpen)
-contract.sample$UnmodifiedIsFullAndOpen[NAisFullAndOpen]<-contract.sample$IsFullAndOpen[NAisFullAndOpen]
-rm(NAisFullAndOpen)
-
-NAnumberOfOffers<-is.na(contract.sample$UnmodifiedNumberOfOffersReceived)&!is.na(contract.sample$NumberOfOffersReceived)
-contract.sample$UnmodifiedNumberOfOffersReceived[NAnumberOfOffers]<-contract.sample$NumberOfOffersReceived[NAnumberOfOffers]
-rm(NAnumberOfOffers)
+##  UnmodifiedIsSomeCompetition     IsIDV       
+##  Comp.    :69509             Min.   :0.0000  
+##  No Comp. :    0             1st Qu.:1.0000  
+##  Unlabeled:    0             Median :1.0000  
+##                              Mean   :0.7663  
+##                              3rd Qu.:1.0000  
+##                              Max.   :1.0000  
+##                                              
+##                  FixedOrCost         UnmodifiedIsFullAndOpen
+##  Fixed-Price           :56167   Full & Open      :38004     
+##  Cost-Based            :10183   Not Full \n& Open:31502     
+##  Combination \nor Other: 3025   Unlabeled        :    3     
+##  NA's                  :  134                               
+##                                                             
+##                                                             
+##                                                             
+##            AnyInternational              SimpleArea   
+##  Just U.S.         :57470   Products          :32010  
+##  Any\nInternational:12039   Services          :33288  
+##  Unlabeled         :    0   R&D               : 4202  
+##                             Mixed or Unlabeled:    9  
+##                                                       
+##                                                       
+##                                                       
+##                 qCeiling             qDuration    
+##  [0.00e+00,1.50e+04): 3278   [    1,   61):20125  
+##  [1.50e+04,1.00e+05): 9836   [   61,  221):17039  
+##  [1.00e+05,1.00e+06):22151   [  221,  366):13672  
+##  [1.00e+06,3.00e+07):31489   [  366,19729]:18673  
+##  [3.00e+07,3.36e+12]: 2755                        
+##                                                   
+##                                                   
+##  UnmodifiedNumberOfOffersReceived
+##  Min.   :  1.000                 
+##  1st Qu.:  2.000                 
+##  Median :  3.000                 
+##  Mean   :  8.949                 
+##  3rd Qu.:  5.000                 
+##  Max.   :999.000                 
+##  NA's   :579
 ```
 
 After imputing using consistent labeled entries where available.
  * UnmodifiedIsFullAndOpen has (0.00% missing data).
- * UnmodifiedNumberOfOffersReceived has (5.20% missing data.
+ * UnmodifiedNumberOfOffersReceived has (0.83% missing data.
 

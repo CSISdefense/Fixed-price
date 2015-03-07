@@ -29,12 +29,161 @@ One contract characteristic we study is the type of product or service being pro
 
 ```{r setup, echo = TRUE}
 contract.sample  <- read.csv(
-    paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv", sep = ""),
+    paste("data\\defense_contract_CSIScontractID_sample_100000_SumofObligatedAmount.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
     stringsAsFactors = TRUE
     )
 
 #These will probably be moved into apply_lookups at some point
+contract.sample$pIsProducts <- contract.sample$ObligatedAmountIsProducts/contract.sample$SumofObligatedAmount
+contract.sample$pIsProducts[is.na(contract.sample$ObligatedAmountIsProducts)] <- 0
+
+contract.sample$pIsServices <- contract.sample$ObligatedAmountIsServices/contract.sample$SumofObligatedAmount
+contract.sample$pIsServices[is.na(contract.sample$ObligatedAmountIsServices)] <- 0
+
+contract.sample$pIsRnD <- contract.sample$ObligatedAmountIsRnD/contract.sample$SumofObligatedAmount
+contract.sample$pIsRnD[is.na(contract.sample$ObligatedAmountIsRnD)] <- 0
+
+
 contract.sample<-apply_lookups(Path,contract.sample)
+
+
+```
+
+
+
+
+```{r overallvars, echo = TRUE}
+summary(subset(contract.sample,select=c(PlatformPortfolio,
+      UnmodifiedPlatformPortfolio,
+      ProductOrServiceArea,
+      UnmodifiedProductOrServiceArea,
+      SimpleArea,
+      UnmodifiedSimpleArea,
+      ObligatedAmountIsProducts,
+      ObligatedAmountIsServices,
+      ObligatedAmountIsRnD
+                                ))
+        )
+# 
+# contract.sample$IsInternational<-factor(contract.sample$IsInternational,
+#                                         exclude=NULL,
+#                                         levels=c(0,1,NA),
+#                                         labels=c("U.S.","International","Unlabeled \nor mixed")
+#                                         )
+# 
+# contract.sample$AnyInternational<-factor(contract.sample$AnyInternational,
+#                                         exclude=NULL,
+#                                         levels=c(0,1,NA),
+#                                         labels=c("Just U.S.","Any\nInternational","Unlabeled")
+#                                         )
+
+# 
+# ggplot(
+#     data = subset(contract.sample,is.na(IsInternational)|IsInternational=="Unlabeled \nor mixed" ),
+#     aes_string(x = "pIsInternational",
+#                fill="AnyInternational"
+#                
+#                ),
+#     main = "Distribution by percent of dollars with fixed-price for mixed and unlabeled contracts."
+#     )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))
+#     
+# 
+# summary(subset(contract.sample,pIsInternational<=0 & AnyInternational=="Any\nInternational",
+#                select=c(PlatformPortfolio
+#       UnmodifiedPlatformPortfolio,
+#       ProductOrServiceArea,
+#       UnmodifiedProductOrServiceArea,
+#       SimpleArea,
+#       UnmodifiedSimpleArea,
+#       ObligatedAmountIsProducts,
+#       ObligatedAmountIsServices,
+#       ObligatedAmountIsRnD
+#                                 ))
+#         )
+# 
+# contract.sample$AnyInternational[contract.sample$pIsInternational<=0 & 
+#                     contract.sample$AnyInternational=="Any\nInternational" &
+#                     contract.sample$UnmodifiedIsInternational==0]<-"Just U.S."
+# 
+# 
+
+ggplot(
+    data = subset(contract.sample,SimpleArea=="Mixed or Unlabeled" ),
+    aes_string(x = "pIsProducts"
+               
+               ),
+    main = "Distribution by percent of dollars with fixed-price for mixed and unlabeled contracts."
+    )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))+facet_wrap(~UnmodifiedSimpleArea)
+
+
+ggplot(
+    data = subset(contract.sample,SimpleArea=="Mixed or Unlabeled" ),
+    aes_string(x = "pIsRnD"
+               
+               ),
+    main = "Distribution by percent of dollars with fixed-price for mixed and unlabeled contracts."
+    )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))+facet_wrap(~UnmodifiedSimpleArea)
+
+
+ggplot(
+    data = subset(contract.sample,SimpleArea=="Mixed or Unlabeled" ),
+    aes_string(x = "pIsServices"
+               
+               ),
+    main = "Distribution by percent of dollars with fixed-price for mixed and unlabeled contracts."
+    )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))+facet_wrap(~UnmodifiedSimpleArea)
+
+NASimpleArea<-contract.sample$SimpleArea=="Mixed or Unlabeled"&!is.na(contract.sample$UnmodifiedSimpleArea)
+contract.sample$SimpleArea[NASimpleArea]<-contract.sample$UnmodifiedSimpleArea[NASimpleArea]
+rm(NASimpleArea)
+
+
+
+summary(subset(SimpleArea=="Mixed or Unlabeled",
+               select=c(PlatformPortfolio,
+      UnmodifiedPlatformPortfolio,
+      ProductOrServiceArea,
+      UnmodifiedProductOrServiceArea,
+      SimpleArea,
+      UnmodifiedSimpleArea,
+      ObligatedAmountIsProducts,
+      ObligatedAmountIsServices,
+      ObligatedAmountIsRnD
+
+                                ))
+        )
+contract.sample$SimpleArea[is.na(contract.sample$SimpleArea) & contract.sample$pIsProducts>0.5]<-"Products"
+contract.sample$SimpleArea[is.na(contract.sample$SimpleArea) & contract.sample$pIsServices>0.5]<-"Services"
+contract.sample$SimpleArea[is.na(contract.sample$SimpleArea) & contract.sample$pIsRnD>0.5]<-"R&D"
+
+ggplot(
+    data = subset(contract.sample,SimpleArea=="Mixed or Unlabeled" & !is.na(ObligatedAmountIsProducts)),
+    aes_string(x = "pIsProducts",
+               fill = "pSimpleArea"
+               ),
+    main = "Distribution by percent of dollars with fixed-price for mixed and unlabeled contracts."
+    )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))+facet_wrap(~UnmodifiedSimpleArea)
+
+
+ggplot(
+    data = subset(contract.sample,SimpleArea=="Mixed or Unlabeled" &!is.na(ObligatedAmountIsRnD) ),
+    aes_string(x = "pIsRnD",
+               fill = "pSimpleArea"
+               ),
+    main = "Distribution by percent of dollars with fixed-price for mixed and unlabeled contracts."
+    )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))+facet_wrap(~UnmodifiedSimpleArea)
+
+
+ggplot(
+    data = subset(contract.sample,SimpleArea=="Mixed or Unlabeled" &  !is.na(ObligatedAmountIsServices)),
+    aes_string(x = "pIsServices",
+               fill = "pSimpleArea"
+               ),
+    main = "Distribution by percent of dollars with fixed-price for mixed and unlabeled contracts."
+    )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))+facet_wrap(~UnmodifiedSimpleArea)
+
+      
+      
 ```

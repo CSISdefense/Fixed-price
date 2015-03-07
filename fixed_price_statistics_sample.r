@@ -57,7 +57,7 @@ View(sample.criteria)
 
 sample.SumofObligatedAmount<-sample.criteria[sample(nrow(sample.criteria)
                                                  , size=sample.size
-#                                                  , prob=abs(sample.criteria$SumofObligatedAmount)
+                                                 , prob=abs(sample.criteria$SumofObligatedAmount)
 ),]
 
 sample.SumofObligatedAmount<-subset(sample.SumofObligatedAmount,select=-c(StartFiscal_Year,SumofObligatedAmount,IsClosed))
@@ -128,6 +128,14 @@ sample.SumofObligatedAmount<-read_and_join(Path
 #                                            ,by="CSIScontractID"
 # )
 
+#data\\defense_contract_SP_ContractBucketPlatformPortfolioCustomer.csv
+sample.SumofObligatedAmount<-read_and_join(Path
+                                           ,"defense_contract_SP_ContractBucketPlatformPortfolioCustomer.csv"
+                                           ,sample.SumofObligatedAmount
+                                           ,"data\\"
+                                           ,by="CSIScontractID"
+)
+
 
 #data\\defense_contract_SP_ContractUnmodifiedCompetitionvehicleCustomer.csv
 sample.SumofObligatedAmount<-read_and_join(Path
@@ -137,9 +145,9 @@ sample.SumofObligatedAmount<-read_and_join(Path
                                            ,by="CSIScontractID"
 )
 # 
-# #Use this to add just a single file
+#Use this to add just a single file
 # sample.SumofObligatedAmount <-read.csv(
-#   paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv",sep=""),
+#   paste("data\\defense_contract_CSIScontractID_sample_100000_SumofObligatedAmount.csv",sep=""),
 #   header=TRUE, sep=",", dec=".", strip.white=TRUE, 
 #   na.strings=c("NULL","NA"),
 #   stringsAsFactors=FALSE
@@ -148,16 +156,13 @@ sample.SumofObligatedAmount<-read_and_join(Path
 # 
 # 
 # sample.SumofObligatedAmount <-subset(sample.SumofObligatedAmount,select=-c(
-#     NumberOfOffersReceived,
-# IsFullAndOpen,
-# IsSomeCompetition,
-# ObligatedAmountIsSomeCompetition,
-# IsOnlyOneSource,
-# IsFollowonToCompetedAction
-# # MultipleOrSingleAwardIDC,
-# # AddMultipleOrSingleAwardIDC,
-# # AwardOrIDVcontractActionType
-# )
+#     StartFiscal_Year,
+#     SumofObligatedAmount,
+#     IsClosed,
+#     LastSignedLastDateToOrder,
+#     LastUltimateCompletionDate,
+#     LastCurrentCompletionDate
+#     )
 # )
 
 

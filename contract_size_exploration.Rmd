@@ -50,8 +50,140 @@ ContractComplete  <- read.csv(
     )
 
 ContractComplete<-subset(ContractComplete,SumOfUnmodifiedbaseandalloptionsvalue>0 & !is.na(SumOfUnmodifiedbaseandalloptionsvalue))
-MeanBaseAndAll<-mean(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)
-sdBaseAndAll<-sd(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)
+
+
+nosim <- 1000
+
+MeanBaseAndAll<-log10(mean(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue))
+sdBaseAndAll<-sd(log10(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue+1))
+10^(MeanBaseAndAll+sdBaseAndAll)
+# 
+cfunc <- function(x, n) (mean(log10(x)))
+
+
+dat <- data.frame(
+  x = c(apply(matrix(sample(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue, nosim * 10, replace = TRUE,
+                            prob=abs(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)), 
+                     nosim), 1, cfunc, 10),
+        apply(matrix(sample(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue, nosim * 20, replace = TRUE,
+                            prob=abs(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)), 
+                     nosim), 1, cfunc, 20),
+        apply(matrix(sample(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue, nosim * 30, replace = TRUE,
+                            prob=abs(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)), 
+                     nosim), 1, cfunc, 30),
+        apply(matrix(sample(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue, nosim * 40, replace = TRUE,
+                            prob=abs(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)), 
+                     nosim), 1, cfunc, 40)
+        ),
+  size = factor(rep(c(10, 20, 30,40), rep(nosim, 4))))
+g <- ggplot(dat, aes(x = x, fill = size)) + geom_histogram(alpha = .20,  colour = "black")#+scale_x_log10() #binwidth=.3, #, aes(y = ..density..)
+g <- g + stat_function(fun = dnorm, size = 2)+ theme(axis.text.x = element_text(angle = 90, hjust = 1))
+g + facet_grid(. ~ size)
+
+
+
+
+
+
+ContractComplete  <- read.csv(
+    paste(Path,"data\\defense_contract_SP_ContractSampleCriteriaDetailsCustomer.csv", sep = ""),
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+ContractComplete<-subset(ContractComplete,SumofObligatedAmount>0 & !is.na(SumofObligatedAmount) & StartFiscal_Year>=2007)
+
+
+quantile(ContractComplete$SumofObligatedAmount,probs=ContractComplete$SumofObligatedAmount/sum(ContractComplete$SumofObligatedAmount),)
+
+wtd.quantile(x=ContractComplete$SumofObligatedAmount,weights=ContractComplete$SumofObligatedAmount,prob=c(0.25,0.5,0.75))
+
+wtd.quantile(x=log10(ContractComplete$SumofObligatedAmount),weights=log10(ContractComplete$SumofObligatedAmount),prob=c(0.25,0.5,0.75))
+
+wtd.mean(x=log10(ContractComplete$SumofObligatedAmount),weights=log10(ContractComplete$SumofObligatedAmount))
+WtdLogMean<-
+WtdLogSD<-sqrt(wtd.var(x=log10(ContractComplete$SumofObligatedAmount),weights=ContractComplete$SumofObligatedAmount))
+
+nosim <- 1000
+
+MeanBaseAndAll<-mean(log10(ContractComplete))
+sdBaseAndAll<-sd(log10(ContractComplete$SumofObligatedAmount))
+10^(MeanBaseAndAll+sdBaseAndAll)
+# 
+cfunc <- function(x, n) (mean(log10(x)))
+sdfunc <- function(x, n) (sd(log10(x)))
+set.seed(1)
+dat <- data.frame(
+  x = c(apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 10, replace = TRUE,
+                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+                     nosim), 1, cfunc, 10),
+        apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 20, replace = TRUE,
+                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+                     nosim), 1, cfunc, 20),
+        apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 30, replace = TRUE,
+                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+                     nosim), 1, cfunc, 30),
+        apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 40, replace = TRUE,
+                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+                     nosim), 1, cfunc, 40)
+        ),
+  size = factor(rep(c(10, 20, 30,40), rep(nosim, 4))))
+g <- ggplot(dat, aes(x = x, fill = size)) + geom_histogram(alpha = .20,  colour = "black")#+scale_x_log10() #binwidth=.3, #, aes(y = ..density..)
+g <- g + stat_function(fun = dnorm, size = 2)+ theme(axis.text.x = element_text(angle = 90, hjust = 1))
+g + facet_grid(. ~ size)
+
+
+sddat <- data.frame(
+  x = c(apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 10, replace = TRUE,
+                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+                     nosim), 1, sdfunc, 10),
+        apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 20, replace = TRUE,
+                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+                     nosim), 1, sdfunc, 20),
+        apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 30, replace = TRUE,
+                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+                     nosim), 1, sdfunc, 30),
+        apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 40, replace = TRUE,
+                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+                     nosim), 1, sdfunc, 40)
+        ),
+  size = factor(rep(c(10, 20, 30,40), rep(nosim, 4))))
+g <- ggplot(sddat, aes(x = x, fill = size)) + geom_histogram(alpha = .20,  colour = "black")#+scale_x_log10() #binwidth=.3, #, aes(y = ..density..)
+g <- g + stat_function(fun = dnorm, size = 2)+ theme(axis.text.x = element_text(angle = 90, hjust = 1))
+g + facet_grid(. ~ size)
+
+weightedmean<-mean(dat$x[sddat$size==40])
+weightedsd<-mean(sddat$x[sddat$size==40])
+
+length(ContractComplete$SumofObligatedAmount[ContractComplete$SumofObligatedAmount>=10^weightedmean])
+length(ContractComplete$SumofObligatedAmount[ContractComplete$SumofObligatedAmount>=10^(weightedmean+weightedsd)])
+10^(weightedmean-weightedsd)
+10^(weightedmean+weightedsd)
+OblMeanLog<-mean(log10(ContractComplete$SumofObligatedAmount))
+OblSDLog<-sd(log10(ContractComplete$SumofObligatedAmount))
+
+
+cutoffs<-c(10^mean(log10(ContractComplete$SumofObligatedAmount)),
+           10^mean(log10(ContractComplete$SumofObligatedAmount)+sd(log10(ContractComplete$SumofObligatedAmount))),
+#mean(ContractComplete$SumofObligatedAmount),
+10^(wtd.mean(x=log10(ContractComplete$SumofObligatedAmount),weights=ContractComplete$SumofObligatedAmount)-
+        sqrt(wtd.var(x=log10(ContractComplete$SumofObligatedAmount),weights=ContractComplete$SumofObligatedAmount))),
+10^(wtd.mean(x=log10(ContractComplete$SumofObligatedAmount),weights=ContractComplete$SumofObligatedAmount))
+)
+ecdf(ContractComplete$SumofObligatedAmount)(cutoffs)
+roundedcutoffs<-c(15000,100000,1000000,30000000)
+ecdf(ContractComplete$SumofObligatedAmount)(roundedcutoffs)
+nrow(subset(ContractComplete,SumofObligatedAmount>=30000000))
+
+10^mean(dat$x[sddat$size==40]))
+
+
+
+10^qnorm(c(0.25,0.5,0.75,0.9,0.95,0.99995),mean=OblMeanLog,sd=OblSDLog)
+
+OblLogMean<-mean(ContractComplete$SumofObligatedAmount)
+OblLogSD<-sd(ContractComplete$SumofObligatedAmount)
+
 summary(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)
 ```
 

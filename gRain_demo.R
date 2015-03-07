@@ -30,6 +30,9 @@ pn2 <- grain(cpp2)
 q2 <- querygrain(pn2)
 
 
+querygrain(setEvidence(pn2, nslist=list("asia"=c(1, 0), "xray"="yes","smoke"="yes")))
+
+
 
 ## Version 2) Specify triangulated undirected graph and data
 ugf <- list(c("either", "lung", "tub"), c("either", "lung", "bronc"),

@@ -12,6 +12,7 @@ output:
 require(ggplot2)
 require(stringr)
 require(plyr)
+require(Hmisc)
 options(error=recover)
 setwd("K:\\Development\\Fixed-price")
 # setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
@@ -41,15 +42,61 @@ Initial contract duration is a new characteristic for CSIS.  The duration is cal
 **Completed contracts** have a contract end date in FY2013 or have been marked as closed and/or terminated. 
 
 ```{r setup, echo = TRUE}
-contract.sample  <- read.csv(
-    paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv", sep = ""),
+ContractSample  <- read.csv(
+    paste("data\\defense_contract_CSIScontractID_sample_100000_SumofObligatedAmount.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
     stringsAsFactors = TRUE
     )
 
 #These will probably be moved into apply_lookups at some point
-contract.sample<-apply_lookups(Path,contract.sample)
+ContractSample<-apply_lookups(Path,ContractSample)
+
+summary(subset(ContractSample,
+               select=c(LastSignedLastDateToOrder,
+      LastUltimateCompletionDate,
+      LastCurrentCompletionDate,
+      UnmodifiedCurrentCompletionDate,
+      UnmodifiedUltimateCompletionDate,
+      UnmodifiedLastDateToOrder,
+      MinOfEffectiveDate,
+      MinOfSignedDate
+      
+                                ))
+        )
+
+min(strptime(ContractSample$MinOfEffectiveDate[!is.na(ContractSample$MinOfEffectiveDate)],"%Y-%m-%d"))
+max(strptime(ContractSample$UnmodifiedCurrentCompletionDate[!is.na(ContractSample$UnmodifiedCurrentCompletionDate)],"%Y-%m-%d"))
+ContractSample$UnmodifiedDays<-as.numeric(difftime(strptime(ContractSample$UnmodifiedCurrentCompletionDate,"%Y-%m-%d")
+                                                     , strptime(ContractSample$MinOfEffectiveDate,"%Y-%m-%d")
+                                                     , unit="days"
+        ))+1
+
+
+daysquantile<-quantile(ContractSample$UnmodifiedDays,c(0.25,0.5,0.75),na.rm=TRUE)
+exp(quantile(log(ContractSample$UnmodifiedDays),c(0.25,0.5,0.75),na.rm=TRUE))
+mean(ContractSample$UnmodifiedDays,na.rm=TRUE)
+exp(mean(log(ContractSample$UnmodifiedDays),na.rm=TRUE))
+
+
+
+ggplot(
+    data = ContractSample,
+    aes_string(x = "UnmodifiedDays",
+               fill = "qDuration")
+    ) +     geom_bar(binwidth=7)  +scale_x_continuous(limits=c(0, 2000))
+
+
+ggplot(
+    data = ContractSample,
+    aes_string(x = "log(UnmodifiedDays)",
+                fill = "qDuration")
+    ) +     geom_bar(binwidth=0.1)  #+scale_x_continuous(limits=c(0, 2000))
+
+
+
+
+
 ```
 
 

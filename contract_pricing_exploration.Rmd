@@ -49,16 +49,16 @@ contract.sample  <- read.csv(
 # contract.sample$MinOfEffectiveDate <- strptime(contract.sample$MinOfEffectiveDate, "%Y-%m-%d")
 
 contract.sample$pIsFixedPrice <- contract.sample$ObligatedAmountIsFixedPrice/contract.sample$SumofObligatedAmount
-contract.sample$pIsFixedPrice[is.nan(contract.sample$ObligatedAmountIsFixedPrice)] <- 0
+contract.sample$pIsFixedPrice[is.nan(contract.sample$ObligatedAmountIsFixedPrice)|is.na(contract.sample$ObligatedAmountIsFixedPrice)] <- 0
 
 contract.sample$pIsCostBased <- contract.sample$ObligatedAmountIsCostBased/contract.sample$SumofObligatedAmount
-contract.sample$pIsCostBased[is.nan(contract.sample$ObligatedAmountIsCostBased)] <- 0
+contract.sample$pIsCostBased[is.nan(contract.sample$ObligatedAmountIsCostBased)|is.na(contract.sample$ObligatedAmountIsCostBased)] <- 0
 
 contract.sample$pIsCombination <- contract.sample$ObligatedAmountIsCombination/contract.sample$SumofObligatedAmount
-contract.sample$pIsCombination[is.nan(contract.sample$ObligatedAmountIsCombination)] <- 0
+contract.sample$pIsCombination[is.nan(contract.sample$ObligatedAmountIsCombination)|is.na(contract.sample$ObligatedAmountIsCombination)] <- 0
 
 contract.sample$pIsIncentive <- contract.sample$ObligatedAmountIsIncentive/contract.sample$SumofObligatedAmount
-contract.sample$pIsIncentive[is.nan(contract.sample$ObligatedAmountIsIncentive)] <- 0
+contract.sample$pIsIncentive[is.nan(contract.sample$ObligatedAmountIsIncentive)|is.na(contract.sample$ObligatedAmountIsIncentive)] <- 0
 
 contract.sample<-apply_lookups(Path,contract.sample)
 
@@ -97,7 +97,7 @@ This set of variables includes three broad types.
 * pIsSomeCompetition is dollar value of all transactions that were labeled as competed divided the contracts total obligations. 
 
 ```{r overallvars, echo = TRUE}
-summary(subset(contract.sample,select=c(#TypeOfContractPricing#Pricing.Mechanism.Code,,#
+summary(subset(contract.sample,select=c(#TypeOfContractPricing#Pricing.Mechanism.Code,#
                                 IsFixedPrice,
                                 UnmodifiedIsFixedPrice,
                                 ObligatedAmountIsFixedPrice,
@@ -118,20 +118,55 @@ summary(subset(contract.sample,select=c(#TypeOfContractPricing#Pricing.Mechanism
         )
 
 
-ggplot(
-    data = subset(contract.sample,is.na(IsFixedPrice)),
-    aes_string(x = "pIsFixedPrice"),
-    main = "Distribution by percent of dollars with fixed-price for mixed and unlabeled contracts."
-    )+geom_bar()#binwidth=0.05
-    
+contract.sample$FixedOrCost[contract.sample$pIsFixedPrice>0  |
+                                      contract.sample$pIsCostBased>0 | 
+                                          contract.sample$pIsCombination>0]<-"Combination \nor Other"
+
+contract.sample$FixedOrCost[contract.sample$pIsFixedPrice>=0.95|(contract.sample$IsFixedPrice=="Fixed Price" & contract.sample$pIsCombination==0)]<-"Fixed-Price"
+contract.sample$FixedOrCost[contract.sample$pIsCostBased>=0.95|(contract.sample$IsCostBased==1 & contract.sample$pIsCombination==0)]<-"Cost-Based"
+contract.sample$FixedOrCost<-factor(contract.sample$FixedOrCost,levels=c("Fixed-Price","Cost-Based","Combination \nor Other"))
 
 ggplot(
-    data = subset(contract.sample,is.na(IsCostBased)),
-    aes_string(x = "pIsCostBased"),
+    data = subset(contract.sample,is.na(IsFixedPrice) | IsFixedPrice== "Combination \nor Unlabeled"),
+    aes_string(x = "pIsFixedPrice",
+               fill="FixedOrCost"
+               
+               ),
+    main = "Distribution by percent of dollars with fixed-price for mixed and unlabeled contracts."
+    )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))
+    
+
+
+ggplot(
+    data = subset(contract.sample,is.na(IsFixedPrice) | is.na(IsCostBased)),
+    aes_string(x = "pIsCostBased",
+               fill="FixedOrCost"
+               
+               ),
     main = "Distribution by percent of dollars with cost-based for mixed and unlabeled contracts."
-    ) +geom_bar()#binwidth=0.05
+    )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))
+    
+
+
+ggplot(
+    data = contract.sample,
+    aes_string(x = "pIsCombination",
+               fill="FixedOrCost"),
+    main = "Distribution by percent of dollars with cost-based for labeled contracts."
+    ) +geom_bar()+scale_x_continuous(limits = c(-0.25, 1.25))
+    
+
+
+ggplot(
+    data = contract.sample,
+    aes_string(x = "pIsFixedPrice",
+               fill="FixedOrCost"
+               
+               ),
+    main = "Distribution by percent of dollars with fixed-price for all."
+    )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))
     
     
-    
+
 
 ```
