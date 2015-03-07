@@ -1,4 +1,4 @@
-# DoD Fixed-Price Study: Contract Vehicle Classification
+# DoD Fixed-Price and Competition Study: Single-Offer Model Building
 Greg Sanders  
 Tuesday, January 13, 2015  
 
@@ -262,7 +262,7 @@ NAisFullAndOpen<-is.na(ContractSample$UnmodifiedIsFullAndOpen)
 ContractSample$UnmodifiedIsFullAndOpen[NAisFullAndOpen]<-ContractSample$IsFullAndOpen[NAisFullAndOpen]
 rm(NAisFullAndOpen)
 
-ContractSample$qDuration<-cut2(ContractSample$UnmodifiedDays,cuts=c(61,221,366))
+ContractSample$qDuration<-cut2(ContractSample$UnmodifiedDays,cuts=c(61,214,366))
 
 NAnumberOfOffers<-is.na(ContractSample$UnmodifiedNumberOfOffersReceived)&!is.na(ContractSample$NumberOfOffersReceived)
 ContractSample$UnmodifiedNumberOfOffersReceived[NAnumberOfOffers]<-ContractSample$NumberOfOffersReceived[NAnumberOfOffers]
@@ -309,8 +309,8 @@ summary(subset(ContractSample,select=c(UnmodifiedIsSomeCompetition,
 ##                                                       
 ##                 qCeiling             qDuration    
 ##  [0.00e+00,1.50e+04): 3278   [    1,   61):20125  
-##  [1.50e+04,1.00e+05): 9836   [   61,  221):17039  
-##  [1.00e+05,1.00e+06):22151   [  221,  366):13672  
+##  [1.50e+04,1.00e+05): 9836   [   61,  214):16504  
+##  [1.00e+05,1.00e+06):22151   [  214,  366):14207  
 ##  [1.00e+06,3.00e+07):31489   [  366,19729]:18673  
 ##  [3.00e+07,3.36e+12]: 2755                        
 ##                                                   
