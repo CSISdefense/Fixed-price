@@ -77,12 +77,19 @@ img {
 
 <pre><code>## Loading required package: ggplot2
 ## Loading required package: stringr
+## Loading required package: graph
 ## Loading required package: plyr
+## 
+## Attaching package: 'plyr'
+## 
+## The following object is masked from 'package:graph':
+## 
+##     join
+## 
 ## Loading required package: Hmisc
 ## Loading required package: grid
 ## Loading required package: lattice
 ## Loading required package: survival
-## Loading required package: splines
 ## Loading required package: Formula
 ## 
 ## Attaching package: 'Hmisc'
@@ -93,7 +100,18 @@ img {
 ## 
 ## The following objects are masked from 'package:base':
 ## 
-##     format.pval, round.POSIXt, trunc.POSIXt, units</code></pre>
+##     format.pval, round.POSIXt, trunc.POSIXt, units
+## 
+## Loading required package: Matrix
+## Loading required package: gRain
+## Loading required package: gRbase
+## Loading required package: bnlearn
+## 
+## Attaching package: 'bnlearn'
+## 
+## The following objects are masked from 'package:gRbase':
+## 
+##     children, parents</code></pre>
 <p>Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the <a href="RnD_1to5_exploration.md">exploration on R&amp;D</a>, we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..</p>
 <div id="studying-contract-vehicle-within-the-sample." class="section level2">
 <h2>Studying contract vehicle within the sample.</h2>
@@ -297,6 +315,11 @@ ContractSample$qDuration&lt;-cut2(ContractSample$UnmodifiedDays,cuts=c(61,214,36
 NAnumberOfOffers&lt;-is.na(ContractSample$UnmodifiedNumberOfOffersReceived)&amp;!is.na(ContractSample$NumberOfOffersReceived)
 ContractSample$UnmodifiedNumberOfOffersReceived[NAnumberOfOffers]&lt;-ContractSample$NumberOfOffersReceived[NAnumberOfOffers]
 rm(NAnumberOfOffers)
+ContractSample$IsIDV&lt;-factor(ContractSample$IsIDV,levels=c(0,1),labels=c(&quot;Def/Pur&quot;,&quot;IDV&quot;))
+ContractSample$SingleOffer&lt;-factor(ContractSample$UnmodifiedNumberOfOffersReceived==1,
+                                   levels=c(TRUE,FALSE),
+                                   labels=c(&quot;Single&quot;,&quot;Multi&quot;)
+)
 
 summary(subset(ContractSample,select=c(UnmodifiedIsSomeCompetition,
                                 IsIDV,
@@ -310,14 +333,14 @@ summary(subset(ContractSample,select=c(UnmodifiedIsSomeCompetition,
                                 UnmodifiedNumberOfOffersReceived
                                 ))
         )</code></pre>
-<pre><code>##  UnmodifiedIsSomeCompetition     IsIDV       
-##  Comp.    :69509             Min.   :0.0000  
-##  No Comp. :    0             1st Qu.:1.0000  
-##  Unlabeled:    0             Median :1.0000  
-##                              Mean   :0.7663  
-##                              3rd Qu.:1.0000  
-##                              Max.   :1.0000  
-##                                              
+<pre><code>##  UnmodifiedIsSomeCompetition     IsIDV      
+##  Comp.    :69509             Def/Pur:16242  
+##  No Comp. :    0             IDV    :53267  
+##  Unlabeled:    0                            
+##                                             
+##                                             
+##                                             
+##                                             
 ##                  FixedOrCost         UnmodifiedIsFullAndOpen
 ##  Fixed-Price           :56167   Full &amp; Open      :38004     
 ##  Cost-Based            :10183   Not Full \n&amp; Open:31502     
@@ -350,7 +373,137 @@ summary(subset(ContractSample,select=c(UnmodifiedIsSomeCompetition,
 ##  3rd Qu.:  5.000                 
 ##  Max.   :999.000                 
 ##  NA's   :579</code></pre>
-<p>After imputing using consistent labeled entries where available. * UnmodifiedIsFullAndOpen has (0.00% missing data). * UnmodifiedNumberOfOffersReceived has (0.83% missing data.</p>
+<p>The model has nine core variables, though one is presently missing. After renaming the variables, all unlabeled data is removed from the final model dataset. * IDV (IsIDV) * FxCb (FixedOrCost) * FnO (UnmodifiedIsFullAndOpen) UnmodifiedIsFullAndOpen has (0.00% missing data). * Intl (AnyInternational) * PSR (SimpleArea) * Cei (qCeiling) * Dur (qDuration) * One (SingleOffer) UnmodifiedNumberOfOffersReceived has (0.83% missing data.</p>
+<p>The shortened names are used for ease of graphical and tabular representation. However, there exact form is still wide open, please make suggestions. Ease of comprehensibility and minimizing confusion between competing variables is key.</p>
+<pre class="r"><code>model&lt;-subset(ContractSample,select=c(IsIDV,
+                                FixedOrCost,
+                                UnmodifiedIsFullAndOpen,
+                                ##Number connected
+                                AnyInternational,
+                                SimpleArea,
+                                qCeiling,
+                                qDuration,
+                                SingleOffer
+                                ))
+
+
+colnames(model)[colnames(model)==&quot;IsIDV&quot;]&lt;-&quot;IDV&quot;
+colnames(model)[colnames(model)==&quot;FixedOrCost&quot;]&lt;-&quot;FxCb&quot;
+colnames(model)[colnames(model)==&quot;UnmodifiedIsFullAndOpen&quot;]&lt;-&quot;FnO&quot;
+colnames(model)[colnames(model)==&quot;AnyInternational&quot;]&lt;-&quot;Intl&quot;
+colnames(model)[colnames(model)==&quot;SimpleArea&quot;]&lt;-&quot;PSR&quot;
+colnames(model)[colnames(model)==&quot;qCeiling&quot;]&lt;-&quot;Cei&quot;
+colnames(model)[colnames(model)==&quot;qDuration&quot;]&lt;-&quot;Dur&quot;
+colnames(model)[colnames(model)==&quot;SingleOffer&quot;]&lt;-&quot;One&quot;
+
+
+nrow(model)</code></pre>
+<pre><code>## [1] 69509</code></pre>
+<pre class="r"><code>summary(nrow(subset(model,complete.cases(model))))</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   68800   68800   68800   68800   68800   68800</code></pre>
+<pre class="r"><code>summary(subset(model,complete.cases(model)))</code></pre>
+<pre><code>##       IDV                            FxCb                      FnO       
+##  Def/Pur:16069   Fixed-Price           :55711   Full &amp; Open      :37843  
+##  IDV    :52727   Cost-Based            :10133   Not Full \n&amp; Open:30950  
+##                  Combination \nor Other: 2952   Unlabeled        :    3  
+##                                                                          
+##                                                                          
+##                  Intl                       PSR       
+##  Just U.S.         :56853   Products          :31806  
+##  Any\nInternational:11943   Services          :32854  
+##  Unlabeled         :    0   R&amp;D               : 4127  
+##                             Mixed or Unlabeled:    9  
+##                                                       
+##                   Cei                   Dur            One       
+##  [0.00e+00,1.50e+04): 3213   [    1,   61):19975   Single:15498  
+##  [1.50e+04,1.00e+05): 9759   [   61,  214):16318   Multi :53298  
+##  [1.00e+05,1.00e+06):21940   [  214,  366):14022                 
+##  [1.00e+06,3.00e+07):31146   [  366,19729]:18481                 
+##  [3.00e+07,3.36e+12]: 2738</code></pre>
+<pre class="r"><code>dropped&lt;-subset(model,!complete.cases(model)|
+           FnO==&quot;Unlabeled&quot;|
+           Intl==&quot;Unlabeled&quot;|
+           PSR ==&quot;Mixed or Unlabeled&quot;)
+
+ContractModel&lt;-subset(model,complete.cases(model)&amp;
+           FnO!=&quot;Unlabeled&quot;&amp;
+           Intl!=&quot;Unlabeled&quot;&amp;
+           PSR !=&quot;Mixed or Unlabeled&quot;)
+nrow(ContractModel)</code></pre>
+<pre><code>## [1] 68784</code></pre>
+<p>The last stage before Bayesian learning is setting the whitelists and blacklists. The whitelist contains vectors that must existing in the graph while the blacklist contains forbidden vectors.</p>
+<p>I’ve listed them below based on the origin piece of evidence. 1. IDV (IsIDV) * Whitelist to FnO (UnmodifiedIsFullAndOpen) as many forms of IDVs don’t qualify for full and open. * Blacklist to PSR (SimpleArea) because what you are buying is picked before how you are buying it. 2. FxCb (FixedOrCost) * Possible Whitelist to One (SingleOffer) as this is the key study question, although I worry that I’m forcing it. * Blacklist to PSR (SimpleArea) and Intl (AnyInternational) because figuring out what and where come first. * Blacklist to Cei (qCeiling) and Dur (qDuration), because project scope should come before project pricing, although this may not be entirely true when the vendors make proposals. 3. FnO (UnmodifiedIsFullAndOpen)<br />* Whitelist to One (SingleOffer). We’ll see how strong this connection ends up being, but it’s really straightforward. * Blacklist to PSR (SimpleArea), Intl (AnyInternational), and FxCb (FixedOrCost), as I think those details are set before deciding competition procedures. 4. Intl (AnyInternational) No restrictions or requirements. 5. PSR (SimpleArea) * Blacklist to Intl (AnyInternational) As I think the place of performance in the U.S. or abroad (but not the vendor location) is sometimes decided at least as early as the product or service. 6. Cei (qCeiling) * Blacklist to PSR (SimpleArea) Intl (AnyInternational) because what and where come before scope. 7. Dur (qDuration) * Blacklist to PSR (SimpleArea) Intl (AnyInternational) because what and where come before scope. 8. One (SingleOffer) * Blacklist to most everything. While the vendors responses may influence some factors at the margin, this is the dependent variable for this part of the study.</p>
+<pre class="r"><code>#White list, connections that must occur
+ContractWL&lt;-data.frame(from=&quot;IDV&quot;,to=&quot;FnO&quot;)
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;FnO&quot;,to=&quot;One&quot;))
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;PSR&quot;,to=&quot;FxCb&quot;))
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;FxCb&quot;,to=&quot;One&quot;))
+#Black list, connections that are prohibited
+ContractBL&lt;-data.frame(from=c(&quot;One&quot;),to= c(&quot;IDV&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;One&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;One&quot;,to=&quot;FxCb&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;One&quot;,to=&quot;PSR&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;One&quot;,to=&quot;Cei&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;One&quot;,to=&quot;Dur&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;PSR&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;Cei&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;Dur&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Cei&quot;,to=&quot;PSR&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Cei&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Dur&quot;,to=&quot;PSR&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Dur&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FnO&quot;,to=&quot;PSR&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FnO&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FnO&quot;,to=&quot;FxCb&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;IDV&quot;,to=&quot;PSR&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;IDV&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;PSR&quot;,to=&quot;Intl&quot;))</code></pre>
+<p>I temporarily hiding the graphs until everyone’s had a chance to think through the blacklist and whitelists.</p>
+<pre class="r"><code>gs_dug&lt;-gs(ContractModel,blacklist=ContractBL,whitelist=ContractWL)</code></pre>
+<pre><code>## Warning in check.data(x): variable FnO has levels that are not observed in
+## the data.</code></pre>
+<pre><code>## Warning in check.data(x): variable Intl has levels that are not observed
+## in the data.</code></pre>
+<pre><code>## Warning in check.data(x): variable PSR has levels that are not observed in
+## the data.</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure FxCb -&gt; IDV &lt;- Cei is not
+## applicable, because one or both arcs introduce cycles in the graph.</code></pre>
+<pre class="r"><code># plot(gs_dug,main=&quot;Greedy&quot;)
+iamb_dug&lt;-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL)</code></pre>
+<pre><code>## Warning in check.data(x): variable FnO has levels that are not observed in
+## the data.</code></pre>
+<pre><code>## Warning in check.data(x): variable Intl has levels that are not observed
+## in the data.</code></pre>
+<pre><code>## Warning in check.data(x): variable PSR has levels that are not observed in
+## the data.</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure FnO -&gt; Cei &lt;- Dur is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure IDV -&gt; Dur &lt;- Intl is not
+## applicable, because one or both arcs introduce cycles in the graph.</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure IDV -&gt; FxCb &lt;- Intl is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.</code></pre>
+<pre class="r"><code># plot(iamb_dug,main=&quot;IAMB&quot;)
+iiamb_dug&lt;-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL)</code></pre>
+<pre><code>## Warning in check.data(x): variable FnO has levels that are not observed in
+## the data.</code></pre>
+<pre><code>## Warning in check.data(x): variable Intl has levels that are not observed
+## in the data.</code></pre>
+<pre><code>## Warning in check.data(x): variable PSR has levels that are not observed in
+## the data.</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure FnO -&gt; Cei &lt;- Dur is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure IDV -&gt; Dur &lt;- Intl is not
+## applicable, because one or both arcs introduce cycles in the graph.</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure IDV -&gt; FxCb &lt;- Intl is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.</code></pre>
+<pre class="r"><code># plot(iiamb_dug,main=&quot;Inter-IAMB&quot;)
+# </code></pre>
 </div>
 </div>
 
