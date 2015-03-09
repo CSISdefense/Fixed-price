@@ -3,9 +3,14 @@
 
 
 ```{r echo = TRUE}
-install.packages("ggplot2")
 
-library("ggplot2")
+if (!require("ggplot2")) {
+  install.packages("ggplot2", repos="http://cran.rstudio.com/") 
+  library("ggplot2")
+}
+
+#install.packages("ggplot2")
+#library("ggplot2")
 
 setwd("K:\\Development\\Fixed-price")
 
