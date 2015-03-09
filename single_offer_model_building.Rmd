@@ -246,25 +246,26 @@ nrow(ContractModel)
 The last stage before Bayesian learning is setting the whitelists and blacklists. The whitelist contains vectors that must existing in the graph while the blacklist contains forbidden vectors.
 
 I've listed them below based on the origin piece of evidence.
+
 1. IDV (IsIDV)
-* Whitelist to FnO (UnmodifiedIsFullAndOpen) as many forms of IDVs don't qualify for full and open.
-* Blacklist to PSR (SimpleArea) because what you are buying is picked before how you are buying it.
+  * Whitelist to FnO (UnmodifiedIsFullAndOpen) as many forms of IDVs don't qualify for full and open.
+  * Blacklist to PSR (SimpleArea) because what you are buying is picked before how you are buying it.
 2. FxCb (FixedOrCost)
-* Possible Whitelist to One (SingleOffer) as this is the key study question, although I worry that I'm forcing it.
-* Blacklist to PSR (SimpleArea) and Intl (AnyInternational) because figuring out what and where come first.
-* Blacklist to Cei (qCeiling) and Dur (qDuration), because project scope should come before project pricing,  although this may not be entirely true when the vendors make proposals.
+  * Possible Whitelist to One (SingleOffer) as this is the key study question, although I worry that I'm forcing it.
+  * Blacklist to PSR (SimpleArea) and Intl (AnyInternational) because figuring out what and where come first.
+  * Blacklist to Cei (qCeiling) and Dur (qDuration), because project scope should come before project pricing,  although this may not be entirely true when the vendors make proposals.
 3. FnO (UnmodifiedIsFullAndOpen)  
-* Whitelist to One (SingleOffer). We'll see how strong this connection ends up being, but it's really straightforward.
-* Blacklist to PSR (SimpleArea),  Intl (AnyInternational), and FxCb (FixedOrCost), as I think those details are set before deciding competition procedures.
+  * Whitelist to One (SingleOffer). We'll see how strong this connection ends up being, but it's really straightforward.
+  * Blacklist to PSR (SimpleArea),  Intl (AnyInternational), and FxCb (FixedOrCost), as I think those details are set before deciding competition procedures.
 4. Intl (AnyInternational) No restrictions or requirements.
 5. PSR (SimpleArea)
-* Blacklist to Intl (AnyInternational) As I think the place of performance in the U.S. or abroad (but not the vendor location) is sometimes decided at least as early as the  product or service.
+  * Blacklist to Intl (AnyInternational) As I think the place of performance in the U.S. or abroad (but not the vendor location) is sometimes decided at least as early as the  product or service.
 6. Cei (qCeiling)
-* Blacklist to PSR (SimpleArea) Intl (AnyInternational) because what and where come before scope.
+  * Blacklist to PSR (SimpleArea) Intl (AnyInternational) because what and where come before scope.
 7. Dur (qDuration)
-* Blacklist to PSR (SimpleArea) Intl (AnyInternational) because what and where come before scope.
+  * Blacklist to PSR (SimpleArea) Intl (AnyInternational) because what and where come before scope.
 8. One (SingleOffer) 
-* Blacklist to most everything. While the vendors responses may influence some factors at the margin, this is the dependent variable for this part of the study.
+  * Blacklist to most everything. While the vendors responses may influence some factors at the margin, this is the dependent variable for this part of the study.
 
 
 
