@@ -193,13 +193,23 @@ summary(subset(ContractSample,select=c(UnmodifiedIsSomeCompetition,
         )
 ```
 The model has nine core variables, though one is presently missing. After renaming the variables, all unlabeled data is removed from the final model dataset.
-* IDV (IsIDV)
-* FxCb (FixedOrCost)
+
+*IDV (IsIDV) IsDefiniteVehicle has ('r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(IsIDV)|IsIDV=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
+
+* FxCb (FixedOrCost) FixedOrCost has ('r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(FixedOrCost)|FixedOrCost=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
+
 * FnO (UnmodifiedIsFullAndOpen) UnmodifiedIsFullAndOpen has (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(UnmodifiedIsFullAndOpen)|UnmodifiedIsFullAndOpen=="Unlabeled")) /nrow(ContractSample)*100)` missing data).
-* Intl (AnyInternational)
-* PSR (SimpleArea)
-* Cei (qCeiling)
-* Dur (qDuration)
+
+* Intl (AnyInternational) AnyInternational has (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(AnyInternational)|AnyInternational=="Unlabeled")) /nrow(ContractSample)*100)` missing data. 
+
+* PSR (SimpleArea) SimpleArea has (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(SimpleArea)|SimpleArea=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
+
+* Cei (qCeiling) qCeiling has (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(UnmodifiedContractBaseAndAllOptionsValue)|UnmodifiedContractBaseAndAllOptionsValue=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
+
+* Dur (qDuration) qDuration has ('r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(MinOfSignedDate)|MinOfSignedDate=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
+
+* Dur (LastUltimateCompleteDate) LastUltimateCompleteDate has (`r sprintf("%1.2f%%", nrow(subset(ContractSample,is.na(LastUltimateCompletionDate)|LastUltimateCompletionDate=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
+
 * One (SingleOffer)  UnmodifiedNumberOfOffersReceived has (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(UnmodifiedNumberOfOffersReceived)|UnmodifiedNumberOfOffersReceived==0)) /nrow(ContractSample)*100)` missing data.
 
 The shortened names are used for ease of graphical and tabular representation. However, there exact form is still wide open, please make suggestions. Ease of comprehensibility and minimizing confusion between competing variables is key.
