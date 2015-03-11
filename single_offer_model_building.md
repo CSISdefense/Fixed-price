@@ -7,49 +7,40 @@ Tuesday, January 13, 2015
 ## Loading required package: ggplot2
 ## Loading required package: stringr
 ## Loading required package: graph
-```
-
-```
-## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
-## logical.return = TRUE, : there is no package called 'graph'
-```
-
-```
 ## Loading required package: plyr
+## 
+## Attaching package: 'plyr'
+## 
+## The following object is masked from 'package:graph':
+## 
+##     join
+## 
 ## Loading required package: Hmisc
-```
-
-```
-## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
-## logical.return = TRUE, : there is no package called 'Hmisc'
-```
-
-```
+## Loading required package: grid
+## Loading required package: lattice
+## Loading required package: survival
+## Loading required package: Formula
+## 
+## Attaching package: 'Hmisc'
+## 
+## The following objects are masked from 'package:plyr':
+## 
+##     is.discrete, summarize
+## 
+## The following objects are masked from 'package:base':
+## 
+##     format.pval, round.POSIXt, trunc.POSIXt, units
+## 
 ## Loading required package: Matrix
 ## Loading required package: gRain
-```
-
-```
-## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
-## logical.return = TRUE, : there is no package called 'gRain'
-```
-
-```
 ## Loading required package: gRbase
-```
-
-```
-## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
-## logical.return = TRUE, : there is no package called 'gRbase'
-```
-
-```
 ## Loading required package: bnlearn
-```
-
-```
-## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
-## logical.return = TRUE, : there is no package called 'bnlearn'
+## 
+## Attaching package: 'bnlearn'
+## 
+## The following objects are masked from 'package:gRbase':
+## 
+##     children, parents
 ```
 
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
@@ -255,122 +246,240 @@ Note that these missing data rates are only for competed entries, so they will t
 
  * IsIDV is a classification for the entirity of the contract  (0.00% missing data). See [vehicle exploration](contract_vehicle_exploration.md) for more. Since this variable is consistently labeled, it isn't necessary to impute data or seperate out unmodified entries.
  * UnmodifiedIsFullAndOpen is the classification given by the first record for the contract (0.00% missing data). See [exploration on competition](contract_competition_exploration.md) for more.
- * UnmodifiedNumberOfOffersReceived reports the Number of Offers received according to the first reported transaction under a contract (59.88% missing data, far too high, there must be a SQL mistake). See [exploration on competition](contract_competition_exploration.md) for more.
+ * UnmodifiedNumberOfOffersReceived reports the Number of Offers Received according to the first reported transaction under a contract (59.88% missing data, far too high, there must be a SQL mistake). See [exploration on competition](contract_competition_exploration.md) for more.
 * simplearea is a classification for the entirity of the contract  ( missing data). See [exploration on product, service, and R&D](contract_ProductServiceRnD_exploration.md) for more.
 
 
 
 
 ```r
-# ContractSample$FixedOrCost[ContractSample$pIsFixedPrice>0  |
-#                                       ContractSample$pIsCostBased>0 | 
-#                                           ContractSample$pIsCombination>0]<-"Combination \nor Other"
-# 
-# ContractSample$FixedOrCost[ContractSample$pIsFixedPrice>=0.95|(ContractSample$IsFixedPrice=="Fixed Price" & ContractSample$pIsCombination==0)]<-"Fixed-Price"
-# ContractSample$FixedOrCost[ContractSample$pIsCostBased>=0.95|(ContractSample$IsCostBased==1 & ContractSample$pIsCombination==0)]<-"Cost-Based"
-# ContractSample$FixedOrCost<-factor(ContractSample$FixedOrCost,levels=c("Fixed-Price","Cost-Based","Combination \nor Other"))
-# 
-# ContractSample$AnyInternational[ContractSample$pIsInternational<=0 & 
-#                     ContractSample$AnyInternational=="Any\nInternational" &
-#                     ContractSample$UnmodifiedIsInternational==0]<-"Just U.S."
-# 
-# NASimpleArea<-ContractSample$SimpleArea=="Mixed or Unlabeled"&!is.na(ContractSample$UnmodifiedSimpleArea)
-# ContractSample$SimpleArea[NASimpleArea]<-ContractSample$UnmodifiedSimpleArea[NASimpleArea]
-# ContractSample$SimpleArea[ContractSample$SimpleArea=="Mixed or Unlabeled" & ContractSample$pIsProducts>0.5]<-"Products"
-# ContractSample$SimpleArea[ContractSample$SimpleArea=="Mixed or Unlabeled" & ContractSample$pIsServices>0.5]<-"Services"
-# ContractSample$SimpleArea[ContractSample$SimpleArea=="Mixed or Unlabeled" & ContractSample$pIsRnD>0.5]<-"R&D"
-# 
-# 
-# roundedcutoffs<-c(15000,100000,1000000,30000000)
-# ContractSample$qCeiling <- cut2(ContractSample$UnmodifiedContractBaseAndAllOptionsValue,cuts=roundedcutoffs)
-# 
-# #Impute missing values
-# NAisFullAndOpen<-is.na(ContractSample$UnmodifiedIsFullAndOpen)
-# ContractSample$UnmodifiedIsFullAndOpen[NAisFullAndOpen]<-ContractSample$IsFullAndOpen[NAisFullAndOpen]
-# rm(NAisFullAndOpen)
-# 
-# ContractSample$qDuration<-cut2(ContractSample$UnmodifiedDays,cuts=c(61,214,366))
-# 
-# NAnumberOfOffers<-is.na(ContractSample$UnmodifiedNumberOfOffersReceived)&!is.na(ContractSample$NumberOfOffersReceived)
-# ContractSample$UnmodifiedNumberOfOffersReceived[NAnumberOfOffers]<-ContractSample$NumberOfOffersReceived[NAnumberOfOffers]
-# rm(NAnumberOfOffers)
-# ContractSample$IsIDV<-factor(ContractSample$IsIDV,levels=c(0,1),labels=c("Def/Pur","IDV"))
-# ContractSample$SingleOffer<-factor(ContractSample$UnmodifiedNumberOfOffersReceived==1,
-#                                    levels=c(TRUE,FALSE),
-#                                    labels=c("Single","Multi")
-# )
-# 
-# summary(subset(ContractSample,select=c(UnmodifiedIsSomeCompetition,
-#                                 IsIDV,
-#                                 FixedOrCost,
-#                                 UnmodifiedIsFullAndOpen,
-#                                 ##Number connected
-#                                 AnyInternational,
-#                                 SimpleArea,
-#                                 qCeiling,
-#                                 qDuration,
-#                                 UnmodifiedNumberOfOffersReceived
-#                                 ))
-#         )
+ContractSample$FixedOrCost[ContractSample$pIsFixedPrice>0  |
+                                      ContractSample$pIsCostBased>0 | 
+                                          ContractSample$pIsCombination>0]<-"Combination \nor Other"
+
+ContractSample$FixedOrCost[ContractSample$pIsFixedPrice>=0.95|(ContractSample$IsFixedPrice=="Fixed Price" & ContractSample$pIsCombination==0)]<-"Fixed-Price"
+ContractSample$FixedOrCost[ContractSample$pIsCostBased>=0.95|(ContractSample$IsCostBased==1 & ContractSample$pIsCombination==0)]<-"Cost-Based"
+ContractSample$FixedOrCost<-factor(ContractSample$FixedOrCost,levels=c("Fixed-Price","Cost-Based","Combination \nor Other"))
+
+ContractSample$AnyInternational[ContractSample$pIsInternational<=0 & 
+                    ContractSample$AnyInternational=="Any\nInternational" &
+                    ContractSample$UnmodifiedIsInternational==0]<-"Just U.S."
+
+NASimpleArea<-ContractSample$SimpleArea=="Mixed or Unlabeled"&!is.na(ContractSample$UnmodifiedSimpleArea)
+ContractSample$SimpleArea[NASimpleArea]<-ContractSample$UnmodifiedSimpleArea[NASimpleArea]
+ContractSample$SimpleArea[ContractSample$SimpleArea=="Mixed or Unlabeled" & ContractSample$pIsProducts>0.5]<-"Products"
+ContractSample$SimpleArea[ContractSample$SimpleArea=="Mixed or Unlabeled" & ContractSample$pIsServices>0.5]<-"Services"
+ContractSample$SimpleArea[ContractSample$SimpleArea=="Mixed or Unlabeled" & ContractSample$pIsRnD>0.5]<-"R&D"
+
+
+roundedcutoffs<-c(15000,100000,1000000,30000000)
+ContractSample$qCeiling <- cut2(ContractSample$UnmodifiedContractBaseAndAllOptionsValue,cuts=roundedcutoffs)
+
+#Impute missing values
+NAisFullAndOpen<-is.na(ContractSample$UnmodifiedIsFullAndOpen)
+ContractSample$UnmodifiedIsFullAndOpen[NAisFullAndOpen]<-ContractSample$IsFullAndOpen[NAisFullAndOpen]
+rm(NAisFullAndOpen)
+
+ContractSample$qDuration<-cut2(ContractSample$UnmodifiedDays,cuts=c(61,214,366))
+
+NAnumberOfOffers<-is.na(ContractSample$UnmodifiedNumberOfOffersReceived)&!is.na(ContractSample$NumberOfOffersReceived)
+ContractSample$UnmodifiedNumberOfOffersReceived[NAnumberOfOffers]<-ContractSample$NumberOfOffersReceived[NAnumberOfOffers]
+rm(NAnumberOfOffers)
+ContractSample$IsIDV<-factor(ContractSample$IsIDV,levels=c(0,1),labels=c("Def/Pur","IDV"))
+ContractSample$SingleOffer<-factor(ContractSample$UnmodifiedNumberOfOffersReceived==1,
+                                   levels=c(TRUE,FALSE),
+                                   labels=c("Single","Multi")
+)
+
+summary(subset(ContractSample,select=c(UnmodifiedIsSomeCompetition,
+                                IsIDV,
+                                FixedOrCost,
+                                UnmodifiedIsFullAndOpen,
+                                ##Number connected
+                                AnyInternational,
+                                SimpleArea,
+                                qCeiling,
+                                qDuration,
+                                UnmodifiedNumberOfOffersReceived
+                                ))
+        )
+```
+
+```
+##  UnmodifiedIsSomeCompetition     IsIDV      
+##  Comp.    :69509             Def/Pur:16242  
+##  No Comp. :    0             IDV    :53267  
+##  Unlabeled:    0                            
+##                                             
+##                                             
+##                                             
+##                                             
+##                  FixedOrCost         UnmodifiedIsFullAndOpen
+##  Fixed-Price           :56167   Full & Open      :38004     
+##  Cost-Based            :10183   Not Full \n& Open:31502     
+##  Combination \nor Other: 3025   Unlabeled        :    3     
+##  NA's                  :  134                               
+##                                                             
+##                                                             
+##                                                             
+##            AnyInternational              SimpleArea   
+##  Just U.S.         :57470   Products          :32010  
+##  Any\nInternational:12039   Services          :33288  
+##  Unlabeled         :    0   R&D               : 4202  
+##                             Mixed or Unlabeled:    9  
+##                                                       
+##                                                       
+##                                                       
+##                 qCeiling             qDuration    
+##  [0.00e+00,1.50e+04): 3278   [    1,   61):20125  
+##  [1.50e+04,1.00e+05): 9836   [   61,  214):16504  
+##  [1.00e+05,1.00e+06):22151   [  214,  366):14207  
+##  [1.00e+06,3.00e+07):31489   [  366,19729]:18673  
+##  [3.00e+07,3.36e+12]: 2755                        
+##                                                   
+##                                                   
+##  UnmodifiedNumberOfOffersReceived
+##  Min.   :  1.000                 
+##  1st Qu.:  2.000                 
+##  Median :  3.000                 
+##  Mean   :  8.949                 
+##  3rd Qu.:  5.000                 
+##  Max.   :999.000                 
+##  NA's   :579
 ```
 The model has nine core variables, though one is presently missing. After renaming the variables, all unlabeled data is removed from the final model dataset.
 
-* IDV (IsIDV) IsDefiniteVehicle has ('r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(IsIDV)|IsIDV=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
-
+*IDV (IsIDV) IsDefiniteVehicle has ('r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(IsIDV)|IsIDV=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
+   
 * FxCb (FixedOrCost) FixedOrCost has ('r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(FixedOrCost)|FixedOrCost=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
 
 * FnO (UnmodifiedIsFullAndOpen) UnmodifiedIsFullAndOpen has (0.00% missing data.
 
 * Intl (AnyInternational) AnyInternational has (0.00% missing data. 
+	* PSR (SimpleArea) SimpleArea has (0.00% missing data.
+	* Ceil (qCeiling) qCeiling has (0.00% missing data.
+	* Dur (qDuration) qDuration has ('r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(MinOfSignedDate)|MinOfSignedDate=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
+	* Dur (LastUltimateCompleteDate) LastUltimateCompleteDate has (0.02% missing data.
+	
+
+* One (SingleOffer)  UnmodifiedNumberOfOffersReceived has (0.83% missing data.
+
+summary(subset(ContractSample,select=c(UnmodifiedIsSomeCompetition,
+                                IsIDV,
+                                FixedOrCost,
+                                UnmodifiedIsFullAndOpen,
+                                ##Number connected
+                                AnyInternational,
+                                SimpleArea,
+                                qCeiling,
+                                qDuration,
+                                UnmodifiedNumberOfOffersReceived
+                                ))
+        )
+```
+The model has nine core variables, though one is presently missing. After renaming the variables, all unlabeled data is removed from the final model dataset.
+
+*IDV (IsIDV) IsDefiniteVehicle has ('r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(IsIDV)|IsIDV=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
+
+* FxCb (FixedOrCost) FixedOrCost has ('r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(FixedOrCost)|FixedOrCost=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
+
+* FnO (UnmodifiedIsFullAndOpen) UnmodifiedIsFullAndOpen has (0.00% missing data).
+
+* Intl (AnyInternational) AnyInternational has (0.00% missing data. 
 
 * PSR (SimpleArea) SimpleArea has (0.00% missing data.
 
-* Cei (qCeiling) qCeiling has ( missing data.
+* Ceil (qCeiling) qCeiling has (0.00% missing data.
 
-* Dur (qDuration) qDuration has ('r #sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(qDuration)|qDuration=="Unlabeled")) /nrow(ContractSample)*100) missing data.
+* Dur (qDuration) qDuration has ('r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(MinOfSignedDate)|MinOfSignedDate=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
 
-* One (SingleOffer)  UnmodifiedNumberOfOffersReceived has (59.88% missing data.
+* Dur (LastUltimateCompleteDate) LastUltimateCompleteDate has (0.02% missing data.
+
+>>>>>>> 27b71e8ed2ac0f7a1e33d77d89b15f6f9bb22e71
+* One (SingleOffer)  UnmodifiedNumberOfOffersReceived has (0.83% missing data.
 
 The shortened names are used for ease of graphical and tabular representation. However, there exact form is still wide open, please make suggestions. Ease of comprehensibility and minimizing confusion between competing variables is key.
 
 
 ```r
-# model<-subset(ContractSample,select=c(IsIDV,
-#                                 FixedOrCost,
-#                                 UnmodifiedIsFullAndOpen,
-#                                 ##Number connected
-#                                 AnyInternational,
-#                                 SimpleArea,
-#                                 qCeiling,
-#                                 qDuration,
-#                                 SingleOffer
-#                                 ))
+ContractModel<-subset(ContractSample,select=c(IsIDV,
+                                FixedOrCost,
+                                UnmodifiedIsFullAndOpen,
+                                ##Number connected
+                                AnyInternational,
+                                SimpleArea,
+                                qCeiling,
+                                qDuration,
+                                SingleOffer
+                                ))
 # 
-# 
-# colnames(model)[colnames(model)=="IsIDV"]<-"IDV"
-# colnames(model)[colnames(model)=="FixedOrCost"]<-"FxCb"
-# colnames(model)[colnames(model)=="UnmodifiedIsFullAndOpen"]<-"FnO"
-# colnames(model)[colnames(model)=="AnyInternational"]<-"Intl"
-# colnames(model)[colnames(model)=="SimpleArea"]<-"PSR"
-# colnames(model)[colnames(model)=="qCeiling"]<-"Cei"
-# colnames(model)[colnames(model)=="qDuration"]<-"Dur"
-# colnames(model)[colnames(model)=="SingleOffer"]<-"One"
-# 
-# 
-# nrow(model)
-# summary(nrow(subset(model,complete.cases(model))))
-# summary(subset(model,complete.cases(model)))
-# 
-# dropped<-subset(model,!complete.cases(model)|
-#            FnO=="Unlabeled"|
-#            Intl=="Unlabeled"|
-#            PSR =="Mixed or Unlabeled")
-# 
-# ContractModel<-subset(model,complete.cases(model)&
-#            FnO!="Unlabeled"&
-#            Intl!="Unlabeled"&
-#            PSR !="Mixed or Unlabeled")
-# nrow(ContractModel)
+
+colnames(ContractModel)[colnames(ContractModel)=="IsIDV"]<-"IDV"
+colnames(ContractModel)[colnames(ContractModel)=="FixedOrCost"]<-"FxCb"
+colnames(ContractModel)[colnames(ContractModel)=="UnmodifiedIsFullAndOpen"]<-"FnO"
+colnames(ContractModel)[colnames(ContractModel)=="AnyInternational"]<-"Intl"
+colnames(ContractModel)[colnames(ContractModel)=="SimpleArea"]<-"PSR"
+colnames(ContractModel)[colnames(ContractModel)=="qCeiling"]<-"Ceil"
+colnames(ContractModel)[colnames(ContractModel)=="qDuration"]<-"Dur"
+colnames(ContractModel)[colnames(ContractModel)=="SingleOffer"]<-"One"
+
+
+nrow(ContractModel)
+```
+
+```
+## [1] 69509
+```
+
+```r
+summary(nrow(subset(ContractModel,complete.cases(ContractModel))))
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   68800   68800   68800   68800   68800   68800
+```
+
+```r
+summary(subset(ContractModel,complete.cases(ContractModel)))
+```
+
+```
+##       IDV                            FxCb                      FnO       
+##  Def/Pur:16069   Fixed-Price           :55711   Full & Open      :37843  
+##  IDV    :52727   Cost-Based            :10133   Not Full \n& Open:30950  
+##                  Combination \nor Other: 2952   Unlabeled        :    3  
+##                                                                          
+##                                                                          
+##                  Intl                       PSR       
+##  Just U.S.         :56853   Products          :31806  
+##  Any\nInternational:11943   Services          :32854  
+##  Unlabeled         :    0   R&D               : 4127  
+##                             Mixed or Unlabeled:    9  
+##                                                       
+##                   Ceil                  Dur            One       
+##  [0.00e+00,1.50e+04): 3213   [    1,   61):19975   Single:15498  
+##  [1.50e+04,1.00e+05): 9759   [   61,  214):16318   Multi :53298  
+##  [1.00e+05,1.00e+06):21940   [  214,  366):14022                 
+##  [1.00e+06,3.00e+07):31146   [  366,19729]:18481                 
+##  [3.00e+07,3.36e+12]: 2738
+```
+
+```r
+dropped<-subset(ContractModel,!complete.cases(ContractModel)|
+           FnO=="Unlabeled"|
+           Intl=="Unlabeled"|
+           PSR =="Mixed or Unlabeled")
+
+ContractModel<-subset(ContractModel,complete.cases(ContractModel)&
+           FnO!="Unlabeled"&
+           Intl!="Unlabeled"&
+           PSR !="Mixed or Unlabeled")
+nrow(ContractModel)
+```
+
+```
+## [1] 68784
 ```
 
 The last stage before Bayesian learning is setting the whitelists and blacklists. The whitelist contains vectors that must existing in the graph while the blacklist contains forbidden vectors.
@@ -382,14 +491,14 @@ I've listed them below based on the origin piece of evidence.
 2. FxCb (FixedOrCost)
 * Possible Whitelist to One (SingleOffer) as this is the key study question, although I worry that I'm forcing it.
 * Blacklist to PSR (SimpleArea) and Intl (AnyInternational) because figuring out what and where come first.
-* Blacklist to Cei (qCeiling) and Dur (qDuration), because project scope should come before project pricing,  although this may not be entirely true when the vendors make proposals.
+* Blacklist to Ceil (qCeiling) and Dur (qDuration), because project scope should come before project pricing,  although this may not be entirely true when the vendors make proposals.
 3. FnO (UnmodifiedIsFullAndOpen)  
 * Whitelist to One (SingleOffer). We'll see how strong this connection ends up being, but it's really straightforward.
 * Blacklist to PSR (SimpleArea),  Intl (AnyInternational), and FxCb (FixedOrCost), as I think those details are set before deciding competition procedures.
 4. Intl (AnyInternational) No restrictions or requirements.
 5. PSR (SimpleArea)
 * Blacklist to Intl (AnyInternational) As I think the place of performance in the U.S. or abroad (but not the vendor location) is sometimes decided at least as early as the  product or service.
-6. Cei (qCeiling)
+6. Ceil (qCeiling)
 * Blacklist to PSR (SimpleArea) Intl (AnyInternational) because what and where come before scope.
 7. Dur (qDuration)
 * Blacklist to PSR (SimpleArea) Intl (AnyInternational) because what and where come before scope.
@@ -401,41 +510,162 @@ I've listed them below based on the origin piece of evidence.
 
 ```r
 #White list, connections that must occur
-# ContractWL<-data.frame(from="IDV",to="FnO")
-# ContractWL<-rbind(ContractWL,data.frame(from="FnO",to="One"))
-# # ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="FxCb"))
-# # ContractWL<-rbind(ContractWL,data.frame(from="FxCb",to="One"))
-# #Black list, connections that are prohibited
-# ContractBL<-data.frame(from=c("One"),to= c("IDV"))
-# ContractBL<-rbind(ContractBL,data.frame(from="One",to="Intl"))
-# ContractBL<-rbind(ContractBL,data.frame(from="One",to="FxCb"))
-# ContractBL<-rbind(ContractBL,data.frame(from="One",to="PSR"))
-# ContractBL<-rbind(ContractBL,data.frame(from="One",to="Cei"))
-# ContractBL<-rbind(ContractBL,data.frame(from="One",to="Dur"))
-# ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="PSR"))
-# ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Intl"))
-# ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Cei"))
-# ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Dur"))
-# ContractBL<-rbind(ContractBL,data.frame(from="Cei",to="PSR"))
-# ContractBL<-rbind(ContractBL,data.frame(from="Cei",to="Intl"))
-# ContractBL<-rbind(ContractBL,data.frame(from="Dur",to="PSR"))
-# ContractBL<-rbind(ContractBL,data.frame(from="Dur",to="Intl"))
-# ContractBL<-rbind(ContractBL,data.frame(from="FnO",to="PSR"))
-# ContractBL<-rbind(ContractBL,data.frame(from="FnO",to="Intl"))
-# ContractBL<-rbind(ContractBL,data.frame(from="FnO",to="FxCb"))
-# ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="PSR"))
-# ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="Intl"))
-# ContractBL<-rbind(ContractBL,data.frame(from="PSR",to="Intl"))
+ContractWL<-data.frame(from="IDV",to="FnO")
+ContractWL<-rbind(ContractWL,data.frame(from="FnO",to="One"))
+ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="FxCb"))
+ContractWL<-rbind(ContractWL,data.frame(from="FxCb",to="One"))
+#Black list, connections that are prohibited
+ContractBL<-data.frame(from=c("One"),to= c("IDV"))
+ContractBL<-rbind(ContractBL,data.frame(from="One",to="Intl"))
+ContractBL<-rbind(ContractBL,data.frame(from="One",to="FxCb"))
+ContractBL<-rbind(ContractBL,data.frame(from="One",to="PSR"))
+ContractBL<-rbind(ContractBL,data.frame(from="One",to="Ceil"))
+ContractBL<-rbind(ContractBL,data.frame(from="One",to="Dur"))
+ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="PSR"))
+ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Intl"))
+ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Ceil"))
+ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Dur"))
+ContractBL<-rbind(ContractBL,data.frame(from="Ceil",to="PSR"))
+ContractBL<-rbind(ContractBL,data.frame(from="Ceil",to="Intl"))
+ContractBL<-rbind(ContractBL,data.frame(from="Dur",to="PSR"))
+ContractBL<-rbind(ContractBL,data.frame(from="Dur",to="Intl"))
+ContractBL<-rbind(ContractBL,data.frame(from="FnO",to="PSR"))
+ContractBL<-rbind(ContractBL,data.frame(from="FnO",to="Intl"))
+ContractBL<-rbind(ContractBL,data.frame(from="FnO",to="FxCb"))
+ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="PSR"))
+ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="Intl"))
+ContractBL<-rbind(ContractBL,data.frame(from="PSR",to="Intl"))
 ```
 
 I temporarily hiding the graphs until everyone's had a chance to think through the blacklist and whitelists.
 
 ```r
-# gs_dug<-gs(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
-# # plot(gs_dug,main="Greedy")
-# iamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
-# # plot(iamb_dug,main="IAMB")
-# iiamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
-# # plot(iiamb_dug,main="Inter-IAMB")
-# # 
+gs_dug<-gs(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
+```
+
+```
+## Warning in check.data(x): variable FnO has levels that are not observed in
+## the data.
+```
+
+```
+## Warning in check.data(x): variable Intl has levels that are not observed
+## in the data.
+```
+
+```
+## Warning in check.data(x): variable PSR has levels that are not observed in
+## the data.
+```
+
+```
+## Warning in FUN(newX[, i], ...): vstructure FnO -> Ceil <- Dur is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.
+```
+
+```
+## Warning in FUN(newX[, i], ...): vstructure IDV -> Dur <- Intl is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.
+```
+
+```
+## Warning in FUN(newX[, i], ...): vstructure IDV -> Ceil <- Intl is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.
+```
+
+```r
+plot(gs_dug,main="Greedy")
+```
+
+![](single_offer_model_building_files/figure-html/BayesianExecution-1.png) 
+
+```r
+iamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
+```
+
+```
+## Warning in check.data(x): variable FnO has levels that are not observed in
+## the data.
+```
+
+```
+## Warning in check.data(x): variable Intl has levels that are not observed
+## in the data.
+```
+
+```
+## Warning in check.data(x): variable PSR has levels that are not observed in
+## the data.
+```
+
+```
+## Warning in FUN(newX[, i], ...): vstructure FnO -> Ceil <- Dur is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.
+```
+
+```
+## Warning in FUN(newX[, i], ...): vstructure IDV -> Dur <- Intl is not
+## applicable, because one or both arcs introduce cycles in the graph.
+```
+
+```
+## Warning in FUN(newX[, i], ...): vstructure IDV -> FxCb <- Intl is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.
+```
+
+```r
+plot(iamb_dug,main="IAMB")
+```
+
+![](single_offer_model_building_files/figure-html/BayesianExecution-2.png) 
+
+```r
+iiamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
+```
+
+```
+## Warning in check.data(x): variable FnO has levels that are not observed in
+## the data.
+```
+
+```
+## Warning in check.data(x): variable Intl has levels that are not observed
+## in the data.
+```
+
+```
+## Warning in check.data(x): variable PSR has levels that are not observed in
+## the data.
+```
+
+```
+## Warning in FUN(newX[, i], ...): vstructure FnO -> Ceil <- Dur is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.
+```
+
+```
+## Warning in FUN(newX[, i], ...): vstructure IDV -> Dur <- Intl is not
+## applicable, because one or both arcs introduce cycles in the graph.
+```
+
+```
+## Warning in FUN(newX[, i], ...): vstructure IDV -> FxCb <- Intl is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.
+```
+
+```r
+plot(iiamb_dug,main="Inter-IAMB")
+```
+
+![](single_offer_model_building_files/figure-html/BayesianExecution-3.png) 
+
+```r
+# 
 ```
