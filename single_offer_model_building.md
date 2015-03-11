@@ -516,9 +516,9 @@ ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="FxCb"))
 ContractWL<-rbind(ContractWL,data.frame(from="FxCb",to="One"))
 #Black list, connections that are prohibited
 ContractBL<-data.frame(from=c("One"),to= c("IDV"))
+ContractBL<-rbind(ContractBL,data.frame(from="One",to="PSR"))
 ContractBL<-rbind(ContractBL,data.frame(from="One",to="Intl"))
 ContractBL<-rbind(ContractBL,data.frame(from="One",to="FxCb"))
-ContractBL<-rbind(ContractBL,data.frame(from="One",to="PSR"))
 ContractBL<-rbind(ContractBL,data.frame(from="One",to="Ceil"))
 ContractBL<-rbind(ContractBL,data.frame(from="One",to="Dur"))
 ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="PSR"))
@@ -531,13 +531,15 @@ ContractBL<-rbind(ContractBL,data.frame(from="Dur",to="PSR"))
 ContractBL<-rbind(ContractBL,data.frame(from="Dur",to="Intl"))
 ContractBL<-rbind(ContractBL,data.frame(from="FnO",to="PSR"))
 ContractBL<-rbind(ContractBL,data.frame(from="FnO",to="Intl"))
+ContractBL<-rbind(ContractBL,data.frame(from="FnO",to="Ceil"))
+ContractBL<-rbind(ContractBL,data.frame(from="FnO",to="Dur"))
 ContractBL<-rbind(ContractBL,data.frame(from="FnO",to="FxCb"))
 ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="PSR"))
 ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="Intl"))
 ContractBL<-rbind(ContractBL,data.frame(from="PSR",to="Intl"))
 ```
 
-I temporarily hiding the graphs until everyone's had a chance to think through the blacklist and whitelists.
+With the white and black lists in hand, Bayesian learning, using three different methods, can be applied.
 
 ```r
 gs_dug<-gs(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
@@ -556,12 +558,6 @@ gs_dug<-gs(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
 ```
 ## Warning in check.data(x): variable PSR has levels that are not observed in
 ## the data.
-```
-
-```
-## Warning in FUN(newX[, i], ...): vstructure FnO -> Ceil <- Dur is not
-## applicable, because one or both arcs are oriented in the opposite
-## direction.
 ```
 
 ```
@@ -602,12 +598,6 @@ iamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
 ```
 
 ```
-## Warning in FUN(newX[, i], ...): vstructure FnO -> Ceil <- Dur is not
-## applicable, because one or both arcs are oriented in the opposite
-## direction.
-```
-
-```
 ## Warning in FUN(newX[, i], ...): vstructure IDV -> Dur <- Intl is not
 ## applicable, because one or both arcs introduce cycles in the graph.
 ```
@@ -641,12 +631,6 @@ iiamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
 ```
 ## Warning in check.data(x): variable PSR has levels that are not observed in
 ## the data.
-```
-
-```
-## Warning in FUN(newX[, i], ...): vstructure FnO -> Ceil <- Dur is not
-## applicable, because one or both arcs are oriented in the opposite
-## direction.
 ```
 
 ```

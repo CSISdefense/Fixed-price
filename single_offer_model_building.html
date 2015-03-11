@@ -480,9 +480,9 @@ ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;PSR&quot;,to=&quot;FxCb&qu
 ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;FxCb&quot;,to=&quot;One&quot;))
 #Black list, connections that are prohibited
 ContractBL&lt;-data.frame(from=c(&quot;One&quot;),to= c(&quot;IDV&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;One&quot;,to=&quot;PSR&quot;))
 ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;One&quot;,to=&quot;Intl&quot;))
 ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;One&quot;,to=&quot;FxCb&quot;))
-ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;One&quot;,to=&quot;PSR&quot;))
 ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;One&quot;,to=&quot;Ceil&quot;))
 ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;One&quot;,to=&quot;Dur&quot;))
 ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;PSR&quot;))
@@ -495,11 +495,13 @@ ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Dur&quot;,to=&quot;PSR&quo
 ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Dur&quot;,to=&quot;Intl&quot;))
 ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FnO&quot;,to=&quot;PSR&quot;))
 ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FnO&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FnO&quot;,to=&quot;Ceil&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FnO&quot;,to=&quot;Dur&quot;))
 ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FnO&quot;,to=&quot;FxCb&quot;))
 ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;IDV&quot;,to=&quot;PSR&quot;))
 ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;IDV&quot;,to=&quot;Intl&quot;))
 ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;PSR&quot;,to=&quot;Intl&quot;))</code></pre>
-<p>I temporarily hiding the graphs until everyone’s had a chance to think through the blacklist and whitelists.</p>
+<p>With the white and black lists in hand, Bayesian learning, using three different methods, can be applied.</p>
 <pre class="r"><code>gs_dug&lt;-gs(ContractModel,blacklist=ContractBL,whitelist=ContractWL)</code></pre>
 <pre><code>## Warning in check.data(x): variable FnO has levels that are not observed in
 ## the data.</code></pre>
@@ -507,9 +509,6 @@ ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;PSR&quot;,to=&quot;Intl&qu
 ## in the data.</code></pre>
 <pre><code>## Warning in check.data(x): variable PSR has levels that are not observed in
 ## the data.</code></pre>
-<pre><code>## Warning in FUN(newX[, i], ...): vstructure FnO -&gt; Ceil &lt;- Dur is not
-## applicable, because one or both arcs are oriented in the opposite
-## direction.</code></pre>
 <pre><code>## Warning in FUN(newX[, i], ...): vstructure IDV -&gt; Dur &lt;- Intl is not
 ## applicable, because one or both arcs are oriented in the opposite
 ## direction.</code></pre>
@@ -525,9 +524,6 @@ ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;PSR&quot;,to=&quot;Intl&qu
 ## in the data.</code></pre>
 <pre><code>## Warning in check.data(x): variable PSR has levels that are not observed in
 ## the data.</code></pre>
-<pre><code>## Warning in FUN(newX[, i], ...): vstructure FnO -&gt; Ceil &lt;- Dur is not
-## applicable, because one or both arcs are oriented in the opposite
-## direction.</code></pre>
 <pre><code>## Warning in FUN(newX[, i], ...): vstructure IDV -&gt; Dur &lt;- Intl is not
 ## applicable, because one or both arcs introduce cycles in the graph.</code></pre>
 <pre><code>## Warning in FUN(newX[, i], ...): vstructure IDV -&gt; FxCb &lt;- Intl is not
@@ -542,9 +538,6 @@ ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;PSR&quot;,to=&quot;Intl&qu
 ## in the data.</code></pre>
 <pre><code>## Warning in check.data(x): variable PSR has levels that are not observed in
 ## the data.</code></pre>
-<pre><code>## Warning in FUN(newX[, i], ...): vstructure FnO -&gt; Ceil &lt;- Dur is not
-## applicable, because one or both arcs are oriented in the opposite
-## direction.</code></pre>
 <pre><code>## Warning in FUN(newX[, i], ...): vstructure IDV -&gt; Dur &lt;- Intl is not
 ## applicable, because one or both arcs introduce cycles in the graph.</code></pre>
 <pre><code>## Warning in FUN(newX[, i], ...): vstructure IDV -&gt; FxCb &lt;- Intl is not
