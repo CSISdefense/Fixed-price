@@ -1,0 +1,115 @@
+#DoD Fixed-Price and Competition Study: Costly Change Orders 
+
+
+
+```{r echo = TRUE}
+
+if (!require("ggplot2")) {
+  install.packages("ggplot2", repos="http://cran.rstudio.com/") 
+  library("ggplot2")
+}
+
+#install.packages("ggplot2")
+#library("ggplot2")
+
+setwd("K:\\Development\\Fixed-price")
+
+Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
+source(paste(Path,"lookups.r",sep=""))
+```
+
+
+Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the exploration on R&D, we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
+
+
+
+##Costly Change Orders: existence and number of change orders 
+
+In the same manner as contract terminations, change orders are reported in the *reason for modification* field.  There are two values that this study counts as change orders: "Change Order" and "Definitize Change Order."  For the remainder of this report, contracts with at least one change order are called **Changed Contracts**.  
+
+There are also multiple modifications captured in FPDS that this current study will not investigate as change orders.  These include:
+
+* Additional World (new agreement, FAR part 6 applies)
+* Supplemental Agreement for work within scope
+* Exercise an Option
+* Definitize Letter Contract
+
+In addition, there are a number of other modifications that may be undertaken based on changes on the government or vendor side that are not included in this analysis. 
+
+```{r echo = TRUE}
+setwd("K:\\Development\\Fixed-price")
+
+ContractWeighted  <- read.csv(
+    paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv", sep = ""),
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+
+#These will probably be moved into apply_lookups at some point
+#ContractWeighted <- apply_lookups(Path,ContractWeighted)
+
+```
+
+
+**A histogram of the data** showing the distribution of the number of change orders each year from 2007.
+
+
+```{r echo = TRUE}
+
+library("ggplot2")
+
+ContractWeighted<-subset(ContractWeighted, StartFiscal_Year>=2007)
+
+ggplot(
+  data = ContractWeighted,
+  aes_string(x = "ChangeOrderBaseAndAllOptionsValue"),
+  ) + scale_x_log10()+
+ geom_bar(binwidth=0.25) +
+  facet_wrap("StartFiscal_Year")
+
+
+```
+
+
+## Costly Change Orders Potential Change Cost 
+
+###size of change orders measured by raise of ceiling
+
+This study uses changes in the *Base and All Options Value Amount* as a way of tracking the potential cost of change orders.
+
+* The *Base and All Options Value Amount* refers to the ceiling of contract costs if all available options were exercised. 
+* The *Base and Exercised Value Amount* is not used because contracts are often specified such that the bulk of the eventually executed contract in dollar terms are treated as options.  In these cases, the all-inclusive value provides a better baseline for tracking growth.  
+* The *Action Obligation* refers to the actual amount transferred to vendors.  This study team does not use this value because spending for change orders are not necessarily front-loaded.  For example, a change to a contract in May of 2010 could easily result in payments from May 2010 through August 2013.
+
+The % Growth in Base and All Options Value Amount form Change Orders is calculated as follows: 
+
+*Base and All Options Value Amount* increases for all Change Order Modifications/
+*Base and All Options Value Amount* from the original unmodified contract transaction
+
+
+**A histogram of the data** showing the distribution of the initial amount of the specific change order 
+
+```{r echo = TRUE}
+
+
+#library("ggplot2")
+
+#ContractWeighted<-subset(ContractWeighted, StartFiscal_Year>=2007)
+
+ggplot(
+  data = ContractWeighted,
+  aes_string(x = "ChangeOrderBaseAndExercisedOptionsValue"),
+  ) + scale_x_log10()+
+ geom_bar(binwidth=0.25) +
+  facet_wrap("StartFiscal_Year")
+
+
+```
+
+
+
+
+
+
+
