@@ -284,14 +284,14 @@ ContractModel<-subset(ContractModel,complete.cases(ContractModel)&
 nrow(ContractModel)
 ```
 
-The last stage before Bayesian learning is setting the whitelists and blacklists. The whitelist contains vectors that must existing in the graph while the blacklist contains forbidden vectors.
+The last stage before Bayesian learning is setting the whitelists and blacklists. The whitelist contains vectors that must existing in the graph while the blacklist contains forbidden vectors. There was some iteration in the development of the white and blacklist, as nonsensical connections were removed and the blacklist was made systematic.
 
 I've listed them below based on the origin piece of evidence.
 1. IDV (IsIDV)
 * Whitelist to FnO (UnmodifiedIsFullAndOpen) as many forms of IDVs don't qualify for full and open.
 * Blacklist to PSR (SimpleArea) because what you are buying is picked before how you are buying it.
 2. FxCb (FixedOrCost)
-* Possible Whitelist to One (SingleOffer) as this is the key study question, although I worry that I'm forcing it.
+* Whitelist to One (SingleOffer) as this is the key study question.
 * Blacklist to PSR (SimpleArea) and Intl (AnyInternational) because figuring out what and where come first.
 * Blacklist to Ceil (qCeiling) and Dur (qDuration), because project scope should come before project pricing,  although this may not be entirely true when the vendors make proposals.
 3. FnO (UnmodifiedIsFullAndOpen)  
@@ -305,9 +305,7 @@ I've listed them below based on the origin piece of evidence.
 7. Dur (qDuration)
 * Blacklist to PSR (SimpleArea) Intl (AnyInternational) because what and where come before scope.
 8. One (SingleOffer) 
-* Blacklist to most everything. While the vendors responses may influence some factors at the margin, this is the dependent variable for this part of the study.
-
-
+* Blacklist to everything not covered by an existing whitelist. While the vendors responses may influence some factors at the margin, this is the dependent variable for this part of the study.
 
 ```{r BayesianLearningSetup, echo = TRUE}
 #White list, connections that must occur
@@ -340,10 +338,29 @@ ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="Intl"))
 ContractBL<-rbind(ContractBL,data.frame(from="PSR",to="Intl"))
 ```
 
-With the white and black lists in hand, Bayesian learning, using three different methods, can be applied.
-```{r BayesianExecution, echo = TRUE}
+After the team developed the initial list and a small number of elements accidentally left off were corrected for, the next step was to do a preliminary run through with Bayesian learning. 
+
+```{r BayesianFirstStep, echo = TRUE}
 gs_dug<-gs(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
-plot(gs_dug,main="Greedy")
+plot(gs_dug,main="Greedy first run")
+```
+
+Noteably this initial run through produced two warnings of challenging relationships IDV to Dur and IDV to FxCb. After consulting within the team, the choice was made to add whitelisted relationships that went against those automatically produced.
+
+IDV (IsIDV) new white lists:
+* Whitelist to FxCb (FixedOrCost) because the pricing mechanism of most IDVs are set. Thus, once the choice of which IDV to use is made, the pricing mechanism would be set automatically. Furthermore, Fixed-price is often the mechanism because the IDV allows for multiple instances of a single contract reducing the need for the flexabilit Cost-Based contracts offer.
+* Whitelist to Dur (Duration) because the use of the IDV mechanism typically means multiple shorter contractors under one IDV rather than a single longer contract. 
+
+With those two connections in hand, all three Bayesian Learning algorith were applied.
+
+```{r BayesianExecution, echo = TRUE}
+#White list, connections that must occur
+ContractWL<-rbind(ContractWL,data.frame(from="IDV",to="Dur"))
+ContractWL<-rbind(ContractWL,data.frame(from="IDV",to="FxCb"))
+
+
+gs_dug<-gs(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
+plot(gs_dug,main="Greedy second run")
 iamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
 plot(iamb_dug,main="IAMB")
 iiamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
