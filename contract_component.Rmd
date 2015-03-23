@@ -1,0 +1,190 @@
+---
+title: "DoD Fixed-Price Study: Component classification"
+author: "Greg Sanders"
+date: "Tuesday, January 13, 2015"
+output:
+html_document:
+keep_md: yes
+---
+
+```{r hiddensetup, echo = FALSE}
+require(ggplot2)
+require(stringr)
+require(plyr)
+options(error=recover)
+setwd("K:\\Development\\Fixed-price")
+# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
+# Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
+source(paste(Path,"lookups.r",sep=""))
+
+```
+
+Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start.
+
+
+##Studying Pricing Mechanism of contracts in the sample.
+One of CSIS's studies is directly focused on pricing mechansisms, specifically fixed-price versus alternatives.
+
+* Test
+
+```{r setup, echo = TRUE}
+ContractSample  <- read.csv(
+    paste("data\\defense_contract_CSIScontractID_sample_100000_SumofObligatedAmount.csv", sep = ""),
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+
+
+
+
+#These will probably be moved into apply_lookups at some point
+# ContractSample$pIsSomeCompetition <- ContractSample$ObligatedAmountIsSomeCompetition/ContractSample$ObligatedAmount
+# ContractSample$pIsSomeCompetition[is.na(ContractSample$ObligatedAmountIsSomeCompetition)] <- 0
+# ContractSample$MinOfEffectiveDate <- strptime(ContractSample$MinOfEffectiveDate, "%Y-%m-%d")
+
+ContractSample$pIsArmy <- ContractSample$ObligatedAmountIsArmy/ContractSample$SumofObligatedAmount
+ContractSample$pIsArmy[is.nan(ContractSample$pIsArmy)|is.infinite(ContractSample$pIsArmy)|is.na(ContractSample$ObligatedAmountIsArmy)] <- 0
+
+ContractSample$pIsNavy <- ContractSample$ObligatedAmountIsNavy/ContractSample$SumofObligatedAmount
+ContractSample$pIsNavy[is.nan(ContractSample$pIsNavy)|is.infinite(ContractSample$pIsNavy)|is.na(ContractSample$ObligatedAmountIsNavy)] <- 0
+
+ContractSample$pIsOtherDoD <- ContractSample$ObligatedAmountIsOtherDoD/ContractSample$SumofObligatedAmount
+ContractSample$pIsOtherDoD[is.nan(ContractSample$pIsOtherDoD)|is.infinite(ContractSample$pIsOtherDoD)|is.na(ContractSample$ObligatedAmountIsOtherDoD)] <- 0
+
+ContractSample$pIsAirForce <- ContractSample$ObligatedAmountIsAirForce/ContractSample$SumofObligatedAmount
+ContractSample$pIsAirForce[is.nan(ContractSample$pIsAirForce)|is.infinite(ContractSample$pIsAirForce)|is.na(ContractSample$ObligatedAmountIsAirForce)] <- 0
+
+ContractSample<-apply_lookups(Path,ContractSample)
+
+
+
+```
+FPDS classifies competition using one variables: "Type of Contract Pricing" listed here as Pricing.Mechanism.Code.
+
+
+###Pricing.Mechanism.Code
+
+###Types of variables
+This set of variables includes three broad types.
+* Unmodified variables, which are set using only those contract transaction with no Modification Number or a Modification Number of 0. Typically there is only one such transaction per contract. In the unexpected event that there are multiple unmodified transactions, the rules for Complete contract variables below are used to resolve them.
+* Complete contract variables follow the schema below. Note that the variables this study uses are typically less granular than the underlying data, so for example IsArmy will not treat the a contract being labeled as "Fixed-Price AirForce" at one point in its life and "Firm Fixed-Price." Thus less granular complete contract variables may be labeled even when more granular ones, based on the exact same fields, are not.
+1. A contract which is sometimes labeled with a particular value and never with another will have that value.
+2. A contract which was always unlabeled will be categorized as "mixed or unlabeled" or another title appropriate to the variable.
+3. A contract which has had multiple distinct values will be classified as as "mixed or unlabeled" or another title appropriate to the variable.
+* Is Fixed Price is a binary variable, true if all varieties of fixed-price contracts,  competitive procedures were used, false if they were not. Unlabeled cases are classified as NAs. 
+* IsNavy works the same way for cost-based contracts, which for the purposes of this study includes time and materials and labor hours contracts.
+* Obligated amount variables. These are based on binary variables, for example IsArmyObligatedAmount ties to IsArmy. This variable is equal to the sum of all obligations made in transactions where the associated binary variable is true. 
+* Percenage variables. These are derived from Obligated amount variables, for example pIsArmy for IsArmyObligatedAmount. The derivation is done by dividing the obligated amount variable by the total obligation amount. Thanks to deobligations, this can result in a negative percentage or a percentage greater than 100%.
+
+*Talk about fixed price here*
+* UnmodifiedIsArmy is the unmodified binary variable that reports fixed-price status  (`r sprintf("%1.2f%%",nrow(subset(ContractSample,UnmodifiedIsArmy=="Unlabeled")) /nrow(ContractSample)*100)` missing data).
+* IsArmy is the complete contract binary variable that reports fixed-price status (`r sprintf("%1.2f%%",nrow(subset(ContractSample,IsArmy=="Mixed or \nUnlabeled")) /nrow(ContractSample)*100)` missing data).
+*Talk about cost-based here*
+* UnmodifiedIsNavy is the unmodified binary variable that reports fixed-price status  (`r sprintf("%1.2f%%",nrow(subset(ContractSample,UnmodifiedIsNavy=="Unlabeled")) /nrow(ContractSample)*100)` missing data).
+* IsNavy is the complete contract binary variable that reports fixed-price status (`r sprintf("%1.2f%%",nrow(subset(ContractSample,IsNavy=="Mixed or \nUnlabeled")) /nrow(ContractSample)*100)` missing data).
+*Talk about OtherDoD here*
+* UnmodifiedIsNavy is the unmodified binary variable that reports fixed-price status  (`r sprintf("%1.2f%%",nrow(subset(ContractSample,UnmodifiedIsNavy=="Unlabeled")) /nrow(ContractSample)*100)` missing data).
+* IsNavy is the complete contract binary variable that reports fixed-price status (`r sprintf("%1.2f%%",nrow(subset(ContractSample,IsNavy=="Mixed or \nUnlabeled")) /nrow(ContractSample)*100)` missing data).
+
+
+
+* pIsSomeCompetition is dollar value of all transactions that were labeled as competed divided the contracts total obligations. 
+
+```{r overallvars, echo = TRUE}
+summary(subset(ContractSample,select=c(#TypeOfContractPricing#Pricing.Mechanism.Code,#
+    Customer,
+    UnmodifiedCustomer,
+    SubCustomer.sum,
+    SubCustomer,
+    UnmodifiedSubCustomer,
+    ObligatedAmountIsArmy,
+    pIsArmy,
+    ObligatedAmountIsNavy,
+    pIsNavy,
+    ObligatedAmountIsAirForce,
+    pIsAirForce,
+    ObligatedAmountIsOtherDoD,
+    pIsOtherDoD
+    ))
+    )
+ContractSample$pIsArmy[is.infinite(ContractSample$pIsArmy)]
+
+
+ggplot(
+    data = subset(ContractSample,is.na(SubCustomer.sum) | SubCustomer.sum=="Uncategorized"),
+    aes_string(x = "pIsArmy"
+               #                ,
+               #                fill="FixedOrCost"
+               
+               ),
+    main = "Distribution by percent of dollars with fixed-price for mixed and unlabeled contracts."
+    )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))
+
+
+
+ggplot(
+    data = subset(ContractSample,is.na(SubCustomer.sum) | SubCustomer.sum=="Uncategorized"),
+    aes_string(x = "pIsNavy"
+               #                ,
+               #                fill="FixedOrCost"
+               
+               ),
+    main = "Distribution by percent of dollars with cost-based for mixed and unlabeled contracts."
+    )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))
+
+
+ggplot(
+    data = subset(ContractSample,is.na(SubCustomer) | SubCustomer=="Mixed or Unlabeled"),
+    aes_string(x = "pIsAirForce"
+               #                ,
+               #                fill="FixedOrCost"
+               ),
+    main = "Distribution by percent of dollars with cost-based for labeled contracts."
+    ) +geom_bar()+scale_x_continuous(limits = c(-0.25, 1.25))
+
+
+ggplot(
+    data = subset(ContractSample,is.na(SubCustomer) | SubCustomer=="Mixed or Unlabeled"),
+    aes_string(x = "pIsOtherDoD"
+               #                ,
+               #                fill="FixedOrCost"
+               ),
+    main = "Distribution by percent of dollars with cost-based for labeled contracts."
+    ) +geom_bar()+scale_x_continuous(limits = c(-0.25, 1.25))
+
+
+```
+
+Other DoD is the only category with any significant presence when a consistent SubCustomer entry is not available. In these cases, there are either contradictions between different 
+
+```{r Combined}
+
+summary(ContractSample$Customer)
+summary(ContractSample$SubCustomer)
+summary(ContractSample$SubCustomer.sum)
+summary(ContractSample$UnmodifiedSubCustomer[ContractSample$SubCustomer.sum=="Uncategorized"])
+
+ContractSample$SubCustomer.sum<-droplevels(ContractSample$SubCustomer.sum)
+ContractSample$SubCustomer.sum[ContractSample$pIsArmy>=0.95&
+                                   ContractSample$SubCustomer.sum=="Uncategorized"]<-"Army"
+ContractSample$SubCustomer.sum[ContractSample$pIsNavy>=0.95&
+                                   ContractSample$SubCustomer.sum=="Uncategorized"]<-"Navy"
+ContractSample$SubCustomer.sum[ContractSample$pIsAirForce>=0.95&
+                                   ContractSample$SubCustomer.sum=="Uncategorized"]<-"Air Force"
+ContractSample$SubCustomer.sum[ContractSample$pCustomer=="Defense"&
+                                   ContractSample$SubCustomer.sum=="Uncategorized"]<-"Other DoD"
+ContractSample$SubCustomer.sum[ContractSample$pIsArmy+ContractSample$pIsNavy+
+                                   ContractSample$pIsAirForce+ContractSample$pIsOtherDoD>0.5&
+                                   ContractSample$SubCustomer.sum=="Uncategorized"]<-"Other DoD"
+
+ContractSample$SubCustomer.sum[
+    ContractSample$SubCustomer.sum=="Uncategorized"&ContractSample$UnmodifiedSubCustomer %in% 
+        c("Army", "Navy", "Air Force","Other DoD")]<-
+    ContractSample$UnmodifiedSubCustomer[ContractSample$SubCustomer.sum==
+                                             "Uncategorized"&ContractSample$UnmodifiedSubCustomer %in% 
+                                             c("Army", "Navy", "Air Force","Other DoD")]
+
+
+

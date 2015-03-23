@@ -19,7 +19,8 @@ require(gRain)
 require(gRbase)
 require(methods)
 require(bnlearn)
-options(error=recover)
+require(rGraphviz) #source("http://bioconductor.org/biocLite.R"); #biocLite("Rgraphviz")
+
 setwd("K:\\Development\\Fixed-price")
 # setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
 Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
@@ -342,7 +343,23 @@ After the team developed the initial list and a small number of elements acciden
 
 ```{r BayesianFirstStep, echo = TRUE}
 gs_dug<-gs(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
-plot(gs_dug,main="Greedy first run")
+(
+ContractWL<-data.frame(from="IDV",to="FnO")
+ContractWL<-rbind(ContractWL,data.frame(from="FnO",to="One"))
+ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="FxCb"))
+ContractWL<-rbind(ContractWL,data.frame(from="FxCb",to="One"))
+
+
+highlightWL1 <- list(arcs = ContractWL,
+                                         col = "blue")
+
+highlightLists <- list(arcs = data.frame(from=c(as.character(ContractWL$from),
+                                                as.character(ContractBL$to)),
+                                         to=c(as.character(ContractWL$to),
+                                              as.character(ContractBL$from))),
+                                         col = "blue")
+
+graphviz.plot(gs_dug,main="Grow-Shrink first run",highlight=highlightLists)
 ```
 
 Noteably this initial run through produced two warnings of challenging relationships IDV to Dur and IDV to FxCb. After consulting within the team, the choice was made to add whitelisted relationships that went against those automatically produced.
@@ -358,11 +375,91 @@ With those two connections in hand, all three Bayesian Learning algorith were ap
 ContractWL<-rbind(ContractWL,data.frame(from="IDV",to="Dur"))
 ContractWL<-rbind(ContractWL,data.frame(from="IDV",to="FxCb"))
 
+highlight.WL2 <- list(arcs = ContractWL, col = "blue")
+
+highlightLists2 <- list(arcs = data.frame(from=c(as.character(ContractWL$from),
+                                                as.character(ContractBL$to)),
+                                         to=c(as.character(ContractWL$to),
+                                              as.character(ContractBL$from))),
+                                         col = "blue")
+
 
 gs_dug<-gs(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
-plot(gs_dug,main="Greedy second run")
-iamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
-plot(iamb_dug,main="IAMB")
-iiamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
-plot(iiamb_dug,main="Inter-IAMB")
-# 
+ugs_dug<-gs(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE)
+all.equal(gs_dug,ugs_dug)
+graphviz.plot(ugs_dug,main="Grow-Shrink second run",highlight=highlight.WL2)
+
+iamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=TRUE)
+uiamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE)
+#Comparing the optimized and unoptimized Incremental Association results
+all.equal(iamb_dug,uiamb_dug)
+graphviz.plot(uiamb_dug,main="Unoptimized Incremental Association ",highlight=highlight.WL2)
+
+
+interiamb_dug<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL)
+uinteriamb_dug<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE)
+all.equal(interiamb_dug,uinteriamb_dug)
+#Comparing the optimized and unoptimized Interleaved Incremental Association results
+graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Incremental Association ",highlight=highlight.WL2)
+
+all.equal(iamb_dug,interiamb_dug)
+all.equal(uiamb_dug,uinteriamb_dug)
+
+```
+To the study teams dismay, the bayesian learning results were not consistent across different methods. The unoptimized versions of the learning algorithms do better at catching statistical oddities at the cost of requiring more comparisons, so given the discrepency they are displayed instead of their optimized alternate network graphs. While the interleved and non-interleaved rsults do not match, in both cases, there is now an undirect arc between IDV and Ceil. This was not present in the Grow-Shring example although other mismatches occured. The study team chose to resolve this with the arc originating from IDV.
+
+* Whitelist to Dur (Duration) because the use of the IDV mechanism typically means multiple lower ceilinged contracts under one IDV rather than a single high ceilinged contract. 
+
+
+```{r BayesianExecutionRd3, echo = TRUE}
+ContractWL<-rbind(ContractWL,data.frame(from="IDV",to="Ceil"))
+highlightLists3 <- list(arcs = data.frame(from=c(as.character(ContractWL$from),
+                                                as.character(ContractBL$to)),
+                                         to=c(as.character(ContractWL$to),
+                                              as.character(ContractBL$from))),
+                                         col = "blue")
+
+
+highlight.WL3 <- list(arcs = ContractWL, col = "blue")
+
+
+
+ugs_dug<-gs(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE)
+graphviz.plot(ugs_dug,main="Grow-Shrink second run",highlight=highlight.WL3)
+
+uiamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE)
+graphviz.plot(uiamb_dug,main="Unoptimized Incremental Association ",highlight=highlightLists3)
+graphviz.plot(uiamb_dug,main="Unoptimized Incremental Association ",highlight=highlightLists3)
+
+hc_dug<- hc(ContractModel, score = "aic",blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE)
+graphviz.plot(hc_dug,main="Hill Climbing Whitelist highlighted",highlight=highlight.WL3)
+graphviz.plot(hc_dug,main="Hill Climbing Whitelist Interleaved highlighted  ",highlight=list(arcs=arcs(uinteriamb_dug)))
+graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Hillclimbing highlighted",highlight=list(arcs=arcs(hc_dug)))
+
+uinteriamb_dug05<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.05)
+uinteriamb_dug005<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.005)
+uinteriamb_dug05
+
+graphviz.plot(uinteriamb_dug05,main="Unoptimized Interleaved Incremental 05 Association 005 highlighted",highlight=list(arcs=arcs(uiamb_dug)))
+
+
+graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Incremental Association Whitelist highlighted",highlight=highlight.WL3)
+graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Incremental Association either list highlighted",highlight=highlightLists3)
+graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Incremental Association IAMB highlighted",highlight=list(arcs=arcs(uiamb_dug)))
+graphviz.plot(uiamb_dug,main="Unoptimized Interleaved Incremental Association ",highlight=list(arcs=arcs(uinteriamb_dug)))
+
+
+```
+The two models do not match exactly. The Interleaved Incremental Association adds one more arc, from duration to single offer. There is no reason that duration could not influence single offer competition, so we will use the model with more arcs.
+
+```{r BayesianCompilation, echo = TRUE}
+modelstring(uinteriamb_dug)
+str(uinteriamb_dug)
+as.grain(uinteriamb_dug)
+dg<-(uinteriamb_dug)
+dg <- dag(~IDV:PSR,~Ceil:IDV:PSR,FnO,~IDV:Intl:PSR:Ceil,Dur|IDV:Intl:PSR:Ceil][FxCb|IDV:Intl:PSR:Dur][One|IDV:FxCb:FnO:Intl:PSR:Dur])
+pp <- extractCPT(ContractModel, dg)
+cpp2 <- compileCPT(pp)
+pn2 <- grain(cpp2)
+
+```

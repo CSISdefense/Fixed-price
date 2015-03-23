@@ -84,6 +84,26 @@ sample.SumofObligatedAmount<-read_and_join(Path
                                            ,by="CSIScontractID"
 )
 
+#data\\defense_contract_SP_ContractInterlinkedUnmodifiedSystemEquipmentPlatform.csv
+sample.SumofObligatedAmount<-read_and_join(Path,
+                                           "defense_contract_SP_ContractInterlinkedUnmodifiedSystemEquipmentPlatform.csv",
+                                           sample.SumofObligatedAmount,
+                                           "data\\",
+                                           by="CSIScontractID"
+)
+
+#data\\Office_processedCSIScontractIDtoContractingOfficeID_linked.csv
+sample.SumofObligatedAmount<-read_and_join(Path,
+                                           "Office_processedCSIScontractIDtoContractingOfficeID_linked.csv",
+                                           sample.SumofObligatedAmount,
+                                           "data\\",
+                                           by="CSIScontractID"
+)
+
+
+
+
+
 #CSIScontractID
 # sample.SumofObligatedAmount<-read_and_join(Path
 #               ,"contract_CSIScontractID.csv"
@@ -144,15 +164,25 @@ sample.SumofObligatedAmount<-read_and_join(Path
                                            ,"data\\"
                                            ,by="CSIScontractID"
 )
+sample.SumofObligatedAmount<-subset(sample.SumofObligatedAmount,select=-c(Customer,UnmodifiedCustomer,SubCustomer,UnmodifiedSubCustomer,ObligatedAmountIsArmy,ObligatedAmountIsNavy,ObligatedAmountIsAirForce,ObligatedAmountIsOtherDoD))
+#data\\Defense_Contract_SP_ContractDefenseSubCustomer.csv
+debug(read_and_join)
+sample.SumofObligatedAmount<-read_and_join(Path
+                                           ,"Defense_Contract_SP_ContractDefenseSubCustomer.csv"
+                                           ,sample.SumofObligatedAmount
+                                           ,"data\\"
+                                           ,by="CSIScontractID"
+)
+
 # 
-#Use this to add just a single file
-# sample.SumofObligatedAmount <-read.csv(
-#   paste("data\\defense_contract_CSIScontractID_sample_100000_SumofObligatedAmount.csv",sep=""),
-#   header=TRUE, sep=",", dec=".", strip.white=TRUE, 
-#   na.strings=c("NULL","NA"),
-#   stringsAsFactors=FALSE
-# )
-# 
+# Use this to add just a single file
+sample.SumofObligatedAmount <-read.csv(
+  paste("data\\defense_contract_CSIScontractID_sample_100000_SumofObligatedAmount.csv",sep=""),
+  header=TRUE, sep=",", dec=".", strip.white=TRUE, 
+  na.strings=c("NULL","NA"),
+  stringsAsFactors=FALSE
+)
+
 # 
 # 
 # sample.SumofObligatedAmount <-subset(sample.SumofObligatedAmount,select=-c(
@@ -197,7 +227,7 @@ sample.SumofObligatedAmount<-read_and_join(Path
 
 write.table(sample.SumofObligatedAmount
             ,file=paste("data\\defense_contract_CSIScontractID_sample_"
-                        ,sample.size
+                        ,sprintf("%i",sample.size)
                         ,"_SumofObligatedAmount.csv"
                         ,sep=""
             )
