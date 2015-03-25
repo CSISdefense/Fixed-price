@@ -379,6 +379,8 @@ rm(NAnumberOfOffers)
 CompleteContracts$qOffers <- cut2(CompleteContracts$NumberOfOffersReceived,cuts=c(1,2,3,5))
 
 
+CompleteContracts$IsIDV<-factor(CompleteContracts$IsIDV,levels=c(0,1),labels=c("Def/Pur","IDV"))
+
 CompleteContracts<-subset(CompleteContracts,select=-c(
     UnmodifiedIsFullAndOpen,
     UnmodifiedIsOnlyOneSource,
@@ -387,7 +389,7 @@ CompleteContracts<-subset(CompleteContracts,select=-c(
     Unmodifiedaddmultipleorsingawardidc,
     IsFullAndOpen,
     IsFollowonToCompetedAction,
-    MultipleOrSingleAwardIDC,
+    multipleorsingleawardidc,
     AddMultipleOrSingleAwardIDC
     )
     )
@@ -584,19 +586,6 @@ CompleteContracts$Comp<-factor(CompleteContracts$Comp,
                                )
 
 
-
-
-#FIX THIS
-CompleteContracts$IsIDV<-factor(CompleteContracts$IsIDV,levels=c(0,1),labels=c("Def/Pur","IDV"))
-
-
-
-
-CompleteContracts$Comp<-factor(CompleteContracts$Comp,
-                               levels=c(0,1,2),
-                               labels=c("No Comp.","Limited\nComp.","Full & Open\nComp.")
-                               )
-
 CompleteContracts$qOffers[is.na(CompleteContracts$qOffers)&
                           !is.na(CompleteContracts$UnmodifiedIsSomeCompetition)&
                               CompleteContracts$UnmodifiedIsSomeCompetition=="No Comp."
@@ -685,10 +674,54 @@ summary(CompleteModel)
 summary(subset(CompleteModel,is.na(Offr)))
 summary(subset(CompleteContracts,is.na(qOffers)))
 summary(subset(CompleteContracts,is.na(FixedOrCost)&IsFixedPrice==1))
-write.table(CompleteContracts
-            ,file=paste("data\\defense_contract_CSIScontractID_sample_"
-                        ,sprintf("%i",sample.size)
-                        ,"_Action.Obligation.csv"
+write.table(CompleteModel
+            ,file=paste("data\\defense_contract_CSIScontractID_model.csv"
+                        ,sep=""
+                        )
+            #   ,header=TRUE
+            , sep=","
+            , row.names=FALSE
+            , append=FALSE
+            )
+
+```
+
+
+
+```{r Detailed}
+CompleteModelAndDetail<-subset(CompleteContracts,select=c(IsIDV,
+    FixedOrCost,
+    UnmodifiedIsSomeCompetition,
+    #                                 Comp,
+    qLinked,
+    SubCustomer.sum,
+    PlatformPortfolio.sum,
+    AnyInternational,
+    SimpleArea,
+    qCeiling,
+    qDuration,
+    SingleOffer,
+    qOffers,
+    UnmodifiedNumberOfOffersReceived
+    )
+    )
+# 
+
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SubCustomer.sum"]<-"Who"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="UnmodifiedIsSomeCompetition"]<-"Comp"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="PlatformPortfolio.sum"]<-"What"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsIDV"]<-"IDV"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="FixedOrCost"]<-"FxCb"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="AnyInternational"]<-"Intl"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleArea"]<-"PSR"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qCeiling"]<-"Ceil"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qLinked"]<-"Link"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qDuration"]<-"Dur"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SingleOffer"]<-"One"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qOffers"]<-"Offr"
+
+write.table(CompleteModelAndDetail
+            ,file=paste("data\\defense_contract_CSIScontractID_detail.csv"
                         ,sep=""
                         )
             #   ,header=TRUE

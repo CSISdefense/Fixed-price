@@ -17,6 +17,23 @@ setwd("K:\\Development\\Fixed-price")
 Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 # Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
 source(paste(Path,"lookups.r",sep=""))
+source(paste(Path,"helper.r",sep=""))
+
+
+Coloration<-read.csv(
+    paste(Path,"Lookups\\","lookup_coloration.csv",sep=""),
+    header=TRUE, sep=",", na.strings="", dec=".", strip.white=TRUE, 
+    stringsAsFactors=FALSE
+    )
+
+Coloration<-ddply(Coloration
+                  , c(.(R), .(G), .(B))
+                  , transform
+                  , ColorRGB=as.character(
+                      if(min(is.na(c(R,G,B)))) {NA} 
+                      else {rgb(max(R),max(G),max(B),max=255)}
+                      )
+                  )
 
 ```
 
@@ -32,6 +49,14 @@ ContractSample  <- read.csv(
     na.strings = c("NULL","NA",""),
     stringsAsFactors = TRUE
     )
+
+CompleteModelAndDetail  <- read.csv(
+    paste("data\\defense_contract_CSIScontractID_detail.csv", sep = ""),
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+
 
 #These will probably be moved into apply_lookups at some point
 ContractSample$pIsSomeCompetition <- ContractSample$ObligatedAmountIsSomeCompetition/ContractSample$ObligatedAmount
@@ -72,6 +97,9 @@ ggplot(
     main = "Distribution by percent of dollars with some competition for mixed and unlabeled contracts."
     ) +
     geom_bar(binwidth=0.05)
+
+
+
 ```
 
 ##Variables describing competition
@@ -91,6 +119,29 @@ The distribution of the number of offers received. For the chart below, we've cu
 
 
 ```{r numoffers, echo = TRUE}
+
+
+# 
+# CompGraph<-LatticePercentLineWrapper(
+#     "Competition"
+#     ,"Competition by DoD Component and Starting Regime"
+#     ,"Fiscal Year of Obligation"
+#     ,"% of Component Obligations"
+#     ,Coloration
+#     ,0
+#     ,0
+#     ,CompPolicy
+#     ,NULL
+#     ,"SignedSemiAnnual"
+#     ,"Obligation.2014"
+#     ,"Competition.sum"
+#     ,"SubCustomer.component"
+#     ,"ATLpolicy"
+#     ,"StartDate"
+#     ,"EndDate"
+#     )
+
+
 ggplot(
     data = subset(ContractSample,UnmodifiedNumberOfOffersReceived<100),
     aes_string(x = "UnmodifiedNumberOfOffersReceived"),
@@ -139,6 +190,10 @@ ggplot(
 
 
 quantile(ContractSample$NumberOfOffersReceived,c(0.25,0.5,0.75),na.rm=TRUE)
+
+
+
+
 
 ```
 
@@ -226,16 +281,139 @@ summary(subset(uncompeted.sample,select=c(
 
 ```{r remaining, echo = FALSE}
 #Graphs I made earlier that I'm not presently using.
-# ggplot(
-#     data = subset(ContractSample),
-#     aes_string(x = "IsSomeCompetition",fill="UnmodifiedIsSomeCompetition"),
-#     main = "Distribution by is full and open"
-#     ) +
-#     geom_bar(binwidth=1)
-# # +     facet_grid( IsFullAndOpen ~ .,
-# #               scales = "free_y",
-# #               space = "free_y") + scale_y_continuous(expand = c(0,50)) 
-# 
+CompleteModelAndDetail$Ceil<-factor(CompleteModelAndDetail$Ceil,
+                                        levels=c("[0.00e+00,1.50e+04)"
+                                                 ,"[1.50e+04,1.00e+05)"
+                                                 ,"[1.00e+05,1.00e+06)"
+                                                 ,"[1.00e+06,3.00e+07)"
+                                                 ,"[3.00e+07,3.36e+12]"
+                                                 ),
+                                        labels=c("[0,15k)"
+                                                 ,"[15k,100k)"
+                                                 ,"[100k,1m)"
+                                                 ,"[1m,30m)"
+                                                 ,"[30m+]"
+                                                 ),
+                                        ordered=TRUE)
+
+
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(Ceil)&UnmodifiedIsSomeCompetition=="Comp."),
+    aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
+    main = "Distribution by is full and open"
+    ) +
+    geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,100))+facet_grid(Ceil~.,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(Ceil)&!is.na(IDV)&UnmodifiedIsSomeCompetition=="Comp."),
+    aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
+    main = "Distribution by is full and open"
+    ) +
+    geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,50))+facet_grid(Ceil~IDV,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+
+
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(Ceil)&!is.na(SimpleArea)&UnmodifiedIsSomeCompetition=="Comp."),
+    aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
+    main = "Distribution by is full and open"
+    ) +
+    geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,50))+facet_grid(Ceil~SimpleArea,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(SimpleArea)&UnmodifiedIsSomeCompetition=="Comp."),
+    aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
+    main = "Distribution by is full and open"
+    ) +
+    geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,50))+facet_grid(FxCb~SimpleArea,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&SimpleArea=="R&D"&UnmodifiedIsSomeCompetition=="Comp."),
+    aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
+    main = "Distribution by is full and open"
+    ) +
+    geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,50))+facet_grid(FxCb~SimpleArea,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&SimpleArea=="R&D"&UnmodifiedIsSomeCompetition=="Comp."),
+    aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
+    main = "Distribution by is full and open"
+    ) +
+    geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,50))+facet_grid(Ceil~FxCb,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(IDV)&SimpleArea=="Products"&UnmodifiedIsSomeCompetition=="Comp."),
+    aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
+    main = "Distribution by is full and open"
+    ) +
+    geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,50))+facet_grid(IDV~FxCb,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+
+
+IDVBox<-BoxplotWrapper(
+    "VAR.name",
+    "VAR.proper.name",
+    "VAR.X.label",
+    "Number of Offers Received" ,
+    Coloration,
+    subset(CompleteModelAndDetail,!is.na(IDV)&!is.na(Ceil)),
+    "Ceil",
+    "UnmodifiedNumberOfOffersReceived",
+"IDV"
+)
+IDVBox+scale_y_continuous(limits=c(0,20))
+FoCbox<-BoxplotWrapper(
+    "VAR.name",
+    "VAR.proper.name",
+    "VAR.X.label",
+    "Number of Offers Received" ,
+    Coloration,
+    subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Ceil)),
+    "Ceil",
+    "UnmodifiedNumberOfOffersReceived",
+"FxCb"
+)
+
+
+Box
+OffersByCeil<-HistogramOrDensityWrapper(
+    "VAR.name"
+    ,"VAR.proper.name"
+    ,"NUmber of Offers Received"
+    ,"Frequency"
+    ,Coloration
+    ,subset(CompleteModelAndDetail,!is.na(Ceil)&UnmodifiedIsSomeCompetition=="Comp.")
+    ,"histogram"
+    ,"UnmodifiedNumberOfOffersReceived"
+    ,"Ceil"
+    
+)
+OffersByCeil+geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,100))+facet_grid(Ceil~.)
+
+
+OffersByCeil+geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,100))+facet_grid(Ceil~.)
+
+# +     facet_grid( IsFullAndOpen ~ .,
+#               scales = "free_y",
+#               space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+
 # 
 # ggplot(
 #     data = subset(ContractSample),
