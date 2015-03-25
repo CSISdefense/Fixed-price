@@ -60,27 +60,18 @@ public:
     } else {
       equipment = true;
     }
-    
+
     // read the last irrelevant field
     if (fh >> field) return true;
     return false;
   }
-<<<<<<< HEAD
-  bool started_later(Contract other) const {
-    // return true if the other contract is started earlier and is
-    // still ongoing when this contract started
-    if (other.start < start && other.end > start) {
-      return true;
-    } else {
-      return false;
-=======
   bool overlap(Contract other) const {
     // return true if timeframes overlap
-    if (end < other.start || other.end < start) {
+    //if (end < other.start || other.end < start) {
+    if (start <= other.start || other.end < start) {
       return false;
     } else {
       return true;
->>>>>>> fabd08cf6cd27dbb5d2a3c46e01abffa53b02d92
     }
   }
 };
@@ -122,17 +113,8 @@ int main() {
     It i1, i2;
     for (i1 = ret.first; i1 != ret.second; i1++) {
       for (i2 = i1, i2++; i2 != ret.second; i2++) {
-<<<<<<< HEAD
-	// if contract i1 
-	if (i1->started_later(*i2) && ! (i1->equipment && i2->equipment)) {
-	  linked[i1->id]++;
-	}
-
-	if (i2->started_later(*i1) && ! (i1->equipment && i2->equipment)) {
-=======
 	if (i1->overlap(*i2) && ! (i1->equipment && i2->equipment)) {
 	  linked[i1->id]++;
->>>>>>> fabd08cf6cd27dbb5d2a3c46e01abffa53b02d92
 	  linked[i2->id]++;
 	}
       }
@@ -144,10 +126,6 @@ int main() {
   // output the linked numbers
   map<int,int>::iterator mit;
   for (mit = linked.begin(); mit != linked.end(); mit++) {
-<<<<<<< HEAD
-    cout << mit->first << "," << mit->second << endl;
-=======
     cout << mit->first << " " << mit->second << endl;
->>>>>>> fabd08cf6cd27dbb5d2a3c46e01abffa53b02d92
   }
 }
