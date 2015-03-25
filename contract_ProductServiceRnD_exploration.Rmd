@@ -28,7 +28,7 @@ Contracts are classified using a mix of numerical and categorical variables. Whi
 One contract characteristic we study is the type of product or service being procured; a product, service or R&D.  This classification can be derived from a single field of the database, using groupings established by the study team.  The mixed and unlabeled category includes contracts that report categories of product and service codes at various points during the lifespan on the contract.   
 
 ```{r setup, echo = TRUE}
-contract.sample  <- read.csv(
+ContractSample  <- read.csv(
     paste("data\\defense_contract_CSIScontractID_sample_100000_SumofObligatedAmount.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
@@ -36,17 +36,17 @@ contract.sample  <- read.csv(
     )
 
 #These will probably be moved into apply_lookups at some point
-contract.sample$pIsProducts <- contract.sample$ObligatedAmountIsProducts/contract.sample$SumofObligatedAmount
-contract.sample$pIsProducts[is.na(contract.sample$ObligatedAmountIsProducts)] <- 0
+ContractSample$pIsProducts <- ContractSample$ObligatedAmountIsProducts/ContractSample$SumofObligatedAmount
+ContractSample$pIsProducts[is.na(ContractSample$ObligatedAmountIsProducts)] <- 0
 
-contract.sample$pIsServices <- contract.sample$ObligatedAmountIsServices/contract.sample$SumofObligatedAmount
-contract.sample$pIsServices[is.na(contract.sample$ObligatedAmountIsServices)] <- 0
+ContractSample$pIsServices <- ContractSample$ObligatedAmountIsServices/ContractSample$SumofObligatedAmount
+ContractSample$pIsServices[is.na(ContractSample$ObligatedAmountIsServices)] <- 0
 
-contract.sample$pIsRnD <- contract.sample$ObligatedAmountIsRnD/contract.sample$SumofObligatedAmount
-contract.sample$pIsRnD[is.na(contract.sample$ObligatedAmountIsRnD)] <- 0
+ContractSample$pIsRnD <- ContractSample$ObligatedAmountIsRnD/ContractSample$SumofObligatedAmount
+ContractSample$pIsRnD[is.na(ContractSample$ObligatedAmountIsRnD)] <- 0
 
 
-contract.sample<-apply_lookups(Path,contract.sample)
+ContractSample<-apply_lookups(Path,ContractSample)
 
 
 ```
@@ -55,7 +55,7 @@ contract.sample<-apply_lookups(Path,contract.sample)
 
 
 ```{r overallvars, echo = TRUE}
-summary(subset(contract.sample,select=c(PlatformPortfolio,
+summary(subset(ContractSample,select=c(PlatformPortfolio,
       UnmodifiedPlatformPortfolio,
       ProductOrServiceArea,
       UnmodifiedProductOrServiceArea,
@@ -67,13 +67,13 @@ summary(subset(contract.sample,select=c(PlatformPortfolio,
                                 ))
         )
 # 
-# contract.sample$IsInternational<-factor(contract.sample$IsInternational,
+# ContractSample$IsInternational<-factor(ContractSample$IsInternational,
 #                                         exclude=NULL,
 #                                         levels=c(0,1,NA),
 #                                         labels=c("U.S.","International","Unlabeled \nor mixed")
 #                                         )
 # 
-# contract.sample$AnyInternational<-factor(contract.sample$AnyInternational,
+# ContractSample$AnyInternational<-factor(ContractSample$AnyInternational,
 #                                         exclude=NULL,
 #                                         levels=c(0,1,NA),
 #                                         labels=c("Just U.S.","Any\nInternational","Unlabeled")
@@ -81,7 +81,7 @@ summary(subset(contract.sample,select=c(PlatformPortfolio,
 
 # 
 # ggplot(
-#     data = subset(contract.sample,is.na(IsInternational)|IsInternational=="Unlabeled \nor mixed" ),
+#     data = subset(ContractSample,is.na(IsInternational)|IsInternational=="Unlabeled \nor mixed" ),
 #     aes_string(x = "pIsInternational",
 #                fill="AnyInternational"
 #                
@@ -90,7 +90,7 @@ summary(subset(contract.sample,select=c(PlatformPortfolio,
 #     )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))
 #     
 # 
-# summary(subset(contract.sample,pIsInternational<=0 & AnyInternational=="Any\nInternational",
+# summary(subset(ContractSample,pIsInternational<=0 & AnyInternational=="Any\nInternational",
 #                select=c(PlatformPortfolio
 #       UnmodifiedPlatformPortfolio,
 #       ProductOrServiceArea,
@@ -103,14 +103,14 @@ summary(subset(contract.sample,select=c(PlatformPortfolio,
 #                                 ))
 #         )
 # 
-# contract.sample$AnyInternational[contract.sample$pIsInternational<=0 & 
-#                     contract.sample$AnyInternational=="Any\nInternational" &
-#                     contract.sample$UnmodifiedIsInternational==0]<-"Just U.S."
+# ContractSample$AnyInternational[ContractSample$pIsInternational<=0 & 
+#                     ContractSample$AnyInternational=="Any\nInternational" &
+#                     ContractSample$UnmodifiedIsInternational==0]<-"Just U.S."
 # 
 # 
 
 ggplot(
-    data = subset(contract.sample,SimpleArea=="Mixed or Unlabeled" ),
+    data = subset(ContractSample,SimpleArea=="Mixed or Unlabeled" ),
     aes_string(x = "pIsProducts"
                
                ),
@@ -119,7 +119,7 @@ ggplot(
 
 
 ggplot(
-    data = subset(contract.sample,SimpleArea=="Mixed or Unlabeled" ),
+    data = subset(ContractSample,SimpleArea=="Mixed or Unlabeled" ),
     aes_string(x = "pIsRnD"
                
                ),
@@ -128,15 +128,15 @@ ggplot(
 
 
 ggplot(
-    data = subset(contract.sample,SimpleArea=="Mixed or Unlabeled" ),
+    data = subset(ContractSample,SimpleArea=="Mixed or Unlabeled" ),
     aes_string(x = "pIsServices"
                
                ),
     main = "Distribution by percent of dollars with fixed-price for mixed and unlabeled contracts."
     )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))+facet_wrap(~UnmodifiedSimpleArea)
 
-NASimpleArea<-contract.sample$SimpleArea=="Mixed or Unlabeled"&!is.na(contract.sample$UnmodifiedSimpleArea)
-contract.sample$SimpleArea[NASimpleArea]<-contract.sample$UnmodifiedSimpleArea[NASimpleArea]
+NASimpleArea<-ContractSample$SimpleArea=="Mixed or Unlabeled"&!is.na(ContractSample$UnmodifiedSimpleArea)
+ContractSample$SimpleArea[NASimpleArea]<-ContractSample$UnmodifiedSimpleArea[NASimpleArea]
 rm(NASimpleArea)
 
 
@@ -154,12 +154,12 @@ summary(subset(SimpleArea=="Mixed or Unlabeled",
 
                                 ))
         )
-contract.sample$SimpleArea[is.na(contract.sample$SimpleArea) & contract.sample$pIsProducts>0.5]<-"Products"
-contract.sample$SimpleArea[is.na(contract.sample$SimpleArea) & contract.sample$pIsServices>0.5]<-"Services"
-contract.sample$SimpleArea[is.na(contract.sample$SimpleArea) & contract.sample$pIsRnD>0.5]<-"R&D"
+ContractSample$SimpleArea[is.na(ContractSample$SimpleArea) & ContractSample$pIsProducts>0.5]<-"Products"
+ContractSample$SimpleArea[is.na(ContractSample$SimpleArea) & ContractSample$pIsServices>0.5]<-"Services"
+ContractSample$SimpleArea[is.na(ContractSample$SimpleArea) & ContractSample$pIsRnD>0.5]<-"R&D"
 
 ggplot(
-    data = subset(contract.sample,SimpleArea=="Mixed or Unlabeled" & !is.na(ObligatedAmountIsProducts)),
+    data = subset(ContractSample,SimpleArea=="Mixed or Unlabeled" & !is.na(ObligatedAmountIsProducts)),
     aes_string(x = "pIsProducts",
                fill = "pSimpleArea"
                ),
@@ -168,7 +168,7 @@ ggplot(
 
 
 ggplot(
-    data = subset(contract.sample,SimpleArea=="Mixed or Unlabeled" &!is.na(ObligatedAmountIsRnD) ),
+    data = subset(ContractSample,SimpleArea=="Mixed or Unlabeled" &!is.na(ObligatedAmountIsRnD) ),
     aes_string(x = "pIsRnD",
                fill = "pSimpleArea"
                ),
@@ -177,7 +177,7 @@ ggplot(
 
 
 ggplot(
-    data = subset(contract.sample,SimpleArea=="Mixed or Unlabeled" &  !is.na(ObligatedAmountIsServices)),
+    data = subset(ContractSample,SimpleArea=="Mixed or Unlabeled" &  !is.na(ObligatedAmountIsServices)),
     aes_string(x = "pIsServices",
                fill = "pSimpleArea"
                ),

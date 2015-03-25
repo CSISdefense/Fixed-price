@@ -3,9 +3,9 @@ title: 'DoD Fixed-Price and Competition Study: Single-Offer Model Building'
 author: "Greg Sanders"
 date: "Tuesday, January 13, 2015"
 output:
-  html_document:
-    keep_md: yes
-    toc: yes
+html_document:
+keep_md: yes
+toc: yes
 --- 
 
 ```{r hiddensetup, echo = FALSE}
@@ -64,6 +64,16 @@ ContractSample$AnyInternational<-factor(ContractSample$AnyInternational,
                                         )
 
 
+contract.sample$pIsProducts <- contract.sample$ObligatedAmountIsProducts/contract.sample$SumofObligatedAmount
+contract.sample$pIsProducts[is.na(contract.sample$ObligatedAmountIsProducts)] <- 0
+
+contract.sample$pIsServices <- contract.sample$ObligatedAmountIsServices/contract.sample$SumofObligatedAmount
+contract.sample$pIsServices[is.na(contract.sample$ObligatedAmountIsServices)] <- 0
+
+contract.sample$pIsRnD <- contract.sample$ObligatedAmountIsRnD/contract.sample$SumofObligatedAmount
+contract.sample$pIsRnD[is.na(contract.sample$ObligatedAmountIsRnD)] <- 0
+
+
 ContractSample$pIsArmy <- ContractSample$ObligatedAmountIsArmy/ContractSample$SumofObligatedAmount
 ContractSample$pIsArmy[is.nan(ContractSample$pIsArmy)|is.infinite(ContractSample$pIsArmy)|is.na(ContractSample$ObligatedAmountIsArmy)] <- 0
 
@@ -85,9 +95,9 @@ ContractSample$LinkedContracts<-ContractSample$ContractingOfficePlatformInterlin
 
 
 ContractSample$UnmodifiedDays<-as.numeric(difftime(strptime(ContractSample$UnmodifiedCurrentCompletionDate,"%Y-%m-%d")
-                                                     , strptime(ContractSample$MinOfEffectiveDate,"%Y-%m-%d")
-                                                     , unit="days"
-        ))+1
+                                                   , strptime(ContractSample$MinOfEffectiveDate,"%Y-%m-%d")
+                                                   , unit="days"
+                                                   ))+1
 
 
 
@@ -121,23 +131,23 @@ ContractSample$SubCustomer.sum<-droplevels(ContractSample$SubCustomer.sum)
 
 
 summary(subset(ContractSample,select=c(UnmodifiedIsSomeCompetition,
-                                IsIDV,
-                                IsFixedPrice,
-                                IsCostBased,
-                                SubCustomer.sum,
-                                LinkedContracts,
-                                UnmodifiedIsSomeCompetition,
-                                UnmodifiedIsFullAndOpen,
-                                PlatformPortfolio.sum,
-                                AnyInternational,
-                                SimpleArea,
-                                UnmodifiedContractBaseAndAllOptionsValue,
-                                UnmodifiedDays,
-                                UnmodifiedNumberOfOffersReceived
-                                ))
+                                       IsIDV,
+                                       IsFixedPrice,
+                                       IsCostBased,
+                                       SubCustomer.sum,
+                                       LinkedContracts,
+                                       UnmodifiedIsSomeCompetition,
+                                       UnmodifiedIsFullAndOpen,
+                                       PlatformPortfolio.sum,
+                                       AnyInternational,
+                                       SimpleArea,
+                                       UnmodifiedContractBaseAndAllOptionsValue,
+                                       UnmodifiedDays,
+                                       UnmodifiedNumberOfOffersReceived
+                                       ))
         )
 
-        
+
 ```
 Describe source variables in FPDS here.
 
@@ -148,10 +158,10 @@ Because this model analyzes the number of offers on competed contracts, the firs
 ###Evidence variables
 Note that these missing data rates are only for competed entries, so they will typically not match the overall unlabeled rates.
 
- * IsIDV is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(IsIDV))) /nrow(ContractSample)*100)` missing data). See [vehicle exploration](contract_vehicle_exploration.md) for more. Since this variable is consistently labeled, it isn't necessary to impute data or seperate out unmodified entries.
- * After imputed, UnmodifiedIsSomeCompetition has a `r sprintf("%1.2f%%",nrow(subset(ContractSample,UnmodifiedIsSomeCompetition=="Unlabeled")) /nrow(ContractSample)*100)` missing data rate. 
- * UnmodifiedIsFullAndOpen is the classification given by the first record for the contract (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(UnmodifiedIsFullAndOpen)|UnmodifiedIsFullAndOpen=="Unlabeled")) /nrow(ContractSample)*100)` missing data). See [exploration on competition](contract_competition_exploration.md) for more.
- * UnmodifiedNumberOfOffersReceived reports the Number of Offers Received according to the first reported transaction under a contract (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(UnmodifiedNumberOfOffersReceived)|UnmodifiedNumberOfOffersReceived==0)) /nrow(ContractSample)*100)` missing data, far too high, there must be a SQL mistake). See [exploration on competition](contract_competition_exploration.md) for more.
+* IsIDV is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(IsIDV))) /nrow(ContractSample)*100)` missing data). See [vehicle exploration](contract_vehicle_exploration.md) for more. Since this variable is consistently labeled, it isn't necessary to impute data or seperate out unmodified entries.
+* After imputed, UnmodifiedIsSomeCompetition has a `r sprintf("%1.2f%%",nrow(subset(ContractSample,UnmodifiedIsSomeCompetition=="Unlabeled")) /nrow(ContractSample)*100)` missing data rate. 
+* UnmodifiedIsFullAndOpen is the classification given by the first record for the contract (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(UnmodifiedIsFullAndOpen)|UnmodifiedIsFullAndOpen=="Unlabeled")) /nrow(ContractSample)*100)` missing data). See [exploration on competition](contract_competition_exploration.md) for more.
+* UnmodifiedNumberOfOffersReceived reports the Number of Offers Received according to the first reported transaction under a contract (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(UnmodifiedNumberOfOffersReceived)|UnmodifiedNumberOfOffersReceived==0)) /nrow(ContractSample)*100)` missing data, far too high, there must be a SQL mistake). See [exploration on competition](contract_competition_exploration.md) for more.
 * simplearea is a classification for the entirity of the contract  (`r #sprintf("%1.2f%%",nrow(subset(ContractSample,SimpleArea=="Mixed or Unlabeled")) /nrow(ContractSample)*100)` missing data). See [exploration on product, service, and R&D](contract_ProductServiceRnD_exploration.md) for more.
 
 
@@ -160,32 +170,32 @@ Note that these missing data rates are only for competed entries, so they will t
 
 
 ContractSample$FixedOrCost[ContractSample$pIsFixedPrice>0  |
-                                      ContractSample$pIsCostBased>0 | 
-                                          ContractSample$pIsCombination>0]<-"Combination \nor Other"
+                               ContractSample$pIsCostBased>0 | 
+                               ContractSample$pIsCombination>0]<-"Combination \nor Other"
 
 
-ContractSample$FixedOrCost[ContractSample$pIsFixedPrice>=0.95|(ContractSample$IsFixedPrice=="Fixed Price" & ContractSample$pIsCombination==0)]<-"Fixed-Price"
-ContractSample$FixedOrCost[ContractSample$pIsCostBased>=0.95|(ContractSample$IsCostBased==1 & ContractSample$pIsCombination==0)]<-"Cost-Based"
+ContractSample$FixedOrCost[ContractSample$pIsFixedPrice>=0.95|(ContractSample$IsFixedPrice=="Fixed Price" & ContractSample$pIsCombination<=0.05)]<-"Fixed-Price"
+ContractSample$FixedOrCost[ContractSample$pIsCostBased>=0.95|(ContractSample$IsCostBased==1 & ContractSample$pIsCombination<=0.05)]<-"Cost-Based"
 ContractSample$FixedOrCost<-factor(ContractSample$FixedOrCost,levels=c("Fixed-Price","Cost-Based","Combination \nor Other"))
 
 
 
 ContractSample$PlatformPortfolio.sum[ContractSample$pIsLand>=0.75&
-                                   ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Land Vehicles"
+                                         ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Land Vehicles"
 ContractSample$PlatformPortfolio.sum[ContractSample$pIsVessel>=0.75&
-                                   ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Ships & Submarines"
+                                         ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Ships & Submarines"
 ContractSample$PlatformPortfolio.sum[ContractSample$pIsAir>=0.75&
-                                   ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Aircraft and Drones"
+                                         ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Aircraft and Drones"
 ContractSample$PlatformPortfolio.sum[ContractSample$pIsOtherPP>=0.75&
-                                   ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Other"
+                                         ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Other"
 ContractSample$PlatformPortfolio.sum[ContractSample$pIsWnA>=0.75&
-                                   ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Weapons and Ammunition"
+                                         ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Weapons and Ammunition"
 ContractSample$PlatformPortfolio.sum[ContractSample$pIsMnS>=0.75&
-                                   ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Missile and Space Systems"
+                                         ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Missile and Space Systems"
 ContractSample$PlatformPortfolio.sum[ContractSample$pIsEnC>=0.75&
-                                   ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Electronics and Communications"
+                                         ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Electronics and Communications"
 ContractSample$PlatformPortfolio.sum[ContractSample$pIsFRSnC>=0.75&
-                                   ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Facilities and Construction"
+                                         ContractSample$PlatformPortfolio.sum=="Unlabeled"]<-"Facilities and Construction"
 
 
 
@@ -216,8 +226,8 @@ ContractSample$qLinked <- cut2(ContractSample$LinkedContracts,cuts=c(1,750))
 ContractSample$qOffers <- cut2(ContractSample$NumberOfOffersReceived,cuts=c(1,2,3,5))
 
 ContractSample$AnyInternational[ContractSample$pIsInternational<=0 & 
-                    ContractSample$AnyInternational=="Any\nInternational" &
-                    ContractSample$UnmodifiedIsInternational==0]<-"Just U.S."
+                                    ContractSample$AnyInternational=="Any\nInternational" &
+                                    ContractSample$UnmodifiedIsInternational==0]<-"Just U.S."
 
 NASimpleArea<-ContractSample$SimpleArea=="Mixed or Unlabeled"&!is.na(ContractSample$UnmodifiedSimpleArea)
 ContractSample$SimpleArea[NASimpleArea]<-ContractSample$UnmodifiedSimpleArea[NASimpleArea]
@@ -251,9 +261,9 @@ ContractSample$Comp[ContractSample$UnmodifiedIsSomeCompetition=="Comp." &
                         ContractSample$UnmodifiedIsFullAndOpen=="Full & Open"]<-2
 
 ContractSample$Comp<-factor(ContractSample$Comp,
-                                   levels=c(0,1,2),
-                                   labels=c("No Comp.","Limited\nComp.","Full & Open\nComp.")
-)
+                            levels=c(0,1,2),
+                            labels=c("No Comp.","Limited\nComp.","Full & Open\nComp.")
+                            )
 
 
 ContractSample$qDuration<-cut2(ContractSample$UnmodifiedDays,cuts=c(61,214,366))
@@ -265,58 +275,58 @@ ContractSample$IsIDV<-factor(ContractSample$IsIDV,levels=c(0,1),labels=c("Def/Pu
 ContractSample$SingleOffer<-factor(ContractSample$UnmodifiedNumberOfOffersReceived==1,
                                    levels=c(TRUE,FALSE),
                                    labels=c("Single","Multi")
-)
+                                   )
 
 
 names(ContractSample)
 
 summary(subset(ContractSample,select=c(UnmodifiedIsSomeCompetition,
-                                IsIDV,
-                                FixedOrCost,
-                                Comp,
-                                SubCustomer.sum,
-                                qLinked,
-                                AnyInternational,
-                                SimpleArea,
-                                qCeiling,
-                                qDuration,
-                                PlatformPortfolio.sum,
-#                                 UnmodifiedNumberOfOffersReceived
-                                qOffers
-                                ))
+                                       IsIDV,
+                                       FixedOrCost,
+                                       Comp,
+                                       SubCustomer.sum,
+                                       qLinked,
+                                       AnyInternational,
+                                       SimpleArea,
+                                       qCeiling,
+                                       qDuration,
+                                       PlatformPortfolio.sum,
+                                       #                                 UnmodifiedNumberOfOffersReceived
+                                       qOffers
+                                       ))
         )
 ```
 The model has nine core variables, though one is presently missing. After renaming the variables, all unlabeled data is removed from the final model dataset.
 
 *IDV (IsIDV) IsDefiniteVehicle has ('r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(IsIDV)|IsIDV=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
-   
+
 * FxCb (FixedOrCost) FixedOrCost has ('r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(FixedOrCost)|FixedOrCost=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
 
 * Comp (UnmodifiedIsFullAndOpen) UnmodifiedIsFullAndOpen has (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(UnmodifiedIsFullAndOpen)|UnmodifiedIsFullAndOpen=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
 
 * Intl (AnyInternational) AnyInternational has (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(AnyInternational)|AnyInternational=="Unlabeled")) /nrow(ContractSample)*100)` missing data. 
-	* PSR (SimpleArea) SimpleArea has (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(SimpleArea)|SimpleArea=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
-	* Ceil (qCeiling) qCeiling has (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(UnmodifiedContractBaseAndAllOptionsValue)|UnmodifiedContractBaseAndAllOptionsValue=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
-	* Dur (qDuration) qDuration has ('r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(MinOfSignedDate)|MinOfSignedDate=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
-	* Dur (LastUltimateCompleteDate) LastUltimateCompleteDate has (`r sprintf("%1.2f%%", nrow(subset(ContractSample,is.na(LastUltimateCompletionDate)|LastUltimateCompletionDate=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
-	
+* PSR (SimpleArea) SimpleArea has (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(SimpleArea)|SimpleArea=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
+* Ceil (qCeiling) qCeiling has (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(UnmodifiedContractBaseAndAllOptionsValue)|UnmodifiedContractBaseAndAllOptionsValue=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
+* Dur (qDuration) qDuration has ('r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(MinOfSignedDate)|MinOfSignedDate=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
+* Dur (LastUltimateCompleteDate) LastUltimateCompleteDate has (`r sprintf("%1.2f%%", nrow(subset(ContractSample,is.na(LastUltimateCompletionDate)|LastUltimateCompletionDate=="Unlabeled")) /nrow(ContractSample)*100)` missing data.
+
 
 * One (SingleOffer)  UnmodifiedNumberOfOffersReceived has (`r sprintf("%1.2f%%",nrow(subset(ContractSample,is.na(UnmodifiedNumberOfOffersReceived)|UnmodifiedNumberOfOffersReceived==0)) /nrow(ContractSample)*100)` missing data.
 ```{r summary}
 summary(subset(ContractSample,select=c(UnmodifiedIsSomeCompetition,
-                                IsIDV,
-                                SubCustomer.sum,
-                                FixedOrCost,
-                                UnmodifiedIsFullAndOpen,
-                                qLinked,
-                                AnyInternational,
-                                SimpleArea,
-                                qCeiling,
-                                qDuration,
-                                PlatformPortfolio.sum,
-#                                 UnmodifiedNumberOfOffersReceived
-qOffers
-                                ))
+                                       IsIDV,
+                                       SubCustomer.sum,
+                                       FixedOrCost,
+                                       UnmodifiedIsFullAndOpen,
+                                       qLinked,
+                                       AnyInternational,
+                                       SimpleArea,
+                                       qCeiling,
+                                       qDuration,
+                                       PlatformPortfolio.sum,
+                                       #                                 UnmodifiedNumberOfOffersReceived
+                                       qOffers
+                                       ))
         )
 ```
 The model has nine core variables, though one is presently missing. After renaming the variables, all unlabeled data is removed from the final model dataset.
@@ -345,9 +355,11 @@ The shortened names are used for ease of graphical and tabular representation. H
 
 ```{r ModelConsolidation, echo = TRUE}
 
-ContractModel<-subset(ContractSample,select=c(IsIDV,
+ContractModel<-subset(ContractSample
+                      ,select=c(IsIDV,
                                 FixedOrCost,
-                                Comp,
+                                UnmodifiedIsSomeCompetition,
+                                #                                 Comp,
                                 qLinked,
                                 SubCustomer.sum,
                                 PlatformPortfolio.sum,
@@ -355,12 +367,15 @@ ContractModel<-subset(ContractSample,select=c(IsIDV,
                                 SimpleArea,
                                 qCeiling,
                                 qDuration,
-#                                 SingleOffer
-qOffers
-                                ))
+                                #                                 SingleOffer
+                                qOffers
+                                )
+                      ,subset=!is.na(ContractSample$StartFiscal_Year)
+                      )
 # 
 
 colnames(ContractModel)[colnames(ContractModel)=="SubCustomer.sum"]<-"Who"
+colnames(ContractModel)[colnames(ContractModel)=="UnmodifiedIsSomeCompetition"]<-"Comp"
 colnames(ContractModel)[colnames(ContractModel)=="PlatformPortfolio.sum"]<-"What"
 colnames(ContractModel)[colnames(ContractModel)=="IsIDV"]<-"IDV"
 colnames(ContractModel)[colnames(ContractModel)=="FixedOrCost"]<-"FxCb"
@@ -374,20 +389,20 @@ colnames(ContractModel)[colnames(ContractModel)=="qOffers"]<-"Offr"
 
 
 nrow(ContractModel)
-summary(nrow(subset(ContractModel,complete.cases(ContractModel))))
+nrow(subset(ContractModel,complete.cases(ContractModel)))
 summary(subset(ContractModel,complete.cases(ContractModel)))
 
 dropped<-subset(ContractModel,!complete.cases(ContractModel)|
-           Intl=="Unlabeled"|
-           PSR =="Mixed or Unlabeled" |
-               Who=="Uncategorized" |
-               What =="Unlabeled")
+                    Intl=="Unlabeled"|
+                    PSR =="Mixed or Unlabeled" |
+                    Who=="Uncategorized" |
+                    What =="Unlabeled")
 
 ContractModel<-subset(ContractModel,complete.cases(ContractModel)&
-           Intl!="Unlabeled"&
-           PSR !="Mixed or Unlabeled"&
-               Who!="Uncategorized" & 
-               What!="Unlabeled")
+                          Intl!="Unlabeled"&
+                          PSR !="Mixed or Unlabeled"&
+                          Who!="Uncategorized" & 
+                          What!="Unlabeled")
 
 ContractModel$Intl<-droplevels(ContractModel$Intl)
 ContractModel$PSR<-droplevels(ContractModel$PSR)
@@ -422,13 +437,13 @@ I've listed them below based on the origin piece of evidence.
 
 ```{r BayesianLearningSetup, echo = TRUE}
 #White list, connections that must occur
-ContractWL<-data.frame(from="IDV",to="Comp")
-ContractWL<-rbind(ContractWL,data.frame(from="Comp",to="Offr"))
+ContractWL<-data.frame(from="Comp",to="Offr")
+# ContractWL<-rbind(ContractWL,data.frame(from="Comp",to="Offr"))
 ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="FxCb"))
-ContractWL<-rbind(ContractWL,data.frame(from="FxCb",to="Offr"))
 ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="Link"))
+ContractWL<-rbind(ContractWL,data.frame(from="FxCb",to="Offr"))
 ContractWL<-rbind(ContractWL,data.frame(from="What",to="Link"))
-ContractWL<-rbind(ContractWL,data.frame(from="Who",to="Intl"))
+# ContractWL<-rbind(ContractWL,data.frame(from="Who",to="Intl"))
 ContractWL<-rbind(ContractWL,data.frame(from="Who",to="What"))
 #Black list, connections that are prohibited
 ContractBL<-data.frame(from=c("Offr"),to= c("IDV"))
@@ -443,12 +458,14 @@ ContractBL<-rbind(ContractBL,data.frame(from="Offr",to="Link"))
 # ContractBL<-rbind(ContractBL,data.frame(from="Who",to="Offr"))
 ContractBL<-rbind(ContractBL,data.frame(from="Link",to="Who"))
 ContractBL<-rbind(ContractBL,data.frame(from="Link",to="Intl"))
+ContractBL<-rbind(ContractBL,data.frame(from="Link",to="IDV"))
 ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Who"))
 ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="What"))
 ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Intl"))
 ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Ceil"))
 ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Dur"))
 ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Link"))
+ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Comp"))
 ContractBL<-rbind(ContractBL,data.frame(from="Ceil",to="Who"))
 ContractBL<-rbind(ContractBL,data.frame(from="Ceil",to="What"))
 ContractBL<-rbind(ContractBL,data.frame(from="Ceil",to="PSR"))
@@ -464,14 +481,14 @@ ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="What"))
 ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="PSR"))
 ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="Link"))
 ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="Intl"))
-ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="Ceil"))
-ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="Dur"))
-ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="FxCb"))
+# ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="Ceil"))
+# ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="Dur"))
 ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="Who"))
 ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="What"))
 ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="PSR"))
 ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="Intl"))
 ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="Link"))
+ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="Comp"))
 ContractBL<-rbind(ContractBL,data.frame(from="PSR",to="Who"))
 ContractBL<-rbind(ContractBL,data.frame(from="PSR",to="What"))
 ContractBL<-rbind(ContractBL,data.frame(from="PSR",to="Intl"))
@@ -481,8 +498,8 @@ arcs(bnWhitelist)<-ContractWL
 graphviz.plot(bnWhitelist,main="Whitelisted Arcs Rd. 1")
 
 bnBlacklist <- empty.graph(nodes = names(ContractModel))
-arcs(bnBlacklist)<-ContractBL
-graphviz.plot(bnBlacklist,main="Blacklisted Arcs Rd. 1")
+# arcs(bnBlacklist)<-ContractBL
+# graphviz.plot(bnBlacklist,main="Blacklisted Arcs Rd. 1")
 ```
 
 After the team developed the initial list and a small number of elements accidentally left off were corrected for, the next step was to do a preliminary run through with Bayesian learning. 
@@ -499,13 +516,13 @@ ContractBL<-rbind(ContractBL,data.frame(from="Who",to="IDV"))
 ContractBL<-rbind(ContractBL,data.frame(from="Who",to="FxCb"))
 
 highlightWL1 <- list(arcs = ContractWL,
-                                         col = "blue")
+                     col = "blue")
 
 highlightLists <- list(arcs = data.frame(from=c(as.character(ContractWL$from),
                                                 as.character(ContractBL$to)),
                                          to=c(as.character(ContractWL$to),
                                               as.character(ContractBL$from))),
-                                         col = "blue")
+                       col = "blue")
 
 
 graphviz.plot(gs_dug,main="Grow-Shrink first run",highlight=highlightLists)
@@ -525,17 +542,17 @@ With those two connections in hand, all three Bayesian Learning algorith were ap
 ContractWL<-rbind(ContractWL,data.frame(from="IDV",to="FxCb"))
 # ContractWL<-rbind(ContractWL,data.frame(from="IDV",to="Ceil"))
 # ContractWL<-rbind(ContractWL,data.frame(from="Dur",to="Ceil"))
-ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="Comp"))
+# ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="Comp"))
 ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="Dur"))
 
 
 highlight.WL2 <- list(arcs = ContractWL, col = "blue")
 
 highlightLists2 <- list(arcs = data.frame(from=c(as.character(ContractWL$from),
-                                                as.character(ContractBL$to)),
-                                         to=c(as.character(ContractWL$to),
-                                              as.character(ContractBL$from))),
-                                         col = "blue")
+                                                 as.character(ContractBL$to)),
+                                          to=c(as.character(ContractWL$to),
+                                               as.character(ContractBL$from))),
+                        col = "blue")
 
 
 
@@ -565,11 +582,15 @@ all.equal(uiamb_dug,mmpc_dug)
 
 
 graphviz.plot(uiamb_dug,main="Unoptimized Incremental Association ",highlight=highlight.WL2)
+graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Incremental Association ",highlight=highlight.WL2)
 graphviz.plot(mmpc_dug,main="Unoptimized Incremental Association ",highlight=highlight.WL2)
 
-arcs(uiamb_dug)
+# graphviz.plot(uiamb_dug,main="Unoptimized Incremental Association ",highlight=arcs(uinteriamb_dug))
+
+
+
 #Comparing the optimized and unoptimized Interleaved Incremental Association results
-graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Incremental Association ",highlight=highlight.WL2)
+
 
 
 ```
@@ -582,10 +603,10 @@ The other alternative within the package, a min-max parents and childrens approa
 
 ```{r BayesianExecutionRd3, echo = TRUE}
 highlightLists3 <- list(arcs = data.frame(from=c(as.character(ContractWL$from),
-                                                as.character(ContractBL$to)),
-                                         to=c(as.character(ContractWL$to),
-                                              as.character(ContractBL$from))),
-                                         col = "blue")
+                                                 as.character(ContractBL$to)),
+                                          to=c(as.character(ContractWL$to),
+                                               as.character(ContractBL$from))),
+                        col = "blue")
 
 
 highlight.WL3 <- list(arcs = ContractWL, col = "blue")
@@ -607,12 +628,16 @@ graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Hillclimbing highligh
 uinteriamb_dug05<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.05)
 uinteriamb_dug00001<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.00001)
 all.equal(uinteriamb_dug05,uinteriamb_dug00001)
+graphviz.plot(uinteriamb_dug00001)
 graphviz.plot(uinteriamb_dug05,main="Unoptimized Interleaved Incremental 05 Association 005 highlighted",highlight=list(arcs=arcs(uinteriamb_dug00001)))
 
+graphviz.plot(uinteriamb_dug00001,main="Unoptimized Interleaved Incremental 05 Association 005 highlighted",highlight=list(arcs=arcs(uinteriamb_dug05)))
 
-graphviz.plot(uinteriamb_dug001,main="Unoptimized Interleaved Incremental Association Whitelist highlighted",highlight=highlight.WL3)
-graphviz.plot(uinteriamb_dug001,main="Unoptimized Interleaved Incremental Association either list highlighted",highlight=highlightLists3)
-graphviz.plot(uinteriamb_dug001,main="Unoptimized Interleaved Incremental Association IAMB highlighted",highlight=list(arcs=arcs(uiamb_dug)))
+
+
+graphviz.plot(uinteriamb_dug00001,main="Unoptimized Interleaved Incremental Association Whitelist highlighted",highlight=highlight.WL3)
+graphviz.plot(uinteriamb_dug00001,main="Unoptimized Interleaved Incremental Association either list highlighted",highlight=highlightLists3)
+graphviz.plot(uinteriamb_dug00001,main="Unoptimized Interleaved Incremental Association IAMB highlighted",highlight=list(arcs=arcs(uiamb_dug)))
 # graphviz.plot(uiamb_dug,main="Unoptimized Interleaved Incremental Association ",highlight=list(arcs=arcs(uinteriamb_dug)))
 
 
@@ -620,7 +645,7 @@ graphviz.plot(uinteriamb_dug001,main="Unoptimized Interleaved Incremental Associ
 
 
 ```{r BayesianCompilation, echo = TRUE}
-CompetitionNetwork<-uinteriamb_dug0005
+CompetitionNetwork<-uinteriamb_dug00001
 modelstring(CompetitionNetwork)
 CompetitionFitted<-bn.fit(x=CompetitionNetwork,data=ContractModel,method="bayes")
 
