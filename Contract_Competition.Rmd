@@ -365,20 +365,53 @@ ggplot(
     geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,50))+facet_grid(IDV~FxCb,scales="free_y")+
     theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
 
+#Move this to fixed price
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Ceil)&!is.na(PSR)),
+    aes_string(x = "FxCb",fill="FxCb"),
+    main = "Distribution by duration and ceiling"
+    ) +
+    geom_bar()+facet_grid(Ceil~PSR,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Comp)&!is.na(PSR)),
+    aes_string(x = "FxCb",fill="FxCb"),
+    main = "Distribution by duration and ceiling"
+    ) +
+    geom_bar()+facet_grid(Comp~PSR,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Dur)&!is.na(PSR)),
+    aes_string(x = "FxCb",fill="FxCb"),
+    main = "Distribution by duration and ceiling"
+    ) +
+    geom_bar()+facet_grid(Dur~PSR,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+Dur
+
 
 
 IDVBox<-BoxplotWrapper(
-    "VAR.name",
-    "VAR.proper.name",
-    "VAR.X.label",
+    "Box plot of number of offers received by ceiling and IDV",
+    "Box plot of number of offers received by ceiling and IDV",
+    "Initial contract ceiling",
     "Number of Offers Received" ,
     Coloration,
     subset(CompleteModelAndDetail,!is.na(IDV)&!is.na(Ceil)),
-    "Ceil",
+"IDV",    
     "UnmodifiedNumberOfOffersReceived",
-"IDV"
 )
-IDVBox+scale_y_continuous(limits=c(0,20))
+IDVBox<-IDVBox+coord_cartesian(ylim=c(0,30))+
+    facet_wrap(~Ceil,ncol=5)+
+    theme(axis.text.x=element_text(angle=0))#size=axis.text.size,
+
+mean(subset(CompleteModelAndDetail,
+            IDV=="IDV"&Ceil=="[30m+]")$UnmodifiedNumberOfOffersReceived,,na.rm=TRUE)
 FoCbox<-BoxplotWrapper(
     "VAR.name",
     "VAR.proper.name",
@@ -390,6 +423,19 @@ FoCbox<-BoxplotWrapper(
     "UnmodifiedNumberOfOffersReceived",
 "FxCb"
 )
+Durbox<-BoxplotWrapper(
+    "VAR.name",
+    "VAR.proper.name",
+    "VAR.X.label",
+    "Number of Offers Received" ,
+    Coloration,
+    subset(CompleteModelAndDetail,!is.na(Dur)&!is.na(Ceil)),
+    "Dur",
+    "UnmodifiedNumberOfOffersReceived",
+"Ceil"
+)
+
+
 
 
 Box
