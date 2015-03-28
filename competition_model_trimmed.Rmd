@@ -1,0 +1,509 @@
+---
+title: 'DoD Fixed-Price and Competition Study: Single-Offer Model Building'
+author: "Greg Sanders"
+date: "Tuesday, January 13, 2015"
+output:
+html_document:
+keep_md: yes
+toc: yes
+--- 
+
+```{r hiddensetup, echo = FALSE}
+require(ggplot2)
+require(stringr)
+require(graph)
+require(plyr)
+require(Hmisc)
+require(Matrix)
+require(gRain)
+require(gRbase)
+require(methods)
+require(bnlearn)
+require(Rgraphviz)
+#source("http://bioconductor.org/biocLite.R"); #biocLite("Rgraphviz")
+
+setwd("K:\\Development\\Fixed-price")
+# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
+# Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
+source(paste(Path,"lookups.r",sep=""))
+
+```
+
+Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
+
+##Studying contract vehicle within the sample.
+Describe contract vehicle here.
+
+```{r setup, echo = TRUE}
+setwd("K:\\Development\\Fixed-price\\")
+filename<-"data\\defense_contract_CSIScontractID_model.csv"
+
+
+
+ContractModel  <- read.csv(
+    filename,
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+ContractModel<-subset(ContractModel,select=-c(SingleOffer))
+
+nrow(ContractModel)
+nrow(subset(ContractModel,complete.cases(ContractModel)))
+summary(subset(ContractModel,complete.cases(ContractModel)))
+
+dropped<-subset(ContractModel,!complete.cases(ContractModel)|
+                    Intl=="Unlabeled"|
+                    PSR =="Mixed or Unlabeled" |
+                    Who=="Uncategorized" |
+                    What =="Unlabeled")
+
+ContractModel<-subset(ContractModel,complete.cases(ContractModel)&
+                          Intl!="Unlabeled"&
+                          PSR !="Mixed or Unlabeled"&
+                          Who!="Uncategorized" & 
+                          What!="Unlabeled")
+
+ContractModel$Intl<-droplevels(ContractModel$Intl)
+ContractModel$PSR<-droplevels(ContractModel$PSR)
+ContractModel$Who<-droplevels(ContractModel$Who)
+ContractModel$What<-droplevels(ContractModel$What)
+
+nrow(ContractModel)
+```
+
+The last stage before Bayesian learning is setting the whitelists and blacklists. The whitelist contains vectors that must existing in the graph while the blacklist contains forbidden vectors. There was some iteration in the development of the white and blacklist, as nonsensical connections were removed and the blacklist was made systematic.
+
+I've listed them below based on the origin piece of evidence.
+1. IDV (IsIDV)
+* Whitelist to Comp (Competition) as many forms of IDVs don't qualify for full and open.
+* Blacklist to PSR (SimpleArea) because what you are buying is picked before how you are buying it.
+2. FxCb (FixedOrCost)
+* Whitelist to One (SingleOffer) as this is the key study question.
+* Blacklist to PSR (SimpleArea) and Intl (AnyInternational) because figuring out what and where come first.
+* Blacklist to Ceil (qCeiling) and Dur (qDuration), because project scope should come before project pricing,  although this may not be entirely true when the vendors make proposals.
+3. Comp (Competition)  
+* Whitelist to One (SingleOffer). We'll see how strong this connection ends up being, but it's really straightforward.
+* Blacklist to PSR (SimpleArea),  Intl (AnyInternational), and FxCb (FixedOrCost), as I think those details are set before deciding competition procedures.
+4. Intl (AnyInternational) No restrictions or requirements.
+5. PSR (SimpleArea)
+* Blacklist to Intl (AnyInternational) As I think the place of performance in the U.S. or abroad (but not the vendor location) is sometimes decided at least as early as the  product or service.
+6. Ceil (qCeiling)
+* Blacklist to PSR (SimpleArea) Intl (AnyInternational) because what and where come before scope.
+7. Dur (qDuration)
+* Blacklist to PSR (SimpleArea) Intl (AnyInternational) because what and where come before scope.
+8. One (SingleOffer) 
+* Blacklist to everything not covered by an existing whitelist. While the vendors responses may influence some factors at the margin, this is the dependent variable for this part of the study.
+
+```{r BayesianLearningSetup, echo = TRUE}
+
+#White list, connections that must occur
+ContractWL<-data.frame(from="Comp",to="Offr")
+# ContractWL<-rbind(ContractWL,data.frame(from="Comp",to="Offr"))
+ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="FxCb"))
+ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="Link"))
+ContractWL<-rbind(ContractWL,data.frame(from="FxCb",to="Offr"))
+ContractWL<-rbind(ContractWL,data.frame(from="What",to="Link"))
+# ContractWL<-rbind(ContractWL,data.frame(from="Who",to="Intl"))
+ContractWL<-rbind(ContractWL,data.frame(from="Who",to="What"))
+ContractWL<-rbind(ContractWL,data.frame(from="IDV",to="Ceil"))
+ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="FxCb"))
+
+bnWhitelist <- empty.graph(nodes = names(ContractModel))
+arcs(bnWhitelist)<-ContractWL
+graphviz.plot(bnWhitelist,main="Whitelisted Arcs Rd. 1")
+
+
+
+#Black list, connections that are prohibited
+ContractBL<-data.frame(from=c("Offr"),to= c("IDV"))
+ContractBL<-rbind(ContractBL,data.frame(from="Offr",to="Who"))
+ContractBL<-rbind(ContractBL,data.frame(from="Offr",to="What"))
+ContractBL<-rbind(ContractBL,data.frame(from="Offr",to="PSR"))
+ContractBL<-rbind(ContractBL,data.frame(from="Offr",to="Intl"))
+ContractBL<-rbind(ContractBL,data.frame(from="Offr",to="FxCb"))
+ContractBL<-rbind(ContractBL,data.frame(from="Offr",to="Ceil"))
+ContractBL<-rbind(ContractBL,data.frame(from="Offr",to="Dur"))
+ContractBL<-rbind(ContractBL,data.frame(from="Offr",to="Link"))
+# ContractBL<-rbind(ContractBL,data.frame(from="Who",to="Offr"))
+ContractBL<-rbind(ContractBL,data.frame(from="Link",to="Who"))
+ContractBL<-rbind(ContractBL,data.frame(from="Link",to="Intl"))
+ContractBL<-rbind(ContractBL,data.frame(from="Link",to="IDV"))
+ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Who"))
+ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="What"))
+ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Intl"))
+ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Ceil"))
+ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Dur"))
+ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Link"))
+ContractBL<-rbind(ContractBL,data.frame(from="FxCb",to="Comp"))
+ContractBL<-rbind(ContractBL,data.frame(from="Ceil",to="Who"))
+ContractBL<-rbind(ContractBL,data.frame(from="Ceil",to="What"))
+ContractBL<-rbind(ContractBL,data.frame(from="Ceil",to="PSR"))
+ContractBL<-rbind(ContractBL,data.frame(from="Ceil",to="Intl"))
+ContractBL<-rbind(ContractBL,data.frame(from="Ceil",to="Link"))
+ContractBL<-rbind(ContractBL,data.frame(from="Dur",to="Who"))
+ContractBL<-rbind(ContractBL,data.frame(from="Dur",to="What"))
+ContractBL<-rbind(ContractBL,data.frame(from="Dur",to="PSR"))
+ContractBL<-rbind(ContractBL,data.frame(from="Dur",to="Intl"))
+ContractBL<-rbind(ContractBL,data.frame(from="Dur",to="Link"))
+ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="Who"))
+ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="What"))
+ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="PSR"))
+ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="Link"))
+ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="Intl"))
+
+
+ContractBL<-rbind(ContractBL,data.frame(from="PSR",to="Who"))
+ContractBL<-rbind(ContractBL,data.frame(from="PSR",to="What"))
+ContractBL<-rbind(ContractBL,data.frame(from="PSR",to="Intl"))
+
+ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="Who"))
+ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="What"))
+ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="PSR"))
+ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="Intl"))
+ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="Comp"))
+
+
+# ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="Ceil"))
+# ContractBL<-rbind(ContractBL,data.frame(from="Comp",to="Dur"))
+
+ContractBL<-rbind(ContractBL,data.frame(from="IDV",to="Link"))
+
+
+ContractBL<-rbind(ContractBL,data.frame(from="Who",to="Comp"))
+ContractBL<-rbind(ContractBL,data.frame(from="Who",to="Offr"))
+ContractBL<-rbind(ContractBL,data.frame(from="Who",to="IDV"))
+ContractBL<-rbind(ContractBL,data.frame(from="Who",to="FxCb"))
+ContractBL<-rbind(ContractBL,data.frame(from="Who",to="Ceil"))
+ContractBL<-rbind(ContractBL,data.frame(from="Who",to="Dur"))
+
+
+df <- data.frame(from=ContractBL$from, to=ContractBL$to, weight=rep(1,nrow(ContractBL)))
+g1 <- graphBAM( data.frame(from=ContractBL$from, to=ContractBL$to, weight=rep(1,nrow(ContractBL))),
+                edgemode = "directed")
+adjacencyMatrix(g1)
+plot(g1,main="Competition Bayesian Network Blacklist")
+edgeNames(g1)
+eAttrs<-list()
+eAttrs$color<-c("Ceil~Intl"="red",
+                "Ceil~Link"="red",
+                "Ceil~PSR"="red",
+                "Ceil~What"="red",
+                "Ceil~Who"="purple",
+                "Comp~Intl"="red",
+                "Comp~Link"="red",
+                "Comp~PSR"="red",
+                "Comp~What"="red",
+                "Comp~Who"="purple",
+                "Dur~Intl"="red",
+                "Dur~Link"="red",
+                "Dur~PSR"="red",
+                "Dur~What"="red",
+                "Dur~Who"="purple",
+                "FxCb~Ceil"="red",
+                "FxCb~Comp"="red",
+                "FxCb~Dur"="red",
+                "FxCb~Intl"="red",
+                "FxCb~Link"="red",
+                "FxCb~What"="red",
+                "FxCb~Who"="purple",
+                "IDV~Intl"="red",
+                "IDV~Link"="purple",
+                "IDV~PSR"="red",
+                "IDV~What"="red",
+                "IDV~Who"="purple",
+                "Link~Intl"="red",
+                "Link~Who"="red",
+                "Offr~Ceil"="red",
+                "Offr~Dur"="red",
+                "Offr~FxCb"="red",
+                "Offr~IDV"="red",
+                "Offr~Intl"="red",
+                "Offr~Link"="red",
+                "Offr~PSR"="red",
+                "Offr~What"="red",
+                "Offr~Who"="purple",
+                "PSR~Intl"="red",
+                "PSR~What"="red",
+                "PSR~Who"="red"  )
+
+plot(g1,
+     main="Competition Bayesian Network Blacklist\nOne-way Blocks in Red, Two-way Blocks in Purple",
+     edgeAttrs=eAttrs)
+
+
+```
+
+After the team developed the initial list and a small number of elements accidentally left off were corrected for, the next step was to do a preliminary run through with Bayesian learning. 
+
+
+
+Noteably this initial run through produced two warnings of challenging relationships IDV to Dur and IDV to FxCb. After consulting within the team, the choice was made to add whitelisted relationships that went against those automatically produced.
+
+IDV (IsIDV) new white lists:
+* Whitelist to FxCb (FixedOrCost) because the pricing mechanism of most IDVs are set. Thus, once the choice of which IDV to use is made, the pricing mechanism would be set automatically. Furthermore, Fixed-price is often the mechanism because the IDV allows for multiple instances of a single contract reducing the need for the flexabilit Cost-Based contracts offer.
+* Whitelist to Dur (Duration) because the use of the IDV mechanism typically means multiple shorter contractors under one IDV rather than a single longer contract. 
+
+With those two connections in hand, all three Bayesian Learning algorith were applied.
+
+```{r BayesianExecution, echo = TRUE}
+#White list, connections that must occur
+# ContractWL<-rbind(ContractWL,data.frame(from="IDV",to="Dur"))
+# ContractWL<-rbind(ContractWL,data.frame(from="IDV",to="FxCb"))
+
+# ContractWL<-rbind(ContractWL,data.frame(from="Dur",to="Ceil"))
+# ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="Comp"))
+# ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="Dur"))
+
+
+# 
+# 
+# highlightWL2 <- list(arcs = ContractWL, col = "blue")
+# 
+# highlightLists2 <- list(arcs = data.frame(from=c(as.character(ContractWL$from),
+#                                                  as.character(ContractBL$to)),
+#                                           to=c(as.character(ContractWL$to),
+#                                                as.character(ContractBL$from))),
+#                         col = "blue")
+# 
+# 
+# 
+# 
+# iamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=TRUE, alpha=0.001)
+# uiamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE, alpha=0.001)
+# #Comparing the optimized and unoptimized Incremental Association results
+# all.equal(iamb_dug,uiamb_dug)
+# 
+# interiamb_dug<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL, alpha=0.001)
+# uinteriamb_dug<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE, alpha=0.001)
+# #They also dont match with interleaved.
+# all.equal(interiamb_dug,uinteriamb_dug)
+# all.equal(uiamb_dug,uinteriamb_dug)
+# 
+# mmpc_dug<-mmpc(ContractModel)
+# ummpc_dug<-mmpc(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE)
+# #They also dont match with interleaved.
+# all.equal(mmpc_dug,ummpc_dug)
+# 
+# gs_dug<-gs(ContractModel,blacklist=ContractBL,whitelist=ContractWL,alpha=0.001)
+# 
+# #But the two methods do not producing matching results
+# all.equal(iamb_dug,interiamb_dug)
+# all.equal(uiamb_dug,uinteriamb_dug)
+# all.equal(uiamb_dug,mmpc_dug)
+# 
+# 
+# uinteriamb_dug05<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.05)
+# 
+# hc_dug<- hc(ContractModel, score = "aic",blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE)
+# graphviz.plot(hc_dug,main="Hill Climbing Whitelist highlighted",highlight=highlightWL2)
+# graphviz.plot(hc_dug,main="Hill Climbing Whitelist Interleaved highlighted  ",highlight=list(arcs=arcs(uinteriamb_dug)))
+# graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Hillclimbing highlighted",highlight=list(arcs=arcs(hc_dug)))
+# 
+# 
+# graphviz.plot(uiamb_dug,main="Unoptimized Incremental Association ",highlight=highlightWL2)
+# graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Incremental Association ",highlight=highlightWL2)
+# graphviz.plot(mmpc_dug,main="MMPC ",highlight=highlightWL2)
+# 
+# # graphviz.plot(uiamb_dug,main="Unoptimized Incremental Association ",highlight=arcs(uinteriamb_dug))
+# 
+# graphviz.plot(gs_dug,main="Grow-Shrink 2nd run",highlight=highlightWL2)
+# 
+# #Comparing the optimized and unoptimized Interleaved Incremental Association results
+# 
+# uinteriamb_dug00001<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.000001)
+# all.equal(uinteriamb_dug,uinteriamb_dug00001)
+# 
+# 
+# modelstring(uinteriamb_dug00001)
+# modelstring(uinteriamb_dug)
+# modelstring(interiamb_dug)
+# modelstring(uiamb_dug)
+# modelstring(iamb_dug)
+# modelstring(hc_dug)
+# modelstring(gs_dug)
+# 
+# # [1] "[Who][What|Who][Intl|Who:What][PSR|Who:What:Intl][FxCb|PSR][Comp|What:Intl:PSR][Link|Who:What:Intl:PSR][IDV|Comp:What:Intl:PSR][Ceil|IDV:What:Intl:PSR][Dur|IDV:Comp:Link:What:Intl:PSR:Ceil][Offr|IDV:FxCb:Comp:Link:What:Intl:Ceil]"
+# # > modelstring(uinteriamb_dug00001)
+# # [1] "[Who][What|Who][Intl|Who:What][PSR|Who:What:Intl][FxCb|PSR][Comp|What:Intl:PSR][Link|Who:What:Intl:PSR][IDV|Comp:What:Intl:PSR][Ceil|IDV:What:Intl:PSR][Dur|IDV:Comp:Link:What:Intl:PSR:Ceil][Offr|IDV:FxCb:Comp:Link:What:Intl:Ceil]"
+# # > modelstring(uinteriamb_dug)
+# # [1] "[Who][What|Who][Intl|Who:What][PSR|Who:What:Intl][FxCb|PSR][Comp|What:Intl:PSR][Link|Who:What:Intl:PSR][IDV|Comp:What:Intl:PSR][Ceil|IDV:What:Intl:PSR][Dur|IDV:Comp:Link:What:Intl:PSR:Ceil][Offr|IDV:FxCb:Comp:Link:What:Intl:Ceil]"
+# # > modelstring(interiamb_dug)
+# # [1] "[Who][What|Who][Intl|Who:What][PSR|Who:What:Intl][FxCb|PSR][Comp|What:Intl:PSR][Link|Who:What:Intl:PSR][IDV|Comp:What:Intl:PSR][Ceil|IDV:What:Intl:PSR][Dur|IDV:Comp:Link:What:Intl:PSR:Ceil][Offr|IDV:FxCb:Comp:Link:What:Intl:Ceil:Dur]"
+# # > modelstring(uiamb_dug)
+# # [1] "[Who][What|Who][Intl|Who:What][PSR|Who:What:Intl][Link|Who:What:Intl:PSR][Comp|Link:What:Intl:PSR][IDV|Comp:What:PSR][Ceil|IDV:What:Intl:PSR][FxCb|PSR:Ceil][Dur|IDV:Comp:Link:What:Intl:PSR:Ceil][Offr|IDV:FxCb:Comp:What:Intl]"
+# # > modelstring(iamb_dug)
+# # [1] "[Who][What|Who][Intl|Who:What][PSR|Who:What:Intl][Link|Who:What:Intl:PSR][Comp|Link:What:Intl:PSR][IDV|Comp:What:PSR][Ceil|IDV:What:Intl:PSR][FxCb|PSR:Ceil][Dur|IDV:Comp:Link:What:Intl:PSR:Ceil][Offr|IDV:FxCb:Comp:What:Intl:Dur]"
+# # > modelstring(hc_dug)
+# # [1] "[Who][Intl|Who][What|Who:Intl][PSR|Who:What:Intl][Link|Who:What:Intl:PSR][Comp|Link:What:Intl:PSR][Dur|Comp:Link:What:Intl:PSR][IDV|Comp:What:Intl:PSR:Dur][Ceil|IDV:Comp:Link:What:Intl:PSR:Dur][FxCb|IDV:Comp:Link:What:PSR:Ceil:Dur][Offr|IDV:FxCb:Comp:What:Intl:PSR:Ceil:Dur]"
+# # graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Incremental 001 Association 00001 highlighted",highlight=list(arcs=arcs(uinteriamb_dug00001)))
+# # graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Incremental Association Optimized highlighted",highlight=list(arcs=arcs(interiamb_dug)))
+# # graphviz.plot(interiamb_dug,main="optimized Interleaved Incremental Association UnOptimized highlighted",highlight=list(arcs=arcs(uinteriamb_dug)))
+# 
+# graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Incremental Association IAMB highlighted",highlight=list(arcs=arcs(uiamb_dug)))
+# 
+# graphviz.plot(iamb_dug,main="Unoptimized Incremental Association Unoptimized IAMB highlighted",highlight=list(arcs=arcs(uiamb_dug)))
+# graphviz.plot(uiamb_dug,main="optimized Incremental Association IAMB highlighted",highlight=list(arcs=arcs(iamb_dug)))
+
+
+
+```
+To the study teams dismay, the bayesian learning results were not consistent across different methods. The unoptimized versions of the learning algorithms do better at catching statistical oddities at the cost of requiring more comparisons. After analyzing the unoptimized and optimized versions, the team chose to adopt one arc that appeared in the both unoptimized versions, namely duration to offers. Seperate analysis shown in the Contract_Competition found that longer contracts did have fewer offers even after controlling for contract ceiling.
+
+Similarly, the grow shrink algorithm included a link from Ceil to FxCb. Analysis shown in Contract_Pricing holds up that connection, even after controlling for PSR. This does not appear to be true of duration or competition. There may well be a link between IDV and Fixed-price, but there's enough complexity in the causality in that relationship that the team chose not to force it.
+
+* Whitelist Ceil (Ceil) to FxCb because higher ceiling contracts are more likely to be cost-based or combination.
+
+Dur (Duration) to Number of Offers received (Offr) was considered, but this ended up resulting in the Ceil to Dur being lost. Of the two, Ceil has the more straightforward relationship, so it was kept. 
+
+
+The other alternative within the package, a min-max parents and childrens approach, 
+
+
+```{r BayesianExecutionRd3, echo = TRUE}
+
+
+
+highlightWL3 <- list(arcs = ContractWL, col = "blue")
+
+highlightLists3 <- list(arcs = data.frame(from=c(as.character(ContractWL$from),
+                                                 as.character(ContractBL$to)),
+                                          to=c(as.character(ContractWL$to),
+                                               as.character(ContractBL$from))),
+                        col = "blue")
+
+uinteriamb3_dug00001<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.000001)
+# uinteriamb3_dug<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.001)
+# 
+# uinteriamb3_dug05<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.05)
+# 
+# all.equal(uinteriamb_dug,uinteriamb3_dug00001)
+# 
+# graphviz.plot(uinteriamb_dug00001,main="Unoptimized Interleaved Incremental Association Whitelist highlighted",highlight=highlightWL3)
+# graphviz.plot(uinteriamb_dug00001,main="Unoptimized Interleaved Incremental Association either list highlighted",highlight=highlightLists3)
+# graphviz.plot(uinteriamb_dug00001,main="Unoptimized Interleaved Incremental Association IAMB highlighted",highlight=list(arcs=arcs(uiamb_dug)))
+# # graphviz.plot(uiamb_dug,main="Unoptimized Interleaved Incremental Association ",highlight=list(arcs=arcs(uinteriamb_dug)))
+# graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Incremental Association IAMB highlighted",highlight=list(arcs=arcs(uinteriamb3_dug00001)))
+# graphviz.plot(uinteriamb3_dug00001,main="Unoptimized Interleaved Incremental Association IAMB highlighted",highlight=list(arcs=arcs(uinteriamb_dug)))
+# graphviz.plot(uinteriamb3_dug,main="Unoptimized Interleaved Incremental Association IAMB highlighted",highlight=list(arcs=arcs(uinteriamb_dug)))
+
+
+# uinteriamb3_dug00001<-set.arc(uinteriamb3_dug00001,"Ceil","Offr")
+# uinteriamb3_dug00001<-drop.arc(uinteriamb3_dug00001,"Dur","Offr")
+
+graphviz.plot(uinteriamb3_dug00001,main="Initial Number of Offers Bayesian Network",highlight=highlightWL3)
+
+
+ContractModel$Offr<-factor(ContractModel$Offr, 
+                           levels=c("  1","  2","[  3,  5)","[  5,999]"),
+                           labels=c("1","2","3-4","5+"),
+                           ordered=TRUE
+                           )
+
+ContractModel$Ceil<-factor(ContractModel$Ceil,
+                                        levels=c("[0.00e+00,1.50e+04)"
+                                                 ,"[1.50e+04,1.00e+05)"
+                                                 ,"[1.00e+05,1.00e+06)"
+                                                 ,"[1.00e+06,3.00e+07)"
+                                                 ,"[3.00e+07,3.36e+12]"
+                                                 ),
+                                        labels=c("[0,15k)"
+                                                 ,"[15k,100k)"
+                                                 ,"[100k,1m)"
+                                                 ,"[1m,30m)"
+                                                 ,"[30m+]"
+                                                 ),
+                                        ordered=TRUE)
+
+```
+
+
+```{r BayesianCompilation, echo = TRUE}
+CompetitionNetwork<-uinteriamb3_dug00001
+modelstring(CompetitionNetwork)
+
+# CompetitionFitted<-bn.fit(x=CompetitionNetwork,data=ContractModel,method="bayes")
+# summary(ContractModel)
+# cpquery(CompetitionFitted, 
+#         event =  (Offr=="1"),
+#         evidence = (FxCb=="Fixed-Price") & (Comp=="Comp."))
+# cpquery(CompetitionFitted, 
+#         event =  (Offr=="1"),
+#         evidence = (FxCb=="Cost-Based") & (Comp=="Comp."))
+# cpquery(CompetitionFitted, 
+#         event =  (Offr=="1"),
+#         evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[0,15k)"))
+# cpquery(CompetitionFitted, 
+#         event =  (Offr=="1"),
+#         evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[15k,100k)"))
+# cpquery(CompetitionFitted, 
+#         event =  (Offr=="1"),
+#         evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[100k,1m)"))
+# cpquery(CompetitionFitted, 
+#         event =  (Offr=="1"),
+#         evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[1m,30m)"))
+# cpquery(CompetitionFitted, 
+#         event =  (Offr=="1"),
+#         evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[30m+]"))
+# 
+# y<-paste("Ceil=='",levels(ContractModel$Ceil),"'",sep="")
+# 
+# sapply(levels(ContractModel$Ceil),function(x) eval(sprintf('cpquery(CompetitionFitted, 
+#         event =  (Offr=="1"),
+#         evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="%s")',x)))
+# 
+# sapply(levels(ContractModel$Ceil),FixedPriceTest)
+
+# FixedPriceTest("[30m+]")
+# 
+# FixedPriceTest<-function(x){
+#     cpquery(CompetitionFitted, 
+#         event =  (Offr=="1"),
+#         evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil==x)
+#         )
+# }
+# 
+# eval("cpquery(CompetitionFitted, \n        event =  (Offr==\"1\"),\n        evidence = (FxCb==\"Cost-Based\") & (Comp==\"Comp.\") & (Ceil==\"[30m+]\")")
+# levels(ContractModel$Ceil)
+# 
+# sapply(levels(ContractModel$Ceil),function(x) paste(x,"")) 
+# 
+# sapply(c(1,2,3),function(x)   cpquery(CompetitionFitted, 
+#         event =  (Offr=="1"),
+#         evidence = (FxCb=="Cost-Based") & (Comp=="Comp."))) (Ceil==x) &  (Ceil==x)) #& (Ceil==x)
+# 
+
+require(gRain)
+# cad.cpt <- extractCPT(ContractModel, as.graphNEL(CompetitionNetwork), smooth = 0.001)
+# compGin <- grain(compileCPT(cad.cpt))
+
+compGin <- grain(as.graphNEL(CompetitionNetwork), data=ContractModel, smooth = 0.0000001)
+summary(compGin)
+
+
+# plot(ContractModel)
+
+# querygrain(compGin, nodes = c("Offr"))
+# 
+# cpquery(CompetitionFitted, 
+#         event =  (Offr=="5+"),
+#         evidence = (FxCb=="Fixed-Price") & (Comp=="Comp."))
+# 
+# gin1.find <- setFinding(compGin, nodes = c("Comp","FxCb"),
+#                         states = c( "Comp.","Fixed-Price"))
+# 
+# gin1.find <- setFinding(compGin, nodes = c("Comp","FxCb"),
+#                         states = c( "Comp.","Fixed-Price"))
+# 
+# sapply(levels(ContractModel$Ceil),function(x) data.frame(nodes = c("Comp","FxCb","Ceil"),
+#                         states = c( "Comp.","Fixed-Price",x)))
+# 
+# 
+# ceiltest<-sapply(levels(ContractModel$Ceil),
+#                  function(x)  setFinding(compGin, nodes = c("Comp","FxCb","Ceil"),
+#                         states = c( "Comp.","Fixed-Price",x)))
+# 
+# sapply(unlist(ceiltest, function(x) querygrain(x, nodes = c("Offr")))
+# querygrain(gin1.find, nodes = c("Offr"))
+```

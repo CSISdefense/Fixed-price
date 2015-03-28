@@ -71,7 +71,7 @@ The latter is prefered for certain types of indefinite delivery vehicles and the
 ###IsSomeCompetition
 Is Some Competition is a binary variable, true if competitive procedures were used, false if they were not. Unlabeled cases are classified as NAs.
 
-* UnmodifiedIsSomeCompetition is the classification given by the first record for the contract (`r sprintf("%1.2f%%",nrow(subset(ContractSample,UnmodifiedIsSomeCompetition=="Unlabeled")) /nrow(ContractSample)*100)` missing data).
+* Comp is the classification given by the first record for the contract (`r sprintf("%1.2f%%",nrow(subset(ContractSample,Comp=="Unlabeled")) /nrow(ContractSample)*100)` missing data).
 * IsSomeCompetition is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(ContractSample,IsSomeCompetition=="Mixed or \nUnlabeled")) /nrow(ContractSample)*100)` missing data).
   1. A contract which is sometimes classified as competed and never classified as uncompeted is categorized as competed. 
   2. A contract which is sometimes classified as uncompeted and never classified as competed is categorized as uncompeted.
@@ -84,7 +84,7 @@ Reassuringly, as is shown below, even when IsSomeCompetition is has a mixed or u
 ```{r overallvars, echo = TRUE}
 summary(subset(ContractSample,select=c(statutoryexceptiontofairopportunity,
                                 extentcompeted,
-                                 UnmodifiedIsSomeCompetition,
+                                 Comp,
                                 IsSomeCompetition,
                                 pIsSomeCompetition
                                 ))
@@ -299,7 +299,7 @@ CompleteModelAndDetail$Ceil<-factor(CompleteModelAndDetail$Ceil,
 
 
 ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(Ceil)&UnmodifiedIsSomeCompetition=="Comp."),
+    data = subset(CompleteModelAndDetail,!is.na(Ceil)&Comp=="Comp."),
     aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
     main = "Distribution by is full and open"
     ) +
@@ -308,7 +308,7 @@ ggplot(
 
 
 ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(Ceil)&!is.na(IDV)&UnmodifiedIsSomeCompetition=="Comp."),
+    data = subset(CompleteModelAndDetail,!is.na(Ceil)&!is.na(IDV)&Comp=="Comp."),
     aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
     main = "Distribution by is full and open"
     ) +
@@ -319,7 +319,7 @@ ggplot(
 
 
 ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(Ceil)&!is.na(SimpleArea)&UnmodifiedIsSomeCompetition=="Comp."),
+    data = subset(CompleteModelAndDetail,!is.na(Ceil)&!is.na(SimpleArea)&Comp=="Comp."),
     aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
     main = "Distribution by is full and open"
     ) +
@@ -329,7 +329,7 @@ ggplot(
 
 
 ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(SimpleArea)&UnmodifiedIsSomeCompetition=="Comp."),
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(SimpleArea)&Comp=="Comp."),
     aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
     main = "Distribution by is full and open"
     ) +
@@ -339,7 +339,7 @@ ggplot(
 
 
 ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(FxCb)&SimpleArea=="R&D"&UnmodifiedIsSomeCompetition=="Comp."),
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&SimpleArea=="R&D"&Comp=="Comp."),
     aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
     main = "Distribution by is full and open"
     ) +
@@ -349,7 +349,7 @@ ggplot(
 
 
 ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(FxCb)&SimpleArea=="R&D"&UnmodifiedIsSomeCompetition=="Comp."),
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&SimpleArea=="R&D"&Comp=="Comp."),
     aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
     main = "Distribution by is full and open"
     ) +
@@ -358,7 +358,7 @@ ggplot(
 
 
 ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(IDV)&SimpleArea=="Products"&UnmodifiedIsSomeCompetition=="Comp."),
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(IDV)&SimpleArea=="Products"&Comp=="Comp."),
     aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
     main = "Distribution by is full and open"
     ) +
@@ -382,6 +382,32 @@ ggplot(
     ) +
     geom_bar()+facet_grid(Comp~PSR,scales="free_y")+
     theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(IDV)&!is.na(PSR)),
+    aes_string(x = "FxCb",fill="FxCb"),
+    main = "Distribution by duration and ceiling"
+    ) +
+    geom_bar()+facet_grid(IDV~PSR,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(IDV)&!is.na(Ceil)),
+    aes_string(x = "FxCb",fill="FxCb"),
+    main = "Distribution by duration and ceiling"
+    ) +
+    geom_bar()+facet_grid(IDV~Ceil,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(IDV)&!is.na(Ceil)),
+    aes_string(x = "IDV",fill="IDV"),
+    main = "Distribution by duration and ceiling"
+    ) +
+    geom_bar()+facet_grid(FxCb~Ceil,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
 
 
 ggplot(
@@ -434,6 +460,17 @@ Durbox<-BoxplotWrapper(
     "UnmodifiedNumberOfOffersReceived",
 "Ceil"
 )
+CeiDurbox<-BoxplotWrapper(
+    "VAR.name",
+    "VAR.proper.name",
+    "VAR.X.label",
+    "Number of Offers Received" ,
+    Coloration,
+    subset(CompleteModelAndDetail,!is.na(Dur)&!is.na(Ceil)),
+"Ceil" ,   
+    "UnmodifiedNumberOfOffersReceived",
+"Dur"
+)
 
 
 
@@ -445,7 +482,7 @@ OffersByCeil<-HistogramOrDensityWrapper(
     ,"NUmber of Offers Received"
     ,"Frequency"
     ,Coloration
-    ,subset(CompleteModelAndDetail,!is.na(Ceil)&UnmodifiedIsSomeCompetition=="Comp.")
+    ,subset(CompleteModelAndDetail,!is.na(Ceil)&Comp=="Comp.")
     ,"histogram"
     ,"UnmodifiedNumberOfOffersReceived"
     ,"Ceil"
@@ -463,7 +500,7 @@ OffersByCeil+geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,100))+facet_grid
 # 
 # ggplot(
 #     data = subset(ContractSample),
-#     aes_string(x = "UnmodifiedIsSomeCompetition"),
+#     aes_string(x = "Comp"),
 #     main = "Distribution by is some competition"
 #     ) +
 #     geom_bar(binwidth=1)+     

@@ -308,8 +308,10 @@ To the study teams dismay, the bayesian learning results were not consistent acr
 
 Similarly, the grow shrink algorithm included a link from Ceil to FxCb. Analysis shown in Contract_Pricing holds up that connection, even after controlling for PSR. This does not appear to be true of duration or competition. There may well be a link between IDV and Fixed-price, but there's enough complexity in the causality in that relationship that the team chose not to force it.
 
-* Whitelist Dur (Duration) to Number of Offers received (Offr) because longer contracts have fewer offers and are probably often used in areas where a trusted vendor partnership already exists. 
 * Whitelist Ceil (Ceil) to FxCb because higher ceiling contracts are more likely to be cost-based or combination.
+
+Dur (Duration) to Number of Offers received (Offr) was considered, but this ended up resulting in the Ceil to Dur being lost. Of the two, Ceil has the more straightforward relationship, so it was kept. 
+
 
 The other alternative within the package, a min-max parents and childrens approach, 
 
@@ -328,21 +330,134 @@ highlightLists3 <- list(arcs = data.frame(from=c(as.character(ContractWL$from),
                                                as.character(ContractBL$from))),
                         col = "blue")
 
-uinteriamb_dug00001<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.000001)
+uinteriamb3_dug00001<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.000001)
+uinteriamb3_dug<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.001)
 
+uinteriamb3_dug05<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.05)
+
+all.equal(uinteriamb_dug,uinteriamb3_dug00001)
 
 graphviz.plot(uinteriamb_dug00001,main="Unoptimized Interleaved Incremental Association Whitelist highlighted",highlight=highlightWL3)
 graphviz.plot(uinteriamb_dug00001,main="Unoptimized Interleaved Incremental Association either list highlighted",highlight=highlightLists3)
 graphviz.plot(uinteriamb_dug00001,main="Unoptimized Interleaved Incremental Association IAMB highlighted",highlight=list(arcs=arcs(uiamb_dug)))
 # graphviz.plot(uiamb_dug,main="Unoptimized Interleaved Incremental Association ",highlight=list(arcs=arcs(uinteriamb_dug)))
+graphviz.plot(uinteriamb_dug,main="Unoptimized Interleaved Incremental Association IAMB highlighted",highlight=list(arcs=arcs(uinteriamb3_dug00001)))
+graphviz.plot(uinteriamb3_dug00001,main="Unoptimized Interleaved Incremental Association IAMB highlighted",highlight=list(arcs=arcs(uinteriamb_dug)))
+graphviz.plot(uinteriamb3_dug,main="Unoptimized Interleaved Incremental Association IAMB highlighted",highlight=list(arcs=arcs(uinteriamb_dug)))
 
+
+uinteriamb3_dug00001<-set.arc(uinteriamb3_dug00001,"Ceil","Offr")
+uinteriamb3_dug00001<-drop.arc(uinteriamb3_dug00001,"Dur","Offr")
+
+graphviz.plot(uinteriamb3_dug00001,main="Unoptimized Interleaved Incremental Association IAMB highlighted",highlight=list(arcs=arcs(uinteriamb_dug)))
+
+
+ContractModel$Offr<-factor(ContractModel$Offr, 
+                           levels=c("  1","  2","[  3,  5)","[  5,999]"),
+                           labels=c("1","2","3-4","5+"),
+                           ordered=TRUE
+                           )
+
+ContractModel$Ceil<-factor(ContractModel$Ceil,
+                                        levels=c("[0.00e+00,1.50e+04)"
+                                                 ,"[1.50e+04,1.00e+05)"
+                                                 ,"[1.00e+05,1.00e+06)"
+                                                 ,"[1.00e+06,3.00e+07)"
+                                                 ,"[3.00e+07,3.36e+12]"
+                                                 ),
+                                        labels=c("[0,15k)"
+                                                 ,"[15k,100k)"
+                                                 ,"[100k,1m)"
+                                                 ,"[1m,30m)"
+                                                 ,"[30m+]"
+                                                 ),
+                                        ordered=TRUE)
 
 ```
 
 
 ```{r BayesianCompilation, echo = TRUE}
-CompetitionNetwork<-uinteriamb_dug00001
+CompetitionNetwork<-uinteriamb3_dug00001
 modelstring(CompetitionNetwork)
 CompetitionFitted<-bn.fit(x=CompetitionNetwork,data=ContractModel,method="bayes")
+summary(ContractModel)
+cpquery(CompetitionFitted, 
+        event =  (Offr=="1"),
+        evidence = (FxCb=="Fixed-Price") & (Comp=="Comp."))
+cpquery(CompetitionFitted, 
+        event =  (Offr=="1"),
+        evidence = (FxCb=="Cost-Based") & (Comp=="Comp."))
+cpquery(CompetitionFitted, 
+        event =  (Offr=="1"),
+        evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[0,15k)"))
+cpquery(CompetitionFitted, 
+        event =  (Offr=="1"),
+        evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[15k,100k)"))
+cpquery(CompetitionFitted, 
+        event =  (Offr=="1"),
+        evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[100k,1m)"))
+cpquery(CompetitionFitted, 
+        event =  (Offr=="1"),
+        evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[1m,30m)"))
+cpquery(CompetitionFitted, 
+        event =  (Offr=="1"),
+        evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[30m+]"))
 
+y<-paste("Ceil=='",levels(ContractModel$Ceil),"'",sep="")
+
+sapply(levels(ContractModel$Ceil),function(x) eval(sprintf('cpquery(CompetitionFitted, 
+        event =  (Offr=="1"),
+        evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="%s")',x)))
+
+sapply(levels(ContractModel$Ceil),FixedPriceTest)
+
+FixedPriceTest("[30m+]")
+
+FixedPriceTest<-function(x){
+    cpquery(CompetitionFitted, 
+        event =  (Offr=="1"),
+        evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil==x)
+        )
+}
+
+eval("cpquery(CompetitionFitted, \n        event =  (Offr==\"1\"),\n        evidence = (FxCb==\"Cost-Based\") & (Comp==\"Comp.\") & (Ceil==\"[30m+]\")")
+levels(ContractModel$Ceil)
+
+sapply(levels(ContractModel$Ceil),function(x) paste(x,"")) 
+
+sapply(c(1,2,3),function(x)   cpquery(CompetitionFitted, 
+        event =  (Offr=="1"),
+        evidence = (FxCb=="Cost-Based") & (Comp=="Comp."))) (Ceil==x) &  (Ceil==x)) #& (Ceil==x)
+
+
+require(gRain)
+cad.cpt <- extractCPT(ContractModel, as.graphNEL(CompetitionNetwork), smooth = 0.001)
+cad.gin <- grain(compileCPT(cad.cpt))
+
+cad.gin <- grain(as.graphNEL(CompetitionNetwork), data=ContractModel, smooth = 0.0000001)
+summary(cad.gin)
+
+
+querygrain(cad.gin, nodes = c("Offr"))
+
+cpquery(CompetitionFitted, 
+        event =  (Offr=="5+"),
+        evidence = (FxCb=="Fixed-Price") & (Comp=="Comp."))
+
+gin1.find <- setFinding(cad.gin, nodes = c("Comp","FxCb"),
+                        states = c( "Comp.","Fixed-Price"))
+
+gin1.find <- setFinding(cad.gin, nodes = c("Comp","FxCb"),
+                        states = c( "Comp.","Fixed-Price"))
+
+sapply(levels(ContractModel$Ceil),function(x) data.frame(nodes = c("Comp","FxCb","Ceil"),
+                        states = c( "Comp.","Fixed-Price",x)))
+
+
+ceiltest<-sapply(levels(ContractModel$Ceil),
+                 function(x)  setFinding(cad.gin, nodes = c("Comp","FxCb","Ceil"),
+                        states = c( "Comp.","Fixed-Price",x)))
+
+sapply(unlist(ceiltest, function(x) querygrain(x, nodes = c("Offr")))
+querygrain(gin1.find, nodes = c("Offr"))
 ```
