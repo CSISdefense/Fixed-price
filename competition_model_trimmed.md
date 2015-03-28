@@ -1,29 +1,45 @@
----
-output:
-  html_document:
-    keep_md: yes
---- 
 
-```{r hiddensetup, echo = FALSE}
-require(ggplot2)
-require(stringr)
-require(graph)
-require(plyr)
-require(Hmisc)
-require(Matrix)
-require(gRain)
-require(gRbase)
-require(methods)
-require(bnlearn)
-require(Rgraphviz)
-#source("http://bioconductor.org/biocLite.R"); #biocLite("Rgraphviz")
 
-setwd("K:\\Development\\Fixed-price")
-# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
-Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
-# Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
-source(paste(Path,"lookups.r",sep=""))
-
+```
+## Loading required package: ggplot2
+## Loading required package: stringr
+## Loading required package: graph
+## Loading required package: plyr
+## 
+## Attaching package: 'plyr'
+## 
+## The following object is masked from 'package:graph':
+## 
+##     join
+## 
+## Loading required package: Hmisc
+## Loading required package: grid
+## Loading required package: lattice
+## Loading required package: survival
+## Loading required package: Formula
+## 
+## Attaching package: 'Hmisc'
+## 
+## The following objects are masked from 'package:plyr':
+## 
+##     is.discrete, summarize
+## 
+## The following objects are masked from 'package:base':
+## 
+##     format.pval, round.POSIXt, trunc.POSIXt, units
+## 
+## Loading required package: Matrix
+## Loading required package: gRain
+## Loading required package: gRbase
+## Loading required package: bnlearn
+## 
+## Attaching package: 'bnlearn'
+## 
+## The following objects are masked from 'package:gRbase':
+## 
+##     children, parents
+## 
+## Loading required package: Rgraphviz
 ```
 
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
@@ -31,7 +47,8 @@ Contracts are classified using a mix of numerical and categorical variables. Whi
 ##Studying contract vehicle within the sample.
 Describe contract vehicle here.
 
-```{r setup, echo = TRUE}
+
+```r
 setwd("K:\\Development\\Fixed-price\\")
 filename<-"data\\defense_contract_CSIScontractID_model.csv"
 
@@ -46,9 +63,68 @@ ContractModel  <- read.csv(
 ContractModel<-subset(ContractModel,select=-c(SingleOffer))
 
 nrow(ContractModel)
-nrow(subset(ContractModel,complete.cases(ContractModel)))
-summary(subset(ContractModel,complete.cases(ContractModel)))
+```
 
+```
+## [1] 5993688
+```
+
+```r
+nrow(subset(ContractModel,complete.cases(ContractModel)))
+```
+
+```
+## [1] 5908989
+```
+
+```r
+summary(subset(ContractModel,complete.cases(ContractModel)))
+```
+
+```
+##       IDV                             FxCb                Comp        
+##  Def/Pur:2091106   Combination \nor Other:  55347   Comp.   :4739149  
+##  IDV    :3817883   Cost-Based            : 203363   No Comp.:1169840  
+##                    Fixed-Price           :5650279                     
+##                                                                       
+##                                                                       
+##                                                                       
+##                                                                       
+##             Link                    Who         
+##      0        :3636072   Air Force    : 632962  
+##  [    1,  750): 822788   Army         :1516632  
+##  [  750,67263]:1450129   Navy         :1364983  
+##                          Other DoD    :2393716  
+##                          Uncategorized:    696  
+##                                                 
+##                                                 
+##                              What                        Intl         
+##  Other                         :2644912   Any\nInternational: 665870  
+##  Facilities and Construction   :1198540   Just U.S.         :5243119  
+##  Electronics and Communications: 903876                               
+##  Aircraft and Drones           : 570691                               
+##  Land Vehicles                 : 269196                               
+##  Ships & Submarines            : 248316                               
+##  (Other)                       :  73458                               
+##        PSR                           Ceil                    Dur         
+##  Products:4780329   [0.00e+00,1.50e+04):3393141   [    0,   61):3671391  
+##  R&D     :  53455   [1.00e+05,1.00e+06): 583140   [   61,  214):1461977  
+##  Services:1075205   [1.00e+06,3.00e+07): 115419   [  214,  366): 445962  
+##                     [1.50e+04,1.00e+05):1811788   [  366,33192]: 329659  
+##                     [3.00e+07,3.36e+12]:   5501                          
+##                                                                          
+##                                                                          
+##         Offr        
+##    1      :2033248  
+##    2      :1030469  
+##  [  3,  5):1164669  
+##  [  5,999]:1680603  
+##                     
+##                     
+## 
+```
+
+```r
 dropped<-subset(ContractModel,!complete.cases(ContractModel)|
                     Intl=="Unlabeled"|
                     PSR =="Mixed or Unlabeled" |
@@ -67,6 +143,10 @@ ContractModel$Who<-droplevels(ContractModel$Who)
 ContractModel$What<-droplevels(ContractModel$What)
 
 nrow(ContractModel)
+```
+
+```
+## [1] 5907181
 ```
 
 The last stage before Bayesian learning is setting the whitelists and blacklists. The whitelist contains vectors that must existing in the graph while the blacklist contains forbidden vectors. There was some iteration in the development of the white and blacklist, as nonsensical connections were removed and the blacklist was made systematic.
@@ -92,8 +172,8 @@ I've listed them below based on the origin piece of evidence.
 8. One (SingleOffer) 
 * Blacklist to everything not covered by an existing whitelist. While the vendors responses may influence some factors at the margin, this is the dependent variable for this part of the study.
 
-```{r BayesianLearningSetup, echo = TRUE}
 
+```r
 #White list, connections that must occur
 ContractWL<-data.frame(from="Comp",to="Offr")
 # ContractWL<-rbind(ContractWL,data.frame(from="Comp",to="Offr"))
@@ -109,9 +189,11 @@ ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="FxCb"))
 bnWhitelist <- empty.graph(nodes = names(ContractModel))
 arcs(bnWhitelist)<-ContractWL
 graphviz.plot(bnWhitelist,main="Whitelisted Arcs Rd. 1")
+```
 
+![](competition_model_trimmed_files/figure-html/BayesianLearningSetup-1.png) 
 
-
+```r
 #Black list, connections that are prohibited
 ContractBL<-data.frame(from=c("Offr"),to= c("IDV"))
 ContractBL<-rbind(ContractBL,data.frame(from="Offr",to="Who"))
@@ -179,8 +261,46 @@ df <- data.frame(from=ContractBL$from, to=ContractBL$to, weight=rep(1,nrow(Contr
 g1 <- graphBAM( data.frame(from=ContractBL$from, to=ContractBL$to, weight=rep(1,nrow(ContractBL))),
                 edgemode = "directed")
 adjacencyMatrix(g1)
+```
+
+```
+##      Ceil Comp Dur FxCb IDV Intl Link Offr PSR What Who
+## Ceil    0    0   0    0   0    1    1    0   1    1   1
+## Comp    0    0   0    0   0    1    1    0   1    1   1
+## Dur     0    0   0    0   0    1    1    0   1    1   1
+## FxCb    1    1   1    0   0    1    1    0   0    1   1
+## IDV     0    1   0    0   0    1    1    0   1    1   1
+## Intl    0    0   0    0   0    0    0    0   0    0   0
+## Link    0    0   0    0   1    1    0    0   0    0   1
+## Offr    1    0   1    1   1    1    1    0   1    1   1
+## PSR     0    0   0    0   0    1    0    0   0    1   1
+## What    0    0   0    0   0    0    0    0   0    0   0
+## Who     1    1   1    1   1    0    0    1   0    0   0
+```
+
+```r
 plot(g1,main="Competition Bayesian Network Blacklist")
+```
+
+![](competition_model_trimmed_files/figure-html/BayesianLearningSetup-2.png) 
+
+```r
 edgeNames(g1)
+```
+
+```
+##  [1] "Ceil~Intl" "Ceil~Link" "Ceil~PSR"  "Ceil~What" "Ceil~Who" 
+##  [6] "Comp~Intl" "Comp~Link" "Comp~PSR"  "Comp~What" "Comp~Who" 
+## [11] "Dur~Intl"  "Dur~Link"  "Dur~PSR"   "Dur~What"  "Dur~Who"  
+## [16] "FxCb~Ceil" "FxCb~Comp" "FxCb~Dur"  "FxCb~Intl" "FxCb~Link"
+## [21] "FxCb~What" "FxCb~Who"  "IDV~Comp"  "IDV~Intl"  "IDV~Link" 
+## [26] "IDV~PSR"   "IDV~What"  "IDV~Who"   "Link~Intl" "Link~Who" 
+## [31] "Offr~Ceil" "Offr~Dur"  "Offr~FxCb" "Offr~IDV"  "Offr~Intl"
+## [36] "Offr~Link" "Offr~PSR"  "Offr~What" "Offr~Who"  "PSR~Intl" 
+## [41] "PSR~What"  "PSR~Who"
+```
+
+```r
 eAttrs<-list()
 eAttrs$color<-c("Ceil~Intl"="red",
                 "Ceil~Link"="red",
@@ -227,9 +347,9 @@ eAttrs$color<-c("Ceil~Intl"="red",
 plot(g1,
      main="Competition Bayesian Network Blacklist\nOne-way Blocks in Red, Two-way Blocks in Purple",
      edgeAttrs=eAttrs)
-
-
 ```
+
+![](competition_model_trimmed_files/figure-html/BayesianLearningSetup-3.png) 
 
 After the team developed the initial list and a small number of elements accidentally left off were corrected for, the next step was to do a preliminary run through with Bayesian learning. 
 
@@ -243,7 +363,8 @@ IDV (IsIDV) new white lists:
 
 With those two connections in hand, all three Bayesian Learning algorith were applied.
 
-```{r BayesianExecution, echo = TRUE}
+
+```r
 #White list, connections that must occur
 # ContractWL<-rbind(ContractWL,data.frame(from="IDV",to="Dur"))
 # ContractWL<-rbind(ContractWL,data.frame(from="IDV",to="FxCb"))
@@ -341,9 +462,6 @@ With those two connections in hand, all three Bayesian Learning algorith were ap
 # 
 # graphviz.plot(iamb_dug,main="Unoptimized Incremental Association Unoptimized IAMB highlighted",highlight=list(arcs=arcs(uiamb_dug)))
 # graphviz.plot(uiamb_dug,main="optimized Incremental Association IAMB highlighted",highlight=list(arcs=arcs(iamb_dug)))
-
-
-
 ```
 To the study teams dismay, the bayesian learning results were not consistent across different methods. The unoptimized versions of the learning algorithms do better at catching statistical oddities at the cost of requiring more comparisons. After analyzing the unoptimized and optimized versions, the team chose to adopt one arc that appeared in the both unoptimized versions, namely duration to offers. Seperate analysis shown in the Contract_Competition found that longer contracts did have fewer offers even after controlling for contract ceiling.
 
@@ -357,10 +475,8 @@ Dur (Duration) to Number of Offers received (Offr) was considered, but this ende
 The other alternative within the package, a min-max parents and childrens approach, 
 
 
-```{r BayesianExecutionRd3, echo = TRUE}
 
-
-
+```r
 highlightWL3 <- list(arcs = ContractWL, col = "blue")
 
 highlightLists3 <- list(arcs = data.frame(from=c(as.character(ContractWL$from),
@@ -389,8 +505,11 @@ uinteriamb3_dug00001<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=Co
 # uinteriamb3_dug00001<-drop.arc(uinteriamb3_dug00001,"Dur","Offr")
 
 graphviz.plot(uinteriamb3_dug00001,main="Initial Number of Offers Bayesian Network",highlight=highlightWL3)
+```
 
+![](competition_model_trimmed_files/figure-html/BayesianExecutionRd3-1.png) 
 
+```r
 ContractModel$Offr<-factor(ContractModel$Offr, 
                            levels=c("  1","  2","[  3,  5)","[  5,999]"),
                            labels=c("1","2","3-4","5+"),
@@ -411,14 +530,20 @@ ContractModel$Ceil<-factor(ContractModel$Ceil,
                                                  ,"[30m+]"
                                                  ),
                                         ordered=TRUE)
-
 ```
 
 
-```{r BayesianCompilation, echo = TRUE}
+
+```r
 CompetitionNetwork<-uinteriamb3_dug00001
 modelstring(CompetitionNetwork)
+```
 
+```
+## [1] "[Who][What|Who][Intl|Who:What][PSR|Who:What:Intl][Comp|What:Intl:PSR][Link|Who:What:Intl:PSR][IDV|Comp:What:Intl:PSR][Ceil|IDV:What:Intl:PSR][FxCb|PSR:Ceil][Dur|IDV:Comp:Link:What:Intl:PSR:Ceil][Offr|IDV:FxCb:Comp:Link:What:Intl:Ceil]"
+```
+
+```r
 # CompetitionFitted<-bn.fit(x=CompetitionNetwork,data=ContractModel,method="bayes")
 # summary(ContractModel)
 # cpquery(CompetitionFitted, 
@@ -475,9 +600,23 @@ require(gRain)
 # compGin <- grain(compileCPT(cad.cpt))
 
 compGin <- grain(as.graphNEL(CompetitionNetwork), data=ContractModel, smooth = 0.0000001)
+```
+
+```
+## extractCPT - data.frame
+```
+
+```r
 summary(compGin)
+```
 
+```
+## Independence network: Compiled: FALSE Propagated: FALSE 
+##  Nodes : Named chr [1:11] "IDV" "FxCb" "Comp" "Link" "Who" "What" ...
+##  - attr(*, "names")= chr [1:11] "IDV" "FxCb" "Comp" "Link" ...
+```
 
+```r
 # plot(ContractModel)
 
 # querygrain(compGin, nodes = c("Offr"))
