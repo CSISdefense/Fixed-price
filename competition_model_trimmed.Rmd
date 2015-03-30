@@ -1,6 +1,7 @@
 ---
 output:
   html_document:
+    self_contained: no
     keep_md: yes
 --- 
 
@@ -594,6 +595,410 @@ QueryCrossSectionOnNode<-function(
 
 ```
 
+
+
+##C1 Aircraft encounter
+
+ *    Aircraft have a 22 point corresponding effect on total contract growth that is explained by schedule and cost overruns. The report looked at time, schedule, and differences between major commands, but not contract pricing mechanism. (Performance of the Defense Acquisition System 2013)
+ *	"During the Second World War leading belligerents such as Britain, the United States, and Germany, favored the use of fixed-price contracts for purchasing military aircraft. These contracts were believed to encourage economical and efficient production. Yet only Britain succeeded in developing contractual procedures based primarily upon the fixed-price. This was primarily driven by the degree of organization by the weapons companies." (The Price of Air Power: Technological Change, Industrial Policy, and Military Aircraft Contracts in the Era of British Rearmament, 1935-39)
+ *	Dependent Variables:
+ *	Single offer competition, contract termination, number of change orders, and cost of change orders.
+ *	Initial Taxonomy:
+ *	The sample will include all contracts with a 50 percent or greater share of obligations in the Aircraft and Drone platform portfolio.
+
+#Changes
+The model incorporated a 75% threshold for classification as a given Platform under What. This excludes some contracts, but captured the vast majority of contracts with a mix of platforms.
+
+#Results
+As expected, numbers of offers are far higher with non-aircraft, for both competed and for all contracts.
+
+```{r C1Aircraft}
+
+levels(ContractModel$What)
+
+AircraftFind<- setEvidence(compGin, 
+                        nodes=c("What"),
+                        states=c("Aircraft and Drones")
+)
+
+AircraftCompFind<- setEvidence(AircraftFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(AircraftFind)
+querygrain(AircraftFind,"Offr")
+
+
+getEvidence(AircraftCompFind)
+querygrain(AircraftCompFind,"Offr")
+
+
+
+NotAircraftFind<- setEvidence(compGin, 
+                        nodes=c("What"),
+                        states=c(list(
+                            levels(ContractModel$What)[levels(ContractModel$What)!=
+                                                           "Aircraft and Drones"]))
+                        )
+
+getEvidence(NotAircraftFind)
+querygrain(NotAircraftFind,"Offr")
+
+
+NotAircraftCompFind<- setEvidence(NotAircraftFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(NotAircraftCompFind)
+querygrain(NotAircraftCompFind,"Offr")
+
+``` 
+
+
+##C2: Undefinitized contract actions (UCAs) in development will encounter more problems
+ *	"For example, analysis is revealing that UCAs can be successfully employed in early production but are concerns for developmental work" (Performance of the Defense Acquisition System 2013)
+ *	"UCAs increase development cycle time by increasing schedule growth." GAO Study
+ *	"The contractor has little incentive to control costs during this period.". (GAO study?)
+ *	DOD has had difficulty overseeing the use of UCAs on at least three levels: (1) how and when to use UCAs, (2) definitizing UCAs in a timely fashion and 3) documenting the basis for negotiated profit or fees (GAO study?)
+ *	Dependent Variables:
+ *	Single offer competition, contract termination, number of change orders, and cost of change orders.
+ *	Initial Taxonomy:
+ *	UCA status will be defined as those contracts labeled as "Letter Contracts."
+ *	The first five phases of R&D as defined by product or service code will be included. This excluding R&D management and support and operational system development. 
+ *	Contracts will be included in the sample if more than 50 percent of obligations in any given year meet the above criteria.
+
+###Next steps: 
+UCA status will be added to IDV. Since the contract type will not be known at the offset, the information lost will primarily be information not available to the contracting officer at contract start. However, theres no available proxy until that information is added.
+
+##Contracts that are initially expected to be very large contracts will encounter more problems.
+ *	For overall DoD contracting in 2013, contracts with an annual value of $500 or more saw the lowest rate of competition with three or more offers- 20 percent. The next lowest rate for contracts between $100 million and $500 million (26 percent). (CSIS Analysis of FPDS Data).
+ *	Dependent Variables:
+ *	Single offer competition, contract termination, number of change orders, and cost of change orders.
+ *	Initial Taxonomy:
+ *	The sample will include all contracts with an initial annualized base and all options amount of at least $500 million, or a initial base and exercised options amount of at least $500 million.
+
+###Placeholder and next steps.
+$500M contracts is not a level of granularity yet available in the Ceil variable, so the lower $30M threshold will be used for the initial analysis. In addition, the criteria we are using is base and all values alone, but that should always match or exceed the base and exercised value. 
+
+
+###Initial results.
+At the $30M ceil level the results were ambigious. For all contracts, single offer is slightly more common among large contracts but competition with 3-4 and 5+. For contracts that were competed, large contracts actually received more offers.
+
+```{r C2Large}
+
+levels(ContractModel$Ceil)
+
+LargeCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c("[30m+]")
+)
+
+LargeCeilCompFind<- setEvidence(LargeCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(LargeCeilFind)
+querygrain(LargeCeilFind,"Offr")
+
+getEvidence(LargeCeilCompFind)
+querygrain(LargeCeilCompFind,"Offr")
+
+
+NotLargeCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c(list(
+                            levels(ContractModel$Ceil)[levels(ContractModel$Ceil)!=
+                                                           "[30m+]"]))
+                        )
+
+getEvidence(NotLargeCeilFind)
+querygrain(NotLargeCeilFind,"Offr")
+
+
+NotLargeCeilCompFind<- setEvidence(NotLargeCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(NotLargeCeilCompFind)
+querygrain(NotLargeCeilCompFind,"Offr")
+
+``` 
+
+##Contracts initially expected to have smaller values will receive more offers.
+ *	For overall DoD contracting in 2013, contracts with an annual value of less than $250,000 saw the highest rate of competition with two or more offers (62 percent), and that rate generally declines as size of contract increases. (CSIS Analysis of FPDS Data). This phenomenon is reversed with services contracts which have less competition when the size is smaller.
+ *	Dependent Variables:
+ *	Single offer competition.
+ *	Initial Taxonomy:
+ *	The independent variable will be the base and all exercised options amount for the contract. This value will not be annualized, as the steady rate of exercising options means that the initial value has severe limitations when predicting total contract value.
+ 
+ For small contracts, the pattern 
+ 
+  ###Initial results
+ The hypothesis does hold weakly for contracts under $15k, although larger contracts have more 5+ offer. The hypothesis does not hold for contracts under $100k and again 5+ offer contracts are remain more common among larger contracts.  If the dividing line is instead $1 million, then the analysis does hold, with contracts of $1m and lower having more competition at every level of analysis.
+ 
+
+```{r C3Small}
+
+levels(ContractModel$Ceil)
+
+SmallCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c(list(c("[0,15k)","[15k,100k)")))
+)
+
+SmallCeilCompFind<- setEvidence(SmallCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(SmallCeilFind)
+querygrain(SmallCeilFind,"Offr")
+
+getEvidence(SmallCeilCompFind)
+querygrain(SmallCeilCompFind,"Offr")
+
+
+NotSmallCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c(list(
+                            levels(ContractModel$Ceil)[!levels(ContractModel$Ceil) %in%
+                                                           c("[0,15k)","[15k,100k)")]))
+                        )
+
+getEvidence(NotSmallCeilFind)
+querygrain(NotSmallCeilFind,"Offr")
+
+
+NotSmallCeilCompFind<- setEvidence(NotSmallCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(NotSmallCeilCompFind)
+querygrain(NotSmallCeilCompFind,"Offr")
+
+VerySmallCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c("[0,15k)")
+)
+
+VerySmallCeilCompFind<- setEvidence(VerySmallCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(VerySmallCeilFind)
+querygrain(VerySmallCeilFind,"Offr")
+
+getEvidence(VerySmallCeilCompFind)
+querygrain(VerySmallCeilCompFind,"Offr")
+
+
+NotVerySmallCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c(list(
+                            levels(ContractModel$Ceil)[levels(ContractModel$Ceil)!=c("[0,15k)")]))
+                        )
+
+getEvidence(NotVerySmallCeilFind)
+querygrain(NotVerySmallCeilFind,"Offr")
+
+
+NotVerySmallCeilCompFind<- setEvidence(NotVerySmallCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(NotVerySmallCeilCompFind)
+querygrain(NotVerySmallCeilCompFind,"Offr")
+
+
+#1M
+
+Under1mCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c(list(c("[0,15k)","[15k,100k)","[100k,1m)")))
+)
+
+Under1mCeilCompFind<- setEvidence(Under1mCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(Under1mCeilFind)
+querygrain(Under1mCeilFind,"Offr")
+
+getEvidence(Under1mCeilCompFind)
+querygrain(Under1mCeilCompFind,"Offr")
+
+
+NotUnder1mCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c(list(
+                            levels(ContractModel$Ceil)[!levels(ContractModel$Ceil) %in%
+                                                           c("[0,15k)","[15k,100k)","[100k,1m)")]))
+                        )
+
+getEvidence(NotUnder1mCeilFind)
+querygrain(NotUnder1mCeilFind,"Offr")
+
+
+NotUnder1mCeilCompFind<- setEvidence(NotUnder1mCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+getEvidence(NotUnder1mCeilCompFind)
+querygrain(NotUnder1mCeilCompFind,"Offr")
+
+``` 
+
+##Contracts using purchase orders and "Other Indefinite Delivery Contracts (IDCs)" are more likely to receive a single offer.
+ *	Past CSIS research has found that contracts using a purchase orders and "Other IDCs" (Other IDCs includes Federal Supply Schedule, Basic Ordering Agreements, Blanket Purchasing Agreements, Government-Wide Acquisition Contracts) have notably higher  rates of single offer competition than other vehicles. (CSIS, Federal Services Contracting and the Supporting Industrial Base, 2000-2012)
+ *	Dependent Variables:
+ *	Single offer competition.
+ *	Initial Taxonomy:
+ *	The sample will include contracts with a 50 percent or greater share of obligations reporting purchase orders or "Other IDCs".
+
+###Placeholders and next steps
+At present, the vehicle variable only has granularity to look at at IDVs versus definitive and purchase orders. Multi-award IDVs have the highest number of offers, so they will be used as the place holder until greater granularity is available.
+
+The analysis indicates validates this past finding, IDVs are marketedly more likely to be competed and to receive more offers when competed.
+
+
+
+
+```{r C4IDV}
+
+levels(ContractModel$IDV)
+
+IDVFind<- setEvidence(compGin, 
+                        nodes=c("IDV"),
+                        states=c("IDV")
+)
+
+IDVCompFind<- setEvidence(IDVFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(IDVFind)
+querygrain(IDVFind,"Offr")
+
+getEvidence(IDVCompFind)
+querygrain(IDVCompFind,"Offr")
+
+
+NotIDVFind<- setEvidence(compGin, 
+                        nodes=c("IDV"),
+                        states=c(list(
+                            levels(ContractModel$IDV)[levels(ContractModel$IDV)!=
+                                                           "IDV"]))
+                        )
+
+getEvidence(NotIDVFind)
+querygrain(NotIDVFind,"Offr")
+
+
+NotIDVCompFind<- setEvidence(NotIDVFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(NotIDVCompFind)
+querygrain(NotIDVCompFind,"Offr")
+
+``` 
+
+##Contracts with longer initially expected periods of performance will encounter more problems.
+ *	Past CSIS research on cost overruns in major defense acquisition projects have found that cost growth is correlated with contract duration. "If cost increases accrue over time, then programs with an older baseline estimate would tend to accumulate relatively higher cost increases. The data for the analyzed programs show that older programs indeed experience larger overruns... this growth correlation not only provides further evidence for the assertion that cost growth occurs steadily throughout the program lifespan, but it also suggests that younger programs are not performing better than older programs." (David Berteau et al.: Cost and Time Overruns for Major Defense Acquisition Programs (2011))
+ *	Dependent Variables:
+ *	Contract termination, number of change orders, and cost of change orders.
+ *	Initial Taxonomy:
+ *	Period of performance will be measured as expected contract duration in 4-week months, rounding up.
+ *	Note: CSIS is including a separate hypothesis (Slide 9) to test whether fixed-price contracts encounter an even greater number of problems under contracts with longer expected periods of performance 
+
+
+```{r C5LongDur}
+        
+        levels(ContractModel$Dur)
+        
+        LongDurFind<- setEvidence(compGin, 
+                                nodes=c("Dur"),
+                                states=c("[  366,33192]")
+        )
+        
+        getEvidence(LongDurFind)
+        
+        LongDurCompFind<- setEvidence(LongDurFind, 
+                                nodes=c("Comp"),
+                                states=c("Comp.")
+        )
+        getEvidence(LongDurCompFind)
+        
+
+getEvidence(LongDurFind)
+querygrain( LongDurFind,"Offr")
+
+getEvidence(LongDurCompFind)
+querygrain(LongDurCompFind,"Offr")
+
+
+NotLongDurFind<- setEvidence(compGin, 
+                        nodes=c("Dur"),
+                        states=c(list(
+                            levels(ContractModel$Dur)[levels(ContractModel$Dur)!=
+                                                           "[  366,33192]"]))
+                        )
+
+getEvidence(NotLongDurFind)
+querygrain(NotLongDurFind,"Offr")
+
+
+NotLongDurCompFind<- setEvidence(NotLongDurFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(NotLongDurCompFind)
+querygrain(NotLongDurCompFind,"Offr")
+
+``` 
+
+
+##Incentive Fee contracts experience fewer problems than other forms of contracts.
+ *	"Incentive formula-type contracts had lower cost growth at the median (i.e., its central tendency), shared savings with the government, and earned slightly lower margins than CPAF/CPFF/CS/other (O) contracts. In other words, to achieve about the same margin on incentive formula-type contracts, contractors had to control cost growth better-and they did so." (Performance of the Defense Acquisition System, 2014) This finding is in line with multiple earlier policy statements from Undersecretary Kendall emphasizing fixed-price incentive fee contracts and vendor motivation. 
+ *	One study uses the F-35 as a case study to examine when to utilize different types of contract incentive structures. The model presented in this study could provide insight into the use of different types of fixed-price contracts. (The Effect of Processes and Incentives on Acquisition Cost Growth)
+ *	Dependent Variables:
+ *	Contract termination, number of change orders, and cost of change orders.
+ *	Initial Taxonomy:
+ *	The sample will include contracts with a 50 percent or greater share of obligations reporting cost-plus incentive fee or fixed-price incentive fee as the pricing mechanism.
+
+##Next steps
+Incentive was not included in the initial model because it made up a small proportion of all contracts. Fee structure should probably be included as a seperate node entirely. Initial analysis at the aggregate dollar levels for the competition study found did not support the hypothesis.
+
+
+
+
+
+
+
 ##H1: Large Research and Development (R&D) contracts will encounter challenges under fixed-price contracts. (On Contracting for Uncertain R&D) 
 
  *    Dependent Variables:
@@ -612,7 +1017,7 @@ The hypothesis is supported with regard to number of offers. Larger fixed-price 
 
 ```{r H1LargeR&D}
 
-ContractModel$Ceil
+levels(ContractModel$Ceil)
 
 largeRnDfind<- setEvidence(compGin, 
                         nodes=c("PSR","Ceil"),
@@ -659,7 +1064,7 @@ The hypothesis was not supported with regard to number of offers, but this shoul
 
 ```{r H2MDAP}
 
-ContractModel$Link
+levels(ContractModel$Link)
 
 HighLinkFind<- setEvidence(compGin, 
                         nodes=c("Link"),
@@ -773,7 +1178,7 @@ Electronics and communications services do have a slight preference for fixed-pr
 
 ```{r H5Software}
 
-summary(levels(ContractModel$PSR))
+levels(ContractModel$PSR)
     
     SoftwareFind<- setEvidence(compGin, 
                             nodes=c("What","PSR"),
@@ -825,162 +1230,4 @@ FxCBresult<-QueryCrossSectionOnNode(SoftwareCompFind,"FxCb","Offr")
         FxCBresult[3,2]
 
 ``` 
-
-
-
-
- *	Aircraft have a 22 point corresponding effect on total contract growth that is explained by schedule and cost overruns. The report looked at time, schedule, and differences between major commands, but not contract pricing mechanism. (Performance of the Defense Acquisition System 2013)
- *	"During the Second World War leading belligerents such as Britain, the United States, and Germany, favored the use of fixed-price contracts for purchasing military aircraft. These contracts were believed to encourage economical and efficient production. Yet only Britain succeeded in developing contractual procedures based primarily upon the fixed-price. This was primarily driven by the degree of organization by the weapons companies." (The Price of Air Power: Technological Change, Industrial Policy, and Military Aircraft Contracts in the Era of British Rearmament, 1935-39)
- *	Dependent Variables:
- *	Single offer competition, contract termination, number of change orders, and cost of change orders.
- *	Initial Taxonomy:
- *	The sample will include all contracts with a 50 percent or greater share of obligations in the Aircraft and Drone platform portfolio.
-
-#Changes
-The model incorporated a 75% threshold for classification as a given Platform under What. This excludes some contracts, but captured the vast majority of contracts with a mix of platforms.
-
-#Results
-As expected, numbers of offers are far higher with non-aircraft, for both competed and for all contracts.
-
-```{r HC1Aircraft}
-
-levels(ContractModel$What)
-
-AircraftFind<- setEvidence(compGin, 
-                        nodes=c("What"),
-                        states=c("Aircraft and Drones")
-)
-
-AircraftCompFind<- setEvidence(AircraftFind, 
-                        nodes=c("Comp"),
-                        states=c("Comp.")
-)
-
-
-getEvidence(AircraftFind)
-querygrain(AircraftFind,"Offr")
-
-getEvidence(AircraftCompFind)
-querygrain(AircraftCompFind,"Offr")
-
-
-NotAircraftFind<- setEvidence(compGin, 
-                        nodes=c("What"),
-                        states=c(list(
-                            levels(ContractModel$What)[levels(ContractModel$What)!=
-                                                           "Aircraft and Drones"]))
-                        )
-
-getEvidence(NotAircraftFind)
-querygrain(NotAircraftFind,"Offr")
-
-
-NotAircraftCompFind<- setEvidence(NotAircraftFind, 
-                        nodes=c("Comp"),
-                        states=c("Comp.")
-)
-
-
-getEvidence(NotAircraftCompFind)
-querygrain(NotAircraftCompFind,"Offr")
-
-``` 
-
-
-##C2: Undefinitized contract actions (UCAs) in development will encounter more problems
- *	"For example, analysis is revealing that UCAs can be successfully employed in early production but are concerns for developmental work" (Performance of the Defense Acquisition System 2013)
- *	"UCAs increase development cycle time by increasing schedule growth." GAO Study
- *	"The contractor has little incentive to control costs during this period.". (GAO study?)
- *	DOD has had difficulty overseeing the use of UCAs on at least three levels: (1) how and when to use UCAs, (2) definitizing UCAs in a timely fashion and 3) documenting the basis for negotiated profit or fees (GAO study?)
- *	Dependent Variables:
- *	Single offer competition, contract termination, number of change orders, and cost of change orders.
- *	Initial Taxonomy:
- *	UCA status will be defined as those contracts labeled as "Letter Contracts."
- *	The first five phases of R&D as defined by product or service code will be included. This excluding R&D management and support and operational system development. 
- *	Contracts will be included in the sample if more than 50 percent of obligations in any given year meet the above criteria.
-
-###Next steps: 
-UCA status will be added to IDV. Since the contract type will not be known at the offset, the information lost will primarily be information not available to the contracting officer at contract start. However, theres no available proxy until that information is added.
-
-##Contracts that are initially expected to be very large contracts will encounter more problems.
- *	For overall DoD contracting in 2013, contracts with an annual value of $500 or more saw the lowest rate of competition with three or more offers- 20 percent. The next lowest rate for contracts between $100 million and $500 million (26 percent). (CSIS Analysis of FPDS Data).
- *	Dependent Variables:
- *	Single offer competition, contract termination, number of change orders, and cost of change orders.
- *	Initial Taxonomy:
- *	The sample will include all contracts with an initial annualized base and all options amount of at least $500 million, or a initial base and exercised options amount of at least $500 million.
-
-###Placeholder and next steps.
-$500M contracts is not a level of granularity yet available in the Ceil variable, so the lower $30M threshold will be used for the initial analysis. In addition, the criteria we are using is base and all values alone, but that should always match or exceed the base and exercised value. 
-
-
-##Contracts initially expected to have smaller values will receive more offers.
- *	For overall DoD contracting in 2013, contracts with an annual value of less than $250,000 saw the highest rate of competition with two or more offers (62 percent), and that rate generally declines as size of contract increases. (CSIS Analysis of FPDS Data)
- *	Dependent Variables:
- *	Single offer competition.
- *	Initial Taxonomy:
- *	The independent variable will be the base and all exercised options amount for the contract. This value will not be annualized, as the steady rate of exercising options means that the initial value has severe limitations when predicting total contract value.
-
-
-
-##Contracts using purchase orders and "Other Indefinite Delivery Contracts (IDCs)" are more likely to receive a single offer.
- *	Past CSIS research has found that contracts using a purchase orders and "Other IDCs" (Other IDCs includes Federal Supply Schedule, Basic Ordering Agreements, Blanket Purchasing Agreements, Government-Wide Acquisition Contracts) have notably higher  rates of single offer competition than other vehicles. (CSIS, Federal Services Contracting and the Supporting Industrial Base, 2000-2012)
- *	Dependent Variables:
- *	Single offer competition.
- *	Initial Taxonomy:
- *	The sample will include contracts with a 50 percent or greater share of obligations reporting purchase orders or "Other IDCs".
-
-##Contracts with longer initially expected periods of performance will encounter more problems.
- *	Past CSIS research on cost overruns in major defense acquisition projects have found that cost growth is correlated with contract duration. "If cost increases accrue over time, then programs with an older baseline estimate would tend to accumulate relatively higher cost increases. The data for the analyzed programs show that older programs indeed experience larger overruns... this growth correlation not only provides further evidence for the assertion that cost growth occurs steadily throughout the program lifespan, but it also suggests that younger programs are not performing better than older programs." (David Berteau et al.: Cost and Time Overruns for Major Defense Acquisition Programs (2011))
- *	Dependent Variables:
- *	Contract termination, number of change orders, and cost of change orders.
- *	Initial Taxonomy:
- *	Period of performance will be measured as expected contract duration in 4-week months, rounding up.
- *	Note: CSIS is including a separate hypothesis (Slide 9) to test whether fixed-price contracts encounter an even greater number of problems under contracts with longer expected periods of performance 
-
-##Incentive Fee contracts experience fewer problems than other forms of contracts.
- *	"Incentive formula-type contracts had lower cost growth at the median (i.e., its central tendency), shared savings with the government, and earned slightly lower margins than CPAF/CPFF/CS/other (O) contracts. In other words, to achieve about the same margin on incentive formula-type contracts, contractors had to control cost growth better-and they did so." (Performance of the Defense Acquisition System, 2014) This finding is in line with multiple earlier policy statements from Undersecretary Kendall emphasizing fixed-price incentive fee contracts and vendor motivation. 
- *	One study uses the F-35 as a case study to examine when to utilize different types of contract incentive structures. The model presented in this study could provide insight into the use of different types of fixed-price contracts. (The Effect of Processes and Incentives on Acquisition Cost Growth)
- *	Dependent Variables:
- *	Contract termination, number of change orders, and cost of change orders.
- *	Initial Taxonomy:
- *	The sample will include contracts with a 50 percent or greater share of obligations reporting cost-plus incentive fee or fixed-price incentive fee as the pricing mechanism.
-
-Hypotheses considered for inclusion in later stages of the project if necessary
-
- *	DAU guidance suggests different forms of fixed-price contracts depending on the stage of development. This goes beyond the advantages of incentive contracts to suggest that certain types of fee structures work better for different phases of a project. However, phases are not clearly labeled in FPDS, complicating any attempt to test this hypothesis.
-
-#Hypotheses not being tested at this time.
-###Does workload factor into a contracting officer's decision whether or not to use fixed-price contract? The dearth of useful and readily available data may limit CSIS's ability to test this hypothesis. 
- *	One study analyzes contracting officer workload data, noting a decrease in the use of fixed-price contract types when contractor workload increases. Were this data widely available, it would assist in explaining differences in practice between contracting offices. (Unintended Consequences of Advocating Use of Fixed-Price Contracts in Defense Acquisition Practice)
-
-###In addition, the broader budget environment may influence the rate of adoption usage of fixed-price contracts
- *	For risk averse sellers, an adjustable price (spot) price contract is advantageous when the cost of production is uncertain. However, if the level of demand is uncertain, risk averse buyers would find fixed-price contracts to be superior. (Fixed-price versus Spot Price Contracts: A Study in Risk Allocation) In the latter case, vendors could not count on making profits in production and may instead rely on a greater risk premium within a fixed-price contract.
-
-##Hypotheses which raise causality concerns
-These involve independent variables that are not necessarily known before the contracting officer specifies a contract as fixed-price. These variables are available, but raise severe causality concerns because their existence may not have been known at the time the contract was initially created. As a result, they will not be included unless these concerns can be resolved.
- *	Contracts with a greater expected number of offers will encounter fewer problems with fixed-price contracts. 
- *	"[Price and schedule growth were lower on competed and sole-source modification contracts than on sole-source [(i.e. including uncompleted and single-offer competition)] contracts for new systems. These analyses demonstrate the general benefit of competition on cost, price, and schedule control. Like price growth, cost growth (not shown) for competed and sole-source modification contracts was lower than that for sole-source contracts for new systems."(Performance of the Defense Acquisition System, 2014)
- *	[Principals] would prefer a fixed-price contract when the number of bidders increases. (On Contracting for Uncertain R&D)
-
- *	Contracts expected to be won by the Big-6 Defense firms will encounter fewer problems with fixed-price contracts.
- *	Qualified suppliers: Bidders will be firms that have experience with this kind of product and can be expected to bid rationally and perform to plan (Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.) 
-Contracts expected to be won by the Big-6 Defense firms are less likely to use fixed-price contracts.
- *	"In the offshore drilling industry, we find that oil and gas companies are less likely to choose fixed-price contracts as the frequency of their interaction with a driller increases. This supports the conclusion that repeated interaction and high-powered formal contracts are substitutes in this setting, indicating that repeated interaction reduces incentive problems more than contracting costs." (The Effect of Repeated Interaction on Contract Choice: Evidence from Offshore Drilling) 
-Larger vendors will fare better with larger contracts.
- *	"Sometimes overruns will happen despite everyone's best efforts. We still want responsible contractors who have the capacity to continue and deliver the product despite potential overruns that may not have been foreseeable". ( Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.)
-
-##Hypotheses that cannot be measured with CSIS's existing databases 
-CSIS does not have an analytical framework for including these hypotheses. They are included in this briefing to ensure comprehensiveness and to offer an opportunity for outside reviewers to suggest new ideas for analytical frameworks.
- * Firm requirements: "Cost vs. performance trades are essentially complete. In essence, we have a very clear under???standing of what we want the contractor to build, and we are confident that the conditions exist to permit the design of an affordable product that the user will be able to afford and is committed to acquiring". (Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.)
- * Expert Knowledge: One pillar of Secretary Kendall's "firm requirements" is the requirement that contracting officers be equipped with 'a clear understanding' of all sides of the trade. Currently, there is no mechanism in FPDS that captures as a value "expert knowledge of the marketplace".  
- * 	Low technical risk: "Design content is established and the components are mature technologies. There are no significant unresolved design issues, no major integration risk, the external interfaces are well defined, and no serious risk exists of unknowns surfacing in developmental testing and causing major redesign". (Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.)
-
-Several hypotheses relate to market conditions and cost uncertainty:
- *	"However, vendors would prefer a [Time and Materials] contract when the risk of employee attrition from the project team is high." (Research Note: On Vendor Preferences for Contract Types in Offshore Software Projects: The Case of fixed-price vs. Time and Materials Contracts)
- *	But price redetermination might be used "whenever contingency charges otherwise would be included in a contract price due to such factors as pro-longed delivery schedules, unstable market conditions for material or labor, or uncertainty as to cost of performance (emphasis added)." (Fixed-prices and Price Redetermination in Defense Contracts)
- *	The issue of complexity has come up in different studies. Generally these studies find that complexity is associated with worse performance, but it is difficult to measure the complexity of projects at the contract level.  MDAP and R&D factors, which are already included in this project, are suggested as offering the most straightforward values that reflect project complexity .
- *	Cost-plus contracts are preferred to fixed-price contracts when a project is more complex. (Incentives versus Transaction Costs: A Theory of Procurement Contracts)
-
- *	Renegotiations and other attempts to regulate extraordinary profits are likewise difficult to measure for the system writ-large.
- *	This article examines the determinants of contractual form and renegotiations in the German construction industry during the Third Reich. At the beginning of World War II, firms dealt with growing uncertainty by convincing procurement agencies either to use cost-plus contracts or to include an additional risk premium in fixed-price contracts. In the later years of the war, procurement agencies initiated renegotiations over contract clauses to reduce the extraordinary profits resulting from information rents and high-risk premiums. This regulatory course undermined the credibility of the regulatory commitment, thereby weakening the incentives of the fixed-price contracts still in use. (Negotiating Contract Types and Contract Clauses in the German Construction Industry during the Third Reich)
 
