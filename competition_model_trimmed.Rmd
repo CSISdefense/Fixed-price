@@ -16,13 +16,16 @@ require(gRbase)
 require(methods)
 require(bnlearn)
 require(Rgraphviz)
-#source("http://bioconductor.org/biocLite.R"); #biocLite("Rgraphviz")
-
+#source("http://bioconductor.org/biocLite.R");
+#biocLite("Rgraphviz")
+# biocLite("RBGL")
 setwd("K:\\Development\\Fixed-price")
 # setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
 Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 # Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
 source(paste(Path,"lookups.r",sep=""))
+
+
 
 ```
 
@@ -476,19 +479,19 @@ require(gRain)
 
 compGin <- grain(as.graphNEL(CompetitionNetwork), data=ContractModel, smooth = 0.0000001)
 summary(compGin)
-
-str(compGin$universe$levels["FxCb"])
-cost.list <- list(nodes = c("FxCb"),
-                        states = c("Cost-Based"))
-cost.find <- setEvidence(compGin, 
-                        nodes=cost.list$nodes,
-                        states=cost.list$states)
-fixed.list<-list(nodes = c("FxCb"),
-                        states = c("Fixed-Price"))
-fixed.find <- setEvidence(compGin, 
-                        nodes=fixed.list$nodes,
-                        states=fixed.list$states)
-
+# 
+# str(compGin$universe$levels["FxCb"])
+# cost.list <- list(nodes = c("FxCb"),
+#                         states = c("Cost-Based"))
+# cost.find <- setEvidence(compGin, 
+#                         nodes=cost.list$nodes,
+#                         states=cost.list$states)
+# fixed.list<-list(nodes = c("FxCb"),
+#                         states = c("Fixed-Price"))
+# fixed.find <- setEvidence(compGin, 
+#                         nodes=fixed.list$nodes,
+#                         states=fixed.list$states)
+# 
 
 
 QueryCrossSectionOnNode<-function(
@@ -514,71 +517,71 @@ QueryCrossSectionOnNode<-function(
         }
     looper
     }
+# 
+# 
+# querygrain(cost.find, nodes = c("Offr"))
+# querygrain(fixed.find, nodes = c("Offr"),states=c("1"))
+# 
+# qCostCeil<-QueryCrossSectionOnNode(cost.find,"Ceil","Offr")
+# qFixedCeil<-QueryCrossSectionOnNode(fixed.find,"Ceil","Offr")
+# 
+# # debug(QueryCrossSectionOnNode)
+# qCostWhat<-QueryCrossSectionOnNode(cost.find,"What","Offr")
+# qFixedWhat<-QueryCrossSectionOnNode(ContractModel,fixed.find,"What","Offr")
+# row(qCostWhat)
+# qCostWhat[6,]
+# qFixedWhat[6,]
+# 
+# qCostPSR<-QueryCrossSectionOnNode(cost.find,"PSR","Offr")
+# qFixedPSR<-QueryCrossSectionOnNode(fixed.find,"PSR","Offr")
+# 
+# qCostPSR[2,]
+# qFixedPSR[2,]
+# 
+# for(x in 1:ncol(eCeil)){
+#     
+#     print(getEvidence(eCeil[,x]))
+#     print(querygrain(eCeil[[,x]],nodes=c("Offr")))
+#     }
+# 
+# 
+# eCeil<-CompleteEvidenceLists(ContractModel,compGin,"Ceil",gin2.list)
+# for(x in 1:ncol(eCeil)){
+#     
+#     print(getEvidence(eCeil[,x]))
+#     print(querygrain(eCeil[[,x]],nodes=c("Offr")))
+#     }
+# 
+# 
+# test<-eCeil[,1]
+# querygrain(test,nodes=c("Offr"))
 
-
-querygrain(cost.find, nodes = c("Offr"))
-querygrain(fixed.find, nodes = c("Offr"),states=c("1"))
-
-qCostCeil<-QueryCrossSectionOnNode(cost.find,"Ceil","Offr")
-qFixedCeil<-QueryCrossSectionOnNode(fixed.find,"Ceil","Offr")
-
-debug(QueryCrossSectionOnNode)
-qCostWhat<-QueryCrossSectionOnNode(cost.find,"What","Offr")
-qFixedWhat<-QueryCrossSectionOnNode(ContractModel,fixed.find,"What"","Offr")
-row(qCostWhat)
-qCostWhat[6,]
-qFixedWhat[6,]
-debug(QueryCrossSectionOnNode","Offr")
-qCostPSR<-QueryCrossSectionOnNode(cost.find,"PSR"","Offr")
-qFixedPSR<-QueryCrossSectionOnNode(fixed.find,"PSR","Offr")
-
-qCostPSR[2,]
-qFixedPSR[2,]
-
-for(x in 1:ncol(eCeil)){
-    
-    print(getEvidence(eCeil[,x]))
-    print(querygrain(eCeil[[,x]],nodes=c("Offr")))
-    }
-
-
-eCeil<-CompleteEvidenceLists(ContractModel,compGin,"Ceil",gin2.list)
-for(x in 1:ncol(eCeil)){
-    
-    print(getEvidence(eCeil[,x]))
-    print(querygrain(eCeil[[,x]],nodes=c("Offr")))
-    }
-
-
-test<-eCeil[,1]
-querygrain(test,nodes=c("Offr"))
-
-
-CeilingFrames<-sapply(levels(ContractModel$Ceil),function(x) list(nodes = c(gin2.list$nodes,"Ceil"),
-                        states = c(gin2.list$states, x))
-
-    
-    
-    data.frame(nodes = c("Comp","FxCb","Ceil"),
-                        states = c( "Comp.","Fixed-Price",x)))
-result<-list()
-for(x in 1:ncol(CeilingFrames )){
-    test <- setFinding(compGin, CeilingFrames[,x])
-    result<-rbind(result,list(CeilingFrames[,x],querygrain(test, nodes = c("Offr"))))
-}
-ncol(CeilingFrames )
-
-test2<-setEvidence(compGin, CeilingFrames[,2])
-getEvidence(test2)
-# str(test2)
-
-str(gin2.find)
-str(eCeil[,1])
-
-as.dateCeil[,1]
-querygrain(gin2.find,nodes=c("Offr"))
-querygrain(eCeil[,1],nodes=c("Offr"))
-getEvidence(test2)
+# 
+# CeilingFrames<-sapply(levels(ContractModel$Ceil),function(x) list(nodes = c(gin2.list$nodes,"Ceil"),
+#                         states = c(gin2.list$states, x))
+# 
+#     
+#     
+#     data.frame(nodes = c("Comp","FxCb","Ceil"),
+#                         states = c( "Comp.","Fixed-Price",x)))
+# result<-list()
+# for(x in 1:ncol(CeilingFrames )){
+#     test <- setFinding(compGin, CeilingFrames[,x])
+#     result<-rbind(result,list(CeilingFrames[,x],querygrain(test, nodes = c("Offr"))))
+# }
+# ncol(CeilingFrames )
+# 
+# test2<-setEvidence(compGin, CeilingFrames[,2])
+# getEvidence(test2)
+# # str(test2)
+# 
+# str(gin2.find)
+# # str(eCeil[,1])
+# 
+# # as.dateCeil[,1]
+# querygrain(gin2.find,nodes=c("Offr"))
+# # querygrain(eCeil[,1],nodes=c("Offr"))
+# # getEvidence(test2)
 
 
 # 
@@ -640,7 +643,7 @@ FxCBresult[3,2]
 ``` 
 
 ##H2: Due to design uncertainty Pre-Milestone B Major Defense Acquisition Programs (MDAPs) are potentially more likely to encounter problems than other fixed-price contracts
- *	Prerequisites for use of fixed-price: "Design content is established and the components are mature technologies. There are no signifi?cant unresolved design issues, no major integration risk, the external interfaces are well defined, and no serious risk exists of unknowns surfacing in developmental testing and causing major redesign." (Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.) {Emphasis added}
+ *	Prerequisites for use of fixed-price: "Design content is established and the components are mature technologies. There are no signifi???cant unresolved design issues, no major integration risk, the external interfaces are well defined, and no serious risk exists of unknowns surfacing in developmental testing and causing major redesign." (Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.) {Emphasis added}
  *	Dependent Variables:
  *	Single offer competition, contract termination, number of change orders, and cost of change orders.
  *	Initial Taxonomy:
@@ -968,7 +971,7 @@ Larger vendors will fare better with larger contracts.
 
 ##Hypotheses that cannot be measured with CSIS's existing databases 
 CSIS does not have an analytical framework for including these hypotheses. They are included in this briefing to ensure comprehensiveness and to offer an opportunity for outside reviewers to suggest new ideas for analytical frameworks.
- * Firm requirements: "Cost vs. performance trades are essentially complete. In essence, we have a very clear under?standing of what we want the contractor to build, and we are confident that the conditions exist to permit the design of an affordable product that the user will be able to afford and is committed to acquiring". (Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.)
+ * Firm requirements: "Cost vs. performance trades are essentially complete. In essence, we have a very clear under???standing of what we want the contractor to build, and we are confident that the conditions exist to permit the design of an affordable product that the user will be able to afford and is committed to acquiring". (Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.)
  * Expert Knowledge: One pillar of Secretary Kendall's "firm requirements" is the requirement that contracting officers be equipped with 'a clear understanding' of all sides of the trade. Currently, there is no mechanism in FPDS that captures as a value "expert knowledge of the marketplace".  
  * 	Low technical risk: "Design content is established and the components are mature technologies. There are no significant unresolved design issues, no major integration risk, the external interfaces are well defined, and no serious risk exists of unknowns surfacing in developmental testing and causing major redesign". (Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.)
 
