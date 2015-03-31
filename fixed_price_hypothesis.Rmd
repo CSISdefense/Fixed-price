@@ -112,17 +112,17 @@ QueryCrossSectionOnNodeFxCbDF<-function(
         )
     
     output<-data.frame(rbind(c(Variable=RHypothesis,
-                    FxCb=FxCbResult[1,1]$evidence$states[[length(FxCbResult[1,1]$evidence$states)]],
+                    FxCb=substr(FxCbResult[1,1]$evidence$states[[length(FxCbResult[1,1]$evidence$states)]],1,5),
                     Control=RControl,
                     pFinding=attributes(FxCbResult[1,1]$evidence)$pFinding,
                     unlist(FxCbResult[1,2])),
                   c(Variable=RHypothesis,
-                    FxCb=FxCbResult[2,1]$evidence$states[[length(FxCbResult[2,1]$evidence$states)]],
+                    FxCb=substr(FxCbResult[2,1]$evidence$states[[length(FxCbResult[2,1]$evidence$states)]],1,5),
                     Control=RControl,
                     pFinding=attributes(FxCbResult[2,1]$evidence)$pFinding,
                     unlist(FxCbResult[2,2])),
                   c(Variable=RHypothesis,
-                    FxCb=FxCbResult[3,1]$evidence$states[[length(FxCbResult[3,1]$evidence$states)]],
+                    FxCb=substr(FxCbResult[3,1]$evidence$states[[length(FxCbResult[3,1]$evidence$states)]],1,5),
                     Control=RControl,
                     pFinding=attributes(FxCbResult[3,1]$evidence)$pFinding,
                     unlist(FxCbResult[3,2]))
