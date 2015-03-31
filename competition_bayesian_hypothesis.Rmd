@@ -21,8 +21,8 @@ require(methods)
 require(bnlearn)
 require(Rgraphviz)
 require(knitr)
-# setwd("K:\\Development\\Fixed-price")
-setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+setwd("K:\\Development\\Fixed-price")
+# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
 # Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 # Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
 # source(paste(Path,"lookups.r",sep=""))
@@ -48,11 +48,6 @@ IDV (IsIDV) new white lists:
 
 With those two connections in hand, all three Bayesian Learning algorith were applied.
 
-```{r BayesianExecution, echo = TRUE}
-
-
-
-```
 To the study teams dismay, the bayesian learning results were not consistent across different methods. The unoptimized versions of the learning algorithms do better at catching statistical oddities at the cost of requiring more comparisons. After analyzing the unoptimized and optimized versions, the team chose to adopt one arc that appeared in the both unoptimized versions, namely duration to offers. Seperate analysis shown in the Contract_Competition found that longer contracts did have fewer offers even after controlling for contract ceiling.
 
 Similarly, the grow shrink algorithm included a link from Ceil to FxCb. Analysis shown in Contract_Pricing holds up that connection, even after controlling for PSR. This does not appear to be true of duration or competition. There may well be a link between IDV and Fixed-price, but there's enough complexity in the causality in that relationship that the team chose not to force it.
@@ -126,19 +121,11 @@ AircraftFind<- setEvidence(compGin,
                            states=c("Aircraft and Drones")
                            )
 
-AircraftCompFind<- setEvidence(AircraftFind, 
-                               nodes=c("Comp"),
-                               states=c("Comp.")
-                               )
-
-data.frame("Offr.1"=NULL,"Offr.2"=NULL,"Offr.3.4"=NULL,"Offr.5"=NULL)
 
 getEvidence(AircraftFind)
 querygrain(AircraftFind,"Offr")
 
 
-getEvidence(AircraftCompFind)
-querygrain(AircraftCompFind,"Offr")
 
 NotAircraftFind<- setEvidence(compGin, 
                               nodes=c("What"),
@@ -150,28 +137,6 @@ NotAircraftFind<- setEvidence(compGin,
 getEvidence(NotAircraftFind)
 querygrain(NotAircraftFind,"Offr")
 
-
-NotAircraftCompFind<- setEvidence(NotAircraftFind, 
-                                  nodes=c("Comp"),
-                                  states=c("Comp.")
-                                  )
-
-
-getEvidence(NotAircraftCompFind)
-querygrain(NotAircraftCompFind,"Offr")
-
-output<-data.frame(rbind(
-    c(Control="Aircraft-All",unlist(querygrain(AircraftFind,"Offr"))),
-    c(Control="!Aircraft-All",unlist(querygrain(NotAircraftFind,"Offr"))),
-    c(Control="Aircraft-Comp",unlist(querygrain(AircraftCompFind,"Offr"))),
-    c(Control="!Aircraft-Comp",unlist(querygrain(NotAircraftCompFind,"Offr")))
-    ))
-names(output)[1]<-"Control"
-output$Offr.1<-as.numeric(as.character(output$Offr.1))
-output$Offr.2<-as.numeric(as.character(output$Offr.2))
-output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
-output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
-kable(output,digits=4)
 
 ``` 
 
@@ -398,11 +363,11 @@ output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
 output<-rbind(output,
-              c(Control="Under1mCeil",Comp="Comp",unlist(querygrain(setEvidence(Under1mCeilCompFind, 
+              c(Control="Under1mCeil",Comp="Comp",unlist(querygrain(setEvidence(Under1mCeilFind, 
                                                                                  nodes=c("Comp"),
                                                                                  states=c("Comp.")
                                                                                  ),"Offr"))),
-              c(Control="!Under1mCeil",Comp="Comp",unlist(querygrain(setEvidence(NotUnder1mCeilCompFind, 
+              c(Control="!Under1mCeil",Comp="Comp",unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
                                                                                  nodes=c("Comp"),
                                                                                  states=c("Comp.")
                                                                                  ),"Offr")))
@@ -510,19 +475,8 @@ LongDurFind<- setEvidence(compGin,
                           )
 
 getEvidence(LongDurFind)
-
-LongDurCompFind<- setEvidence(LongDurFind, 
-                              nodes=c("Comp"),
-                              states=c("Comp.")
-                              )
-getEvidence(LongDurCompFind)
-
-
-getEvidence(LongDurFind)
 querygrain( LongDurFind,"Offr")
 
-getEvidence(LongDurCompFind)
-querygrain(LongDurCompFind,"Offr")
 
 
 NotLongDurFind<- setEvidence(compGin, 
@@ -536,27 +490,7 @@ getEvidence(NotLongDurFind)
 querygrain(NotLongDurFind,"Offr")
 
 
-NotLongDurCompFind<- setEvidence(NotLongDurFind, 
-                                 nodes=c("Comp"),
-                                 states=c("Comp.")
-                                 )
 
-
-getEvidence(NotLongDurCompFind)
-querygrain(NotLongDurCompFind,"Offr")
-
-
-output<-data.frame(rbind(
-    c(Control="LongDur-All",unlist(querygrain(LongDurFind,"Offr"))),
-    c(Control="!LongDur-All",unlist(querygrain(NotLongDurFind,"Offr"))),
-    c(Control="LongDur-Comp",unlist(querygrain(LongDurCompFind,"Offr"))),
-    c(Control="!LongDur-Comp",unlist(querygrain(NotLongDurCompFind,"Offr")))
-    ))
-output$Offr.1<-as.numeric(as.character(output$Offr.1))
-output$Offr.2<-as.numeric(as.character(output$Offr.2))
-output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
-output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
-kable(output,digits=4)
 
 
 ``` 
@@ -595,221 +529,183 @@ For this example, we're still using usual R&D rather than excluding R&d7
 ##Results
 The hypothesis is supported with regard to number of offers. Larger fixed-price contracts are more likely to experience single offer competition and are less likely to experience competition with three or more offers. Combination tracks more closely with fixed-price than cost-plus.
 
-```{r H1LargeR&D}
-
-unlist(compGin$universe$levels["Ceil"])
-
-largeRnDfind<- setEvidence(compGin, 
-                           nodes=c("PSR","Ceil"),
-                           states=c("R&D","[30m+]")
-                           )
-
-getEvidence(largeRnDfind)
-
-largeRnDcompFind<- setEvidence(largeRnDfind, 
-                               nodes=c("Comp"),
-                               states=c("Comp.")
-                               )
-getEvidence(largeRnDcompFind)
-
-FxCBresult<-QueryCrossSectionOnNode(largeRnDcompFind,"FxCb","Offr")
-
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
-
-
-``` 
-
-##H2: Due to design uncertainty Pre-Milestone B Major Defense Acquisition Programs (MDAPs) are potentially more likely to encounter problems than other fixed-price contracts
-*	Prerequisites for use of fixed-price: "Design content is established and the components are mature technologies. There are no signifi???cant unresolved design issues, no major integration risk, the external interfaces are well defined, and no serious risk exists of unknowns surfacing in developmental testing and causing major redesign." (Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.) {Emphasis added}
-*	Dependent Variables:
-*	Single offer competition, contract termination, number of change orders, and cost of change orders.
-*	Initial Taxonomy:
-*	Using past CSIS research on Major Defense Acquisition Programs, CSIS will include in the sample System Equipment Codes for MDAPs that also include Pre-Milestone B spending. 
-*	Contracts will be included if greater than 50% of obligations are classified with a relevant System Equipment Code and/or if they are manually labeled as belonging to that MDAP.
-*	Note: This criteria will capture a similar sample to the prior R&D hypothesis. The study team would like to also include Major Automated Information Systems, but cannot because they are not labeled in FPDS.
-
-#Temporary changes and next steps
-MDAP specific classification is not yet included because it represents such a small portion of total contracts. It is presently planned to be incorporated through the Interlinked Variable. As an intermediate step.
-
-#Initial results
-The hypothesis was not supported with regard to number of offers, but this should be treated as a soft negative finding until the more precise question is tested.
-
-```{r H2MDAP}
-
-unlist(compGin$universe$levels["Link"])
-
-HighLinkFind<- setEvidence(compGin, 
-                           nodes=c("Link"),
-                           states=c("[  750,67263]")
-                           )
-
-getEvidence(HighLinkFind)
-
-HighLinkCompFind<- setEvidence(HighLinkFind, 
-                               nodes=c("Comp"),
-                               states=c("Comp.")
-                               )
-getEvidence(HighLinkCompFind)
-
-FxCBresult<-QueryCrossSectionOnNode(HighLinkCompFind,"FxCb","Offr")
-
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
-
-
-``` 
-
-
-
-##H3: Contracts with longer schedules will encounter greater problems with fixed-price contracts.
-*	"But price redetermination might be used whenever contingency charges otherwise would be included in a contract price due to such factors as prolonged delivery schedules, unstable market conditions for material or labor, or uncertainty as to cost of performance." (Fixed-prices and Price Redetermination in Defense Contracts)
-*	Dependent Variables:
-*	Single offer competition, contract termination, number of change orders, and cost of change orders.
-*	Initial Taxonomy:
-*	Period of performance will be measured by expected contract duration in 4-week months (rounded up).
-
-#Placeholder variable and next steps
-This was initially expected to be tested with a continuous value for length rather than a discrete value. In addition the test would benefit from having more granularity at the high end of contract lengths. The next step will be to expand Dur's granularity in the greater than 1 year category.
-
-#Initial results
-The hypothesis regarding number of offers was not supported at the greater than 1 year level. Further subdivision into 2 year plus or other breakdowns might show a different result. Combination resembled fixed-price, but did not do as well with 5 or more offers.
-
-```{r H3MDAP}
-
-unlist(compGin$universe$levels["Dur"])
-
-LongDurFind<- setEvidence(compGin, 
-                          nodes=c("Dur"),
-                          states=c("[  366,33192]")
-                          )
-
-getEvidence(LongDurFind)
-
-LongDurCompFind<- setEvidence(LongDurFind, 
-                              nodes=c("Comp"),
-                              states=c("Comp.")
-                              )
-getEvidence(LongDurCompFind)
-
-
-FxCBresult<-QueryCrossSectionOnNode(LongDurCompFind,"FxCb","Offr")
-
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
-
-
-``` 
-
-
-
-##H4: Fixed-price contracts with the potential competition for multiple offers will encounter fewer challenges.
-*	"[Principals] would prefer a fixed-price contract when the number of bidders increases." (On Contracting for Uncertain R&D)
-*	Complicating this relationship, are recent revisions to the DFAR that reduced the emphasis on seeking additional offers as long as a fair competitive price can be verified. (DFAR 215.371)
-*	Dependent Variables:
-*	Contract termination, number of change orders, and cost of change orders.
-*	Initial Taxonomy:
-*	Due to limitations in available data, CSIS will use whether or not a contract is initially competed as a broad proxy for whether competition with multiple offers is available. CSIS will follow standard DoD procedures in identifying competed contracts.
-*	Note: Testing for this hypothesis is constrained by a lack of relevant data in  FPDS. The number of offers requested field was dispensed with when the DoD contract system was folded into FPDS. (See "Hypotheses which raise causality concerns" (slide 21-22) for further discussion.) 
-
-#Next steps.
-
-This hypothesis is requires incorporation of the next two dependent variables into the Bayesian Network.
-
-
-
-##H5: Fixed-price are preferred by vendors for larger software contracts
-*	"We hypothesize that the vendor's ability to leverage information asymmetry about capabilities and experiences translates into the vendor preferring Fixed-Price contract to secure larger information rents. Our results support this hypothesis and suggest that the vendor would prefer the FP contract for larger and longer projects with larger teams. However, vendors would prefer a [Time and Materials] contract when the risk of employee attrition from the project team is high." (Research Note: On Vendor Preferences for Contract Types in Offshore Software Projects: The Case of fixed-price vs. Time and Materials Contracts)
-*	Dependent Variables:
-*	Single offer competition and contract termination. 
-*	Initial Taxonomy:
-*	Past CSIS research has found that software contracts are not all contained within the Automated Data Processing category of the product or service codes. CSIS tentatively plans to include contracts with greater than 50% by value content in the Information and Communication Technology services category
-*	Note: This hypothesis tests commercial vendor practices, but contradicts other government-focused observations. This is because this study does not seek to construct only consistent hypotheses, but instead to test a range of ideas from the literature.
-Hypotheses regarding general contract performance that may be used as controls
-Contracts for aircraft have more challenges than other contracts
-
-#Placeholder and next steps
-Software is typically classified as a service under PSR, though also could be under R&D, and is especially prominent in electronics in communication under What. Given that all sorts of platforms have software, PSR would be the best place to incorporate it under the present model, possibly linking software services and software R&D. NAICS codes may also assist. Software is not particularly easy to identify in FPDS as it is often incorporated into larger contracts, but there should be a number of clearcut cases.
-
-#Initial results
-
-Electronics and communications services do have a slight preference for fixed-price contracts when it comes to number of offers. However, when R&D is also included, the advantage switches to Cost-based.
-
-```{r H5Software}
+```{r R1Products}
 
 unlist(compGin$universe$levels["PSR"])
 
-SoftwareFind<- setEvidence(compGin, 
-                           nodes=c("What","PSR"),
-                           states=c("Electronics and Communications","Services"))
+
+RNodes=c("PSR")
+RStates=c("Products")
+RVariable=c("Products")
+
+output<-data.frame(rbind(
+    c(Variable=RVariable,Control="None",Comp="All",
+      unlist(querygrain(setEvidence(compGin, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="None",Comp="Comp",
+      unlist(querygrain(setEvidence(compGin, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    ),"Offr")))
+    )
+    )
 
 
-getEvidence(SoftwareFind)
-
-SoftwareCompFind<- setEvidence(SoftwareFind, 
-                               nodes=c("Comp"),
-                               states=c("Comp.")
-                               )
-getEvidence(SoftwareCompFind)
-
-
-FxCBresult<-QueryCrossSectionOnNode(SoftwareCompFind,"FxCb","Offr")
-
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
-
-SoftwareFind<- setEvidence(compGin, 
-                           nodes=c("What","PSR"),
-                           states=c("Electronics and Communications",list(c("Services","R&D")))
-                           )
-getEvidence(SoftwareFind)
-
-SoftwareCompFind<- setEvidence(SoftwareFind, 
-                               nodes=c("Comp"),
-                               states=c("Comp.")
-                               )
-
-FxCBresult<-QueryCrossSectionOnNode(SoftwareCompFind,"FxCb","Offr")
+output$Control<-as.character(output$Control)
+output$Comp<-as.character(output$Comp)
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
 
+output<-rbind(output,
+    c(Variable=RVariable,Control="Aircraft",Comp="All",
+      unlist(querygrain(setEvidence(AircraftFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!Aircraft",Comp="All",
+      unlist(querygrain(setEvidence(NotAircraftFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+    
 
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
+output<-rbind(output,
+              c(Variable=RVariable,Control="Aircraft",Comp="Comp",
+                unlist(querygrain(setEvidence(AircraftFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!Aircraft",Comp="Comp",
+                unlist(querygrain(setEvidence(NotAircraftFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="LargeCeil",Comp="All",
+      unlist(querygrain(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!LargeCeil",Comp="All",
+      unlist(querygrain(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+    
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="LargeCeil",Comp="Comp",
+                unlist(querygrain(setEvidence(LargeCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!LargeCeil",Comp="Comp",
+                unlist(querygrain(setEvidence(NotLargeCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="Under1mCeil",Comp="All",
+      unlist(querygrain(setEvidence(Under1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!Under1mCeil",Comp="All",
+      unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+    
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="Under1mCeil",Comp="Comp",
+                unlist(querygrain(setEvidence(Under1mCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!Under1mCeil",Comp="Comp",
+                unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="IDV",Comp="All",
+      unlist(querygrain(setEvidence(IDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!IDV",Comp="All",
+      unlist(querygrain(setEvidence(NotIDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+    
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="IDV",Comp="Comp",
+                unlist(querygrain(setEvidence(IDVFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!IDV",Comp="Comp",
+                unlist(querygrain(setEvidence(NotIDVFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="LongDur",Comp="All",
+      unlist(querygrain(setEvidence(LongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!LongDur",Comp="All",
+      unlist(querygrain(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+    
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="LongDur",Comp="Comp",
+                unlist(querygrain(setEvidence(LongDurFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!LongDur",Comp="Comp",
+                unlist(querygrain(setEvidence(NotLongDurFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+kable(output,digits=4)
 
 ``` 
-
