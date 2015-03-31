@@ -349,7 +349,7 @@ output$Offr.1<-as.numeric(as.character(output$Offr.1))
 output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
-kable(output,digits=4)
+knitr::kable(output,digits=4)
 ```
 
 
@@ -676,7 +676,7 @@ output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
-kable(output,digits=4)
+knitr::kable(output,digits=4)
 ```
 
 
@@ -834,7 +834,7 @@ output$Offr.1<-as.numeric(as.character(output$Offr.1))
 output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
-kable(output,digits=4)
+knitr::kable(output,digits=4)
 ```
 
 
@@ -1225,7 +1225,7 @@ output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
-kable(output,digits=4)
+knitr::kable(output,digits=4)
 ```
 
 
@@ -1527,7 +1527,7 @@ output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
-kable(output,digits=4)
+knitr::kable(output,digits=4)
 ```
 
 
@@ -1830,7 +1830,7 @@ output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
-kable(output,digits=4)
+knitr::kable(output,digits=4)
 ```
 
 
@@ -2095,7 +2095,7 @@ output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
-kable(output,digits=4)
+knitr::kable(output,digits=4)
 ```
 
 
@@ -2354,7 +2354,7 @@ output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
-kable(output,digits=4)
+knitr::kable(output,digits=4)
 ```
 
 
@@ -2614,7 +2614,7 @@ output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
-kable(output,digits=4)
+knitr::kable(output,digits=4)
 ```
 
 
@@ -2873,7 +2873,7 @@ output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
-kable(output,digits=4)
+knitr::kable(output,digits=4)
 ```
 
 
@@ -3133,7 +3133,7 @@ output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
-kable(output,digits=4)
+knitr::kable(output,digits=4)
 ```
 
 
@@ -3433,7 +3433,7 @@ output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
-kable(output,digits=4)
+knitr::kable(output,digits=4)
 ```
 
 
