@@ -21,8 +21,8 @@ require(methods)
 require(bnlearn)
 require(Rgraphviz)
 require(knitr)
-setwd("K:\\Development\\Fixed-price")
-# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+# setwd("K:\\Development\\Fixed-price")
+setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
 # Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 # Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
 # source(paste(Path,"lookups.r",sep=""))
@@ -48,11 +48,6 @@ IDV (IsIDV) new white lists:
 
 With those two connections in hand, all three Bayesian Learning algorith were applied.
 
-```{r BayesianExecution, echo = TRUE}
-
-
-
-```
 To the study teams dismay, the bayesian learning results were not consistent across different methods. The unoptimized versions of the learning algorithms do better at catching statistical oddities at the cost of requiring more comparisons. After analyzing the unoptimized and optimized versions, the team chose to adopt one arc that appeared in the both unoptimized versions, namely duration to offers. Seperate analysis shown in the Contract_Competition found that longer contracts did have fewer offers even after controlling for contract ceiling.
 
 Similarly, the grow shrink algorithm included a link from Ceil to FxCb. Analysis shown in Contract_Pricing holds up that connection, even after controlling for PSR. This does not appear to be true of duration or competition. There may well be a link between IDV and Fixed-price, but there's enough complexity in the causality in that relationship that the team chose not to force it.
@@ -100,6 +95,50 @@ QueryCrossSectionOnNode<-function(
     looper
     }
 
+
+QueryCrossSectionOnNodeFxCbDF<-function(
+    gin,
+    PivotNode,
+    QueryNode,
+    RHypothesis,
+    RControl
+    )
+    {
+    
+    FxCbResult<-QueryCrossSectionOnNode(
+        gin,
+        PivotNode,
+        QueryNode
+        )
+    
+    output<-data.frame(rbind(c(Variable=RHypothesis,
+                    FxCb=FxCbResult[1,1]$evidence$states[[length(FxCbResult[1,1]$evidence$states)]],
+                    Control=RControl,
+                    pFinding=attributes(FxCbResult[1,1]$evidence)$pFinding,
+                    unlist(FxCbResult[1,2])),
+                  c(Variable=RHypothesis,
+                    FxCb=FxCbResult[2,1]$evidence$states[[length(FxCbResult[2,1]$evidence$states)]],
+                    Control=RControl,
+                    pFinding=attributes(FxCbResult[2,1]$evidence)$pFinding,
+                    unlist(FxCbResult[2,2])),
+                  c(Variable=RHypothesis,
+                    FxCb=FxCbResult[3,1]$evidence$states[[length(FxCbResult[3,1]$evidence$states)]],
+                    Control=RControl,
+                    pFinding=attributes(FxCbResult[3,1]$evidence)$pFinding,
+                    unlist(FxCbResult[3,2]))
+                  ))
+    output$Control<-as.character(output$Control)
+    output$Variable<-as.character(output$Variable)
+    output$pFinding<-as.numeric(as.character(output$pFinding))
+    output$result.Offr.1<-as.numeric(as.character(output$result.Offr.1))
+    output$result.Offr.2<-as.numeric(as.character(output$result.Offr.2))
+    output$result.Offr.3.4<-as.numeric(as.character(output$result.Offr.3.4))
+    output$result.Offr.5.<-as.numeric(as.character(output$result.Offr.5.))
+    
+    output
+    }
+    
+
 ```
 
 
@@ -126,19 +165,9 @@ AircraftFind<- setEvidence(compGin,
                            states=c("Aircraft and Drones")
                            )
 
-AircraftCompFind<- setEvidence(AircraftFind, 
-                               nodes=c("Comp"),
-                               states=c("Comp.")
-                               )
-
-data.frame("Offr.1"=NULL,"Offr.2"=NULL,"Offr.3.4"=NULL,"Offr.5"=NULL)
 
 getEvidence(AircraftFind)
 querygrain(AircraftFind,"Offr")
-
-
-getEvidence(AircraftCompFind)
-querygrain(AircraftCompFind,"Offr")
 
 NotAircraftFind<- setEvidence(compGin, 
                               nodes=c("What"),
@@ -151,20 +180,12 @@ getEvidence(NotAircraftFind)
 querygrain(NotAircraftFind,"Offr")
 
 
-NotAircraftCompFind<- setEvidence(NotAircraftFind, 
-                                  nodes=c("Comp"),
-                                  states=c("Comp.")
-                                  )
-
-
-getEvidence(NotAircraftCompFind)
-querygrain(NotAircraftCompFind,"Offr")
 
 output<-data.frame(rbind(
     c(Control="Aircraft-All",unlist(querygrain(AircraftFind,"Offr"))),
-    c(Control="!Aircraft-All",unlist(querygrain(NotAircraftFind,"Offr"))),
-    c(Control="Aircraft-Comp",unlist(querygrain(AircraftCompFind,"Offr"))),
-    c(Control="!Aircraft-Comp",unlist(querygrain(NotAircraftCompFind,"Offr")))
+    c(Control="!Aircraft-All",unlist(querygrain(NotAircraftFind,"Offr")))
+    #     c(Control="Aircraft-Comp",unlist(querygrain(AircraftCompFind,"Offr"))),
+    #     c(Control="!Aircraft-Comp",unlist(querygrain(NotAircraftCompFind,"Offr")))
     ))
 names(output)[1]<-"Control"
 output$Offr.1<-as.numeric(as.character(output$Offr.1))
@@ -214,17 +235,9 @@ LargeCeilFind<- setEvidence(compGin,
                             states=c("[30m+]")
                             )
 
-LargeCeilCompFind<- setEvidence(LargeCeilFind, 
-                                nodes=c("Comp"),
-                                states=c("Comp.")
-                                )
-
-
 getEvidence(LargeCeilFind)
 querygrain(LargeCeilFind,"Offr")
 
-getEvidence(LargeCeilCompFind)
-querygrain(LargeCeilCompFind,"Offr")
 
 
 NotLargeCeilFind<- setEvidence(compGin, 
@@ -238,22 +251,15 @@ getEvidence(NotLargeCeilFind)
 querygrain(NotLargeCeilFind,"Offr")
 
 
-NotLargeCeilCompFind<- setEvidence(NotLargeCeilFind, 
-                                   nodes=c("Comp"),
-                                   states=c("Comp.")
-                                   )
 
-
-getEvidence(NotLargeCeilCompFind)
-querygrain(NotLargeCeilCompFind,"Offr")
 
 
 
 output<-data.frame(rbind(
     c(Control="LargeCeil-All",unlist(querygrain(LargeCeilFind,"Offr"))),
-    c(Control="!LargeCeil-All",unlist(querygrain(NotLargeCeilFind,"Offr"))),
-    c(Control="LargeCeil-Comp",unlist(querygrain(LargeCeilCompFind,"Offr"))),
-    c(Control="!LargeCeil-Comp",unlist(querygrain(NotLargeCeilCompFind,"Offr")))
+    c(Control="!LargeCeil-All",unlist(querygrain(NotLargeCeilFind,"Offr")))
+    #     c(Control="LargeCeil-Comp",unlist(querygrain(LargeCeilCompFind,"Offr"))),
+    #     c(Control="!LargeCeil-Comp",unlist(querygrain(NotLargeCeilCompFind,"Offr")))
     ))
 output$Offr.1<-as.numeric(as.character(output$Offr.1))
 output$Offr.2<-as.numeric(as.character(output$Offr.2))
@@ -286,17 +292,8 @@ SmallCeilFind<- setEvidence(compGin,
                             states=c(list(c("[0,15k)","[15k,100k)")))
                             )
 
-SmallCeilCompFind<- setEvidence(SmallCeilFind, 
-                                nodes=c("Comp"),
-                                states=c("Comp.")
-                                )
-
-
 getEvidence(SmallCeilFind)
 querygrain(SmallCeilFind,"Offr")
-
-getEvidence(SmallCeilCompFind)
-querygrain(SmallCeilCompFind,"Offr")
 
 
 NotSmallCeilFind<- setEvidence(compGin, 
@@ -310,17 +307,7 @@ getEvidence(NotSmallCeilFind)
 querygrain(NotSmallCeilFind,"Offr")
 
 
-NotSmallCeilCompFind<- setEvidence(NotSmallCeilFind, 
-                                   nodes=c("Comp"),
-                                   states=c("Comp.")
-                                   )
 
-
-getEvidence(NotSmallCeilCompFind)
-querygrain(NotSmallCeilCompFind,"Offr")
-
-rm(SmallCeilFind,NotSmallCeilFind)
-rm(SmallCeilCompFind,NotSmallCeilCompFind)
 
 
 VerySmallCeilFind<- setEvidence(compGin, 
@@ -328,17 +315,8 @@ VerySmallCeilFind<- setEvidence(compGin,
                                 states=c("[0,15k)")
                                 )
 
-VerySmallCeilCompFind<- setEvidence(VerySmallCeilFind, 
-                                    nodes=c("Comp"),
-                                    states=c("Comp.")
-                                    )
-
-
 getEvidence(VerySmallCeilFind)
 querygrain(VerySmallCeilFind,"Offr")
-
-getEvidence(VerySmallCeilCompFind)
-querygrain(VerySmallCeilCompFind,"Offr")
 
 
 NotVerySmallCeilFind<- setEvidence(compGin, 
@@ -351,17 +329,9 @@ getEvidence(NotVerySmallCeilFind)
 querygrain(NotVerySmallCeilFind,"Offr")
 
 
-NotVerySmallCeilCompFind<- setEvidence(NotVerySmallCeilFind, 
-                                       nodes=c("Comp"),
-                                       states=c("Comp.")
-                                       )
-
-
-getEvidence(NotVerySmallCeilCompFind)
-querygrain(NotVerySmallCeilCompFind,"Offr")
 
 rm(NotVerySmallCeilFind,VerySmallCeilFind)
-rm(NotVerySmallCeilCompFind,VerySmallCeilCompFind)
+
 
 
 
@@ -397,16 +367,16 @@ output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
-output<-rbind(output,
-              c(Control="Under1mCeil",Comp="Comp",unlist(querygrain(setEvidence(Under1mCeilCompFind, 
-                                                                                 nodes=c("Comp"),
-                                                                                 states=c("Comp.")
-                                                                                 ),"Offr"))),
-              c(Control="!Under1mCeil",Comp="Comp",unlist(querygrain(setEvidence(NotUnder1mCeilCompFind, 
-                                                                                 nodes=c("Comp"),
-                                                                                 states=c("Comp.")
-                                                                                 ),"Offr")))
-              )
+# output<-rbind(output,
+#               c(Control="Under1mCeil",Comp="Comp",unlist(querygrain(setEvidence(Under1mCeilCompFind, 
+#                                                                                  nodes=c("Comp"),
+#                                                                                  states=c("Comp.")
+#                                                                                  ),"Offr"))),
+#               c(Control="!Under1mCeil",Comp="Comp",unlist(querygrain(setEvidence(NotUnder1mCeilCompFind, 
+#                                                                                  nodes=c("Comp"),
+#                                                                                  states=c("Comp.")
+#                                                                                  ),"Offr")))
+#               )
 
 output$Offr.1<-as.numeric(as.character(output$Offr.1))
 output$Offr.2<-as.numeric(as.character(output$Offr.2))
@@ -441,17 +411,10 @@ IDVFind<- setEvidence(compGin,
                       states=c("IDV")
                       )
 
-IDVCompFind<- setEvidence(IDVFind, 
-                          nodes=c("Comp"),
-                          states=c("Comp.")
-                          )
-
 
 getEvidence(IDVFind)
 querygrain(IDVFind,"Offr")
 
-getEvidence(IDVCompFind)
-querygrain(IDVCompFind,"Offr")
 
 
 NotIDVFind<- setEvidence(compGin, 
@@ -465,22 +428,13 @@ getEvidence(NotIDVFind)
 querygrain(NotIDVFind,"Offr")
 
 
-NotIDVCompFind<- setEvidence(NotIDVFind, 
-                             nodes=c("Comp"),
-                             states=c("Comp.")
-                             )
-
-
-getEvidence(NotIDVCompFind)
-querygrain(NotIDVCompFind,"Offr")
-
 
 
 output<-data.frame(rbind(
     c(Control="IDV-All",unlist(querygrain(IDVFind,"Offr"))),
-    c(Control="!IDV-All",unlist(querygrain(NotIDVFind,"Offr"))),
-    c(Control="IDV-Comp",unlist(querygrain(IDVCompFind,"Offr"))),
-    c(Control="!IDV-Comp",unlist(querygrain(NotIDVCompFind,"Offr")))
+    c(Control="!IDV-All",unlist(querygrain(NotIDVFind,"Offr")))
+    #     c(Control="IDV-Comp",unlist(querygrain(IDVCompFind,"Offr"))),
+    #     c(Control="!IDV-Comp",unlist(querygrain(NotIDVCompFind,"Offr")))
     ))
 output$Offr.1<-as.numeric(as.character(output$Offr.1))
 output$Offr.2<-as.numeric(as.character(output$Offr.2))
@@ -511,18 +465,10 @@ LongDurFind<- setEvidence(compGin,
 
 getEvidence(LongDurFind)
 
-LongDurCompFind<- setEvidence(LongDurFind, 
-                              nodes=c("Comp"),
-                              states=c("Comp.")
-                              )
-getEvidence(LongDurCompFind)
-
 
 getEvidence(LongDurFind)
 querygrain( LongDurFind,"Offr")
 
-getEvidence(LongDurCompFind)
-querygrain(LongDurCompFind,"Offr")
 
 
 NotLongDurFind<- setEvidence(compGin, 
@@ -536,21 +482,11 @@ getEvidence(NotLongDurFind)
 querygrain(NotLongDurFind,"Offr")
 
 
-NotLongDurCompFind<- setEvidence(NotLongDurFind, 
-                                 nodes=c("Comp"),
-                                 states=c("Comp.")
-                                 )
-
-
-getEvidence(NotLongDurCompFind)
-querygrain(NotLongDurCompFind,"Offr")
-
-
 output<-data.frame(rbind(
     c(Control="LongDur-All",unlist(querygrain(LongDurFind,"Offr"))),
-    c(Control="!LongDur-All",unlist(querygrain(NotLongDurFind,"Offr"))),
-    c(Control="LongDur-Comp",unlist(querygrain(LongDurCompFind,"Offr"))),
-    c(Control="!LongDur-Comp",unlist(querygrain(NotLongDurCompFind,"Offr")))
+    c(Control="!LongDur-All",unlist(querygrain(NotLongDurFind,"Offr")))
+    #     c(Control="LongDur-Comp",unlist(querygrain(LongDurCompFind,"Offr"))),
+    #     c(Control="!LongDur-Comp",unlist(querygrain(NotLongDurCompFind,"Offr")))
     ))
 output$Offr.1<-as.numeric(as.character(output$Offr.1))
 output$Offr.2<-as.numeric(as.character(output$Offr.2))
@@ -599,31 +535,97 @@ The hypothesis is supported with regard to number of offers. Larger fixed-price 
 
 unlist(compGin$universe$levels["Ceil"])
 
-largeRnDfind<- setEvidence(compGin, 
-                           nodes=c("PSR","Ceil"),
-                           states=c("R&D","[30m+]")
-                           )
+RNodes<-c("PSR","Ceil")
+RStates<-c("R&D","[30m+]")
+RVariable<-"LargeRnDcomp"
+# debug(QueryCrossSectionOnNodeFxCbDF)
+output<-QueryCrossSectionOnNodeFxCbDF(setEvidence(compGin, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"None"
+                                      )
+    
 
-getEvidence(largeRnDfind)
 
-largeRnDcompFind<- setEvidence(largeRnDfind, 
-                               nodes=c("Comp"),
-                               states=c("Comp.")
-                               )
-getEvidence(largeRnDcompFind)
 
-FxCBresult<-QueryCrossSectionOnNode(largeRnDcompFind,"FxCb","Offr")
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(AircraftFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"Aircraft"
+                                      )
+              )
 
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotAircraftFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotAircraft"
+                                      )
+              )
 
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(IDVFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"IDV"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotIDVFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotIDV"
+                                      )
+              )
+
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LongDurFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"LongDur"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLongDurFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotLongDur"
+                                      )
+              )
+
+
+kable(output,decimals=4)
 
 ``` 
 
@@ -646,30 +648,143 @@ The hypothesis was not supported with regard to number of offers, but this shoul
 
 unlist(compGin$universe$levels["Link"])
 
-HighLinkFind<- setEvidence(compGin, 
-                           nodes=c("Link"),
-                           states=c("[  750,67263]")
-                           )
+RNodes<-c("Link")
+RStates<-c("[  750,67263]")
+RVariable<-"HighLink"
+# debug(QueryCrossSectionOnNodeFxCbDF)
+output<-QueryCrossSectionOnNodeFxCbDF(setEvidence(compGin, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"None"
+                                      )
+    
 
-getEvidence(HighLinkFind)
 
-HighLinkCompFind<- setEvidence(HighLinkFind, 
-                               nodes=c("Comp"),
-                               states=c("Comp.")
-                               )
-getEvidence(HighLinkCompFind)
 
-FxCBresult<-QueryCrossSectionOnNode(HighLinkCompFind,"FxCb","Offr")
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(AircraftFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"Aircraft"
+                                      )
+              )
 
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotAircraftFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotAircraft"
+                                      )
+              )
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LargeCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"LargeCeil"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLargeCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotLargeCeil"
+                                      )
+              )
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(IDVFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"IDV"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotIDVFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotIDV"
+                                      )
+              )
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(Under1mCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"Under1mCeil"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotUnder1mCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotUnder1mCeil"
+                                      )
+              )
+
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LongDurFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"LongDur"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLongDurFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotLongDur"
+                                      )
+              )
+
+
+kable(output,decimals=4)
 
 
 ``` 
@@ -689,35 +804,125 @@ This was initially expected to be tested with a continuous value for length rath
 #Initial results
 The hypothesis regarding number of offers was not supported at the greater than 1 year level. Further subdivision into 2 year plus or other breakdowns might show a different result. Combination resembled fixed-price, but did not do as well with 5 or more offers.
 
-```{r H3MDAP}
+```{r H4LongDur}
 
 unlist(compGin$universe$levels["Dur"])
 
-LongDurFind<- setEvidence(compGin, 
-                          nodes=c("Dur"),
-                          states=c("[  366,33192]")
-                          )
 
-getEvidence(LongDurFind)
+RNodes<-c("Dur")
+RStates<-c("[  366,33192]")
+RVariable<-"LongDur"
+# debug(QueryCrossSectionOnNodeFxCbDF)
+output<-QueryCrossSectionOnNodeFxCbDF(setEvidence(compGin, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"None"
+                                      )
+    
 
-LongDurCompFind<- setEvidence(LongDurFind, 
-                              nodes=c("Comp"),
-                              states=c("Comp.")
-                              )
-getEvidence(LongDurCompFind)
 
 
-FxCBresult<-QueryCrossSectionOnNode(LongDurCompFind,"FxCb","Offr")
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(AircraftFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"Aircraft"
+                                      )
+              )
 
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotAircraftFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotAircraft"
+                                      )
+              )
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LargeCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"LargeCeil"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLargeCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotLargeCeil"
+                                      )
+              )
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(IDVFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"IDV"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotIDVFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotIDV"
+                                      )
+              )
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(Under1mCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"Under1mCeil"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotUnder1mCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotUnder1mCeil"
+                                      )
+              )
+
+
+
+kable(output,decimals=4)
 
 
 ``` 
@@ -760,56 +965,150 @@ Electronics and communications services do have a slight preference for fixed-pr
 
 unlist(compGin$universe$levels["PSR"])
 
-SoftwareFind<- setEvidence(compGin, 
-                           nodes=c("What","PSR"),
-                           states=c("Electronics and Communications","Services"))
 
+unlist(compGin$universe$levels["What"])
 
-getEvidence(SoftwareFind)
-
-SoftwareCompFind<- setEvidence(SoftwareFind, 
-                               nodes=c("Comp"),
-                               states=c("Comp.")
-                               )
-getEvidence(SoftwareCompFind)
-
-
-FxCBresult<-QueryCrossSectionOnNode(SoftwareCompFind,"FxCb","Offr")
-
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
-
-SoftwareFind<- setEvidence(compGin, 
-                           nodes=c("What","PSR"),
-                           states=c("Electronics and Communications",list(c("Services","R&D")))
-                           )
-getEvidence(SoftwareFind)
-
-SoftwareCompFind<- setEvidence(SoftwareFind, 
-                               nodes=c("Comp"),
-                               states=c("Comp.")
-                               )
-
-FxCBresult<-QueryCrossSectionOnNode(SoftwareCompFind,"FxCb","Offr")
+RNodes<-c("What","PSR")
+RStates<-c("Electronics and Communications","Services")
+RVariable<-"Software"
+# debug(QueryCrossSectionOnNodeFxCbDF)
+output<-QueryCrossSectionOnNodeFxCbDF(setEvidence(compGin, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"None"
+                                      )
+    
 
 
 
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LargeCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"LargeCeil"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLargeCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotLargeCeil"
+                                      )
+              )
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(IDVFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"IDV"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotIDVFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotIDV"
+                                      )
+              )
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(Under1mCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"Under1mCeil"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotUnder1mCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotUnder1mCeil"
+                                      )
+              )
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LongDurFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"LongDur"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLongDurFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotLongDur"
+                                      )
+              )
+
+
+kable(output,decimals=4)
+
+
+# 
+# SoftwareFind<- setEvidence(compGin, 
+#                            nodes=c("What","PSR"),
+#                            states=c("Electronics and Communications",list(c("Services","R&D")))
+#                            )
+# getEvidence(SoftwareFind)
+# 
+# SoftwareCompFind<- setEvidence(SoftwareFind, 
+#                                nodes=c("Comp"),
+#                                states=c("Comp.")
+#                                )
+# 
+# FxCbResult<-QueryCrossSectionOnNode(SoftwareCompFind,"FxCb","Offr")
+# 
+# 
+# 
+# #Combination
+# FxCbResult[1,1]
+# FxCbResult[1,2]
+# #Cost-plus
+# FxCbResult[2,1]
+# FxCbResult[2,2]
+# #Fixed-price
+# FxCbResult[3,1]
+# FxCbResult[3,2]
 
 ``` 
 
