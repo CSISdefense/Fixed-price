@@ -18,7 +18,17 @@
 ## Loading required package: lattice
 ## Loading required package: survival
 ## Loading required package: Formula
-## Loading required package: ggplot2
+## 
+## Attaching package: 'Hmisc'
+## 
+## The following objects are masked from 'package:plyr':
+## 
+##     is.discrete, summarize
+## 
+## The following objects are masked from 'package:base':
+## 
+##     format.pval, round.POSIXt, trunc.POSIXt, units
+## 
 ## Loading required package: Matrix
 ## Loading required package: gRain
 ## Loading required package: gRbase
@@ -958,11 +968,19 @@ RVariable=c("Products")
 
 output<-data.frame(rbind(
     c(Variable=RVariable,Control="None",Comp="All",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(compGin, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="None",Comp="Comp",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(compGin, 
                                     nodes=c(RNodes,"Comp"),
                                     states=c(RStates, "Comp.")
@@ -973,6 +991,7 @@ output<-data.frame(rbind(
 
 output$Control<-as.character(output$Control)
 output$Comp<-as.character(output$Comp)
+output$pFinding<-as.character(output$pFinding)
 output$Offr.1<-as.numeric(as.character(output$Offr.1))
 output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
@@ -981,11 +1000,19 @@ output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
 output<-rbind(output,
     c(Variable=RVariable,Control="Aircraft",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(AircraftFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(AircraftFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!Aircraft",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotAircraftFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotAircraftFind, 
                                     nodes=RNodes,
                                     states=RStates
@@ -995,11 +1022,19 @@ output<-rbind(output,
 
 output<-rbind(output,
               c(Variable=RVariable,Control="Aircraft",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(AircraftFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(AircraftFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!Aircraft",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotAircraftFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotAircraftFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
@@ -1007,60 +1042,86 @@ output<-rbind(output,
               )
 
 
+
 output<-rbind(output,
     c(Variable=RVariable,Control="LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(LargeCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotLargeCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
 
 output<-rbind(output,
               c(Variable=RVariable,Control="LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(LargeCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotLargeCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr")))
               )
 
-output$Offr.1<-as.numeric(as.character(output$Offr.1))
-output$Offr.2<-as.numeric(as.character(output$Offr.2))
-output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
-output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
-
-
 output<-rbind(output,
     c(Variable=RVariable,Control="Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(Under1mCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
+
 
 output<-rbind(output,
               c(Variable=RVariable,Control="Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(Under1mCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
@@ -1068,27 +1129,45 @@ output<-rbind(output,
               )
 
 
+
+
 output<-rbind(output,
     c(Variable=RVariable,Control="IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(IDVFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotIDVFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
+
 
 output<-rbind(output,
               c(Variable=RVariable,Control="IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(IDVFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotIDVFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
@@ -1098,25 +1177,41 @@ output<-rbind(output,
 
 output<-rbind(output,
     c(Variable=RVariable,Control="LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(LongDurFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotLongDurFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
+
 
 output<-rbind(output,
               c(Variable=RVariable,Control="LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(LongDurFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotLongDurFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
@@ -1124,66 +1219,70 @@ output<-rbind(output,
               )
 
 
+output$pFinding<-as.numeric(as.character(output$pFinding))
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+
 kable(output,digits=4)
 ```
 
 
 
-Variable   Control        Comp   Offr.1              Offr.2              Offr.3.4            Offr.5.           
----------  -------------  -----  ------------------  ------------------  ------------------  ------------------
-Products   None           All    0.32585533604941    0.176572849775149   0.202611606399363   0.294960207776077 
-Products   None           Comp   0.184540545483185   0.213556143992667   0.244894224716868   0.357009085807281 
-Products   Aircraft       All    0.53234828828525    0.184886201740667   0.129154062733427   0.153611447240655 
-Products   !Aircraft      All    0.298942413265389   0.175489342579858   0.212185575773036   0.313382668381717 
-Products   Aircraft       Comp   0.25156710157878    0.298149438450373   0.20633270427346    0.243950755697387 
-Products   !Aircraft      Comp   0.178253658977912   0.205621551014264   0.248511177707152   0.367613612300672 
-Products   LargeCeil      All    0.366404055696933   0.163677001326768   0.186362133936612   0.283556809039687 
-Products   !LargeCeil     All    0.325839209457484   0.176577978570516   0.202618068961282   0.294964743010718 
-Products   LargeCeil      Comp   0.180129037447518   0.211706408077127   0.240555424897213   0.367609129578143 
-Products   !LargeCeil     Comp   0.184542184154049   0.213556831083867   0.244895836379998   0.357005148382085 
-Products   Under1mCeil    All    0.325032408418113   0.176695001116595   0.202811303109247   0.295461287356045 
-Products   !Under1mCeil   All    0.415562441483184   0.163257167023505   0.180842725240148   0.240337666253163 
-Products   Under1mCeil    Comp   0.18399298930086    0.213591538829511   0.245002526391944   0.357412945477685 
-Products   !Under1mCeil   Comp   0.248002811637989   0.209453849782817   0.232341960765551   0.310201377813644 
-Products   IDV            All    0.258640543508096   0.198679353777492   0.208416032472314   0.334264070242098 
-Products   !IDV           All    0.32585533604941    0.176572849775149   0.202611606399363   0.294960207776077 
-Products   IDV            Comp   0.129705279842264   0.233022424063301   0.244136653420048   0.393135642674386 
-Products   !IDV           Comp   0.184540545483185   0.213556143992667   0.244894224716868   0.357009085807281 
-Products   LongDur        All    0.580210242434576   0.144102103108725   0.125499415988157   0.150188238468542 
-Products   !LongDur       All    0.32585533604941    0.176572849775149   0.202611606399363   0.294960207776077 
-Products   LongDur        Comp   0.253936239215701   0.256393187033641   0.221821252969159   0.267849320781499 
-Products   !LongDur       Comp   0.184540545483185   0.213556143992667   0.244894224716868   0.357009085807281 
-
-
+Variable   Control        Comp    pFinding   Offr.1   Offr.2   Offr.3.4   Offr.5.
+---------  -------------  -----  ---------  -------  -------  ---------  --------
+Products   None           All       0.8091   0.3259   0.1766     0.2026    0.2950
+Products   None           Comp      0.6634   0.1845   0.2136     0.2449    0.3570
+Products   Aircraft       All       0.0933   0.5323   0.1849     0.1292    0.1536
+Products   !Aircraft      All       0.7158   0.2989   0.1755     0.2122    0.3134
+Products   Aircraft       Comp      0.0569   0.2516   0.2981     0.2063    0.2440
+Products   !Aircraft      Comp      0.6065   0.1783   0.2056     0.2485    0.3676
+Products   LargeCeil      All       0.0003   0.3664   0.1637     0.1864    0.2836
+Products   !LargeCeil     All       0.8087   0.3258   0.1766     0.2026    0.2950
+Products   LargeCeil      Comp      0.0002   0.1801   0.2117     0.2406    0.3676
+Products   !LargeCeil     Comp      0.6632   0.1845   0.2136     0.2449    0.3570
+Products   Under1mCeil    All       0.8017   0.3250   0.1767     0.2028    0.2955
+Products   !Under1mCeil   All       0.0074   0.4156   0.1633     0.1808    0.2403
+Products   Under1mCeil    Comp      0.6578   0.1840   0.2136     0.2450    0.3574
+Products   !Under1mCeil   Comp      0.0057   0.2480   0.2095     0.2323    0.3102
+Products   IDV            All       0.5136   0.2586   0.1987     0.2084    0.3343
+Products   !IDV           All       0.8091   0.3259   0.1766     0.2026    0.2950
+Products   IDV            Comp      0.4359   0.1297   0.2330     0.2441    0.3931
+Products   !IDV           Comp      0.6634   0.1845   0.2136     0.2449    0.3570
+Products   LongDur        All       0.0267   0.5802   0.1441     0.1255    0.1502
+Products   !LongDur       All       0.8091   0.3259   0.1766     0.2026    0.2950
+Products   LongDur        Comp      0.0147   0.2539   0.2564     0.2218    0.2678
+Products   !LongDur       Comp      0.6634   0.1845   0.2136     0.2449    0.3570
 
 
 ```r
-unlist(compGin$universe$levels["What"])
+unlist(compGin$universe$levels["PSR"])
 ```
 
-```
-##                            What1                            What2 
-##            "Aircraft and Drones" "Electronics and Communications" 
-##                            What3                            What4 
-##    "Facilities and Construction"                  "Land Vehicles" 
-##                            What5                            What6 
-##      "Missile and Space Systems"                          "Other" 
-##                            What7                            What8 
-##             "Ships & Submarines"         "Weapons and Ammunition"
-```
+      PSR1       PSR2       PSR3 
+"Products"      "R&D" "Services" 
 
 ```r
-RNodes=c("What")
-RStates=c("Missile and Space Systems")
-RVariable=c("MnS")
+RNodes=c("PSR")
+RStates=c("Services")
+RVariable=c("Services")
 
 output<-data.frame(rbind(
     c(Variable=RVariable,Control="None",Comp="All",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(compGin, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="None",Comp="Comp",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(compGin, 
                                     nodes=c(RNodes,"Comp"),
                                     states=c(RStates, "Comp.")
@@ -1194,19 +1293,29 @@ output<-data.frame(rbind(
 
 output$Control<-as.character(output$Control)
 output$Comp<-as.character(output$Comp)
+output$pFinding<-as.character(output$pFinding)
 output$Offr.1<-as.numeric(as.character(output$Offr.1))
 output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
+
 output<-rbind(output,
-    c(Variable=RVariable,Control="LargeCeil",Comp="All",
-      unlist(querygrain(setEvidence(LargeCeilFind, 
+    c(Variable=RVariable,Control="Aircraft",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(AircraftFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(AircraftFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
-    c(Variable=RVariable,Control="!LargeCeil",Comp="All",
-      unlist(querygrain(setEvidence(NotLargeCeilFind, 
+    c(Variable=RVariable,Control="!Aircraft",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotAircraftFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotAircraftFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
@@ -1214,45 +1323,107 @@ output<-rbind(output,
     
 
 output<-rbind(output,
+              c(Variable=RVariable,Control="Aircraft",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(AircraftFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(AircraftFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!Aircraft",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotAircraftFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotAircraftFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+output<-rbind(output,
               c(Variable=RVariable,Control="LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(LargeCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotLargeCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr")))
               )
 
-output$Offr.1<-as.numeric(as.character(output$Offr.1))
-output$Offr.2<-as.numeric(as.character(output$Offr.2))
-output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
-output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
-
-
 output<-rbind(output,
     c(Variable=RVariable,Control="Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(Under1mCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
+
 
 output<-rbind(output,
               c(Variable=RVariable,Control="Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(Under1mCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
@@ -1260,27 +1431,45 @@ output<-rbind(output,
               )
 
 
+
+
 output<-rbind(output,
     c(Variable=RVariable,Control="IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(IDVFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotIDVFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
+
 
 output<-rbind(output,
               c(Variable=RVariable,Control="IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(IDVFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotIDVFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
@@ -1290,25 +1479,41 @@ output<-rbind(output,
 
 output<-rbind(output,
     c(Variable=RVariable,Control="LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(LongDurFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotLongDurFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
+
 
 output<-rbind(output,
               c(Variable=RVariable,Control="LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(LongDurFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotLongDurFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
@@ -1316,31 +1521,345 @@ output<-rbind(output,
               )
 
 
+output$pFinding<-as.numeric(as.character(output$pFinding))
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+
 kable(output,digits=4)
 ```
 
 
 
-Variable   Control        Comp   Offr.1              Offr.2              Offr.3.4            Offr.5.           
----------  -------------  -----  ------------------  ------------------  ------------------  ------------------
-MnS        None           All    0.513734965743959   0.15113167446621    0.128444645092375   0.206688714697455 
-MnS        None           Comp   0.285868982194464   0.222147953019645   0.186136878837809   0.305846185948082 
-MnS        LargeCeil      All    0.597382699811705   0.111713813559634   0.176747997139016   0.114155489489645 
-MnS        !LargeCeil     All    0.513100911342688   0.151430464008749   0.128078503040798   0.207390121607764 
-MnS        LargeCeil      Comp   0.411986669388489   0.15828347557486    0.261519047241652   0.168210807795    
-MnS        !LargeCeil     Comp   0.28491309780964    0.222632001356501   0.18556553441123    0.306889366422628 
-MnS        Under1mCeil    All    0.507899771310608   0.150244256381089   0.125891886208267   0.215964086100036 
-MnS        !Under1mCeil   All    0.568227654453285   0.159418938587382   0.15228390131777    0.120069505641563 
-MnS        Under1mCeil    Comp   0.275698670714301   0.22133966561529    0.182482112599631   0.320479551070779 
-MnS        !Under1mCeil   Comp   0.378565750939997   0.229515046028309   0.219448053373635   0.172471149658059 
-MnS        IDV            All    0.524303989728478   0.190365975023001   0.161967126414584   0.123362908833938 
-MnS        !IDV           All    0.513734965743959   0.15113167446621    0.128444645092375   0.206688714697455 
-MnS        IDV            Comp   0.303854579203659   0.280294436105268   0.23289277009286    0.182958214598213 
-MnS        !IDV           Comp   0.285868982194464   0.222147953019645   0.186136878837809   0.305846185948082 
-MnS        LongDur        All    0.457270693941006   0.184632535761563   0.127943966934135   0.230152803363297 
-MnS        !LongDur       All    0.513734965743959   0.15113167446621    0.128444645092375   0.206688714697455 
-MnS        LongDur        Comp   0.284211450667344   0.243686004888459   0.16727447070069    0.304828073743507 
-MnS        !LongDur       Comp   0.285868982194464   0.222147953019645   0.186136878837809   0.305846185948082 
+Variable   Control        Comp    pFinding   Offr.1   Offr.2   Offr.3.4   Offr.5.
+---------  -------------  -----  ---------  -------  -------  ---------  --------
+Services   None           All       0.1819   0.4487   0.1571     0.1812    0.2129
+Services   None           Comp      0.1315   0.2478   0.2136     0.2470    0.2916
+Services   Aircraft       All       0.0027   0.6415   0.1552     0.1464    0.0568
+Services   !Aircraft      All       0.1792   0.4458   0.1572     0.1818    0.2153
+Services   Aircraft       Comp      0.0014   0.2904   0.3080     0.2908    0.1108
+Services   !Aircraft      Comp      0.1301   0.2474   0.2126     0.2466    0.2934
+Services   LargeCeil      All       0.0006   0.3433   0.1238     0.1693    0.3637
+Services   !LargeCeil     All       0.1814   0.4490   0.1572     0.1813    0.2125
+Services   LargeCeil      Comp      0.0004   0.1330   0.1631     0.2196    0.4843
+Services   !LargeCeil     Comp      0.1311   0.2482   0.2138     0.2471    0.2910
+Services   Under1mCeil    All       0.1703   0.4504   0.1587     0.1814    0.2095
+Services   !Under1mCeil   All       0.0116   0.4242   0.1341     0.1791    0.2626
+Services   Under1mCeil    Comp      0.1231   0.2505   0.2156     0.2472    0.2867
+Services   !Under1mCeil   Comp      0.0084   0.2081   0.1839     0.2450    0.3631
+Services   IDV            All       0.1285   0.3879   0.1754     0.1918    0.2449
+Services   !IDV           All       0.1819   0.4487   0.1571     0.1812    0.2129
+Services   IDV            Comp      0.0986   0.2125   0.2246     0.2461    0.3168
+Services   !IDV           Comp      0.1315   0.2478   0.2136     0.2470    0.2916
+Services   LongDur        All       0.0263   0.4722   0.1466     0.1648    0.2163
+Services   !LongDur       All       0.1819   0.4487   0.1571     0.1812    0.2129
+Services   LongDur        Comp      0.0184   0.2548   0.2063     0.2321    0.3069
+Services   !LongDur       Comp      0.1315   0.2478   0.2136     0.2470    0.2916
+
+
+
+```r
+unlist(compGin$universe$levels["PSR"])
+```
+
+      PSR1       PSR2       PSR3 
+"Products"      "R&D" "Services" 
+
+```r
+RNodes=c("PSR")
+RStates=c("R&D")
+RVariable=c("R&D")
+
+output<-data.frame(rbind(
+    c(Variable=RVariable,Control="None",Comp="All",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(compGin, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="None",Comp="Comp",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(compGin, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    ),"Offr")))
+    )
+    )
+
+
+output$Control<-as.character(output$Control)
+output$Comp<-as.character(output$Comp)
+output$pFinding<-as.character(output$pFinding)
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="Aircraft",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(AircraftFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(AircraftFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!Aircraft",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotAircraftFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotAircraftFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+    
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="Aircraft",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(AircraftFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(AircraftFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!Aircraft",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotAircraftFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotAircraftFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(LargeCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotLargeCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(Under1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(Under1mCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(IDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotIDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(IDVFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotIDVFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(LongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(LongDurFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotLongDurFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+output$pFinding<-as.numeric(as.character(output$pFinding))
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+
+kable(output,digits=4)
+```
+
+
+
+Variable   Control        Comp    pFinding   Offr.1   Offr.2   Offr.3.4   Offr.5.
+---------  -------------  -----  ---------  -------  -------  ---------  --------
+R&D        None           All       0.0090   0.4735   0.1605     0.1316    0.2344
+R&D        None           Comp      0.0071   0.3372   0.2018     0.1653    0.2957
+R&D        Aircraft       All       0.0006   0.5387   0.1767     0.1414    0.1432
+R&D        !Aircraft      All       0.0084   0.4690   0.1594     0.1309    0.2407
+R&D        Aircraft       Comp      0.0004   0.3318   0.2561     0.2046    0.2075
+R&D        !Aircraft      Comp      0.0067   0.3375   0.1986     0.1629    0.3010
+R&D        LargeCeil      All       0.0001   0.4078   0.1727     0.1844    0.2351
+R&D        !LargeCeil     All       0.0090   0.4739   0.1604     0.1313    0.2344
+R&D        LargeCeil      Comp      0.0000   0.2467   0.2190     0.2352    0.2992
+R&D        !LargeCeil     Comp      0.0071   0.3377   0.2017     0.1648    0.2957
+R&D        Under1mCeil    All       0.0076   0.4686   0.1603     0.1318    0.2393
+R&D        !Under1mCeil   All       0.0014   0.4991   0.1617     0.1304    0.2089
+R&D        Under1mCeil    Comp      0.0060   0.3350   0.2003     0.1646    0.3000
+R&D        !Under1mCeil   Comp      0.0011   0.3489   0.2100     0.1688    0.2723
+R&D        IDV            All       0.0041   0.5139   0.1655     0.1470    0.1736
+R&D        !IDV           All       0.0090   0.4735   0.1605     0.1316    0.2344
+R&D        IDV            Comp      0.0028   0.3041   0.2366     0.2099    0.2493
+R&D        !IDV           Comp      0.0071   0.3372   0.2018     0.1653    0.2957
+R&D        LongDur        All       0.0030   0.4717   0.1659     0.1242    0.2382
+R&D        !LongDur       All       0.0090   0.4735   0.1605     0.1316    0.2344
+R&D        LongDur        Comp      0.0023   0.3336   0.2090     0.1562    0.3012
+R&D        !LongDur       Comp      0.0071   0.3372   0.2018     0.1653    0.2957
+
 
 
 
@@ -1365,11 +1884,19 @@ RVariable=c("Air")
 
 output<-data.frame(rbind(
     c(Variable=RVariable,Control="None",Comp="All",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(compGin, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="None",Comp="Comp",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(compGin, 
                                     nodes=c(RNodes,"Comp"),
                                     states=c(RStates, "Comp.")
@@ -1380,65 +1907,92 @@ output<-data.frame(rbind(
 
 output$Control<-as.character(output$Control)
 output$Comp<-as.character(output$Comp)
+output$pFinding<-as.character(output$pFinding)
 output$Offr.1<-as.numeric(as.character(output$Offr.1))
 output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
+
 output<-rbind(output,
     c(Variable=RVariable,Control="LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(LargeCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotLargeCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
 
 output<-rbind(output,
               c(Variable=RVariable,Control="LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(LargeCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotLargeCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr")))
               )
 
-output$Offr.1<-as.numeric(as.character(output$Offr.1))
-output$Offr.2<-as.numeric(as.character(output$Offr.2))
-output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
-output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
-
-
 output<-rbind(output,
     c(Variable=RVariable,Control="Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(Under1mCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
+
 
 output<-rbind(output,
               c(Variable=RVariable,Control="Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(Under1mCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
@@ -1446,27 +2000,45 @@ output<-rbind(output,
               )
 
 
+
+
 output<-rbind(output,
     c(Variable=RVariable,Control="IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(IDVFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotIDVFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
+
 
 output<-rbind(output,
               c(Variable=RVariable,Control="IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(IDVFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotIDVFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
@@ -1476,58 +2048,337 @@ output<-rbind(output,
 
 output<-rbind(output,
     c(Variable=RVariable,Control="LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(LongDurFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotLongDurFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
+
 
 output<-rbind(output,
               c(Variable=RVariable,Control="LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(LongDurFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotLongDurFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr")))
               )
 
+output$pFinding<-as.numeric(as.character(output$pFinding))
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
 kable(output,digits=4)
 ```
 
 
 
-Variable   Control        Comp   Offr.1              Offr.2              Offr.3.4             Offr.5.            
----------  -------------  -----  ------------------  ------------------  -------------------  -------------------
-Air        None           All    0.535462548082371   0.184000537183175   0.129715477481769    0.150821437252685  
-Air        None           Comp   0.253016872490764   0.298087666293648   0.20827427355896     0.240621187656629  
-Air        LargeCeil      All    0.583217300504607   0.201775868520037   0.119997015664456    0.0950098153108999 
-Air        !LargeCeil     All    0.535413622723623   0.183982326127345   0.129725434171036    0.150878616977996  
-Air        LargeCeil      Comp   0.203879865353524   0.386140596921256   0.22899705778592     0.1809824799393    
-Air        !LargeCeil     Comp   0.253060013624886   0.298010357895937   0.208256079442838    0.240673549036338  
-Air        Under1mCeil    All    0.533402154835718   0.184497006079233   0.129649573250716    0.152451265834334  
-Air        !Under1mCeil   All    0.643022952101513   0.158082962890171   0.133155930283726    0.0657381547245907 
-Air        Under1mCeil    Comp   0.251867215881508   0.298074501789988   0.207532797890762    0.242525484437742  
-Air        !Under1mCeil   Comp   0.322813606113603   0.298886895687742   0.253289958489919    0.125009539708736  
-Air        IDV            All    0.624628089243093   0.238727897100677   0.0951235235673124   0.0415204900889172 
-Air        !IDV           All    0.535462548082371   0.184000537183175   0.129715477481769    0.150821437252685  
-Air        IDV            Comp   0.235897748040281   0.48631893370617    0.193348647471664    0.0844346707818849 
-Air        !IDV           Comp   0.253016872490764   0.298087666293648   0.20827427355896     0.240621187656629  
-Air        LongDur        All    0.657649267517146   0.155412445066161   0.0901269989182764   0.0968112884984163 
-Air        !LongDur       All    0.535462548082371   0.184000537183175   0.129715477481769    0.150821437252685  
-Air        LongDur        Comp   0.284709471070324   0.325906889621552   0.18785165086179     0.201531988446335  
-Air        !LongDur       Comp   0.253016872490764   0.298087666293648   0.20827427355896     0.240621187656629  
+Variable   Control        Comp    pFinding   Offr.1   Offr.2   Offr.3.4   Offr.5.
+---------  -------------  -----  ---------  -------  -------  ---------  --------
+Air        None           All       0.0966   0.5355   0.1840     0.1297    0.1508
+Air        None           Comp      0.0587   0.2530   0.2981     0.2083    0.2406
+Air        LargeCeil      All       0.0001   0.5832   0.2018     0.1200    0.0950
+Air        !LargeCeil     All       0.0965   0.5354   0.1840     0.1297    0.1509
+Air        LargeCeil      Comp      0.0001   0.2039   0.3861     0.2290    0.1810
+Air        !LargeCeil     Comp      0.0586   0.2531   0.2980     0.2083    0.2407
+Air        Under1mCeil    All       0.0948   0.5334   0.1845     0.1296    0.1525
+Air        !Under1mCeil   All       0.0018   0.6430   0.1581     0.1332    0.0657
+Air        Under1mCeil    Comp      0.0577   0.2519   0.2981     0.2075    0.2425
+Air        !Under1mCeil   Comp      0.0010   0.3228   0.2989     0.2533    0.1250
+Air        IDV            All       0.0497   0.6246   0.2387     0.0951    0.0415
+Air        !IDV           All       0.0966   0.5355   0.1840     0.1297    0.1508
+Air        IDV            Comp      0.0243   0.2359   0.4863     0.1933    0.0844
+Air        !IDV           Comp      0.0587   0.2530   0.2981     0.2083    0.2406
+Air        LongDur        All       0.0110   0.6576   0.1554     0.0901    0.0968
+Air        !LongDur       All       0.0966   0.5355   0.1840     0.1297    0.1508
+Air        LongDur        Comp      0.0052   0.2847   0.3259     0.1879    0.2015
+Air        !LongDur       Comp      0.0587   0.2530   0.2981     0.2083    0.2406
 
+
+
+```r
+unlist(compGin$universe$levels["What"])
+```
+
+                           What1                            What2 
+           "Aircraft and Drones" "Electronics and Communications" 
+                           What3                            What4 
+   "Facilities and Construction"                  "Land Vehicles" 
+                           What5                            What6 
+     "Missile and Space Systems"                          "Other" 
+                           What7                            What8 
+            "Ships & Submarines"         "Weapons and Ammunition" 
+
+```r
+RNodes=c("What")
+RStates=c("Missile and Space Systems")
+RVariable=c("MnS")
+
+output<-data.frame(rbind(
+    c(Variable=RVariable,Control="None",Comp="All",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(compGin, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="None",Comp="Comp",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(compGin, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    ),"Offr")))
+    )
+    )
+
+
+output$Control<-as.character(output$Control)
+output$Comp<-as.character(output$Comp)
+output$pFinding<-as.character(output$pFinding)
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(LargeCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotLargeCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(Under1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(Under1mCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(IDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotIDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(IDVFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotIDVFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(LongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(LongDurFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotLongDurFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+output$pFinding<-as.numeric(as.character(output$pFinding))
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+
+kable(output,digits=4)
+```
+
+
+
+Variable   Control        Comp    pFinding   Offr.1   Offr.2   Offr.3.4   Offr.5.
+---------  -------------  -----  ---------  -------  -------  ---------  --------
+MnS        None           All       0.0033   0.5137   0.1511     0.1284    0.2067
+MnS        None           Comp      0.0022   0.2859   0.2221     0.1861    0.3058
+MnS        LargeCeil      All       0.0000   0.5974   0.1117     0.1767    0.1142
+MnS        !LargeCeil     All       0.0033   0.5131   0.1514     0.1281    0.2074
+MnS        LargeCeil      Comp      0.0000   0.4120   0.1583     0.2615    0.1682
+MnS        !LargeCeil     Comp      0.0022   0.2849   0.2226     0.1856    0.3069
+MnS        Under1mCeil    All       0.0030   0.5079   0.1502     0.1259    0.2160
+MnS        !Under1mCeil   All       0.0003   0.5682   0.1594     0.1523    0.1201
+MnS        Under1mCeil    Comp      0.0020   0.2757   0.2213     0.1825    0.3205
+MnS        !Under1mCeil   Comp      0.0002   0.3786   0.2295     0.2194    0.1725
+MnS        IDV            All       0.0014   0.5243   0.1904     0.1620    0.1234
+MnS        !IDV           All       0.0033   0.5137   0.1511     0.1284    0.2067
+MnS        IDV            Comp      0.0009   0.3039   0.2803     0.2329    0.1830
+MnS        !IDV           Comp      0.0022   0.2859   0.2221     0.1861    0.3058
+MnS        LongDur        All       0.0007   0.4573   0.1846     0.1279    0.2302
+MnS        !LongDur       All       0.0033   0.5137   0.1511     0.1284    0.2067
+MnS        LongDur        Comp      0.0005   0.2842   0.2437     0.1673    0.3048
+MnS        !LongDur       Comp      0.0022   0.2859   0.2221     0.1861    0.3058
 
 
 
@@ -1552,11 +2403,19 @@ RVariable=c("EnC")
 
 output<-data.frame(rbind(
     c(Variable=RVariable,Control="None",Comp="All",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(compGin, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="None",Comp="Comp",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(compGin, 
                                     nodes=c(RNodes,"Comp"),
                                     states=c(RStates, "Comp.")
@@ -1567,65 +2426,92 @@ output<-data.frame(rbind(
 
 output$Control<-as.character(output$Control)
 output$Comp<-as.character(output$Comp)
+output$pFinding<-as.character(output$pFinding)
 output$Offr.1<-as.numeric(as.character(output$Offr.1))
 output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
+
 output<-rbind(output,
     c(Variable=RVariable,Control="LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(LargeCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotLargeCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
 
 output<-rbind(output,
               c(Variable=RVariable,Control="LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(LargeCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotLargeCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr")))
               )
 
-output$Offr.1<-as.numeric(as.character(output$Offr.1))
-output$Offr.2<-as.numeric(as.character(output$Offr.2))
-output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
-output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
-
-
 output<-rbind(output,
     c(Variable=RVariable,Control="Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(Under1mCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
+
 
 output<-rbind(output,
               c(Variable=RVariable,Control="Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(Under1mCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
@@ -1633,27 +2519,45 @@ output<-rbind(output,
               )
 
 
+
+
 output<-rbind(output,
     c(Variable=RVariable,Control="IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(IDVFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotIDVFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
+
 
 output<-rbind(output,
               c(Variable=RVariable,Control="IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(IDVFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotIDVFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
@@ -1663,57 +2567,78 @@ output<-rbind(output,
 
 output<-rbind(output,
     c(Variable=RVariable,Control="LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(LongDurFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotLongDurFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
+
 
 output<-rbind(output,
               c(Variable=RVariable,Control="LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(LongDurFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotLongDurFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr")))
               )
 
+output$pFinding<-as.numeric(as.character(output$pFinding))
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
 kable(output,digits=4)
 ```
 
 
 
-Variable   Control        Comp   Offr.1              Offr.2              Offr.3.4            Offr.5.           
----------  -------------  -----  ------------------  ------------------  ------------------  ------------------
-EnC        None           All    0.449693955945052   0.166410079105281   0.188562118805526   0.195333846144141 
-EnC        None           Comp   0.280688831247824   0.21749192823921    0.24577230770695    0.256046932806016 
-EnC        LargeCeil      All    0.451949517148704   0.1226209277        0.236541629032146   0.188887926119151 
-EnC        !LargeCeil     All    0.449690243714628   0.166482147830289   0.188483153536331   0.195344454918753 
-EnC        LargeCeil      Comp   0.260459613194215   0.163769732570821   0.32023541448944    0.255535239745524 
-EnC        !LargeCeil     Comp   0.280721247258987   0.217578014576798   0.245652985403225   0.25604775276099  
-EnC        Under1mCeil    All    0.448814565958883   0.16663637889646    0.189361973270468   0.19518708187419  
-EnC        !Under1mCeil   All    0.478609155825603   0.158969121398483   0.162262124385673   0.200159598390241 
-EnC        Under1mCeil    Comp   0.280067422462747   0.217647630823496   0.246632936984724   0.255652009729033 
-EnC        !Under1mCeil   Comp   0.301550201823034   0.212264822687587   0.216880044316606   0.269304931172773 
-EnC        IDV            All    0.459080421439392   0.189667075721695   0.180554674832546   0.170697828006367 
-EnC        !IDV           All    0.449693955945052   0.166410079105281   0.188562118805526   0.195333846144141 
-EnC        IDV            Comp   0.29665520655623    0.246998461463536   0.233293641578752   0.223052690401482 
-EnC        !IDV           Comp   0.280688831247824   0.21749192823921    0.24577230770695    0.256046932806016 
-EnC        LongDur        All    0.542771728930048   0.144822174553112   0.149896567746913   0.162509528769926 
-EnC        !LongDur       All    0.449693955945052   0.166410079105281   0.188562118805526   0.195333846144141 
-EnC        LongDur        Comp   0.292015467474901   0.22425739930699    0.230506717828618   0.253220415389492 
-EnC        !LongDur       Comp   0.280688831247824   0.21749192823921    0.24577230770695    0.256046932806016 
+Variable   Control        Comp    pFinding   Offr.1   Offr.2   Offr.3.4   Offr.5.
+---------  -------------  -----  ---------  -------  -------  ---------  --------
+EnC        None           All       0.1530   0.4497   0.1664     0.1886    0.1953
+EnC        None           Comp      0.1157   0.2807   0.2175     0.2458    0.2560
+EnC        LargeCeil      All       0.0003   0.4519   0.1226     0.2365    0.1889
+EnC        !LargeCeil     All       0.1527   0.4497   0.1665     0.1885    0.1953
+EnC        LargeCeil      Comp      0.0002   0.2605   0.1638     0.3202    0.2555
+EnC        !LargeCeil     Comp      0.1155   0.2807   0.2176     0.2457    0.2560
+EnC        Under1mCeil    All       0.1485   0.4488   0.1666     0.1894    0.1952
+EnC        !Under1mCeil   All       0.0045   0.4786   0.1590     0.1623    0.2002
+EnC        Under1mCeil    Comp      0.1124   0.2801   0.2176     0.2466    0.2557
+EnC        !Under1mCeil   Comp      0.0033   0.3016   0.2123     0.2169    0.2693
+EnC        IDV            All       0.0808   0.4591   0.1897     0.1806    0.1707
+EnC        !IDV           All       0.1530   0.4497   0.1664     0.1886    0.1953
+EnC        IDV            Comp      0.0613   0.2967   0.2470     0.2333    0.2231
+EnC        !IDV           Comp      0.1157   0.2807   0.2175     0.2458    0.2560
+EnC        LongDur        All       0.0150   0.5428   0.1448     0.1499    0.1625
+EnC        !LongDur       All       0.1530   0.4497   0.1664     0.1886    0.1953
+EnC        LongDur        Comp      0.0095   0.2920   0.2243     0.2305    0.2532
+EnC        !LongDur       Comp      0.1157   0.2807   0.2175     0.2458    0.2560
 
 
 
@@ -1732,16 +2657,24 @@ unlist(compGin$universe$levels["What"])
 
 ```r
 RNodes=c("What")
-RStates=c("Electronics and Communications")
-RVariable=c("EnC")
+RStates=c("Ships & Submarines")
+RVariable=c("Vessel")
 
 output<-data.frame(rbind(
     c(Variable=RVariable,Control="None",Comp="All",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(compGin, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="None",Comp="Comp",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(compGin, 
                                     nodes=c(RNodes,"Comp"),
                                     states=c(RStates, "Comp.")
@@ -1752,65 +2685,92 @@ output<-data.frame(rbind(
 
 output$Control<-as.character(output$Control)
 output$Comp<-as.character(output$Comp)
+output$pFinding<-as.character(output$pFinding)
 output$Offr.1<-as.numeric(as.character(output$Offr.1))
 output$Offr.2<-as.numeric(as.character(output$Offr.2))
 output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
 output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
 
+
 output<-rbind(output,
     c(Variable=RVariable,Control="LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(LargeCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotLargeCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
 
 output<-rbind(output,
               c(Variable=RVariable,Control="LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(LargeCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotLargeCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr")))
               )
 
-output$Offr.1<-as.numeric(as.character(output$Offr.1))
-output$Offr.2<-as.numeric(as.character(output$Offr.2))
-output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
-output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
-
-
 output<-rbind(output,
     c(Variable=RVariable,Control="Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(Under1mCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
+
 
 output<-rbind(output,
               c(Variable=RVariable,Control="Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(Under1mCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
@@ -1818,27 +2778,45 @@ output<-rbind(output,
               )
 
 
+
+
 output<-rbind(output,
     c(Variable=RVariable,Control="IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(IDVFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotIDVFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
     )
-    
+
 
 output<-rbind(output,
               c(Variable=RVariable,Control="IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(IDVFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotIDVFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
@@ -1848,12 +2826,402 @@ output<-rbind(output,
 
 output<-rbind(output,
     c(Variable=RVariable,Control="LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
       unlist(querygrain(setEvidence(LongDurFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr"))),
     c(Variable=RVariable,Control="!LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
       unlist(querygrain(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(LongDurFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotLongDurFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+output$pFinding<-as.numeric(as.character(output$pFinding))
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+
+kable(output,digits=4)
+```
+
+
+
+Variable   Control        Comp    pFinding   Offr.1   Offr.2   Offr.3.4   Offr.5.
+---------  -------------  -----  ---------  -------  -------  ---------  --------
+Vessel     None           All       0.0420   0.5404   0.1487     0.1544    0.1565
+Vessel     None           Comp      0.0280   0.3200   0.2195     0.2287    0.2319
+Vessel     LargeCeil      All       0.0000   0.3091   0.2057     0.1848    0.3003
+Vessel     !LargeCeil     All       0.0420   0.5405   0.1487     0.1544    0.1564
+Vessel     LargeCeil      Comp      0.0000   0.1599   0.2460     0.2170    0.3772
+Vessel     !LargeCeil     Comp      0.0280   0.3200   0.2194     0.2287    0.2319
+Vessel     Under1mCeil    All       0.0415   0.5412   0.1489     0.1543    0.1555
+Vessel     !Under1mCeil   All       0.0005   0.4704   0.1268     0.1587    0.2441
+Vessel     Under1mCeil    Comp      0.0277   0.3208   0.2199     0.2287    0.2305
+Vessel     !Under1mCeil   Comp      0.0003   0.2483   0.1788     0.2251    0.3479
+Vessel     IDV            All       0.0160   0.4812   0.1688     0.1517    0.1982
+Vessel     !IDV           All       0.0420   0.5404   0.1487     0.1544    0.1565
+Vessel     IDV            Comp      0.0113   0.2750   0.2342     0.2118    0.2790
+Vessel     !IDV           Comp      0.0280   0.3200   0.2195     0.2287    0.2319
+Vessel     LongDur        All       0.0017   0.7366   0.0837     0.0840    0.0958
+Vessel     !LongDur       All       0.0420   0.5404   0.1487     0.1544    0.1565
+Vessel     LongDur        Comp      0.0006   0.2991   0.2149     0.2233    0.2627
+Vessel     !LongDur       Comp      0.0280   0.3200   0.2195     0.2287    0.2319
+
+
+
+
+```r
+unlist(compGin$universe$levels["What"])
+```
+
+                           What1                            What2 
+           "Aircraft and Drones" "Electronics and Communications" 
+                           What3                            What4 
+   "Facilities and Construction"                  "Land Vehicles" 
+                           What5                            What6 
+     "Missile and Space Systems"                          "Other" 
+                           What7                            What8 
+            "Ships & Submarines"         "Weapons and Ammunition" 
+
+```r
+RNodes=c("What")
+RStates=c("Weapons and Ammunition")
+RVariable=c("WnA")
+
+output<-data.frame(rbind(
+    c(Variable=RVariable,Control="None",Comp="All",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(compGin, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="None",Comp="Comp",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(compGin, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    ),"Offr")))
+    )
+    )
+
+
+output$Control<-as.character(output$Control)
+output$Comp<-as.character(output$Comp)
+output$pFinding<-as.character(output$pFinding)
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(LargeCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotLargeCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(Under1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(Under1mCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(IDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotIDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(IDVFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotIDVFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(LongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(LongDurFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotLongDurFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+output$pFinding<-as.numeric(as.character(output$pFinding))
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+
+kable(output,digits=4)
+```
+
+
+
+Variable   Control        Comp    pFinding   Offr.1   Offr.2   Offr.3.4   Offr.5.
+---------  -------------  -----  ---------  -------  -------  ---------  --------
+WnA        None           All       0.0089   0.4343   0.1734     0.1567    0.2356
+WnA        None           Comp      0.0067   0.2658   0.2262     0.2018    0.3062
+WnA        LargeCeil      All       0.0000   0.4163   0.2757     0.1247    0.1832
+WnA        !LargeCeil     All       0.0089   0.4343   0.1731     0.1568    0.2358
+WnA        LargeCeil      Comp      0.0000   0.2251   0.3728     0.1598    0.2423
+WnA        !LargeCeil     Comp      0.0067   0.2659   0.2258     0.2019    0.3064
+WnA        Under1mCeil    All       0.0085   0.4332   0.1703     0.1552    0.2413
+WnA        !Under1mCeil   All       0.0005   0.4529   0.2284     0.1831    0.1356
+WnA        Under1mCeil    Comp      0.0064   0.2668   0.2215     0.1993    0.3125
+WnA        !Under1mCeil   Comp      0.0003   0.2483   0.3143     0.2501    0.1873
+WnA        IDV            All       0.0036   0.4674   0.2147     0.1493    0.1687
+WnA        !IDV           All       0.0089   0.4343   0.1734     0.1567    0.2356
+WnA        IDV            Comp      0.0025   0.2460   0.3065     0.2080    0.2396
+WnA        !IDV           Comp      0.0067   0.2658   0.2262     0.2018    0.3062
+WnA        LongDur        All       0.0008   0.4781   0.1845     0.1479    0.1895
+WnA        !LongDur       All       0.0089   0.4343   0.1734     0.1567    0.2356
+WnA        LongDur        Comp      0.0006   0.2786   0.2557     0.2028    0.2629
+WnA        !LongDur       Comp      0.0067   0.2658   0.2262     0.2018    0.3062
+
+
+
+
+```r
+unlist(compGin$universe$levels["IDV"])
+```
+
+     IDV1      IDV2 
+"Def/Pur"     "IDV" 
+
+```r
+RNodes=c("IDV")
+RStates=c("IDV")
+RVariable=c("IDV")
+
+output<-data.frame(rbind(
+    c(Variable=RVariable,Control="None",Comp="All",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(compGin, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="None",Comp="Comp",
+      pFinding=attributes(getEvidence(setEvidence(compGin, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(compGin, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    ),"Offr")))
+    )
+    )
+
+
+output$Control<-as.character(output$Control)
+output$Comp<-as.character(output$Comp)
+output$pFinding<-as.character(output$pFinding)
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="Aircraft",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(AircraftFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(AircraftFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!Aircraft",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotAircraftFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotAircraftFind, 
                                     nodes=RNodes,
                                     states=RStates
                                     ),"Offr")))
@@ -1861,12 +3229,197 @@ output<-rbind(output,
     
 
 output<-rbind(output,
+              c(Variable=RVariable,Control="Aircraft",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(AircraftFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(AircraftFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!Aircraft",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotAircraftFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotAircraftFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(LargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!LargeCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotLargeCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(LargeCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!LargeCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLargeCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotLargeCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(Under1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!Under1mCeil",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(Under1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(Under1mCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!Under1mCeil",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotUnder1mCeilFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotUnder1mCeilFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(IDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!IDV",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotIDVFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+
+output<-rbind(output,
+              c(Variable=RVariable,Control="IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(IDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(IDVFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr"))),
+              c(Variable=RVariable,Control="!IDV",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotIDVFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
+                unlist(querygrain(setEvidence(NotIDVFind, 
+                                              nodes=c(RNodes,"Comp"),
+                                              states=c(RStates,"Comp.")
+                                              ),"Offr")))
+              )
+
+
+output<-rbind(output,
+    c(Variable=RVariable,Control="LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,
+      unlist(querygrain(setEvidence(LongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr"))),
+    c(Variable=RVariable,Control="!LongDur",Comp="All",
+     pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    )))$pFinding,   
+      unlist(querygrain(setEvidence(NotLongDurFind, 
+                                    nodes=RNodes,
+                                    states=RStates
+                                    ),"Offr")))
+    )
+
+
+output<-rbind(output,
               c(Variable=RVariable,Control="LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(LongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(LongDurFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
                                               ),"Offr"))),
               c(Variable=RVariable,Control="!LongDur",Comp="Comp",
+                      pFinding=attributes(getEvidence(setEvidence(NotLongDurFind, 
+                                    nodes=c(RNodes,"Comp"),
+                                    states=c(RStates, "Comp.")
+                                    )))$pFinding,
                 unlist(querygrain(setEvidence(NotLongDurFind, 
                                               nodes=c(RNodes,"Comp"),
                                               states=c(RStates,"Comp.")
@@ -1874,28 +3427,38 @@ output<-rbind(output,
               )
 
 
+output$pFinding<-as.numeric(as.character(output$pFinding))
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+
 kable(output,digits=4)
 ```
 
 
 
-Variable   Control        Comp   Offr.1              Offr.2              Offr.3.4            Offr.5.           
----------  -------------  -----  ------------------  ------------------  ------------------  ------------------
-EnC        None           All    0.449693955945052   0.166410079105281   0.188562118805526   0.195333846144141 
-EnC        None           Comp   0.280688831247824   0.21749192823921    0.24577230770695    0.256046932806016 
-EnC        LargeCeil      All    0.451949517148704   0.1226209277        0.236541629032146   0.188887926119151 
-EnC        !LargeCeil     All    0.449690243714628   0.166482147830289   0.188483153536331   0.195344454918753 
-EnC        LargeCeil      Comp   0.260459613194215   0.163769732570821   0.32023541448944    0.255535239745524 
-EnC        !LargeCeil     Comp   0.280721247258987   0.217578014576798   0.245652985403225   0.25604775276099  
-EnC        Under1mCeil    All    0.448814565958883   0.16663637889646    0.189361973270468   0.19518708187419  
-EnC        !Under1mCeil   All    0.478609155825603   0.158969121398483   0.162262124385673   0.200159598390241 
-EnC        Under1mCeil    Comp   0.280067422462747   0.217647630823496   0.246632936984724   0.255652009729033 
-EnC        !Under1mCeil   Comp   0.301550201823034   0.212264822687587   0.216880044316606   0.269304931172773 
-EnC        IDV            All    0.459080421439392   0.189667075721695   0.180554674832546   0.170697828006367 
-EnC        !IDV           All    0.449693955945052   0.166410079105281   0.188562118805526   0.195333846144141 
-EnC        IDV            Comp   0.29665520655623    0.246998461463536   0.233293641578752   0.223052690401482 
-EnC        !IDV           Comp   0.280688831247824   0.21749192823921    0.24577230770695    0.256046932806016 
-EnC        LongDur        All    0.542771728930048   0.144822174553112   0.149896567746913   0.162509528769926 
-EnC        !LongDur       All    0.449693955945052   0.166410079105281   0.188562118805526   0.195333846144141 
-EnC        LongDur        Comp   0.292015467474901   0.22425739930699    0.230506717828618   0.253220415389492 
-EnC        !LongDur       Comp   0.280688831247824   0.21749192823921    0.24577230770695    0.256046932806016 
+Variable   Control        Comp    pFinding   Offr.1   Offr.2   Offr.3.4   Offr.5.
+---------  -------------  -----  ---------  -------  -------  ---------  --------
+IDV        None           All       0.6461   0.2860   0.1938     0.2047    0.3155
+IDV        None           Comp      0.5374   0.1458   0.2315     0.2443    0.3784
+IDV        Aircraft       All       0.0497   0.6246   0.2387     0.0951    0.0415
+IDV        !Aircraft      All       0.5965   0.2578   0.1901     0.2138    0.3383
+IDV        Aircraft       Comp      0.0243   0.2359   0.4863     0.1933    0.0844
+IDV        !Aircraft      Comp      0.5130   0.1415   0.2194     0.2467    0.3923
+IDV        LargeCeil      All       0.0007   0.3355   0.1427     0.1764    0.3454
+IDV        !LargeCeil     All       0.6454   0.2859   0.1939     0.2048    0.3154
+IDV        LargeCeil      Comp      0.0006   0.1439   0.1841     0.2245    0.4476
+IDV        !LargeCeil     Comp      0.5368   0.1458   0.2315     0.2443    0.3783
+IDV        Under1mCeil    All       0.6303   0.2832   0.1948     0.2051    0.3169
+IDV        !Under1mCeil   All       0.0158   0.3963   0.1561     0.1883    0.2593
+IDV        Under1mCeil    Comp      0.5255   0.1445   0.2321     0.2443    0.3792
+IDV        !Under1mCeil   Comp      0.0119   0.2057   0.2048     0.2466    0.3428
+IDV        IDV            All       0.6461   0.2860   0.1938     0.2047    0.3155
+IDV        !IDV           All       1.0000   0.3495   0.1729     0.1981    0.2795
+IDV        IDV            Comp      0.5374   0.1458   0.2315     0.2443    0.3784
+IDV        !IDV           Comp      0.8020   0.1963   0.2135     0.2445    0.3457
+IDV        LongDur        All       0.0365   0.5198   0.1591     0.1391    0.1821
+IDV        !LongDur       All       0.6461   0.2860   0.1938     0.2047    0.3155
+IDV        LongDur        Comp      0.0224   0.2281   0.2553     0.2219    0.2947
+IDV        !LongDur       Comp      0.5374   0.1458   0.2315     0.2443    0.3784
