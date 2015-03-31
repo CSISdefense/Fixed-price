@@ -40,18 +40,18 @@ setwd("K:\\Development\\Fixed-price\\")
 filename<-"data\\defense_contract_CSIScontractID_model.csv"
 
 
-
-ContractModel  <- read.csv(
-    filename,
-    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
-    na.strings = c("NULL","NA",""),
-    stringsAsFactors = TRUE
-    )
-ContractModel<-subset(ContractModel,select=-c(SingleOffer))
-
-nrow(ContractModel)
-nrow(subset(ContractModel,complete.cases(ContractModel)))
-summary(subset(ContractModel,complete.cases(ContractModel)))
+# 
+# ContractModel  <- read.csv(
+#     filename,
+#     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+#     na.strings = c("NULL","NA",""),
+#     stringsAsFactors = TRUE
+#     )
+# ContractModel<-subset(ContractModel,select=-c(SingleOffer))
+# 
+# nrow(ContractModel)
+# nrow(subset(ContractModel,complete.cases(ContractModel)))
+# summary(subset(ContractModel,complete.cases(ContractModel)))
 
 dropped<-subset(ContractModel,!complete.cases(ContractModel)|
                     Intl=="Unlabeled"|
@@ -1219,6 +1219,8 @@ SoftwareCompFind<- setEvidence(SoftwareFind,
 
 FxCBresult<-QueryCrossSectionOnNode(SoftwareCompFind,"FxCb","Offr")
         
+
+
         #Combination
         FxCBresult[1,1]
         FxCBresult[1,2]

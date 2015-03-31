@@ -380,84 +380,11 @@ ContractModel$Ceil<-factor(ContractModel$Ceil,
 CompetitionNetwork<-uinteriamb3_dug00001
 modelstring(CompetitionNetwork)
 CompetitionFitted<-bn.fit(x=CompetitionNetwork,data=ContractModel,method="bayes")
-summary(ContractModel)
-cpquery(CompetitionFitted, 
-        event =  (Offr=="1"),
-        evidence = (FxCb=="Fixed-Price") & (Comp=="Comp."))
-cpquery(CompetitionFitted, 
-        event =  (Offr=="1"),
-        evidence = (FxCb=="Cost-Based") & (Comp=="Comp."))
-cpquery(CompetitionFitted, 
-        event =  (Offr=="1"),
-        evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[0,15k)"))
-cpquery(CompetitionFitted, 
-        event =  (Offr=="1"),
-        evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[15k,100k)"))
-cpquery(CompetitionFitted, 
-        event =  (Offr=="1"),
-        evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[100k,1m)"))
-cpquery(CompetitionFitted, 
-        event =  (Offr=="1"),
-        evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[1m,30m)"))
-cpquery(CompetitionFitted, 
-        event =  (Offr=="1"),
-        evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[30m+]"))
-
-y<-paste("Ceil=='",levels(ContractModel$Ceil),"'",sep="")
-
-sapply(levels(ContractModel$Ceil),function(x) eval(sprintf('cpquery(CompetitionFitted, 
-        event =  (Offr=="1"),
-        evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="%s")',x)))
-
-sapply(levels(ContractModel$Ceil),FixedPriceTest)
-
-FixedPriceTest("[30m+]")
-
-FixedPriceTest<-function(x){
-    cpquery(CompetitionFitted, 
-        event =  (Offr=="1"),
-        evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil==x)
-        )
-}
-
-eval("cpquery(CompetitionFitted, \n        event =  (Offr==\"1\"),\n        evidence = (FxCb==\"Cost-Based\") & (Comp==\"Comp.\") & (Ceil==\"[30m+]\")")
-levels(ContractModel$Ceil)
-
-sapply(levels(ContractModel$Ceil),function(x) paste(x,"")) 
-
-sapply(c(1,2,3),function(x)   cpquery(CompetitionFitted, 
-        event =  (Offr=="1"),
-        evidence = (FxCb=="Cost-Based") & (Comp=="Comp."))) (Ceil==x) &  (Ceil==x)) #& (Ceil==x)
+compGin <- grain(as.graphNEL(CompetitionNetwork), data=ContractModel, smooth = 0.0000001)
 
 
-require(gRain)
-cad.cpt <- extractCPT(ContractModel, as.graphNEL(CompetitionNetwork), smooth = 0.001)
-cad.gin <- grain(compileCPT(cad.cpt))
-
-cad.gin <- grain(as.graphNEL(CompetitionNetwork), data=ContractModel, smooth = 0.0000001)
-summary(cad.gin)
+save(compGin,"compGin.rData")
+save(CompetitionNetwork,file="CompetitionNetworkBN.rData")
 
 
-querygrain(cad.gin, nodes = c("Offr"))
-
-cpquery(CompetitionFitted, 
-        event =  (Offr=="5+"),
-        evidence = (FxCb=="Fixed-Price") & (Comp=="Comp."))
-
-gin1.find <- setFinding(cad.gin, nodes = c("Comp","FxCb"),
-                        states = c( "Comp.","Fixed-Price"))
-
-gin1.find <- setFinding(cad.gin, nodes = c("Comp","FxCb"),
-                        states = c( "Comp.","Fixed-Price"))
-
-sapply(levels(ContractModel$Ceil),function(x) data.frame(nodes = c("Comp","FxCb","Ceil"),
-                        states = c( "Comp.","Fixed-Price",x)))
-
-
-ceiltest<-sapply(levels(ContractModel$Ceil),
-                 function(x)  setFinding(cad.gin, nodes = c("Comp","FxCb","Ceil"),
-                        states = c( "Comp.","Fixed-Price",x)))
-
-sapply(unlist(ceiltest, function(x) querygrain(x, nodes = c("Offr")))
-querygrain(gin1.find, nodes = c("Offr"))
 ```
