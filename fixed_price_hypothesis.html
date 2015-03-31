@@ -61,7 +61,10 @@ img {
 
 
 
-<pre><code>## Loading required package: ggplot2
+<pre><code>## Bioconductor version 2.13 (BiocInstaller 1.12.1), ?biocLite for help
+## A newer version of Bioconductor is available after installing a new
+##   version of R, ?BiocUpgrade for help
+## Loading required package: ggplot2
 ## Loading required package: stringr
 ## Loading required package: graph
 ## Loading required package: plyr
@@ -76,8 +79,19 @@ img {
 ## Loading required package: grid
 ## Loading required package: lattice
 ## Loading required package: survival
+## Loading required package: splines
 ## Loading required package: Formula
-## Loading required package: ggplot2
+## 
+## Attaching package: 'Hmisc'
+## 
+## The following objects are masked from 'package:plyr':
+## 
+##     is.discrete, summarize
+## 
+## The following objects are masked from 'package:base':
+## 
+##     format.pval, round.POSIXt, trunc.POSIXt, units
+## 
 ## Loading required package: Matrix
 ## Loading required package: gRain
 ## Loading required package: gRbase
@@ -95,8 +109,6 @@ img {
 <div id="studying-contract-vehicle-within-the-sample." class="section level2">
 <h2>Studying contract vehicle within the sample.</h2>
 <p>Describe contract vehicle here.</p>
-<pre class="r"><code>setwd(&quot;K:\\Development\\Fixed-price\\&quot;)
-filename&lt;-&quot;data\\defense_contract_CSIScontractID_model.csv&quot;</code></pre>
 <p>After the team developed the initial list and a small number of elements accidentally left off were corrected for, the next step was to do a preliminary run through with Bayesian learning.</p>
 <p>Noteably this initial run through produced two warnings of challenging relationships IDV to Dur and IDV to FxCb. After consulting within the team, the choice was made to add whitelisted relationships that went against those automatically produced.</p>
 <p>IDV (IsIDV) new white lists: * Whitelist to FxCb (FixedOrCost) because the pricing mechanism of most IDVs are set. Thus, once the choice of which IDV to use is made, the pricing mechanism would be set automatically. Furthermore, Fixed-price is often the mechanism because the IDV allows for multiple instances of a single contract reducing the need for the flexabilit Cost-Based contracts offer. * Whitelist to Dur (Duration) because the use of the IDV mechanism typically means multiple shorter contractors under one IDV rather than a single longer contract.</p>
@@ -118,27 +130,70 @@ summary(compGin)</code></pre>
 ##  Nodes : Named chr [1:11] &quot;IDV&quot; &quot;FxCb&quot; &quot;Comp&quot; &quot;Link&quot; &quot;Who&quot; &quot;What&quot; ...
 ##  - attr(*, &quot;names&quot;)= chr [1:11] &quot;IDV&quot; &quot;FxCb&quot; &quot;Comp&quot; &quot;Link&quot; ...</code></pre>
 <pre class="r"><code>QueryCrossSectionOnNode&lt;-function(
-                        gin,
-                        PivotNode,
-                        QueryNode
-                        )
+    gin,
+    PivotNode,
+    QueryNode
+    )
     {
     looper&lt;-NULL
     for(x in unlist(compGin$universe$levels[PivotNode])){
         looper&lt;-rbind(looper,list(evidence=getEvidence(setEvidence(gin,
-                                                                 nodes = c(PivotNode),
-                                                                 states = c(x)
-                                                     
-                                                     )),
-                                result=querygrain(setEvidence(gin,
-                                                              nodes = c(PivotNode),
-                                                              states = c(x))
-                                                  , nodes = c(QueryNode)
-                                                  )
-                                )
-              )
+                                                                   nodes = c(PivotNode),
+                                                                   states = c(x)
+                                                                   
+                                                                   )),
+                                  result=querygrain(setEvidence(gin,
+                                                                nodes = c(PivotNode),
+                                                                states = c(x))
+                                                    , nodes = c(QueryNode)
+                                                    )
+                                  )
+                      )
         }
     looper
+    }
+
+
+QueryCrossSectionOnNodeFxCbDF&lt;-function(
+    gin,
+    PivotNode,
+    QueryNode,
+    RHypothesis,
+    RControl
+    )
+    {
+    
+    FxCbResult&lt;-QueryCrossSectionOnNode(
+        gin,
+        PivotNode,
+        QueryNode
+        )
+    
+    output&lt;-data.frame(rbind(c(Variable=RHypothesis,
+                    FxCb=FxCbResult[1,1]$evidence$states[[length(FxCbResult[1,1]$evidence$states)]],
+                    Control=RControl,
+                    pFinding=attributes(FxCbResult[1,1]$evidence)$pFinding,
+                    unlist(FxCbResult[1,2])),
+                  c(Variable=RHypothesis,
+                    FxCb=FxCbResult[2,1]$evidence$states[[length(FxCbResult[2,1]$evidence$states)]],
+                    Control=RControl,
+                    pFinding=attributes(FxCbResult[2,1]$evidence)$pFinding,
+                    unlist(FxCbResult[2,2])),
+                  c(Variable=RHypothesis,
+                    FxCb=FxCbResult[3,1]$evidence$states[[length(FxCbResult[3,1]$evidence$states)]],
+                    Control=RControl,
+                    pFinding=attributes(FxCbResult[3,1]$evidence)$pFinding,
+                    unlist(FxCbResult[3,2]))
+                  ))
+    output$Control&lt;-as.character(output$Control)
+    output$Variable&lt;-as.character(output$Variable)
+    output$pFinding&lt;-as.numeric(as.character(output$pFinding))
+    output$result.Offr.1&lt;-as.numeric(as.character(output$result.Offr.1))
+    output$result.Offr.2&lt;-as.numeric(as.character(output$result.Offr.2))
+    output$result.Offr.3.4&lt;-as.numeric(as.character(output$result.Offr.3.4))
+    output$result.Offr.5.&lt;-as.numeric(as.character(output$result.Offr.5.))
+    
+    output
     }</code></pre>
 </div>
 <div id="c1-aircraft-encounter" class="section level2">
@@ -160,18 +215,12 @@ summary(compGin)</code></pre>
 <h1>Results</h1>
 <p>As expected, numbers of offers are far higher with non-aircraft, for both competed and for all contracts.</p>
 <pre class="r"><code>AircraftFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;What&quot;),
-                        states=c(&quot;Aircraft and Drones&quot;)
-)
+                           nodes=c(&quot;What&quot;),
+                           states=c(&quot;Aircraft and Drones&quot;)
+                           )
 
-AircraftCompFind&lt;- setEvidence(AircraftFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
 
-data.frame(&quot;Offr.1&quot;=NULL,&quot;Offr.2&quot;=NULL,&quot;Offr.3.4&quot;=NULL,&quot;Offr.5&quot;=NULL)</code></pre>
-<pre><code>## data frame with 0 columns and 0 rows</code></pre>
-<pre class="r"><code>getEvidence(AircraftFind)</code></pre>
+getEvidence(AircraftFind)</code></pre>
 <pre><code>## Finding: 
 ## What: Aircraft and Drones
 ## Pr(Finding)= 0.09659616</code></pre>
@@ -180,22 +229,12 @@ data.frame(&quot;Offr.1&quot;=NULL,&quot;Offr.2&quot;=NULL,&quot;Offr.3.4&quot;=
 ## Offr
 ##         1         2       3-4        5+ 
 ## 0.5354625 0.1840005 0.1297155 0.1508214</code></pre>
-<pre class="r"><code>getEvidence(AircraftCompFind)</code></pre>
-<pre><code>## Finding: 
-## What: Aircraft and Drones
-## Comp: Comp.
-## Pr(Finding)= 0.05865099</code></pre>
-<pre class="r"><code>querygrain(AircraftCompFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.2530169 0.2980877 0.2082743 0.2406212</code></pre>
 <pre class="r"><code>NotAircraftFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;What&quot;),
-                        states=c(list(
-                            unlist(compGin$universe$levels[&quot;What&quot;])[unlist(compGin$universe$levels[&quot;What&quot;]) != 
-                                                           &quot;Aircraft and Drones&quot;]))
-                        )
+                              nodes=c(&quot;What&quot;),
+                              states=c(list(
+                                  unlist(compGin$universe$levels[&quot;What&quot;])[unlist(compGin$universe$levels[&quot;What&quot;]) != 
+                                                                              &quot;Aircraft and Drones&quot;]))
+                              )
 
 getEvidence(NotAircraftFind)</code></pre>
 <pre><code>## Finding: 
@@ -206,68 +245,42 @@ getEvidence(NotAircraftFind)</code></pre>
 ## Offr
 ##         1         2       3-4        5+ 
 ## 0.3296511 0.1717030 0.2053938 0.2932521</code></pre>
-<pre class="r"><code>NotAircraftCompFind&lt;- setEvidence(NotAircraftFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
-
-
-getEvidence(NotAircraftCompFind)</code></pre>
-<pre><code>## Finding: 
-## What: Electronics and Communications, Facilities and Construction, Land Vehicles, Missile and Space Systems, Other, Ships &amp; Submarines, Weapons and Ammunition
-## Comp: Comp.
-## Pr(Finding)= 0.7433984</code></pre>
-<pre class="r"><code>querygrain(NotAircraftCompFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.1917945 0.2067809 0.2473978 0.3540268</code></pre>
 <pre class="r"><code>output&lt;-data.frame(rbind(
-    c(&quot;Aircraft-All&quot;,unlist(querygrain(AircraftFind,&quot;Offr&quot;))),
-      c(&quot;!Aircraft-All&quot;,unlist(querygrain(NotAircraftFind,&quot;Offr&quot;))),
-      c(&quot;Aircraft-Comp&quot;,unlist(querygrain(AircraftCompFind,&quot;Offr&quot;))),
-      c(&quot;!Aircraft-Comp&quot;,unlist(querygrain(NotAircraftCompFind,&quot;Offr&quot;)))
-))
+    c(Control=&quot;Aircraft-All&quot;,unlist(querygrain(AircraftFind,&quot;Offr&quot;))),
+    c(Control=&quot;!Aircraft-All&quot;,unlist(querygrain(NotAircraftFind,&quot;Offr&quot;)))
+    #     c(Control=&quot;Aircraft-Comp&quot;,unlist(querygrain(AircraftCompFind,&quot;Offr&quot;))),
+    #     c(Control=&quot;!Aircraft-Comp&quot;,unlist(querygrain(NotAircraftCompFind,&quot;Offr&quot;)))
+    ))
 names(output)[1]&lt;-&quot;Control&quot;
+output$Offr.1&lt;-as.numeric(as.character(output$Offr.1))
+output$Offr.2&lt;-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4&lt;-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.&lt;-as.numeric(as.character(output$Offr.5.))
 kable(output,digits=4)</code></pre>
 <table>
 <thead>
 <tr class="header">
 <th align="left">Control</th>
-<th align="left">Offr.1</th>
-<th align="left">Offr.2</th>
-<th align="left">Offr.3.4</th>
-<th align="left">Offr.5.</th>
+<th align="right">Offr.1</th>
+<th align="right">Offr.2</th>
+<th align="right">Offr.3.4</th>
+<th align="right">Offr.5.</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">Aircraft-All</td>
-<td align="left">0.535462548082371</td>
-<td align="left">0.184000537183175</td>
-<td align="left">0.129715477481769</td>
-<td align="left">0.150821437252685</td>
+<td align="right">0.5355</td>
+<td align="right">0.1840</td>
+<td align="right">0.1297</td>
+<td align="right">0.1508</td>
 </tr>
 <tr class="even">
 <td align="left">!Aircraft-All</td>
-<td align="left">0.329651083366553</td>
-<td align="left">0.171702956596799</td>
-<td align="left">0.205393834273115</td>
-<td align="left">0.293252125763533</td>
-</tr>
-<tr class="odd">
-<td align="left">Aircraft-Comp</td>
-<td align="left">0.253016872490764</td>
-<td align="left">0.298087666293648</td>
-<td align="left">0.20827427355896</td>
-<td align="left">0.240621187656629</td>
-</tr>
-<tr class="even">
-<td align="left">!Aircraft-Comp</td>
-<td align="left">0.191794458726782</td>
-<td align="left">0.20678093948082</td>
-<td align="left">0.24739780112515</td>
-<td align="left">0.354026800667247</td>
+<td align="right">0.3297</td>
+<td align="right">0.1717</td>
+<td align="right">0.2054</td>
+<td align="right">0.2933</td>
 </tr>
 </tbody>
 </table>
@@ -310,15 +323,9 @@ kable(output,digits=4)</code></pre>
 <pre><code>##        Ceil1        Ceil2        Ceil3        Ceil4        Ceil5 
 ##    &quot;[0,15k)&quot; &quot;[15k,100k)&quot;  &quot;[100k,1m)&quot;   &quot;[1m,30m)&quot;     &quot;[30m+]&quot;</code></pre>
 <pre class="r"><code>LargeCeilFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;Ceil&quot;),
-                        states=c(&quot;[30m+]&quot;)
-)
-
-LargeCeilCompFind&lt;- setEvidence(LargeCeilFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
-
+                            nodes=c(&quot;Ceil&quot;),
+                            states=c(&quot;[30m+]&quot;)
+                            )
 
 getEvidence(LargeCeilFind)</code></pre>
 <pre><code>## Finding: 
@@ -329,22 +336,12 @@ getEvidence(LargeCeilFind)</code></pre>
 ## Offr
 ##         1         2       3-4        5+ 
 ## 0.3551266 0.1404792 0.1760890 0.3283052</code></pre>
-<pre class="r"><code>getEvidence(LargeCeilCompFind)</code></pre>
-<pre><code>## Finding: 
-## Ceil: [30m+]
-## Comp: Comp.
-## Pr(Finding)= 0.0006982732</code></pre>
-<pre class="r"><code>querygrain(LargeCeilCompFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.1565562 0.1836192 0.2279471 0.4318775</code></pre>
 <pre class="r"><code>NotLargeCeilFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;Ceil&quot;),
-                        states=c(list(
-                            unlist(compGin$universe$levels[&quot;Ceil&quot;])[unlist(compGin$universe$levels[&quot;Ceil&quot;])!=
-                                                           &quot;[30m+]&quot;]))
-                        )
+                               nodes=c(&quot;Ceil&quot;),
+                               states=c(list(
+                                   unlist(compGin$universe$levels[&quot;Ceil&quot;])[unlist(compGin$universe$levels[&quot;Ceil&quot;])!=
+                                                                               &quot;[30m+]&quot;]))
+                               )
 
 getEvidence(NotLargeCeilFind)</code></pre>
 <pre><code>## Finding: 
@@ -355,22 +352,44 @@ getEvidence(NotLargeCeilFind)</code></pre>
 ## Offr
 ##         1         2       3-4        5+ 
 ## 0.3495265 0.1729210 0.1981040 0.2794485</code></pre>
-<pre class="r"><code>NotLargeCeilCompFind&lt;- setEvidence(NotLargeCeilFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
-
-
-getEvidence(NotLargeCeilCompFind)</code></pre>
-<pre><code>## Finding: 
-## Ceil: [0,15k), [15k,100k), [100k,1m), [1m,30m)
-## Comp: Comp.
-## Pr(Finding)= 0.8013511</code></pre>
-<pre class="r"><code>querygrain(NotLargeCeilCompFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.1963060 0.2134839 0.2445513 0.3456588</code></pre>
+<pre class="r"><code>output&lt;-data.frame(rbind(
+    c(Control=&quot;LargeCeil-All&quot;,unlist(querygrain(LargeCeilFind,&quot;Offr&quot;))),
+    c(Control=&quot;!LargeCeil-All&quot;,unlist(querygrain(NotLargeCeilFind,&quot;Offr&quot;)))
+    #     c(Control=&quot;LargeCeil-Comp&quot;,unlist(querygrain(LargeCeilCompFind,&quot;Offr&quot;))),
+    #     c(Control=&quot;!LargeCeil-Comp&quot;,unlist(querygrain(NotLargeCeilCompFind,&quot;Offr&quot;)))
+    ))
+output$Offr.1&lt;-as.numeric(as.character(output$Offr.1))
+output$Offr.2&lt;-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4&lt;-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.&lt;-as.numeric(as.character(output$Offr.5.))
+kable(output,digits=4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Control</th>
+<th align="right">Offr.1</th>
+<th align="right">Offr.2</th>
+<th align="right">Offr.3.4</th>
+<th align="right">Offr.5.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">LargeCeil-All</td>
+<td align="right">0.3551</td>
+<td align="right">0.1405</td>
+<td align="right">0.1761</td>
+<td align="right">0.3283</td>
+</tr>
+<tr class="even">
+<td align="left">!LargeCeil-All</td>
+<td align="right">0.3495</td>
+<td align="right">0.1729</td>
+<td align="right">0.1981</td>
+<td align="right">0.2794</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div id="contracts-initially-expected-to-have-smaller-values-will-receive-more-offers." class="section level2">
@@ -383,20 +402,16 @@ getEvidence(NotLargeCeilCompFind)</code></pre>
 <li>The independent variable will be the base and all exercised options amount for the contract. This value will not be annualized, as the steady rate of exercising options means that the initial value has severe limitations when predicting total contract value.</li>
 </ul>
 <p>For small contracts, the pattern</p>
-<p>###Initial results The hypothesis does hold weakly for contracts under $15k, although larger contracts have more 5+ offer. The hypothesis does not hold for contracts under $100k and again 5+ offer contracts are remain more common among larger contracts. If the dividing line is instead $1 million, then the analysis does hold, with contracts of $1m and lower having more competition at every level of analysis.</p>
+<div id="initial-results" class="section level3">
+<h3>Initial results</h3>
+<p>The hypothesis does hold weakly for contracts under $15k, although larger contracts have more 5+ offer. The hypothesis does not hold for contracts under $100k and again 5+ offer contracts are remain more common among larger contracts. If the dividing line is instead $1 million, then the analysis does hold, with contracts of $1m and lower having more competition at every level of analysis.</p>
 <pre class="r"><code>unlist(compGin$universe$levels[&quot;Ceil&quot;])</code></pre>
 <pre><code>##        Ceil1        Ceil2        Ceil3        Ceil4        Ceil5 
 ##    &quot;[0,15k)&quot; &quot;[15k,100k)&quot;  &quot;[100k,1m)&quot;   &quot;[1m,30m)&quot;     &quot;[30m+]&quot;</code></pre>
 <pre class="r"><code>SmallCeilFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;Ceil&quot;),
-                        states=c(list(c(&quot;[0,15k)&quot;,&quot;[15k,100k)&quot;)))
-)
-
-SmallCeilCompFind&lt;- setEvidence(SmallCeilFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
-
+                            nodes=c(&quot;Ceil&quot;),
+                            states=c(list(c(&quot;[0,15k)&quot;,&quot;[15k,100k)&quot;)))
+                            )
 
 getEvidence(SmallCeilFind)</code></pre>
 <pre><code>## Finding: 
@@ -407,22 +422,12 @@ getEvidence(SmallCeilFind)</code></pre>
 ## Offr
 ##         1         2       3-4        5+ 
 ## 0.3428907 0.1734741 0.2002586 0.2833767</code></pre>
-<pre class="r"><code>getEvidence(SmallCeilCompFind)</code></pre>
-<pre><code>## Finding: 
-## Ceil: [0,15k), [15k,100k)
-## Comp: Comp.
-## Pr(Finding)= 0.709844</code></pre>
-<pre class="r"><code>querygrain(SmallCeilCompFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.1918834 0.2132486 0.2460865 0.3487815</code></pre>
 <pre class="r"><code>NotSmallCeilFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;Ceil&quot;),
-                        states=c(list(
-                            unlist(compGin$universe$levels[&quot;Ceil&quot;])[!unlist(compGin$universe$levels[&quot;Ceil&quot;]) %in%
-                                                           c(&quot;[0,15k)&quot;,&quot;[15k,100k)&quot;)]))
-                        )
+                               nodes=c(&quot;Ceil&quot;),
+                               states=c(list(
+                                   unlist(compGin$universe$levels[&quot;Ceil&quot;])[!unlist(compGin$universe$levels[&quot;Ceil&quot;]) %in%
+                                                                               c(&quot;[0,15k)&quot;,&quot;[15k,100k)&quot;)]))
+                               )
 
 getEvidence(NotSmallCeilFind)</code></pre>
 <pre><code>## Finding: 
@@ -433,32 +438,10 @@ getEvidence(NotSmallCeilFind)</code></pre>
 ## Offr
 ##         1         2       3-4        5+ 
 ## 0.3986593 0.1685766 0.1819940 0.2507701</code></pre>
-<pre class="r"><code>NotSmallCeilCompFind&lt;- setEvidence(NotSmallCeilFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
-
-
-getEvidence(NotSmallCeilCompFind)</code></pre>
-<pre><code>## Finding: 
-## Ceil: [100k,1m), [1m,30m), [30m+]
-## Comp: Comp.
-## Pr(Finding)= 0.09220538</code></pre>
-<pre class="r"><code>querygrain(NotSmallCeilCompFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.2300526 0.2150690 0.2326066 0.3222719</code></pre>
 <pre class="r"><code>VerySmallCeilFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;Ceil&quot;),
-                        states=c(&quot;[0,15k)&quot;)
-)
-
-VerySmallCeilCompFind&lt;- setEvidence(VerySmallCeilFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
-
+                                nodes=c(&quot;Ceil&quot;),
+                                states=c(&quot;[0,15k)&quot;)
+                                )
 
 getEvidence(VerySmallCeilFind)</code></pre>
 <pre><code>## Finding: 
@@ -469,21 +452,11 @@ getEvidence(VerySmallCeilFind)</code></pre>
 ## Offr
 ##         1         2       3-4        5+ 
 ## 0.3377189 0.1818385 0.2087960 0.2716467</code></pre>
-<pre class="r"><code>getEvidence(VerySmallCeilCompFind)</code></pre>
-<pre><code>## Finding: 
-## Ceil: [0,15k)
-## Comp: Comp.
-## Pr(Finding)= 0.4641208</code></pre>
-<pre class="r"><code>querygrain(VerySmallCeilCompFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.1885442 0.2229925 0.2557982 0.3326651</code></pre>
 <pre class="r"><code>NotVerySmallCeilFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;Ceil&quot;),
-                        states=c(list(
-                            unlist(compGin$universe$levels[&quot;Ceil&quot;])[unlist(compGin$universe$levels[&quot;Ceil&quot;])!=c(&quot;[0,15k)&quot;)]))
-                        )
+                                   nodes=c(&quot;Ceil&quot;),
+                                   states=c(list(
+                                       unlist(compGin$universe$levels[&quot;Ceil&quot;])[unlist(compGin$universe$levels[&quot;Ceil&quot;])!=c(&quot;[0,15k)&quot;)]))
+                                   )
 
 getEvidence(NotVerySmallCeilFind)</code></pre>
 <pre><code>## Finding: 
@@ -494,85 +467,94 @@ getEvidence(NotVerySmallCeilFind)</code></pre>
 ## Offr
 ##         1         2       3-4        5+ 
 ## 0.3654679 0.1608199 0.1836319 0.2900803</code></pre>
-<pre class="r"><code>NotVerySmallCeilCompFind&lt;- setEvidence(NotVerySmallCeilFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
+<pre class="r"><code>rm(NotVerySmallCeilFind,VerySmallCeilFind)
 
 
-getEvidence(NotVerySmallCeilCompFind)</code></pre>
-<pre><code>## Finding: 
-## Ceil: [15k,100k), [100k,1m), [1m,30m), [30m+]
-## Comp: Comp.
-## Pr(Finding)= 0.3379286</code></pre>
-<pre class="r"><code>querygrain(NotVerySmallCeilCompFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.2068842 0.2003628 0.2290702 0.3636829</code></pre>
-<pre class="r"><code>#1M
+
+
+#1M
 
 Under1mCeilFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;Ceil&quot;),
-                        states=c(list(c(&quot;[0,15k)&quot;,&quot;[15k,100k)&quot;,&quot;[100k,1m)&quot;)))
-)
-
-Under1mCeilCompFind&lt;- setEvidence(Under1mCeilFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
+                              nodes=c(&quot;Ceil&quot;),
+                              states=c(list(c(&quot;[0,15k)&quot;,&quot;[15k,100k)&quot;,&quot;[100k,1m)&quot;)))
+                              )
 
 
 getEvidence(Under1mCeilFind)</code></pre>
 <pre><code>## Finding: 
 ## Ceil: [0,15k), [15k,100k), [100k,1m)
 ## Pr(Finding)= 0.9795632</code></pre>
-<pre class="r"><code>querygrain(Under1mCeilFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.3479289 0.1734406 0.1985386 0.2800919</code></pre>
-<pre class="r"><code>getEvidence(Under1mCeilCompFind)</code></pre>
-<pre><code>## Finding: 
-## Ceil: [0,15k), [15k,100k), [100k,1m)
-## Comp: Comp.
-## Pr(Finding)= 0.7869142</code></pre>
-<pre class="r"><code>querygrain(Under1mCeilCompFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.1955597 0.2138058 0.2447258 0.3459087</code></pre>
 <pre class="r"><code>NotUnder1mCeilFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;Ceil&quot;),
-                        states=c(list(
-                            unlist(compGin$universe$levels[&quot;Ceil&quot;])[!unlist(compGin$universe$levels[&quot;Ceil&quot;]) %in%
-                                                           c(&quot;[0,15k)&quot;,&quot;[15k,100k)&quot;,&quot;[100k,1m)&quot;)]))
-                        )
+                                 nodes=c(&quot;Ceil&quot;),
+                                 states=c(list(
+                                     unlist(compGin$universe$levels[&quot;Ceil&quot;])[!unlist(compGin$universe$levels[&quot;Ceil&quot;]) %in%
+                                                                                 c(&quot;[0,15k)&quot;,&quot;[15k,100k)&quot;,&quot;[100k,1m)&quot;)]))
+                                 )
 
 getEvidence(NotUnder1mCeilFind)</code></pre>
 <pre><code>## Finding: 
 ## Ceil: [1m,30m), [30m+]
 ## Pr(Finding)= 0.02043682</code></pre>
-<pre class="r"><code>querygrain(NotUnder1mCeilFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.4263529 0.1465433 0.1762723 0.2508316</code></pre>
-<pre class="r"><code>NotUnder1mCeilCompFind&lt;- setEvidence(NotUnder1mCeilFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
+<pre class="r"><code>output&lt;-data.frame(rbind(
+    c(Control=&quot;Under1mCeil&quot;,Comp=&quot;All&quot;,unlist(querygrain(Under1mCeilFind,&quot;Offr&quot;))),
+    c(Control=&quot;!Under1mCeil&quot;,Comp=&quot;All&quot;,unlist(querygrain(NotUnder1mCeilFind,&quot;Offr&quot;)))
+    )
+    )
+output$Control&lt;-as.character(output$Control)
+output$Comp&lt;-as.character(output$Comp)
+output$Offr.1&lt;-as.numeric(as.character(output$Offr.1))
+output$Offr.2&lt;-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4&lt;-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.&lt;-as.numeric(as.character(output$Offr.5.))
 
-getEvidence(NotUnder1mCeilCompFind)</code></pre>
-<pre><code>## Finding: 
-## Ceil: [1m,30m), [30m+]
-## Comp: Comp.
-## Pr(Finding)= 0.01513517</code></pre>
-<pre class="r"><code>querygrain(NotUnder1mCeilCompFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.2332760 0.1953700 0.2347116 0.3366424</code></pre>
+# output&lt;-rbind(output,
+#               c(Control=&quot;Under1mCeil&quot;,Comp=&quot;Comp&quot;,unlist(querygrain(setEvidence(Under1mCeilCompFind, 
+#                                                                                  nodes=c(&quot;Comp&quot;),
+#                                                                                  states=c(&quot;Comp.&quot;)
+#                                                                                  ),&quot;Offr&quot;))),
+#               c(Control=&quot;!Under1mCeil&quot;,Comp=&quot;Comp&quot;,unlist(querygrain(setEvidence(NotUnder1mCeilCompFind, 
+#                                                                                  nodes=c(&quot;Comp&quot;),
+#                                                                                  states=c(&quot;Comp.&quot;)
+#                                                                                  ),&quot;Offr&quot;)))
+#               )
+
+output$Offr.1&lt;-as.numeric(as.character(output$Offr.1))
+output$Offr.2&lt;-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4&lt;-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.&lt;-as.numeric(as.character(output$Offr.5.))
+
+kable(output,digits=4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Control</th>
+<th align="left">Comp</th>
+<th align="right">Offr.1</th>
+<th align="right">Offr.2</th>
+<th align="right">Offr.3.4</th>
+<th align="right">Offr.5.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Under1mCeil</td>
+<td align="left">All</td>
+<td align="right">0.3479</td>
+<td align="right">0.1734</td>
+<td align="right">0.1985</td>
+<td align="right">0.2801</td>
+</tr>
+<tr class="even">
+<td align="left">!Under1mCeil</td>
+<td align="left">All</td>
+<td align="right">0.4264</td>
+<td align="right">0.1465</td>
+<td align="right">0.1763</td>
+<td align="right">0.2508</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="contracts-using-purchase-orders-and-other-indefinite-delivery-contracts-idcs-are-more-likely-to-receive-a-single-offer." class="section level2">
 <h2>Contracts using purchase orders and “Other Indefinite Delivery Contracts (IDCs)” are more likely to receive a single offer.</h2>
@@ -591,14 +573,9 @@ getEvidence(NotUnder1mCeilCompFind)</code></pre>
 <pre><code>##      IDV1      IDV2 
 ## &quot;Def/Pur&quot;     &quot;IDV&quot;</code></pre>
 <pre class="r"><code>IDVFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;IDV&quot;),
-                        states=c(&quot;IDV&quot;)
-)
-
-IDVCompFind&lt;- setEvidence(IDVFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
+                      nodes=c(&quot;IDV&quot;),
+                      states=c(&quot;IDV&quot;)
+                      )
 
 
 getEvidence(IDVFind)</code></pre>
@@ -610,22 +587,12 @@ getEvidence(IDVFind)</code></pre>
 ## Offr
 ##         1         2       3-4        5+ 
 ## 0.2859609 0.1938452 0.2047210 0.3154729</code></pre>
-<pre class="r"><code>getEvidence(IDVCompFind)</code></pre>
-<pre><code>## Finding: 
-##  IDV: IDV
-## Comp: Comp.
-## Pr(Finding)= 0.5373753</code></pre>
-<pre class="r"><code>querygrain(IDVCompFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.1458193 0.2314938 0.2443179 0.3783691</code></pre>
 <pre class="r"><code>NotIDVFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;IDV&quot;),
-                        states=c(list(
-                            unlist(compGin$universe$levels[&quot;IDV&quot;])[unlist(compGin$universe$levels[&quot;IDV&quot;]!=
-                                                           &quot;IDV&quot;)]))
-                        )
+                         nodes=c(&quot;IDV&quot;),
+                         states=c(list(
+                             unlist(compGin$universe$levels[&quot;IDV&quot;])[unlist(compGin$universe$levels[&quot;IDV&quot;]!=
+                                                                               &quot;IDV&quot;)]))
+                         )
 
 getEvidence(NotIDVFind)</code></pre>
 <pre><code>## Finding: 
@@ -636,22 +603,44 @@ getEvidence(NotIDVFind)</code></pre>
 ## Offr
 ##         1         2       3-4        5+ 
 ## 0.3495317 0.1728909 0.1980836 0.2794939</code></pre>
-<pre class="r"><code>NotIDVCompFind&lt;- setEvidence(NotIDVFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
-
-
-getEvidence(NotIDVCompFind)</code></pre>
-<pre><code>## Finding: 
-##  IDV: Def/Pur, IDV
-## Comp: Comp.
-## Pr(Finding)= 0.8020494</code></pre>
-<pre class="r"><code>querygrain(NotIDVCompFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.1962714 0.2134579 0.2445368 0.3457339</code></pre>
+<pre class="r"><code>output&lt;-data.frame(rbind(
+    c(Control=&quot;IDV-All&quot;,unlist(querygrain(IDVFind,&quot;Offr&quot;))),
+    c(Control=&quot;!IDV-All&quot;,unlist(querygrain(NotIDVFind,&quot;Offr&quot;)))
+    #     c(Control=&quot;IDV-Comp&quot;,unlist(querygrain(IDVCompFind,&quot;Offr&quot;))),
+    #     c(Control=&quot;!IDV-Comp&quot;,unlist(querygrain(NotIDVCompFind,&quot;Offr&quot;)))
+    ))
+output$Offr.1&lt;-as.numeric(as.character(output$Offr.1))
+output$Offr.2&lt;-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4&lt;-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.&lt;-as.numeric(as.character(output$Offr.5.))
+kable(output,digits=4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Control</th>
+<th align="right">Offr.1</th>
+<th align="right">Offr.2</th>
+<th align="right">Offr.3.4</th>
+<th align="right">Offr.5.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">IDV-All</td>
+<td align="right">0.2860</td>
+<td align="right">0.1938</td>
+<td align="right">0.2047</td>
+<td align="right">0.3155</td>
+</tr>
+<tr class="even">
+<td align="left">!IDV-All</td>
+<td align="right">0.3495</td>
+<td align="right">0.1729</td>
+<td align="right">0.1981</td>
+<td align="right">0.2795</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div id="contracts-with-longer-initially-expected-periods-of-performance-will-encounter-more-problems." class="section level2">
@@ -664,27 +653,18 @@ getEvidence(NotIDVCompFind)</code></pre>
 <li>Period of performance will be measured as expected contract duration in 4-week months, rounding up.</li>
 <li>Note: CSIS is including a separate hypothesis (Slide 9) to test whether fixed-price contracts encounter an even greater number of problems under contracts with longer expected periods of performance</li>
 </ul>
-<pre class="r"><code>        unlist(compGin$universe$levels[&quot;Dur&quot;])</code></pre>
+<pre class="r"><code>unlist(compGin$universe$levels[&quot;Dur&quot;])</code></pre>
 <pre><code>##            Dur1            Dur2            Dur3            Dur4 
 ## &quot;[    0,   61)&quot; &quot;[   61,  214)&quot; &quot;[  214,  366)&quot; &quot;[  366,33192]&quot;</code></pre>
-<pre class="r"><code>        LongDurFind&lt;- setEvidence(compGin, 
-                                nodes=c(&quot;Dur&quot;),
-                                states=c(&quot;[  366,33192]&quot;)
-        )
-        
-        getEvidence(LongDurFind)</code></pre>
+<pre class="r"><code>LongDurFind&lt;- setEvidence(compGin, 
+                          nodes=c(&quot;Dur&quot;),
+                          states=c(&quot;[  366,33192]&quot;)
+                          )
+
+getEvidence(LongDurFind)</code></pre>
 <pre><code>## Finding: 
 ## Dur: [  366,33192]
 ## Pr(Finding)= 0.05594229</code></pre>
-<pre class="r"><code>        LongDurCompFind&lt;- setEvidence(LongDurFind, 
-                                nodes=c(&quot;Comp&quot;),
-                                states=c(&quot;Comp.&quot;)
-        )
-        getEvidence(LongDurCompFind)</code></pre>
-<pre><code>## Finding: 
-##  Dur: [  366,33192]
-## Comp: Comp.
-## Pr(Finding)= 0.03541949</code></pre>
 <pre class="r"><code>getEvidence(LongDurFind)</code></pre>
 <pre><code>## Finding: 
 ## Dur: [  366,33192]
@@ -694,22 +674,12 @@ getEvidence(NotIDVCompFind)</code></pre>
 ## Offr
 ##         1         2       3-4        5+ 
 ## 0.5236394 0.1464318 0.1439375 0.1859913</code></pre>
-<pre class="r"><code>getEvidence(LongDurCompFind)</code></pre>
-<pre><code>## Finding: 
-##  Dur: [  366,33192]
-## Comp: Comp.
-## Pr(Finding)= 0.03541949</code></pre>
-<pre class="r"><code>querygrain(LongDurCompFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.2596487 0.2272653 0.2227794 0.2903066</code></pre>
 <pre class="r"><code>NotLongDurFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;Dur&quot;),
-                        states=c(list(
-                            unlist(compGin$universe$levels[&quot;Dur&quot;])[unlist(compGin$universe$levels[&quot;Dur&quot;]!=
-                                                           &quot;[  366,33192]&quot;)]))
-                        )
+                             nodes=c(&quot;Dur&quot;),
+                             states=c(list(
+                                 unlist(compGin$universe$levels[&quot;Dur&quot;])[unlist(compGin$universe$levels[&quot;Dur&quot;]!=
+                                                                                   &quot;[  366,33192]&quot;)]))
+                             )
 
 getEvidence(NotLongDurFind)</code></pre>
 <pre><code>## Finding: 
@@ -720,22 +690,44 @@ getEvidence(NotLongDurFind)</code></pre>
 ## Offr
 ##         1         2       3-4        5+ 
 ## 0.3495317 0.1728909 0.1980836 0.2794939</code></pre>
-<pre class="r"><code>NotLongDurCompFind&lt;- setEvidence(NotLongDurFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
-
-
-getEvidence(NotLongDurCompFind)</code></pre>
-<pre><code>## Finding: 
-##  Dur: [    0,   61), [   61,  214), [  214,  366), [  366,33192]
-## Comp: Comp.
-## Pr(Finding)= 0.8020494</code></pre>
-<pre class="r"><code>querygrain(NotLongDurCompFind,&quot;Offr&quot;)</code></pre>
-<pre><code>## $Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.1962714 0.2134579 0.2445368 0.3457339</code></pre>
+<pre class="r"><code>output&lt;-data.frame(rbind(
+    c(Control=&quot;LongDur-All&quot;,unlist(querygrain(LongDurFind,&quot;Offr&quot;))),
+    c(Control=&quot;!LongDur-All&quot;,unlist(querygrain(NotLongDurFind,&quot;Offr&quot;)))
+    #     c(Control=&quot;LongDur-Comp&quot;,unlist(querygrain(LongDurCompFind,&quot;Offr&quot;))),
+    #     c(Control=&quot;!LongDur-Comp&quot;,unlist(querygrain(NotLongDurCompFind,&quot;Offr&quot;)))
+    ))
+output$Offr.1&lt;-as.numeric(as.character(output$Offr.1))
+output$Offr.2&lt;-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4&lt;-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.&lt;-as.numeric(as.character(output$Offr.5.))
+kable(output,digits=4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Control</th>
+<th align="right">Offr.1</th>
+<th align="right">Offr.2</th>
+<th align="right">Offr.3.4</th>
+<th align="right">Offr.5.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">LongDur-All</td>
+<td align="right">0.5236</td>
+<td align="right">0.1464</td>
+<td align="right">0.1439</td>
+<td align="right">0.1860</td>
+</tr>
+<tr class="even">
+<td align="left">!LongDur-All</td>
+<td align="right">0.3495</td>
+<td align="right">0.1729</td>
+<td align="right">0.1981</td>
+<td align="right">0.2795</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="incentive-fee-contracts-experience-fewer-problems-than-other-forms-of-contracts." class="section level2">
 <h2>Incentive Fee contracts experience fewer problems than other forms of contracts.</h2>
@@ -773,74 +765,393 @@ getEvidence(NotLongDurCompFind)</code></pre>
 <pre class="r"><code>unlist(compGin$universe$levels[&quot;Ceil&quot;])</code></pre>
 <pre><code>##        Ceil1        Ceil2        Ceil3        Ceil4        Ceil5 
 ##    &quot;[0,15k)&quot; &quot;[15k,100k)&quot;  &quot;[100k,1m)&quot;   &quot;[1m,30m)&quot;     &quot;[30m+]&quot;</code></pre>
-<pre class="r"><code>largeRnDfind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;PSR&quot;,&quot;Ceil&quot;),
-                        states=c(&quot;R&amp;D&quot;,&quot;[30m+]&quot;)
-)
+<pre class="r"><code>RNodes&lt;-c(&quot;PSR&quot;,&quot;Ceil&quot;)
+RStates&lt;-c(&quot;R&amp;D&quot;,&quot;[30m+]&quot;)
+RVariable&lt;-&quot;LargeRnDcomp&quot;
+# debug(QueryCrossSectionOnNodeFxCbDF)
+output&lt;-QueryCrossSectionOnNodeFxCbDF(setEvidence(compGin, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;None&quot;
+                                      )
+    
 
-getEvidence(largeRnDfind)</code></pre>
-<pre><code>## Finding: 
-##  PSR: R&amp;D
-## Ceil: [30m+]
-## Pr(Finding)= 5.518707e-05</code></pre>
-<pre class="r"><code>largeRnDcompFind&lt;- setEvidence(largeRnDfind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
-getEvidence(largeRnDcompFind)</code></pre>
-<pre><code>## Finding: 
-##  PSR: R&amp;D
-## Ceil: [30m+]
-## Comp: Comp.
-## Pr(Finding)= 4.248541e-05</code></pre>
-<pre class="r"><code>FxCBresult&lt;-QueryCrossSectionOnNode(largeRnDcompFind,&quot;FxCb&quot;,&quot;Offr&quot;)
 
-#Combination
-FxCBresult[1,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-##  PSR: R&amp;D
-## Ceil: [30m+]
-## Comp: Comp.
-## FxCb: Combination 
-## or Other
-## Pr(Finding)= 4.952287e-06</code></pre>
-<pre class="r"><code>FxCBresult[1,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.3145995 0.2564465 0.2496382 0.1793159</code></pre>
-<pre class="r"><code>#Cost-plus
-FxCBresult[2,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-##  PSR: R&amp;D
-## Ceil: [30m+]
-## Comp: Comp.
-## FxCb: Cost-Based
-## Pr(Finding)= 3.114728e-05</code></pre>
-<pre class="r"><code>FxCBresult[2,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.2255373 0.2108130 0.2404177 0.3232319</code></pre>
-<pre class="r"><code>#Fixed-price
-FxCBresult[3,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-##  PSR: R&amp;D
-## Ceil: [30m+]
-## Comp: Comp.
-## FxCb: Fixed-Price
-## Pr(Finding)= 6.385844e-06</code></pre>
-<pre class="r"><code>FxCBresult[3,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.2972096 0.2297503 0.1983109 0.2747292</code></pre>
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(AircraftFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;Aircraft&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotAircraftFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotAircraft&quot;
+                                      )
+              )
+
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(IDVFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;IDV&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotIDVFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotIDV&quot;
+                                      )
+              )
+
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LongDurFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;LongDur&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLongDurFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotLongDur&quot;
+                                      )
+              )
+
+
+kable(output,decimals=4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">FxCb</th>
+<th align="left">Control</th>
+<th align="right">pFinding</th>
+<th align="right">result.Offr.1</th>
+<th align="right">result.Offr.2</th>
+<th align="right">result.Offr.3.4</th>
+<th align="right">result.Offr.5.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other None</td>
+<td align="left">5.00e-06</td>
+<td align="left">0.3145995</td>
+<td align="right">0.25644</td>
+<td align="right">65 0.249</td>
+<td align="right">6382 0.17</td>
+<td align="right">93159</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Cost-Based</td>
+<td align="left">None</td>
+<td align="right">3.11e-05</td>
+<td align="right">0.2255373</td>
+<td align="right">0.2108130</td>
+<td align="right">0.2404177</td>
+<td align="right">0.3232319</td>
+</tr>
+<tr class="even">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Fixed-Price</td>
+<td align="left">None</td>
+<td align="right">6.40e-06</td>
+<td align="right">0.2972096</td>
+<td align="right">0.2297503</td>
+<td align="right">0.1983109</td>
+<td align="right">0.2747292</td>
+</tr>
+<tr class="odd">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other Airc</td>
+<td align="left">raft 4.00e-07</td>
+<td align="left">0.3324386</td>
+<td align="right">0.20193</td>
+<td align="right">61 0.189</td>
+<td align="right">5855 0.27</td>
+<td align="right">60398</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Cost-Based</td>
+<td align="left">Aircraft</td>
+<td align="right">2.60e-06</td>
+<td align="right">0.1127123</td>
+<td align="right">0.2756734</td>
+<td align="right">0.4253817</td>
+<td align="right">0.1862326</td>
+</tr>
+<tr class="even">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Fixed-Price</td>
+<td align="left">Aircraft</td>
+<td align="right">5.00e-07</td>
+<td align="right">0.3766444</td>
+<td align="right">0.3597088</td>
+<td align="right">0.1514896</td>
+<td align="right">0.1121572</td>
+</tr>
+<tr class="odd">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other NotA</td>
+<td align="left">ircraft 4.50e-06</td>
+<td align="left">0.3129417</td>
+<td align="right">0.26151</td>
+<td align="right">22 0.255</td>
+<td align="right">2190 0.17</td>
+<td align="right">03271</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotAircraft</td>
+<td align="right">2.85e-05</td>
+<td align="right">0.2360224</td>
+<td align="right">0.2047854</td>
+<td align="right">0.2232286</td>
+<td align="right">0.3359636</td>
+</tr>
+<tr class="even">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotAircraft</td>
+<td align="right">5.80e-06</td>
+<td align="right">0.2898275</td>
+<td align="right">0.2176730</td>
+<td align="right">0.2026621</td>
+<td align="right">0.2898374</td>
+</tr>
+<tr class="odd">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other IDV</td>
+<td align="left">2.70e-06</td>
+<td align="left">0.2491154</td>
+<td align="right">0.28885</td>
+<td align="right">55 0.273</td>
+<td align="right">5353 0.18</td>
+<td align="right">84937</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Cost-Based</td>
+<td align="left">IDV</td>
+<td align="right">1.67e-05</td>
+<td align="right">0.2604141</td>
+<td align="right">0.2209877</td>
+<td align="right">0.1971463</td>
+<td align="right">0.3214518</td>
+</tr>
+<tr class="even">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Fixed-Price</td>
+<td align="left">IDV</td>
+<td align="right">3.40e-06</td>
+<td align="right">0.2048548</td>
+<td align="right">0.2500602</td>
+<td align="right">0.2174395</td>
+<td align="right">0.3276455</td>
+</tr>
+<tr class="odd">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other NotI</td>
+<td align="left">DV 5.00e-06</td>
+<td align="left">0.3145995</td>
+<td align="right">0.25644</td>
+<td align="right">65 0.249</td>
+<td align="right">6382 0.17</td>
+<td align="right">93159</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotIDV</td>
+<td align="right">3.11e-05</td>
+<td align="right">0.2255373</td>
+<td align="right">0.2108130</td>
+<td align="right">0.2404177</td>
+<td align="right">0.3232319</td>
+</tr>
+<tr class="even">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotIDV</td>
+<td align="right">6.40e-06</td>
+<td align="right">0.2972096</td>
+<td align="right">0.2297503</td>
+<td align="right">0.1983109</td>
+<td align="right">0.2747292</td>
+</tr>
+<tr class="odd">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other Long</td>
+<td align="left">Dur 3.20e-06</td>
+<td align="left">0.3339620</td>
+<td align="right">0.24928</td>
+<td align="right">40 0.249</td>
+<td align="right">2839 0.16</td>
+<td align="right">74702</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Cost-Based</td>
+<td align="left">LongDur</td>
+<td align="right">2.04e-05</td>
+<td align="right">0.2413365</td>
+<td align="right">0.2099265</td>
+<td align="right">0.2693050</td>
+<td align="right">0.2794319</td>
+</tr>
+<tr class="even">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Fixed-Price</td>
+<td align="left">LongDur</td>
+<td align="right">4.20e-06</td>
+<td align="right">0.3175540</td>
+<td align="right">0.2316343</td>
+<td align="right">0.1918265</td>
+<td align="right">0.2589852</td>
+</tr>
+<tr class="odd">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other NotL</td>
+<td align="left">ongDur 5.00e-06</td>
+<td align="left">0.3145995</td>
+<td align="right">0.25644</td>
+<td align="right">65 0.249</td>
+<td align="right">6382 0.17</td>
+<td align="right">93159</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotLongDur</td>
+<td align="right">3.11e-05</td>
+<td align="right">0.2255373</td>
+<td align="right">0.2108130</td>
+<td align="right">0.2404177</td>
+<td align="right">0.3232319</td>
+</tr>
+<tr class="even">
+<td align="left">LargeRnDcomp</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotLongDur</td>
+<td align="right">6.40e-06</td>
+<td align="right">0.2972096</td>
+<td align="right">0.2297503</td>
+<td align="right">0.1983109</td>
+<td align="right">0.2747292</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="h2-due-to-design-uncertainty-pre-milestone-b-major-defense-acquisition-programs-mdaps-are-potentially-more-likely-to-encounter-problems-than-other-fixed-price-contracts" class="section level2">
 <h2>H2: Due to design uncertainty Pre-Milestone B Major Defense Acquisition Programs (MDAPs) are potentially more likely to encounter problems than other fixed-price contracts</h2>
@@ -859,75 +1170,605 @@ FxCBresult[3,1]</code></pre>
 <h1>Temporary changes and next steps</h1>
 <p>MDAP specific classification is not yet included because it represents such a small portion of total contracts. It is presently planned to be incorporated through the Interlinked Variable. As an intermediate step.</p>
 </div>
-<div id="initial-results" class="section level1">
+<div id="initial-results-1" class="section level1">
 <h1>Initial results</h1>
 <p>The hypothesis was not supported with regard to number of offers, but this should be treated as a soft negative finding until the more precise question is tested.</p>
 <pre class="r"><code>unlist(compGin$universe$levels[&quot;Link&quot;])</code></pre>
 <pre><code>##           Link1           Link2           Link3 
 ##         &quot;    0&quot; &quot;[    1,  750)&quot; &quot;[  750,67263]&quot;</code></pre>
-<pre class="r"><code>HighLinkFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;Link&quot;),
-                        states=c(&quot;[  750,67263]&quot;)
-)
+<pre class="r"><code>RNodes&lt;-c(&quot;Link&quot;)
+RStates&lt;-c(&quot;[  750,67263]&quot;)
+RVariable&lt;-&quot;HighLink&quot;
+# debug(QueryCrossSectionOnNodeFxCbDF)
+output&lt;-QueryCrossSectionOnNodeFxCbDF(setEvidence(compGin, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;None&quot;
+                                      )
+    
 
-getEvidence(HighLinkFind)</code></pre>
-<pre><code>## Finding: 
-## Link: [  750,67263]
-## Pr(Finding)= 0.2453573</code></pre>
-<pre class="r"><code>HighLinkCompFind&lt;- setEvidence(HighLinkFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
-getEvidence(HighLinkCompFind)</code></pre>
-<pre><code>## Finding: 
-## Link: [  750,67263]
-## Comp: Comp.
-## Pr(Finding)= 0.1746073</code></pre>
-<pre class="r"><code>FxCBresult&lt;-QueryCrossSectionOnNode(HighLinkCompFind,&quot;FxCb&quot;,&quot;Offr&quot;)
 
-#Combination
-FxCBresult[1,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-## Link: [  750,67263]
-## Comp: Comp.
-## FxCb: Combination 
-## or Other
-## Pr(Finding)= 0.001668255</code></pre>
-<pre class="r"><code>FxCBresult[1,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.3674903 0.3269367 0.1793328 0.1262401</code></pre>
-<pre class="r"><code>#Cost-plus
-FxCBresult[2,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-## Link: [  750,67263]
-## Comp: Comp.
-## FxCb: Cost-Based
-## Pr(Finding)= 0.00692329</code></pre>
-<pre class="r"><code>FxCBresult[2,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.3411438 0.2386997 0.1824740 0.2376825</code></pre>
-<pre class="r"><code>#Fixed-price
-FxCBresult[3,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-## Link: [  750,67263]
-## Comp: Comp.
-## FxCb: Fixed-Price
-## Pr(Finding)= 0.1660157</code></pre>
-<pre class="r"><code>FxCBresult[3,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.2649649 0.2513328 0.2120370 0.2716653</code></pre>
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(AircraftFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;Aircraft&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotAircraftFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotAircraft&quot;
+                                      )
+              )
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LargeCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;LargeCeil&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLargeCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotLargeCeil&quot;
+                                      )
+              )
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(IDVFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;IDV&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotIDVFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotIDV&quot;
+                                      )
+              )
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(Under1mCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;Under1mCeil&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotUnder1mCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotUnder1mCeil&quot;
+                                      )
+              )
+
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LongDurFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;LongDur&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLongDurFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotLongDur&quot;
+                                      )
+              )
+
+
+kable(output,decimals=4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">FxCb</th>
+<th align="left">Control</th>
+<th align="right">pFinding</th>
+<th align="right">result.Offr.1</th>
+<th align="right">result.Offr.2</th>
+<th align="right">result.Offr.3.4</th>
+<th align="right">result.Offr.5.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">None 0.0016</td>
+<td align="left">683 0.36749</td>
+<td align="right">03 0.3</td>
+<td align="right">269367 0</td>
+<td align="right">.1793328</td>
+<td align="right">0.1262401</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Cost-Based</td>
+<td align="left">None</td>
+<td align="right">0.0069233</td>
+<td align="right">0.3411438</td>
+<td align="right">0.2386997</td>
+<td align="right">0.1824740</td>
+<td align="right">0.2376825</td>
+</tr>
+<tr class="even">
+<td align="left">HighLink</td>
+<td align="left">Fixed-Price</td>
+<td align="left">None</td>
+<td align="right">0.1660157</td>
+<td align="right">0.2649649</td>
+<td align="right">0.2513328</td>
+<td align="right">0.2120370</td>
+<td align="right">0.2716653</td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">Aircraft 0.0003</td>
+<td align="left">335 0.64435</td>
+<td align="right">84 0.3</td>
+<td align="right">006751 0</td>
+<td align="right">.0366313</td>
+<td align="right">0.0183353</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Cost-Based</td>
+<td align="left">Aircraft</td>
+<td align="right">0.0009295</td>
+<td align="right">0.2236209</td>
+<td align="right">0.2172461</td>
+<td align="right">0.4035406</td>
+<td align="right">0.1555924</td>
+</tr>
+<tr class="even">
+<td align="left">HighLink</td>
+<td align="left">Fixed-Price</td>
+<td align="left">Aircraft</td>
+<td align="right">0.0419276</td>
+<td align="right">0.2487344</td>
+<td align="right">0.3342655</td>
+<td align="right">0.1675127</td>
+<td align="right">0.2494874</td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">NotAircraft 0.0013</td>
+<td align="left">348 0.29832</td>
+<td align="right">08 0.3</td>
+<td align="right">334976 0</td>
+<td align="right">.2149837</td>
+<td align="right">0.1531978</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotAircraft</td>
+<td align="right">0.0059938</td>
+<td align="right">0.3593682</td>
+<td align="right">0.2420265</td>
+<td align="right">0.1481932</td>
+<td align="right">0.2504122</td>
+</tr>
+<tr class="even">
+<td align="left">HighLink</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotAircraft</td>
+<td align="right">0.1240881</td>
+<td align="right">0.2704489</td>
+<td align="right">0.2233110</td>
+<td align="right">0.2270811</td>
+<td align="right">0.2791589</td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">LargeCeil 0.0000</td>
+<td align="left">154 0.25317</td>
+<td align="right">54 0.2</td>
+<td align="right">932765 0</td>
+<td align="right">.2580744</td>
+<td align="right">0.1954737</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Cost-Based</td>
+<td align="left">LargeCeil</td>
+<td align="right">0.0000662</td>
+<td align="right">0.1818530</td>
+<td align="right">0.1678439</td>
+<td align="right">0.1531170</td>
+<td align="right">0.4971861</td>
+</tr>
+<tr class="even">
+<td align="left">HighLink</td>
+<td align="left">Fixed-Price</td>
+<td align="left">LargeCeil</td>
+<td align="right">0.0001577</td>
+<td align="right">0.2487078</td>
+<td align="right">0.2369064</td>
+<td align="right">0.3361476</td>
+<td align="right">0.1782382</td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">NotLargeCeil 0.0016</td>
+<td align="left">528 0.36855</td>
+<td align="right">88 0.3</td>
+<td align="right">272514 0</td>
+<td align="right">.1785968</td>
+<td align="right">0.1255930</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotLargeCeil</td>
+<td align="right">0.0068571</td>
+<td align="right">0.3426813</td>
+<td align="right">0.2393835</td>
+<td align="right">0.1827574</td>
+<td align="right">0.2351778</td>
+</tr>
+<tr class="even">
+<td align="left">HighLink</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotLargeCeil</td>
+<td align="right">0.1658581</td>
+<td align="right">0.2649803</td>
+<td align="right">0.2513466</td>
+<td align="right">0.2119190</td>
+<td align="right">0.2717541</td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">IDV 0.0009</td>
+<td align="left">134 0.17955</td>
+<td align="right">30 0.5</td>
+<td align="right">160506 0</td>
+<td align="right">.1616285</td>
+<td align="right">0.1427678</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Cost-Based</td>
+<td align="left">IDV</td>
+<td align="right">0.0038365</td>
+<td align="right">0.3154989</td>
+<td align="right">0.2850563</td>
+<td align="right">0.1859593</td>
+<td align="right">0.2134855</td>
+</tr>
+<tr class="even">
+<td align="left">HighLink</td>
+<td align="left">Fixed-Price</td>
+<td align="left">IDV</td>
+<td align="right">0.0787206</td>
+<td align="right">0.2619291</td>
+<td align="right">0.3421622</td>
+<td align="right">0.1948540</td>
+<td align="right">0.2010547</td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">NotIDV 0.0016</td>
+<td align="left">683 0.36749</td>
+<td align="right">03 0.3</td>
+<td align="right">269367 0</td>
+<td align="right">.1793328</td>
+<td align="right">0.1262401</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotIDV</td>
+<td align="right">0.0069233</td>
+<td align="right">0.3411438</td>
+<td align="right">0.2386997</td>
+<td align="right">0.1824740</td>
+<td align="right">0.2376825</td>
+</tr>
+<tr class="even">
+<td align="left">HighLink</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotIDV</td>
+<td align="right">0.1660157</td>
+<td align="right">0.2649649</td>
+<td align="right">0.2513328</td>
+<td align="right">0.2120370</td>
+<td align="right">0.2716653</td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">Under1mCeil 0.0014</td>
+<td align="left">271 0.37843</td>
+<td align="right">79 0.3</td>
+<td align="right">427076 0</td>
+<td align="right">.1676000</td>
+<td align="right">0.1112544</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Cost-Based</td>
+<td align="left">Under1mCeil</td>
+<td align="right">0.0058685</td>
+<td align="right">0.3396033</td>
+<td align="right">0.2404335</td>
+<td align="right">0.1867978</td>
+<td align="right">0.2331654</td>
+</tr>
+<tr class="even">
+<td align="left">HighLink</td>
+<td align="left">Fixed-Price</td>
+<td align="left">Under1mCeil</td>
+<td align="right">0.1626760</td>
+<td align="right">0.2646724</td>
+<td align="right">0.2519392</td>
+<td align="right">0.2117223</td>
+<td align="right">0.2716661</td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">NotUnder1mCeil 0.0002</td>
+<td align="left">411 0.30269</td>
+<td align="right">88 0.2</td>
+<td align="right">335990 0</td>
+<td align="right">.2487718</td>
+<td align="right">0.2149305</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotUnder1mCeil</td>
+<td align="right">0.0010548</td>
+<td align="right">0.3497147</td>
+<td align="right">0.2290536</td>
+<td align="right">0.1584188</td>
+<td align="right">0.2628129</td>
+</tr>
+<tr class="even">
+<td align="left">HighLink</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotUnder1mCeil</td>
+<td align="right">0.0033397</td>
+<td align="right">0.2792123</td>
+<td align="right">0.2217991</td>
+<td align="right">0.2273658</td>
+<td align="right">0.2716227</td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">LongDur 0.0002</td>
+<td align="left">747 0.33785</td>
+<td align="right">83 0.2</td>
+<td align="right">722547 0</td>
+<td align="right">.1826827</td>
+<td align="right">0.2072043</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Cost-Based</td>
+<td align="left">LongDur</td>
+<td align="right">0.0017115</td>
+<td align="right">0.3379845</td>
+<td align="right">0.2406574</td>
+<td align="right">0.1470141</td>
+<td align="right">0.2743441</td>
+</tr>
+<tr class="even">
+<td align="left">HighLink</td>
+<td align="left">Fixed-Price</td>
+<td align="left">LongDur</td>
+<td align="right">0.0129545</td>
+<td align="right">0.2781497</td>
+<td align="right">0.2577953</td>
+<td align="right">0.2008677</td>
+<td align="right">0.2631873</td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">NotLongDur 0.0016</td>
+<td align="left">683 0.36749</td>
+<td align="right">03 0.3</td>
+<td align="right">269367 0</td>
+<td align="right">.1793328</td>
+<td align="right">0.1262401</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">HighLink</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotLongDur</td>
+<td align="right">0.0069233</td>
+<td align="right">0.3411438</td>
+<td align="right">0.2386997</td>
+<td align="right">0.1824740</td>
+<td align="right">0.2376825</td>
+</tr>
+<tr class="even">
+<td align="left">HighLink</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotLongDur</td>
+<td align="right">0.1660157</td>
+<td align="right">0.2649649</td>
+<td align="right">0.2513328</td>
+<td align="right">0.2120370</td>
+<td align="right">0.2716653</td>
+</tr>
+</tbody>
+</table>
 <div id="h3-contracts-with-longer-schedules-will-encounter-greater-problems-with-fixed-price-contracts." class="section level2">
 <h2>H3: Contracts with longer schedules will encounter greater problems with fixed-price contracts.</h2>
 <ul>
@@ -943,75 +1784,502 @@ FxCBresult[3,1]</code></pre>
 <h1>Placeholder variable and next steps</h1>
 <p>This was initially expected to be tested with a continuous value for length rather than a discrete value. In addition the test would benefit from having more granularity at the high end of contract lengths. The next step will be to expand Dur’s granularity in the greater than 1 year category.</p>
 </div>
-<div id="initial-results-1" class="section level1">
+<div id="initial-results-2" class="section level1">
 <h1>Initial results</h1>
 <p>The hypothesis regarding number of offers was not supported at the greater than 1 year level. Further subdivision into 2 year plus or other breakdowns might show a different result. Combination resembled fixed-price, but did not do as well with 5 or more offers.</p>
-<pre class="r"><code>        unlist(compGin$universe$levels[&quot;Dur&quot;])</code></pre>
+<pre class="r"><code>unlist(compGin$universe$levels[&quot;Dur&quot;])</code></pre>
 <pre><code>##            Dur1            Dur2            Dur3            Dur4 
 ## &quot;[    0,   61)&quot; &quot;[   61,  214)&quot; &quot;[  214,  366)&quot; &quot;[  366,33192]&quot;</code></pre>
-<pre class="r"><code>        LongDurFind&lt;- setEvidence(compGin, 
-                                nodes=c(&quot;Dur&quot;),
-                                states=c(&quot;[  366,33192]&quot;)
-        )
-        
-        getEvidence(LongDurFind)</code></pre>
-<pre><code>## Finding: 
-## Dur: [  366,33192]
-## Pr(Finding)= 0.05594229</code></pre>
-<pre class="r"><code>        LongDurCompFind&lt;- setEvidence(LongDurFind, 
-                                nodes=c(&quot;Comp&quot;),
-                                states=c(&quot;Comp.&quot;)
-        )
-        getEvidence(LongDurCompFind)</code></pre>
-<pre><code>## Finding: 
-##  Dur: [  366,33192]
-## Comp: Comp.
-## Pr(Finding)= 0.03541949</code></pre>
-<pre class="r"><code>        FxCBresult&lt;-QueryCrossSectionOnNode(LongDurCompFind,&quot;FxCb&quot;,&quot;Offr&quot;)
-        
-        #Combination
-        FxCBresult[1,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-##  Dur: [  366,33192]
-## Comp: Comp.
-## FxCb: Combination 
-## or Other
-## Pr(Finding)= 0.0007496621</code></pre>
-<pre class="r"><code>        FxCBresult[1,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.2591922 0.2593155 0.2245120 0.2569803</code></pre>
-<pre class="r"><code>        #Cost-plus
-        FxCBresult[2,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-##  Dur: [  366,33192]
-## Comp: Comp.
-## FxCb: Cost-Based
-## Pr(Finding)= 0.003915736</code></pre>
-<pre class="r"><code>        FxCBresult[2,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.3142475 0.2432304 0.1710390 0.2714831</code></pre>
-<pre class="r"><code>        #Fixed-price
-        FxCBresult[3,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-##  Dur: [  366,33192]
-## Comp: Comp.
-## FxCb: Fixed-Price
-## Pr(Finding)= 0.03075409</code></pre>
-<pre class="r"><code>        FxCBresult[3,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.2527080 0.2244513 0.2293250 0.2935157</code></pre>
+<pre class="r"><code>RNodes&lt;-c(&quot;Dur&quot;)
+RStates&lt;-c(&quot;[  366,33192]&quot;)
+RVariable&lt;-&quot;LongDur&quot;
+# debug(QueryCrossSectionOnNodeFxCbDF)
+output&lt;-QueryCrossSectionOnNodeFxCbDF(setEvidence(compGin, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;None&quot;
+                                      )
+    
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(AircraftFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;Aircraft&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotAircraftFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotAircraft&quot;
+                                      )
+              )
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LargeCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;LargeCeil&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLargeCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotLargeCeil&quot;
+                                      )
+              )
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(IDVFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;IDV&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotIDVFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotIDV&quot;
+                                      )
+              )
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(Under1mCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;Under1mCeil&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotUnder1mCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotUnder1mCeil&quot;
+                                      )
+              )
+
+
+
+kable(output,decimals=4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">FxCb</th>
+<th align="left">Control</th>
+<th align="right">pFinding</th>
+<th align="right">result.Offr.1</th>
+<th align="right">result.Offr.2</th>
+<th align="right">result.Offr.3.4</th>
+<th align="right">result.Offr.5.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">None 0.0007</td>
+<td align="left">497 0.25919</td>
+<td align="right">22 0.2</td>
+<td align="right">593155 0</td>
+<td align="right">.2245120</td>
+<td align="right">0.2569803</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Cost-Based</td>
+<td align="left">None</td>
+<td align="right">0.0039157</td>
+<td align="right">0.3142475</td>
+<td align="right">0.2432304</td>
+<td align="right">0.1710390</td>
+<td align="right">0.2714831</td>
+</tr>
+<tr class="even">
+<td align="left">LongDur</td>
+<td align="left">Fixed-Price</td>
+<td align="left">None</td>
+<td align="right">0.0307541</td>
+<td align="right">0.2527080</td>
+<td align="right">0.2244513</td>
+<td align="right">0.2293250</td>
+<td align="right">0.2935157</td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">Aircraft 0.0000</td>
+<td align="left">539 0.51538</td>
+<td align="right">43 0.2</td>
+<td align="right">757539 0</td>
+<td align="right">.1164433</td>
+<td align="right">0.0924186</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Cost-Based</td>
+<td align="left">Aircraft</td>
+<td align="right">0.0002311</td>
+<td align="right">0.2927916</td>
+<td align="right">0.2312700</td>
+<td align="right">0.2904821</td>
+<td align="right">0.1854563</td>
+</tr>
+<tr class="even">
+<td align="left">LongDur</td>
+<td align="left">Fixed-Price</td>
+<td align="left">Aircraft</td>
+<td align="right">0.0049130</td>
+<td align="right">0.2817975</td>
+<td align="right">0.3309093</td>
+<td align="right">0.1838074</td>
+<td align="right">0.2034858</td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">NotAircraft 0.0006</td>
+<td align="left">957 0.23933</td>
+<td align="right">65 0.2</td>
+<td align="right">580415 0</td>
+<td align="right">.2328877</td>
+<td align="right">0.2697343</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotAircraft</td>
+<td align="right">0.0036846</td>
+<td align="right">0.3155934</td>
+<td align="right">0.2439806</td>
+<td align="right">0.1635469</td>
+<td align="right">0.2768791</td>
+</tr>
+<tr class="even">
+<td align="left">LongDur</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotAircraft</td>
+<td align="right">0.0258411</td>
+<td align="right">0.2471775</td>
+<td align="right">0.2042112</td>
+<td align="right">0.2379789</td>
+<td align="right">0.3106324</td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">LargeCeil 0.0000</td>
+<td align="left">219 0.15168</td>
+<td align="right">89 0.3</td>
+<td align="right">476505 0</td>
+<td align="right">.1690726</td>
+<td align="right">0.3315879</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Cost-Based</td>
+<td align="left">LargeCeil</td>
+<td align="right">0.0000933</td>
+<td align="right">0.1441153</td>
+<td align="right">0.1732796</td>
+<td align="right">0.2326588</td>
+<td align="right">0.4499463</td>
+</tr>
+<tr class="even">
+<td align="left">LongDur</td>
+<td align="left">Fixed-Price</td>
+<td align="left">LargeCeil</td>
+<td align="right">0.0002218</td>
+<td align="right">0.1428518</td>
+<td align="right">0.1742953</td>
+<td align="right">0.2254957</td>
+<td align="right">0.4573572</td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">NotLargeCeil 0.0007</td>
+<td align="left">278 0.26242</td>
+<td align="right">60 0.2</td>
+<td align="right">566583 0</td>
+<td align="right">.2261797</td>
+<td align="right">0.2547360</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotLargeCeil</td>
+<td align="right">0.0038225</td>
+<td align="right">0.3183995</td>
+<td align="right">0.2449375</td>
+<td align="right">0.1695352</td>
+<td align="right">0.2671277</td>
+</tr>
+<tr class="even">
+<td align="left">LongDur</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotLargeCeil</td>
+<td align="right">0.0305323</td>
+<td align="right">0.2535060</td>
+<td align="right">0.2248157</td>
+<td align="right">0.2293528</td>
+<td align="right">0.2923256</td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">IDV 0.0005</td>
+<td align="left">216 0.17937</td>
+<td align="right">25 0.3</td>
+<td align="right">084722 0</td>
+<td align="right">.2365367</td>
+<td align="right">0.2756186</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Cost-Based</td>
+<td align="left">IDV</td>
+<td align="right">0.0024470</td>
+<td align="right">0.2696515</td>
+<td align="right">0.2795166</td>
+<td align="right">0.1995036</td>
+<td align="right">0.2513282</td>
+</tr>
+<tr class="even">
+<td align="left">LongDur</td>
+<td align="left">Fixed-Price</td>
+<td align="left">IDV</td>
+<td align="right">0.0194128</td>
+<td align="right">0.2242020</td>
+<td align="right">0.2508412</td>
+<td align="right">0.2242817</td>
+<td align="right">0.3006751</td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">NotIDV 0.0007</td>
+<td align="left">497 0.25919</td>
+<td align="right">22 0.2</td>
+<td align="right">593155 0</td>
+<td align="right">.2245120</td>
+<td align="right">0.2569803</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotIDV</td>
+<td align="right">0.0039157</td>
+<td align="right">0.3142475</td>
+<td align="right">0.2432304</td>
+<td align="right">0.1710390</td>
+<td align="right">0.2714831</td>
+</tr>
+<tr class="even">
+<td align="left">LongDur</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotIDV</td>
+<td align="right">0.0307541</td>
+<td align="right">0.2527080</td>
+<td align="right">0.2244513</td>
+<td align="right">0.2293250</td>
+<td align="right">0.2935157</td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">Under1mCeil 0.0004</td>
+<td align="left">191 0.26989</td>
+<td align="right">17 0.2</td>
+<td align="right">917530 0</td>
+<td align="right">.1954127</td>
+<td align="right">0.2429426</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Cost-Based</td>
+<td align="left">Under1mCeil</td>
+<td align="right">0.0026009</td>
+<td align="right">0.3147303</td>
+<td align="right">0.2624804</td>
+<td align="right">0.1654881</td>
+<td align="right">0.2573012</td>
+</tr>
+<tr class="even">
+<td align="left">LongDur</td>
+<td align="left">Fixed-Price</td>
+<td align="left">Under1mCeil</td>
+<td align="right">0.0271042</td>
+<td align="right">0.2584305</td>
+<td align="right">0.2278819</td>
+<td align="right">0.2271535</td>
+<td align="right">0.2865341</td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">NotUnder1mCeil 0.0003</td>
+<td align="left">306 0.24562</td>
+<td align="right">62 0.2</td>
+<td align="right">181880 0</td>
+<td align="right">.2614071</td>
+<td align="right">0.2747788</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">LongDur</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotUnder1mCeil</td>
+<td align="right">0.0013148</td>
+<td align="right">0.3132926</td>
+<td align="right">0.2051510</td>
+<td align="right">0.1820195</td>
+<td align="right">0.2995369</td>
+</tr>
+<tr class="even">
+<td align="left">LongDur</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotUnder1mCeil</td>
+<td align="right">0.0036499</td>
+<td align="right">0.2102125</td>
+<td align="right">0.1989755</td>
+<td align="right">0.2454505</td>
+<td align="right">0.3453615</td>
+</tr>
+</tbody>
+</table>
 <div id="h4-fixed-price-contracts-with-the-potential-competition-for-multiple-offers-will-encounter-fewer-challenges." class="section level2">
 <h2>H4: Fixed-price contracts with the potential competition for multiple offers will encounter fewer challenges.</h2>
 <ul>
@@ -1044,143 +2312,536 @@ FxCBresult[3,1]</code></pre>
 <h1>Placeholder and next steps</h1>
 <p>Software is typically classified as a service under PSR, though also could be under R&amp;D, and is especially prominent in electronics in communication under What. Given that all sorts of platforms have software, PSR would be the best place to incorporate it under the present model, possibly linking software services and software R&amp;D. NAICS codes may also assist. Software is not particularly easy to identify in FPDS as it is often incorporated into larger contracts, but there should be a number of clearcut cases.</p>
 </div>
-<div id="initial-results-2" class="section level1">
+<div id="initial-results-3" class="section level1">
 <h1>Initial results</h1>
 <p>Electronics and communications services do have a slight preference for fixed-price contracts when it comes to number of offers. However, when R&amp;D is also included, the advantage switches to Cost-based.</p>
 <pre class="r"><code>unlist(compGin$universe$levels[&quot;PSR&quot;])</code></pre>
 <pre><code>##       PSR1       PSR2       PSR3 
 ## &quot;Products&quot;      &quot;R&amp;D&quot; &quot;Services&quot;</code></pre>
-<pre class="r"><code>    SoftwareFind&lt;- setEvidence(compGin, 
-                            nodes=c(&quot;What&quot;,&quot;PSR&quot;),
-                            states=c(&quot;Electronics and Communications&quot;,&quot;Services&quot;))
+<pre class="r"><code>unlist(compGin$universe$levels[&quot;What&quot;])</code></pre>
+<pre><code>##                            What1                            What2 
+##            &quot;Aircraft and Drones&quot; &quot;Electronics and Communications&quot; 
+##                            What3                            What4 
+##    &quot;Facilities and Construction&quot;                  &quot;Land Vehicles&quot; 
+##                            What5                            What6 
+##      &quot;Missile and Space Systems&quot;                          &quot;Other&quot; 
+##                            What7                            What8 
+##             &quot;Ships &amp; Submarines&quot;         &quot;Weapons and Ammunition&quot;</code></pre>
+<pre class="r"><code>RNodes&lt;-c(&quot;What&quot;,&quot;PSR&quot;)
+RStates&lt;-c(&quot;Electronics and Communications&quot;,&quot;Services&quot;)
+RVariable&lt;-&quot;Software&quot;
+# debug(QueryCrossSectionOnNodeFxCbDF)
+output&lt;-QueryCrossSectionOnNodeFxCbDF(setEvidence(compGin, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;None&quot;
+                                      )
     
-    
-    getEvidence(SoftwareFind)</code></pre>
-<pre><code>## Finding: 
-## What: Electronics and Communications
-##  PSR: Services
-## Pr(Finding)= 0.02785525</code></pre>
-<pre class="r"><code>    SoftwareCompFind&lt;- setEvidence(SoftwareFind, 
-                            nodes=c(&quot;Comp&quot;),
-                            states=c(&quot;Comp.&quot;)
-    )
-    getEvidence(SoftwareCompFind)</code></pre>
-<pre><code>## Finding: 
-## What: Electronics and Communications
-##  PSR: Services
-## Comp: Comp.
-## Pr(Finding)= 0.01825118</code></pre>
-<pre class="r"><code>            FxCBresult&lt;-QueryCrossSectionOnNode(SoftwareCompFind,&quot;FxCb&quot;,&quot;Offr&quot;)
-            
-            #Combination
-            FxCBresult[1,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-## What: Electronics and Communications
-##  PSR: Services
-## Comp: Comp.
-## FxCb: Combination 
-## or Other
-## Pr(Finding)= 0.000352052</code></pre>
-<pre class="r"><code>            FxCBresult[1,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.2301743 0.3592055 0.1569352 0.2536850</code></pre>
-<pre class="r"><code>            #Cost-plus
-            FxCBresult[2,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-## What: Electronics and Communications
-##  PSR: Services
-## Comp: Comp.
-## FxCb: Cost-Based
-## Pr(Finding)= 0.001732241</code></pre>
-<pre class="r"><code>            FxCBresult[2,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.3872955 0.2282474 0.1727175 0.2117397</code></pre>
-<pre class="r"><code>            #Fixed-price
-            FxCBresult[3,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-## What: Electronics and Communications
-##  PSR: Services
-## Comp: Comp.
-## FxCb: Fixed-Price
-## Pr(Finding)= 0.01616688</code></pre>
-<pre class="r"><code>            FxCBresult[3,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.2878610 0.2262571 0.2378161 0.2480658</code></pre>
-<pre class="r"><code>SoftwareFind&lt;- setEvidence(compGin, 
-                        nodes=c(&quot;What&quot;,&quot;PSR&quot;),
-                        states=c(&quot;Electronics and Communications&quot;,list(c(&quot;Services&quot;,&quot;R&amp;D&quot;)))
-)
-getEvidence(SoftwareFind)</code></pre>
-<pre><code>## Finding: 
-## What: Electronics and Communications
-##  PSR: Services, R&amp;D
-## Pr(Finding)= 0.02957722</code></pre>
-<pre class="r"><code>SoftwareCompFind&lt;- setEvidence(SoftwareFind, 
-                        nodes=c(&quot;Comp&quot;),
-                        states=c(&quot;Comp.&quot;)
-)
 
-FxCBresult&lt;-QueryCrossSectionOnNode(SoftwareCompFind,&quot;FxCb&quot;,&quot;Offr&quot;)
-        
 
-        #Combination
-        FxCBresult[1,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-## What: Electronics and Communications
-##  PSR: Services, R&amp;D
-## Comp: Comp.
-## FxCb: Combination 
-## or Other
-## Pr(Finding)= 0.0004109416</code></pre>
-<pre class="r"><code>        FxCBresult[1,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.2448219 0.3419415 0.1573452 0.2558914</code></pre>
-<pre class="r"><code>        #Cost-plus
-        FxCBresult[2,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-## What: Electronics and Communications
-##  PSR: Services, R&amp;D
-## Comp: Comp.
-## FxCb: Cost-Based
-## Pr(Finding)= 0.002539111</code></pre>
-<pre class="r"><code>        FxCBresult[2,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.3945996 0.2331509 0.1529838 0.2192657</code></pre>
-<pre class="r"><code>        #Fixed-price
-        FxCBresult[3,1]</code></pre>
-<pre><code>## $evidence
-## Finding: 
-## What: Electronics and Communications
-##  PSR: Services, R&amp;D
-## Comp: Comp.
-## FxCb: Fixed-Price
-## Pr(Finding)= 0.01682046</code></pre>
-<pre class="r"><code>        FxCBresult[3,2]</code></pre>
-<pre><code>## $result
-## $result$Offr
-## Offr
-##         1         2       3-4        5+ 
-## 0.2874211 0.2248195 0.2375204 0.2502390</code></pre>
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LargeCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;LargeCeil&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLargeCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotLargeCeil&quot;
+                                      )
+              )
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(IDVFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;IDV&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotIDVFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotIDV&quot;
+                                      )
+              )
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(Under1mCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;Under1mCeil&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotUnder1mCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotUnder1mCeil&quot;
+                                      )
+              )
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LongDurFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;LongDur&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLongDurFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotLongDur&quot;
+                                      )
+              )
+
+
+kable(output,decimals=4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">FxCb</th>
+<th align="left">Control</th>
+<th align="right">pFinding</th>
+<th align="right">result.Offr.1</th>
+<th align="right">result.Offr.2</th>
+<th align="right">result.Offr.3.4</th>
+<th align="right">result.Offr.5.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">None 0.0003</td>
+<td align="left">521 0.23017</td>
+<td align="right">43 0.3</td>
+<td align="right">592055 0</td>
+<td align="right">.1569352</td>
+<td align="right">0.2536850</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Cost-Based</td>
+<td align="left">None</td>
+<td align="right">0.0017322</td>
+<td align="right">0.3872955</td>
+<td align="right">0.2282474</td>
+<td align="right">0.1727175</td>
+<td align="right">0.2117397</td>
+</tr>
+<tr class="even">
+<td align="left">Software</td>
+<td align="left">Fixed-Price</td>
+<td align="left">None</td>
+<td align="right">0.0161669</td>
+<td align="right">0.2878610</td>
+<td align="right">0.2262571</td>
+<td align="right">0.2378161</td>
+<td align="right">0.2480658</td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">LargeCeil 0.0000</td>
+<td align="left">086 0.23569</td>
+<td align="right">53 0.3</td>
+<td align="right">665522 0</td>
+<td align="right">.1922392</td>
+<td align="right">0.2055133</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Cost-Based</td>
+<td align="left">LargeCeil</td>
+<td align="right">0.0000404</td>
+<td align="right">0.2124614</td>
+<td align="right">0.0900046</td>
+<td align="right">0.1147154</td>
+<td align="right">0.5828186</td>
+</tr>
+<tr class="even">
+<td align="left">Software</td>
+<td align="left">Fixed-Price</td>
+<td align="left">LargeCeil</td>
+<td align="right">0.0000629</td>
+<td align="right">0.2896722</td>
+<td align="right">0.1579345</td>
+<td align="right">0.4207164</td>
+<td align="right">0.1316769</td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">NotLargeCeil 0.0003</td>
+<td align="left">434 0.23003</td>
+<td align="right">53 0.3</td>
+<td align="right">590206 0</td>
+<td align="right">.1560465</td>
+<td align="right">0.2548976</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotLargeCeil</td>
+<td align="right">0.0016919</td>
+<td align="right">0.3914676</td>
+<td align="right">0.2315463</td>
+<td align="right">0.1741016</td>
+<td align="right">0.2028845</td>
+</tr>
+<tr class="even">
+<td align="left">Software</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotLargeCeil</td>
+<td align="right">0.0161040</td>
+<td align="right">0.2878539</td>
+<td align="right">0.2265239</td>
+<td align="right">0.2371020</td>
+<td align="right">0.2485202</td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">IDV 0.0003</td>
+<td align="left">184 0.21252</td>
+<td align="right">21 0.3</td>
+<td align="right">720937 0</td>
+<td align="right">.1530876</td>
+<td align="right">0.2622967</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Cost-Based</td>
+<td align="left">IDV</td>
+<td align="right">0.0015366</td>
+<td align="right">0.3761060</td>
+<td align="right">0.2252758</td>
+<td align="right">0.1796555</td>
+<td align="right">0.2189627</td>
+</tr>
+<tr class="even">
+<td align="left">Software</td>
+<td align="left">Fixed-Price</td>
+<td align="left">IDV</td>
+<td align="right">0.0135151</td>
+<td align="right">0.2882757</td>
+<td align="right">0.2358343</td>
+<td align="right">0.2349265</td>
+<td align="right">0.2409635</td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">NotIDV 0.0003</td>
+<td align="left">521 0.23017</td>
+<td align="right">43 0.3</td>
+<td align="right">592055 0</td>
+<td align="right">.1569352</td>
+<td align="right">0.2536850</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotIDV</td>
+<td align="right">0.0017322</td>
+<td align="right">0.3872955</td>
+<td align="right">0.2282474</td>
+<td align="right">0.1727175</td>
+<td align="right">0.2117397</td>
+</tr>
+<tr class="even">
+<td align="left">Software</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotIDV</td>
+<td align="right">0.0161669</td>
+<td align="right">0.2878610</td>
+<td align="right">0.2262571</td>
+<td align="right">0.2378161</td>
+<td align="right">0.2480658</td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">Under1mCeil 0.0002</td>
+<td align="left">377 0.21108</td>
+<td align="right">02 0.4</td>
+<td align="right">006993 0</td>
+<td align="right">.1338588</td>
+<td align="right">0.2543617</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Cost-Based</td>
+<td align="left">Under1mCeil</td>
+<td align="right">0.0014192</td>
+<td align="right">0.3880447</td>
+<td align="right">0.2357752</td>
+<td align="right">0.1776533</td>
+<td align="right">0.1985268</td>
+</tr>
+<tr class="even">
+<td align="left">Software</td>
+<td align="left">Fixed-Price</td>
+<td align="left">Under1mCeil</td>
+<td align="right">0.0151478</td>
+<td align="right">0.2887227</td>
+<td align="right">0.2273225</td>
+<td align="right">0.2378085</td>
+<td align="right">0.2461464</td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">NotUnder1mCeil 0.0001</td>
+<td align="left">144 0.26984</td>
+<td align="right">17 0.2</td>
+<td align="right">730032 0</td>
+<td align="right">.2048758</td>
+<td align="right">0.2522793</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotUnder1mCeil</td>
+<td align="right">0.0003131</td>
+<td align="right">0.3838995</td>
+<td align="right">0.1941240</td>
+<td align="right">0.1503434</td>
+<td align="right">0.2716330</td>
+</tr>
+<tr class="even">
+<td align="left">Software</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotUnder1mCeil</td>
+<td align="right">0.0010191</td>
+<td align="right">0.2750539</td>
+<td align="right">0.2104216</td>
+<td align="right">0.2379290</td>
+<td align="right">0.2765955</td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">LongDur 0.0001</td>
+<td align="left">095 0.24231</td>
+<td align="right">69 0.3</td>
+<td align="right">378332 0</td>
+<td align="right">.1600312</td>
+<td align="right">0.2598186</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Cost-Based</td>
+<td align="left">LongDur</td>
+<td align="right">0.0005015</td>
+<td align="right">0.3990833</td>
+<td align="right">0.2268706</td>
+<td align="right">0.1674594</td>
+<td align="right">0.2065867</td>
+</tr>
+<tr class="even">
+<td align="left">Software</td>
+<td align="left">Fixed-Price</td>
+<td align="left">LongDur</td>
+<td align="right">0.0041767</td>
+<td align="right">0.2816760</td>
+<td align="right">0.2252614</td>
+<td align="right">0.2370726</td>
+<td align="right">0.2559900</td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Combination</td>
+<td align="left"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">or Other</td>
+<td align="left">NotLongDur 0.0003</td>
+<td align="left">521 0.23017</td>
+<td align="right">43 0.3</td>
+<td align="right">592055 0</td>
+<td align="right">.1569352</td>
+<td align="right">0.2536850</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">Software</td>
+<td align="left">Cost-Based</td>
+<td align="left">NotLongDur</td>
+<td align="right">0.0017322</td>
+<td align="right">0.3872955</td>
+<td align="right">0.2282474</td>
+<td align="right">0.1727175</td>
+<td align="right">0.2117397</td>
+</tr>
+<tr class="even">
+<td align="left">Software</td>
+<td align="left">Fixed-Price</td>
+<td align="left">NotLongDur</td>
+<td align="right">0.0161669</td>
+<td align="right">0.2878610</td>
+<td align="right">0.2262571</td>
+<td align="right">0.2378161</td>
+<td align="right">0.2480658</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># 
+# SoftwareFind&lt;- setEvidence(compGin, 
+#                            nodes=c(&quot;What&quot;,&quot;PSR&quot;),
+#                            states=c(&quot;Electronics and Communications&quot;,list(c(&quot;Services&quot;,&quot;R&amp;D&quot;)))
+#                            )
+# getEvidence(SoftwareFind)
+# 
+# SoftwareCompFind&lt;- setEvidence(SoftwareFind, 
+#                                nodes=c(&quot;Comp&quot;),
+#                                states=c(&quot;Comp.&quot;)
+#                                )
+# 
+# FxCbResult&lt;-QueryCrossSectionOnNode(SoftwareCompFind,&quot;FxCb&quot;,&quot;Offr&quot;)
+# 
+# 
+# 
+# #Combination
+# FxCbResult[1,1]
+# FxCbResult[1,2]
+# #Cost-plus
+# FxCbResult[2,1]
+# FxCbResult[2,2]
+# #Fixed-price
+# FxCbResult[3,1]
+# FxCbResult[3,2]</code></pre>
 </div>
 
 
