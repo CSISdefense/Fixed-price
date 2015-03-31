@@ -16,6 +16,7 @@ require(gRbase)
 require(methods)
 require(bnlearn)
 require(Rgraphviz)
+require(knitr)
 #source("http://bioconductor.org/biocLite.R");
 #biocLite("Rgraphviz")
 # biocLite("RBGL")
@@ -80,19 +81,6 @@ require(gRain)
 
 CompGin<-load("data/CompGin.rData")
 summary(compGin)
-# 
-# str(compGin$universe$levels["FxCb"])
-# cost.list <- list(nodes = c("FxCb"),
-#                         states = c("Cost-Based"))
-# cost.find <- setEvidence(compGin, 
-#                         nodes=cost.list$nodes,
-#                         states=cost.list$states)
-# fixed.list<-list(nodes = c("FxCb"),
-#                         states = c("Fixed-Price"))
-# fixed.find <- setEvidence(compGin, 
-#                         nodes=fixed.list$nodes,
-#                         states=fixed.list$states)
-# 
 
 
 QueryCrossSectionOnNode<-function(
@@ -118,80 +106,6 @@ QueryCrossSectionOnNode<-function(
         }
     looper
     }
-# 
-# 
-# querygrain(cost.find, nodes = c("Offr"))
-# querygrain(fixed.find, nodes = c("Offr"),states=c("1"))
-# 
-# qCostCeil<-QueryCrossSectionOnNode(cost.find,"Ceil","Offr")
-# qFixedCeil<-QueryCrossSectionOnNode(fixed.find,"Ceil","Offr")
-# 
-# # debug(QueryCrossSectionOnNode)
-# qCostWhat<-QueryCrossSectionOnNode(cost.find,"What","Offr")
-# qFixedWhat<-QueryCrossSectionOnNode(ContractModel,fixed.find,"What","Offr")
-# row(qCostWhat)
-# qCostWhat[6,]
-# qFixedWhat[6,]
-# 
-# qCostPSR<-QueryCrossSectionOnNode(cost.find,"PSR","Offr")
-# qFixedPSR<-QueryCrossSectionOnNode(fixed.find,"PSR","Offr")
-# 
-# qCostPSR[2,]
-# qFixedPSR[2,]
-# 
-# for(x in 1:ncol(eCeil)){
-#     
-#     print(getEvidence(eCeil[,x]))
-#     print(querygrain(eCeil[[,x]],nodes=c("Offr")))
-#     }
-# 
-# 
-# eCeil<-CompleteEvidenceLists(ContractModel,compGin,"Ceil",gin2.list)
-# for(x in 1:ncol(eCeil)){
-#     
-#     print(getEvidence(eCeil[,x]))
-#     print(querygrain(eCeil[[,x]],nodes=c("Offr")))
-#     }
-# 
-# 
-# test<-eCeil[,1]
-# querygrain(test,nodes=c("Offr"))
-
-# 
-# CeilingFrames<-sapply(unlist(compGin$universe$levels["Ceil"]),function(x) list(nodes = c(gin2.list$nodes,"Ceil"),
-#                         states = c(gin2.list$states, x))
-# 
-#     
-#     
-#     data.frame(nodes = c("Comp","FxCb","Ceil"),
-#                         states = c( "Comp.","Fixed-Price",x)))
-# result<-list()
-# for(x in 1:ncol(CeilingFrames )){
-#     test <- setFinding(compGin, CeilingFrames[,x])
-#     result<-rbind(result,list(CeilingFrames[,x],querygrain(test, nodes = c("Offr"))))
-# }
-# ncol(CeilingFrames )
-# 
-# test2<-setEvidence(compGin, CeilingFrames[,2])
-# getEvidence(test2)
-# # str(test2)
-# 
-# str(gin2.find)
-# # str(eCeil[,1])
-# 
-# # as.dateCeil[,1]
-# querygrain(gin2.find,nodes=c("Offr"))
-# # querygrain(eCeil[,1],nodes=c("Offr"))
-# # getEvidence(test2)
-
-
-# 
-# 
-# ceiltest<-sapply(unlist(compGin$universe$levels["Ceil"]),
-#                  function(x)  setFinding(compGin, nodes = c("Comp","FxCb","Ceil"),
-#                         states = c( "Comp.","Fixed-Price",x)))
-# 
-# sapply(unlist(ceiltest, function(x) querygrain(x, nodes = c("Offr")))
 
 ```
 
@@ -224,6 +138,7 @@ AircraftCompFind<- setEvidence(AircraftFind,
                         states=c("Comp.")
 )
 
+data.frame("Offr.1"=NULL,"Offr.2"=NULL,"Offr.3.4"=NULL,"Offr.5"=NULL)
 
 getEvidence(AircraftFind)
 querygrain(AircraftFind,"Offr")
@@ -231,8 +146,6 @@ querygrain(AircraftFind,"Offr")
 
 getEvidence(AircraftCompFind)
 querygrain(AircraftCompFind,"Offr")
-
-
 
 NotAircraftFind<- setEvidence(compGin, 
                         nodes=c("What"),
@@ -253,6 +166,19 @@ NotAircraftCompFind<- setEvidence(NotAircraftFind,
 
 getEvidence(NotAircraftCompFind)
 querygrain(NotAircraftCompFind,"Offr")
+
+output<-data.frame(rbind(
+    c(Control="Aircraft-All",unlist(querygrain(AircraftFind,"Offr"))),
+      c(Control="!Aircraft-All",unlist(querygrain(NotAircraftFind,"Offr"))),
+      c(Control="Aircraft-Comp",unlist(querygrain(AircraftCompFind,"Offr"))),
+      c(Control="!Aircraft-Comp",unlist(querygrain(NotAircraftCompFind,"Offr")))
+))
+names(output)[1]<-"Control"
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+kable(output,digits=4)
 
 ``` 
 
@@ -327,6 +253,21 @@ NotLargeCeilCompFind<- setEvidence(NotLargeCeilFind,
 
 getEvidence(NotLargeCeilCompFind)
 querygrain(NotLargeCeilCompFind,"Offr")
+
+
+
+output<-data.frame(rbind(
+    c(Control="LargeCeil-All",unlist(querygrain(LargeCeilFind,"Offr"))),
+      c(Control="!LargeCeil-All",unlist(querygrain(NotLargeCeilFind,"Offr"))),
+      c(Control="LargeCeil-Comp",unlist(querygrain(LargeCeilCompFind,"Offr"))),
+      c(Control="!LargeCeil-Comp",unlist(querygrain(NotLargeCeilCompFind,"Offr")))
+))
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+kable(output,digits=4)
+
 
 ``` 
 
@@ -462,6 +403,19 @@ NotUnder1mCeilCompFind<- setEvidence(NotUnder1mCeilFind,
 getEvidence(NotUnder1mCeilCompFind)
 querygrain(NotUnder1mCeilCompFind,"Offr")
 
+
+output<-data.frame(rbind(
+    c(Control="Under1mCeil-All",unlist(querygrain(Under1mCeilFind,"Offr"))),
+      c(Control="!Under1mCeil-All",unlist(querygrain(NotUnder1mCeilFind,"Offr"))),
+      c(Control="Under1mCeil-Comp",unlist(querygrain(Under1mCeilCompFind,"Offr"))),
+      c(Control="!Under1mCeil-Comp",unlist(querygrain(NotUnder1mCeilCompFind,"Offr")))
+))
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+kable(output,digits=4)
+
 ``` 
 
 ##Contracts using purchase orders and "Other Indefinite Delivery Contracts (IDCs)" are more likely to receive a single offer.
@@ -521,6 +475,21 @@ NotIDVCompFind<- setEvidence(NotIDVFind,
 getEvidence(NotIDVCompFind)
 querygrain(NotIDVCompFind,"Offr")
 
+
+
+output<-data.frame(rbind(
+    c(Control="IDV-All",unlist(querygrain(IDVFind,"Offr"))),
+      c(Control="!IDV-All",unlist(querygrain(NotIDVFind,"Offr"))),
+      c(Control="IDV-Comp",unlist(querygrain(IDVCompFind,"Offr"))),
+      c(Control="!IDV-Comp",unlist(querygrain(NotIDVCompFind,"Offr")))
+))
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+kable(output,digits=4)
+
+
 ``` 
 
 ##Contracts with longer initially expected periods of performance will encounter more problems.
@@ -576,6 +545,20 @@ NotLongDurCompFind<- setEvidence(NotLongDurFind,
 
 getEvidence(NotLongDurCompFind)
 querygrain(NotLongDurCompFind,"Offr")
+
+
+output<-data.frame(rbind(
+    c(Control="LongDur-All",unlist(querygrain(LongDurFind,"Offr"))),
+      c(Control="!LongDur-All",unlist(querygrain(NotLongDurFind,"Offr"))),
+      c(Control="LongDur-Comp",unlist(querygrain(LongDurCompFind,"Offr"))),
+      c(Control="!LongDur-Comp",unlist(querygrain(NotLongDurCompFind,"Offr")))
+))
+output$Offr.1<-as.numeric(as.character(output$Offr.1))
+output$Offr.2<-as.numeric(as.character(output$Offr.2))
+output$Offr.3.4<-as.numeric(as.character(output$Offr.3.4))
+output$Offr.5.<-as.numeric(as.character(output$Offr.5.))
+kable(output,digits=4)
+
 
 ``` 
 

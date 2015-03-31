@@ -30,6 +30,7 @@
 ##     children, parents
 ## 
 ## Loading required package: Rgraphviz
+## Loading required package: knitr
 ```
 
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
@@ -85,21 +86,6 @@ summary(compGin)
 ```
 
 ```r
-# 
-# str(compGin$universe$levels["FxCb"])
-# cost.list <- list(nodes = c("FxCb"),
-#                         states = c("Cost-Based"))
-# cost.find <- setEvidence(compGin, 
-#                         nodes=cost.list$nodes,
-#                         states=cost.list$states)
-# fixed.list<-list(nodes = c("FxCb"),
-#                         states = c("Fixed-Price"))
-# fixed.find <- setEvidence(compGin, 
-#                         nodes=fixed.list$nodes,
-#                         states=fixed.list$states)
-# 
-
-
 QueryCrossSectionOnNode<-function(
                         gin,
                         PivotNode,
@@ -123,80 +109,6 @@ QueryCrossSectionOnNode<-function(
         }
     looper
     }
-# 
-# 
-# querygrain(cost.find, nodes = c("Offr"))
-# querygrain(fixed.find, nodes = c("Offr"),states=c("1"))
-# 
-# qCostCeil<-QueryCrossSectionOnNode(cost.find,"Ceil","Offr")
-# qFixedCeil<-QueryCrossSectionOnNode(fixed.find,"Ceil","Offr")
-# 
-# # debug(QueryCrossSectionOnNode)
-# qCostWhat<-QueryCrossSectionOnNode(cost.find,"What","Offr")
-# qFixedWhat<-QueryCrossSectionOnNode(ContractModel,fixed.find,"What","Offr")
-# row(qCostWhat)
-# qCostWhat[6,]
-# qFixedWhat[6,]
-# 
-# qCostPSR<-QueryCrossSectionOnNode(cost.find,"PSR","Offr")
-# qFixedPSR<-QueryCrossSectionOnNode(fixed.find,"PSR","Offr")
-# 
-# qCostPSR[2,]
-# qFixedPSR[2,]
-# 
-# for(x in 1:ncol(eCeil)){
-#     
-#     print(getEvidence(eCeil[,x]))
-#     print(querygrain(eCeil[[,x]],nodes=c("Offr")))
-#     }
-# 
-# 
-# eCeil<-CompleteEvidenceLists(ContractModel,compGin,"Ceil",gin2.list)
-# for(x in 1:ncol(eCeil)){
-#     
-#     print(getEvidence(eCeil[,x]))
-#     print(querygrain(eCeil[[,x]],nodes=c("Offr")))
-#     }
-# 
-# 
-# test<-eCeil[,1]
-# querygrain(test,nodes=c("Offr"))
-
-# 
-# CeilingFrames<-sapply(unlist(compGin$universe$levels["Ceil"]),function(x) list(nodes = c(gin2.list$nodes,"Ceil"),
-#                         states = c(gin2.list$states, x))
-# 
-#     
-#     
-#     data.frame(nodes = c("Comp","FxCb","Ceil"),
-#                         states = c( "Comp.","Fixed-Price",x)))
-# result<-list()
-# for(x in 1:ncol(CeilingFrames )){
-#     test <- setFinding(compGin, CeilingFrames[,x])
-#     result<-rbind(result,list(CeilingFrames[,x],querygrain(test, nodes = c("Offr"))))
-# }
-# ncol(CeilingFrames )
-# 
-# test2<-setEvidence(compGin, CeilingFrames[,2])
-# getEvidence(test2)
-# # str(test2)
-# 
-# str(gin2.find)
-# # str(eCeil[,1])
-# 
-# # as.dateCeil[,1]
-# querygrain(gin2.find,nodes=c("Offr"))
-# # querygrain(eCeil[,1],nodes=c("Offr"))
-# # getEvidence(test2)
-
-
-# 
-# 
-# ceiltest<-sapply(unlist(compGin$universe$levels["Ceil"]),
-#                  function(x)  setFinding(compGin, nodes = c("Comp","FxCb","Ceil"),
-#                         states = c( "Comp.","Fixed-Price",x)))
-# 
-# sapply(unlist(ceiltest, function(x) querygrain(x, nodes = c("Offr")))
 ```
 
 
@@ -228,7 +140,14 @@ AircraftCompFind<- setEvidence(AircraftFind,
                         states=c("Comp.")
 )
 
+data.frame("Offr.1"=NULL,"Offr.2"=NULL,"Offr.3.4"=NULL,"Offr.5"=NULL)
+```
 
+```
+## data frame with 0 columns and 0 rows
+```
+
+```r
 getEvidence(AircraftFind)
 ```
 
@@ -326,6 +245,26 @@ querygrain(NotAircraftCompFind,"Offr")
 ##         1         2       3-4        5+ 
 ## 0.1917945 0.2067809 0.2473978 0.3540268
 ```
+
+```r
+output<-data.frame(rbind(
+    c("Aircraft-All",unlist(querygrain(AircraftFind,"Offr"))),
+      c("!Aircraft-All",unlist(querygrain(NotAircraftFind,"Offr"))),
+      c("Aircraft-Comp",unlist(querygrain(AircraftCompFind,"Offr"))),
+      c("!Aircraft-Comp",unlist(querygrain(NotAircraftCompFind,"Offr")))
+))
+names(output)[1]<-"Control"
+kable(output,digits=4)
+```
+
+
+
+Control          Offr.1              Offr.2              Offr.3.4            Offr.5.           
+---------------  ------------------  ------------------  ------------------  ------------------
+Aircraft-All     0.535462548082371   0.184000537183175   0.129715477481769   0.150821437252685 
+!Aircraft-All    0.329651083366553   0.171702956596799   0.205393834273115   0.293252125763533 
+Aircraft-Comp    0.253016872490764   0.298087666293648   0.20827427355896    0.240621187656629 
+!Aircraft-Comp   0.191794458726782   0.20678093948082    0.24739780112515    0.354026800667247 
 
 
 ##C2: Undefinitized contract actions (UCAs) in development will encounter more problems
