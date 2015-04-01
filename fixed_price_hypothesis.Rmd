@@ -964,7 +964,6 @@ Electronics and communications services do have a slight preference for fixed-pr
 
 ```{r H5Software}
 
-unlist(compGin$universe$levels["PSR"])
 
 
 unlist(compGin$universe$levels["What"])
@@ -1110,6 +1109,152 @@ kable(output,decimals=4)
 # #Fixed-price
 # FxCbResult[3,1]
 # FxCbResult[3,2]
+
+
+unlist(compGin$universe$levels["What"])
+
+RNodes<-c("What","PSR")
+RStates<-c("Electronics and Communications",list(c("Services","R&D")))
+RVariable<-"SoftwareSnR"
+# debug(QueryCrossSectionOnNodeFxCbDF)
+output<-QueryCrossSectionOnNodeFxCbDF(setEvidence(compGin, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"None"
+                                      )
+    
+
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LargeCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"LargeCeil"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLargeCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotLargeCeil"
+                                      )
+              )
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(IDVFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"IDV"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotIDVFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotIDV"
+                                      )
+              )
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(Under1mCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"Under1mCeil"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotUnder1mCeilFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotUnder1mCeil"
+                                      )
+              )
+
+
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LongDurFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"LongDur"
+                                      )
+              )
+
+output<-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLongDurFind, 
+                                                  nodes=c(RNodes,"Comp"),
+                                                  states=c(RStates,"Comp.")
+                                                  )
+                                      ,"FxCb"
+                                      ,"Offr"
+                                      ,RVariable
+                                      ,"NotLongDur"
+                                      )
+              )
+
+
+kable(output,decimals=4)
+
+
+# 
+# SoftwareFind<- setEvidence(compGin, 
+#                            nodes=c("What","PSR"),
+#                            states=c("Electronics and Communications",list(c("Services","R&D")))
+#                            )
+# getEvidence(SoftwareFind)
+# 
+# SoftwareCompFind<- setEvidence(SoftwareFind, 
+#                                nodes=c("Comp"),
+#                                states=c("Comp.")
+#                                )
+# 
+# FxCbResult<-QueryCrossSectionOnNode(SoftwareCompFind,"FxCb","Offr")
+# 
+# 
+# 
+# #Combination
+# FxCbResult[1,1]
+# FxCbResult[1,2]
+# #Cost-plus
+# FxCbResult[2,1]
+# FxCbResult[2,2]
+# #Fixed-price
+# FxCbResult[3,1]
+# FxCbResult[3,2]
+
 
 ``` 
 
