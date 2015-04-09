@@ -11,6 +11,7 @@ output:
 require(ggplot2)
 require(stringr)
 require(plyr)
+require(Hmisc)
 options(error=recover)
 setwd("K:\\Development\\Fixed-price")
 # setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
@@ -94,8 +95,8 @@ summary(subset(ContractSample,select=c(statutoryexceptiontofairopportunity,
 ggplot(
     data = subset(ContractSample,IsSomeCompetition=="Mixed or \nUnlabeled"),
     aes_string(x = "pIsSomeCompetition"),
-    main = "Distribution by percent of dollars with some competition for mixed and unlabeled contracts."
-    ) +
+    
+    ) + scale_y_continuous(labels=percent)
     geom_bar(binwidth=0.05)
 
 

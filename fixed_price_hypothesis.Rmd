@@ -22,8 +22,8 @@ require(methods)
 require(bnlearn)
 require(Rgraphviz)
 require(knitr)
-# setwd("K:\\Development\\Fixed-price")
-setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+setwd("K:\\Development\\Fixed-price")
+# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
 # Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 # Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
 # source(paste(Path,"lookups.r",sep=""))

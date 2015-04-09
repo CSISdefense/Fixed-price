@@ -10,6 +10,24 @@ setwd("K:\\Development\\Fixed-price")
 
 Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 source(paste(Path,"lookups.r",sep=""))
+
+
+
+Coloration<-read.csv(
+    paste(Path,"Lookups\\","lookup_coloration.csv",sep=""),
+    header=TRUE, sep=",", na.strings="", dec=".", strip.white=TRUE, 
+    stringsAsFactors=FALSE
+    )
+
+Coloration<-ddply(Coloration
+                  , c(.(R), .(G), .(B))
+                  , transform
+                  , ColorRGB=as.character(
+                      if(min(is.na(c(R,G,B)))) {NA} 
+                      else {rgb(max(R),max(G),max(B),max=255)}
+                      )
+                  )
+
 ```
 
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the exploration on R&D, we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
@@ -39,6 +57,29 @@ ContractWeighted  <- read.csv(
     stringsAsFactors = TRUE
     )
 
+CompleteModelAndDetail  <- read.csv(
+    paste("data\\defense_contract_CSIScontractID_detail.csv", sep = ""),
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+
+
+CompleteModelAndDetail$Ceil<-factor(CompleteModelAndDetail$Ceil,
+                                        levels=c("[0.00e+00,1.50e+04)"
+                                                 ,"[1.50e+04,1.00e+05)"
+                                                 ,"[1.00e+05,1.00e+06)"
+                                                 ,"[1.00e+06,3.00e+07)"
+                                                 ,"[3.00e+07,3.36e+12]"
+                                                 ),
+                                        labels=c("[0,15k)"
+                                                 ,"[15k,100k)"
+                                                 ,"[100k,1m)"
+                                                 ,"[1m,30m)"
+                                                 ,"[30m+]"
+                                                 ),
+                                        ordered=TRUE)
+
 #These will probably be moved into apply_lookups at some point
 #ContractWeighted <- apply_lookups(Path,ContractWeighted)
 
@@ -59,6 +100,86 @@ ggplot(
 facet_wrap("StartFiscal_Year")
 
 
+
+ggplot(
+  data = CompleteModelAndDetail,
+  aes_string(x = "Term"),
+  ) + geom_bar() + 
+    facet_grid( Ceil ~ .,
+                scales = "free_y",
+                space = "free_y") + scale_y_continuous(expand = c(0,50)) 
+
+
+
+
+
+ggplot(
+  data = subset(CompleteModelAndDetail,Term=="Terminated"),
+  aes_string(x = "Ceil")
+  )+ geom_bar()+
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value")+scale_y_continuous("Number of Partially or Completely \nTerminated Contracts")
+
+
+
+
+
+
+CompleteModelAndDetail$Graph[CompleteModelAndDetail$Term=="Terminated"]<-TRUE
+
+CompleteModelAndDetail$Graph[CompleteModelAndDetail$Term=="Unterminated"]<-FALSE
+
+CompleteModelAndDetail$ContractCount<-1
+CompleteModelAndDetail<-ddply(CompleteModelAndDetail, .(Ceil), transform, pContract=ContractCount/sum(ContractCount))
+CompleteModelAndDetail<-ddply(CompleteModelAndDetail, .(Ceil), transform, pObligation=Action.Obligation/sum(Action.Obligation))
+
+head(CompleteModelAndDetail)
+
+ggplot(
+  data = subset(CompleteModelAndDetail,Term=="Terminated"),
+  aes_string(x = "Ceil",weight="Action.Obligation")
+  )+ geom_bar()+
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value")+scale_y_continuous("Total Obligated Value of Partially or Completely Terminated Contracts")
+
+
+ggplot(
+  data = subset(CompleteModelAndDetail,Term=="Terminated"),
+  aes_string(x = "Ceil",weight="pContract")
+#   main="Percentage of Contracts going to Partially or Completely Terminated Contracts\nBy Initial Contract Ceiling"
+  )+ geom_bar()+ scale_y_continuous("Percent of Contracts by Cost Ceiling Category", labels=percent)+
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")
+
+
+ggplot(
+  data = subset(CompleteModelAndDetail,Term=="Terminated"),
+  aes_string(x = "Ceil",weight="pObligation"),
+  main="Percentage of Contract Obligations going to Partially or Completely Terminated Contracts\nBy Initial Contract Ceiling"
+  )+ geom_bar()+ scale_y_continuous("Percent of Obligations in Cost Ceiling Category", labels=percent)+
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")
+
+
+# 
+# LatticePercentLineWrapper("VAR.name"
+#                                     ,"VAR.proper.name"
+#                                     ,"VAR.X.label"
+#                                     ,"VAR.Y.label"
+#                                     ,Coloration
+#                                     ,subset(CompleteModelAndDetail,!is.na(Term))
+#                                     ,NULL
+#                                     ,"Ceil"
+#                                     ,"Count"
+#                                     ,"Term"
+#                                     ,NA
+#                                     ,NA
+#                                     )
+
+
++ 
+    facet_grid( Ceil ~ .,
+                scales = "free_y",
+                space = "free_y") 
+
+
+head(CompleteModelAndDetail)
 ```
 
 

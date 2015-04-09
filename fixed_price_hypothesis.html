@@ -103,9 +103,7 @@ img {
 </ul>
 </div>
 
-<pre><code>## Bioconductor version 2.13 (BiocInstaller 1.12.1), ?biocLite for help
-## A newer version of Bioconductor is available after installing a new
-##   version of R, ?BiocUpgrade for help
+<pre><code>## Bioconductor version 3.0 (BiocInstaller 1.16.2), ?biocLite for help
 ## Loading required package: ggplot2
 ## Loading required package: stringr
 ## Loading required package: graph
@@ -121,7 +119,6 @@ img {
 ## Loading required package: grid
 ## Loading required package: lattice
 ## Loading required package: survival
-## Loading required package: splines
 ## Loading required package: Formula
 ## 
 ## Attaching package: 'Hmisc'
@@ -2087,9 +2084,6 @@ kable(output,decimals=4)</code></pre>
 <div id="initial-results-3" class="section level1">
 <h1>Initial results</h1>
 <p>Electronics and communications services do have a slight preference for fixed-price contracts when it comes to number of offers. However, when R&amp;D is also included, the advantage switches to Cost-based.</p>
-<pre class="r"><code>unlist(compGin$universe$levels[&quot;PSR&quot;])</code></pre>
-<pre><code>##       PSR1       PSR2       PSR3 
-## &quot;Products&quot;      &quot;R&amp;D&quot; &quot;Services&quot;</code></pre>
 <pre class="r"><code>unlist(compGin$universe$levels[&quot;What&quot;])</code></pre>
 <pre><code>##                            What1                            What2 
 ##            &quot;Aircraft and Drones&quot; &quot;Electronics and Communications&quot; 
@@ -2496,6 +2490,442 @@ kable(output,decimals=4)</code></pre>
 <td align="right">0.2262571</td>
 <td align="right">0.2378161</td>
 <td align="right">0.2480658</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># 
+# SoftwareFind&lt;- setEvidence(compGin, 
+#                            nodes=c(&quot;What&quot;,&quot;PSR&quot;),
+#                            states=c(&quot;Electronics and Communications&quot;,list(c(&quot;Services&quot;,&quot;R&amp;D&quot;)))
+#                            )
+# getEvidence(SoftwareFind)
+# 
+# SoftwareCompFind&lt;- setEvidence(SoftwareFind, 
+#                                nodes=c(&quot;Comp&quot;),
+#                                states=c(&quot;Comp.&quot;)
+#                                )
+# 
+# FxCbResult&lt;-QueryCrossSectionOnNode(SoftwareCompFind,&quot;FxCb&quot;,&quot;Offr&quot;)
+# 
+# 
+# 
+# #Combination
+# FxCbResult[1,1]
+# FxCbResult[1,2]
+# #Cost-plus
+# FxCbResult[2,1]
+# FxCbResult[2,2]
+# #Fixed-price
+# FxCbResult[3,1]
+# FxCbResult[3,2]
+
+
+unlist(compGin$universe$levels[&quot;What&quot;])</code></pre>
+<pre><code>##                            What1                            What2 
+##            &quot;Aircraft and Drones&quot; &quot;Electronics and Communications&quot; 
+##                            What3                            What4 
+##    &quot;Facilities and Construction&quot;                  &quot;Land Vehicles&quot; 
+##                            What5                            What6 
+##      &quot;Missile and Space Systems&quot;                          &quot;Other&quot; 
+##                            What7                            What8 
+##             &quot;Ships &amp; Submarines&quot;         &quot;Weapons and Ammunition&quot;</code></pre>
+<pre class="r"><code>RNodes&lt;-c(&quot;What&quot;,&quot;PSR&quot;)
+RStates&lt;-c(&quot;Electronics and Communications&quot;,list(c(&quot;Services&quot;,&quot;R&amp;D&quot;)))
+RVariable&lt;-&quot;SoftwareSnR&quot;
+# debug(QueryCrossSectionOnNodeFxCbDF)
+output&lt;-QueryCrossSectionOnNodeFxCbDF(setEvidence(compGin, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;None&quot;
+                                      )
+    
+
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LargeCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;LargeCeil&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLargeCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotLargeCeil&quot;
+                                      )
+              )
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(IDVFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;IDV&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotIDVFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotIDV&quot;
+                                      )
+              )
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(Under1mCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;Under1mCeil&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotUnder1mCeilFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotUnder1mCeil&quot;
+                                      )
+              )
+
+
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(LongDurFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;LongDur&quot;
+                                      )
+              )
+
+output&lt;-rbind(output,QueryCrossSectionOnNodeFxCbDF(setEvidence(NotLongDurFind, 
+                                                  nodes=c(RNodes,&quot;Comp&quot;),
+                                                  states=c(RStates,&quot;Comp.&quot;)
+                                                  )
+                                      ,&quot;FxCb&quot;
+                                      ,&quot;Offr&quot;
+                                      ,RVariable
+                                      ,&quot;NotLongDur&quot;
+                                      )
+              )
+
+
+kable(output,decimals=4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">FxCb</th>
+<th align="left">Control</th>
+<th align="right">pFinding</th>
+<th align="right">result.Offr.1</th>
+<th align="right">result.Offr.2</th>
+<th align="right">result.Offr.3.4</th>
+<th align="right">result.Offr.5.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">SoftwareSnR</td>
+<td align="left">Combi</td>
+<td align="left">None</td>
+<td align="right">0.0004109</td>
+<td align="right">0.2448219</td>
+<td align="right">0.3419415</td>
+<td align="right">0.1573452</td>
+<td align="right">0.2558914</td>
+</tr>
+<tr class="even">
+<td align="left">SoftwareSnR</td>
+<td align="left">Cost-</td>
+<td align="left">None</td>
+<td align="right">0.0025391</td>
+<td align="right">0.3945996</td>
+<td align="right">0.2331509</td>
+<td align="right">0.1529838</td>
+<td align="right">0.2192657</td>
+</tr>
+<tr class="odd">
+<td align="left">SoftwareSnR</td>
+<td align="left">Fixed</td>
+<td align="left">None</td>
+<td align="right">0.0168205</td>
+<td align="right">0.2874211</td>
+<td align="right">0.2248195</td>
+<td align="right">0.2375204</td>
+<td align="right">0.2502390</td>
+</tr>
+<tr class="even">
+<td align="left">SoftwareSnR</td>
+<td align="left">Combi</td>
+<td align="left">LargeCeil</td>
+<td align="right">0.0000101</td>
+<td align="right">0.2514402</td>
+<td align="right">0.3544272</td>
+<td align="right">0.2033263</td>
+<td align="right">0.1908064</td>
+</tr>
+<tr class="odd">
+<td align="left">SoftwareSnR</td>
+<td align="left">Cost-</td>
+<td align="left">LargeCeil</td>
+<td align="right">0.0000492</td>
+<td align="right">0.2237237</td>
+<td align="right">0.0999871</td>
+<td align="right">0.1239446</td>
+<td align="right">0.5523446</td>
+</tr>
+<tr class="even">
+<td align="left">SoftwareSnR</td>
+<td align="left">Fixed</td>
+<td align="left">LargeCeil</td>
+<td align="right">0.0000647</td>
+<td align="right">0.2883648</td>
+<td align="right">0.1601469</td>
+<td align="right">0.4211344</td>
+<td align="right">0.1303539</td>
+</tr>
+<tr class="odd">
+<td align="left">SoftwareSnR</td>
+<td align="left">Combi</td>
+<td align="left">NotLargeCeil</td>
+<td align="right">0.0004009</td>
+<td align="right">0.2446559</td>
+<td align="right">0.3416284</td>
+<td align="right">0.1561920</td>
+<td align="right">0.2575237</td>
+</tr>
+<tr class="even">
+<td align="left">SoftwareSnR</td>
+<td align="left">Cost-</td>
+<td align="left">NotLargeCeil</td>
+<td align="right">0.0024899</td>
+<td align="right">0.3979789</td>
+<td align="right">0.2357843</td>
+<td align="right">0.1535581</td>
+<td align="right">0.2126787</td>
+</tr>
+<tr class="odd">
+<td align="left">SoftwareSnR</td>
+<td align="left">Fixed</td>
+<td align="left">NotLargeCeil</td>
+<td align="right">0.0167558</td>
+<td align="right">0.2874175</td>
+<td align="right">0.2250692</td>
+<td align="right">0.2368114</td>
+<td align="right">0.2507019</td>
+</tr>
+<tr class="even">
+<td align="left">SoftwareSnR</td>
+<td align="left">Combi</td>
+<td align="left">IDV</td>
+<td align="right">0.0003395</td>
+<td align="right">0.2137825</td>
+<td align="right">0.3698189</td>
+<td align="right">0.1538746</td>
+<td align="right">0.2625240</td>
+</tr>
+<tr class="odd">
+<td align="left">SoftwareSnR</td>
+<td align="left">Cost-</td>
+<td align="left">IDV</td>
+<td align="right">0.0018116</td>
+<td align="right">0.3777010</td>
+<td align="right">0.2234052</td>
+<td align="right">0.1789748</td>
+<td align="right">0.2199189</td>
+</tr>
+<tr class="even">
+<td align="left">SoftwareSnR</td>
+<td align="left">Fixed</td>
+<td align="left">IDV</td>
+<td align="right">0.0137157</td>
+<td align="right">0.2879032</td>
+<td align="right">0.2355517</td>
+<td align="right">0.2348660</td>
+<td align="right">0.2416791</td>
+</tr>
+<tr class="odd">
+<td align="left">SoftwareSnR</td>
+<td align="left">Combi</td>
+<td align="left">NotIDV</td>
+<td align="right">0.0004109</td>
+<td align="right">0.2448219</td>
+<td align="right">0.3419415</td>
+<td align="right">0.1573452</td>
+<td align="right">0.2558914</td>
+</tr>
+<tr class="even">
+<td align="left">SoftwareSnR</td>
+<td align="left">Cost-</td>
+<td align="left">NotIDV</td>
+<td align="right">0.0025391</td>
+<td align="right">0.3945996</td>
+<td align="right">0.2331509</td>
+<td align="right">0.1529838</td>
+<td align="right">0.2192657</td>
+</tr>
+<tr class="odd">
+<td align="left">SoftwareSnR</td>
+<td align="left">Fixed</td>
+<td align="left">NotIDV</td>
+<td align="right">0.0168205</td>
+<td align="right">0.2874211</td>
+<td align="right">0.2248195</td>
+<td align="right">0.2375204</td>
+<td align="right">0.2502390</td>
+</tr>
+<tr class="even">
+<td align="left">SoftwareSnR</td>
+<td align="left">Combi</td>
+<td align="left">Under1mCeil</td>
+<td align="right">0.0002746</td>
+<td align="right">0.2268811</td>
+<td align="right">0.3820850</td>
+<td align="right">0.1314397</td>
+<td align="right">0.2595941</td>
+</tr>
+<tr class="odd">
+<td align="left">SoftwareSnR</td>
+<td align="left">Cost-</td>
+<td align="left">Under1mCeil</td>
+<td align="right">0.0019955</td>
+<td align="right">0.3928973</td>
+<td align="right">0.2438399</td>
+<td align="right">0.1562368</td>
+<td align="right">0.2070259</td>
+</tr>
+<tr class="even">
+<td align="left">SoftwareSnR</td>
+<td align="left">Fixed</td>
+<td align="left">Under1mCeil</td>
+<td align="right">0.0157615</td>
+<td align="right">0.2881829</td>
+<td align="right">0.2258217</td>
+<td align="right">0.2374705</td>
+<td align="right">0.2485249</td>
+</tr>
+<tr class="odd">
+<td align="left">SoftwareSnR</td>
+<td align="left">Combi</td>
+<td align="left">NotUnder1mCeil</td>
+<td align="right">0.0001363</td>
+<td align="right">0.2809730</td>
+<td align="right">0.2610514</td>
+<td align="right">0.2095453</td>
+<td align="right">0.2484303</td>
+</tr>
+<tr class="even">
+<td align="left">SoftwareSnR</td>
+<td align="left">Cost-</td>
+<td align="left">NotUnder1mCeil</td>
+<td align="right">0.0005436</td>
+<td align="right">0.4008483</td>
+<td align="right">0.1939139</td>
+<td align="right">0.1410426</td>
+<td align="right">0.2641952</td>
+</tr>
+<tr class="odd">
+<td align="left">SoftwareSnR</td>
+<td align="left">Fixed</td>
+<td align="left">NotUnder1mCeil</td>
+<td align="right">0.0010590</td>
+<td align="right">0.2760827</td>
+<td align="right">0.2099038</td>
+<td align="right">0.2382629</td>
+<td align="right">0.2757506</td>
+</tr>
+<tr class="even">
+<td align="left">SoftwareSnR</td>
+<td align="left">Combi</td>
+<td align="left">LongDur</td>
+<td align="right">0.0001358</td>
+<td align="right">0.2618838</td>
+<td align="right">0.3120271</td>
+<td align="right">0.1646589</td>
+<td align="right">0.2614302</td>
+</tr>
+<tr class="odd">
+<td align="left">SoftwareSnR</td>
+<td align="left">Cost-</td>
+<td align="left">LongDur</td>
+<td align="right">0.0008417</td>
+<td align="right">0.4021955</td>
+<td align="right">0.2283887</td>
+<td align="right">0.1452081</td>
+<td align="right">0.2242078</td>
+</tr>
+<tr class="even">
+<td align="left">SoftwareSnR</td>
+<td align="left">Fixed</td>
+<td align="left">LongDur</td>
+<td align="right">0.0043474</td>
+<td align="right">0.2818398</td>
+<td align="right">0.2236099</td>
+<td align="right">0.2365190</td>
+<td align="right">0.2580313</td>
+</tr>
+<tr class="odd">
+<td align="left">SoftwareSnR</td>
+<td align="left">Combi</td>
+<td align="left">NotLongDur</td>
+<td align="right">0.0004109</td>
+<td align="right">0.2448219</td>
+<td align="right">0.3419415</td>
+<td align="right">0.1573452</td>
+<td align="right">0.2558914</td>
+</tr>
+<tr class="even">
+<td align="left">SoftwareSnR</td>
+<td align="left">Cost-</td>
+<td align="left">NotLongDur</td>
+<td align="right">0.0025391</td>
+<td align="right">0.3945996</td>
+<td align="right">0.2331509</td>
+<td align="right">0.1529838</td>
+<td align="right">0.2192657</td>
+</tr>
+<tr class="odd">
+<td align="left">SoftwareSnR</td>
+<td align="left">Fixed</td>
+<td align="left">NotLongDur</td>
+<td align="right">0.0168205</td>
+<td align="right">0.2874211</td>
+<td align="right">0.2248195</td>
+<td align="right">0.2375204</td>
+<td align="right">0.2502390</td>
 </tr>
 </tbody>
 </table>
