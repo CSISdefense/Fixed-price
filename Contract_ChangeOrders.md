@@ -1,14 +1,25 @@
-#DoD Fixed-Price and Competition Study: Costly Change Orders 
+# ChangeOrders
+Greg Sanders  
+Friday, March 20, 2015  
+
+Dod Fixed-Price Study: Costly Change Orders 
+============================================================================
 
 
 
-```{r echo = TRUE}
 
+```r
 if (!require("ggplot2")) {
   install.packages("ggplot2", repos="http://cran.rstudio.com/") 
   library("ggplot2")
 }
+```
 
+```
+## Loading required package: ggplot2
+```
+
+```r
 #install.packages("ggplot2")
 #library("ggplot2")
 
@@ -16,6 +27,28 @@ setwd("K:\\Development\\Fixed-price")
 
 Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 source(paste(Path,"lookups.r",sep=""))
+```
+
+```
+## Loading required package: stringr
+## Loading required package: plyr
+```
+
+```r
+Coloration<-read.csv(
+    paste(Path,"Lookups\\","lookup_coloration.csv",sep=""),
+    header=TRUE, sep=",", na.strings="", dec=".", strip.white=TRUE, 
+    stringsAsFactors=FALSE
+    )
+
+Coloration<-ddply(Coloration
+                  , c(.(R), .(G), .(B))
+                  , transform
+                  , ColorRGB=as.character(
+                      if(min(is.na(c(R,G,B)))) {NA} 
+                      else {rgb(max(R),max(G),max(B),max=255)}
+                      )
+                  )
 ```
 
 
@@ -36,7 +69,8 @@ There are also multiple modifications captured in FPDS that this current study w
 
 In addition, there are a number of other modifications that may be undertaken based on changes on the government or vendor side that are not included in this analysis. 
 
-```{r echo = TRUE}
+
+```r
 setwd("K:\\Development\\Fixed-price")
 
 ContractWeighted  <- read.csv(
@@ -46,17 +80,23 @@ ContractWeighted  <- read.csv(
     stringsAsFactors = TRUE
     )
 
+
+CompleteModelAndDetail  <- read.csv(
+    paste("data\\defense_contract_CSIScontractID_detail.csv", sep = ""),
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
 #These will probably be moved into apply_lookups at some point
 #ContractWeighted <- apply_lookups(Path,ContractWeighted)
-
 ```
 
 
 **A histogram of the data** showing the distribution of the number of change orders each year from 2007.
 
 
-```{r echo = TRUE}
 
+```r
 library("ggplot2")
 
 ContractWeighted<-subset(ContractWeighted, StartFiscal_Year>=2007)
@@ -67,9 +107,13 @@ ggplot(
   ) + scale_x_log10()+
  geom_bar(binwidth=0.25) +
   facet_wrap("StartFiscal_Year")
-
+```
 
 ```
+## Warning in scale$trans$trans(x): NaNs produced
+```
+
+![](Contract_ChangeOrders_files/figure-html/unnamed-chunk-3-1.png) 
 
 
 ## Costly Change Orders Potential Change Cost 
@@ -90,9 +134,8 @@ The % Growth in Base and All Options Value Amount form Change Orders is calculat
 
 **A histogram of the data** showing the distribution of the initial amount of the specific change order 
 
-```{r echo = TRUE}
 
-
+```r
 #library("ggplot2")
 
 #ContractWeighted<-subset(ContractWeighted, StartFiscal_Year>=2007)
@@ -103,9 +146,13 @@ ggplot(
   ) + scale_x_log10()+
  geom_bar(binwidth=0.25) +
   facet_wrap("StartFiscal_Year")
-
+```
 
 ```
+## Warning in scale$trans$trans(x): NaNs produced
+```
+
+![](Contract_ChangeOrders_files/figure-html/unnamed-chunk-4-1.png) 
 
 
 

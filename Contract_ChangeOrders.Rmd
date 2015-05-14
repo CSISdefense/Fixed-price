@@ -1,4 +1,14 @@
-#DoD Fixed-Price and Competition Study: Costly Change Orders 
+---
+title: "ChangeOrders"
+author: "Greg Sanders"
+date: "Friday, March 20, 2015"
+output:
+  html_document:
+    keep_md: yes
+--- 
+
+Dod Fixed-Price Study: Costly Change Orders 
+============================================================================
 
 
 
@@ -9,10 +19,11 @@ if (!require("ggplot2")) {
   library("ggplot2")
 }
 
+require(scales)
+
 #install.packages("ggplot2")
 #library("ggplot2")
 
-setwd("K:\\Development\\Fixed-price")
 
 Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 source(paste(Path,"lookups.r",sep=""))
@@ -70,8 +81,28 @@ CompleteModelAndDetail  <- read.csv(
     na.strings = c("NULL","NA",""),
     stringsAsFactors = TRUE
     )
+
+
+
+CompleteModelAndDetail$Ceil<-factor(CompleteModelAndDetail$Ceil,
+                                        levels=c("[0.00e+00,1.50e+04)"
+                                                 ,"[1.50e+04,1.00e+05)"
+                                                 ,"[1.00e+05,1.00e+06)"
+                                                 ,"[1.00e+06,3.00e+07)"
+                                                 ,"[3.00e+07,3.36e+12]"
+                                                 ),
+                                        labels=c("[0,15k)"
+                                                 ,"[15k,100k)"
+                                                 ,"[100k,1m)"
+                                                 ,"[1m,30m)"
+                                                 ,"[30m+]"
+                                                 ),
+                                        ordered=TRUE)
+
+
 #These will probably be moved into apply_lookups at some point
 #ContractWeighted <- apply_lookups(Path,ContractWeighted)
+
 
 ```
 
@@ -79,7 +110,7 @@ CompleteModelAndDetail  <- read.csv(
 **A histogram of the data** showing the distribution of the number of change orders each year from 2007.
 
 
-```{r echo = TRUE}
+```{r NumberOfChangeOrders, echo = TRUE, fig.width=4.5,fig.height=6}
 
 library("ggplot2")
 
@@ -91,6 +122,72 @@ ggplot(
   ) + scale_x_log10()+
  geom_bar(binwidth=0.25) +
   facet_wrap("StartFiscal_Year")
+
+
+
+CompleteModelAndDetail$Graph[CompleteModelAndDetail$SumOfisChangeOrder>0]<-TRUE
+CompleteModelAndDetail$Graph[CompleteModelAndDetail$SumOfisChangeOrder==0]<-FALSE
+
+CompleteModelAndDetail$ContractCount<-1
+CompleteModelAndDetail<-ddply(CompleteModelAndDetail, .(Ceil), transform, pContract=ContractCount/sum(ContractCount))
+CompleteModelAndDetail<-ddply(CompleteModelAndDetail, .(Ceil), transform, pObligation=Action.Obligation/sum(Action.Obligation))
+
+
+ggplot(
+  data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
+  aes_string(x = "SumOfisChangeOrder"),
+  ) + geom_bar(binwidth=1) + 
+    facet_grid( Ceil ~ .,
+                scales = "free_y",
+                space = "free_y") + scale_y_continuous(expand = c(0,50)) +scale_x_continuous(limits=c(0,10))
+
+
+
+ggplot(
+  data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
+  aes_string(x = "Ceil")
+  )+ geom_bar()+
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+scale_y_continuous("Number of Contracts with Change Orders")
+
+
+
+ggplot(
+  data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
+  aes_string(x = "Ceil",weight="pContract")
+#   main="Percentage of Contracts going to Partially or Completely Terminated Contracts\nBy Initial Contract Ceiling"
+  )+ geom_bar()+ scale_y_continuous("Percent of Contracts with Change Orders", labels=percent)+
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")
+
+
+ggplot(
+  data =subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
+  aes_string(x = "Ceil",weight="pObligation"),
+  main="Percentage of Contract Obligations going to Contracts with Change Orders\nBy Initial Contract Ceiling"
+  )+ geom_bar()+ scale_y_continuous("Percent of Obligations in Cost Ceiling Category", labels=percent)+
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")
+
+
+ggplot(
+  data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
+  aes_string(x = "Ceil",weight="Action.Obligation")
+  )+ geom_bar()+
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+scale_y_continuous("Total Obligated Value of Contracts with Change Orders")
+
+levels(CompleteModelAndDetail$Ceil)
+
+quantile(CompleteModelAndDetail$SumOfisChangeOrder,c(0.999,0.995,0.99),na.rm=TRUE)
+
+
+
+quantile(subset(CompleteModelAndDetail$SumOfisChangeOrder,
+                    !CompleteModelAndDetail$Ceil %in% c("[0,15k)","[15k,100k)")),c(0.9,0.95,0.99),na.rm=TRUE)
+
+
+quantile(subset(CompleteModelAndDetail$SumOfisChangeOrder,CompleteModelAndDetail$SumOfisChangeOrder>0&
+                    CompleteModelAndDetail$Ceil!="[0,15k)"),c(0.25,0.5,0.75,0.9),na.rm=TRUE)
+
+
+ecdf(subset(CompleteModelAndDetail$SumOfisChangeOrder,CompleteModelAndDetail$SumOfisChangeOrder>0))(c(0,1,2,3,4))
 
 
 ```
@@ -114,26 +211,72 @@ The % Growth in Base and All Options Value Amount form Change Orders is calculat
 
 **A histogram of the data** showing the distribution of the initial amount of the specific change order 
 
-```{r echo = TRUE}
+```{r CostCeilingRaisingChangeOrders, echo = TRUE, fig.width=4.5,fig.height=6}
 
 
-#library("ggplot2")
-
-#ContractWeighted<-subset(ContractWeighted, StartFiscal_Year>=2007)
 
 ggplot(
-  data = ContractWeighted,
-  aes_string(x = "ChangeOrderBaseAndExercisedOptionsValue"),
-  ) + scale_x_log10()+
- geom_bar(binwidth=0.25) +
-  facet_wrap("StartFiscal_Year")
+  data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
+  aes_string(x = "pChangeOrderObligated"),
+  ) + geom_bar(bin=0.01) + 
+    facet_grid( Ceil ~ .,
+                scales = "free_y",
+                space = "free_y") +   
+    scale_y_continuous("Number of Contracts with Change Orders")+
+    scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)",
+                       limits=c(-1.25,1.25), labels=percent)
+
+
+names(CompleteModelAndDetail)
+
+ggplot(
+  data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
+  aes_string(x = "pChangeOrderObligated")
+  )+ geom_bar()+
+#     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)")
+    scale_y_continuous("Number of Contracts with Change Orders")+
+        facet_grid( . ~ Ceil ) +
+    scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)",
+                       limits=c(-1.25,1.25), labels=percent)
+
+
+
+ggplot(
+  data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
+  aes_string(x = "pChangeOrderObligated",weight="pContract")
+  )+ geom_bar()+
+#     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)")
+    scale_y_continuous("Percent of Contracts with Change Orders", labels=percent)+
+        facet_grid( . ~ Ceil ) +
+    scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)",
+                       limits=c(-0.5,1), labels=percent)
+
+
+
+ggplot(
+  data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
+  aes_string(x = "Ceil",weight="pContract")
+#   main="Percentage of Contracts going to Partially or Completely Terminated Contracts\nBy Initial Contract Ceiling"
+  )+ geom_bar()+ scale_y_continuous("Percent of Contracts with Change Orders", labels=percent)+
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")
+
+
+ggplot(
+  data =subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
+  aes_string(x = "Ceil",weight="pObligation"),
+  main="Percentage of Contract Obligations going to Contracts with Change Orders\nBy Initial Contract Ceiling"
+  )+ geom_bar()+ scale_y_continuous("Percent of Obligations in Cost Ceiling Category", labels=percent)+
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")
+
+
+ggplot(
+  data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
+  aes_string(x = "Ceil",weight="Action.Obligation")
+  )+ geom_bar()+
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+scale_y_continuous("Total Obligated Value of Contracts with Change Orders")
 
 
 ```
-
-
-
-
 
 
 

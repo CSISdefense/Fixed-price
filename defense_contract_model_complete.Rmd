@@ -222,6 +222,20 @@ roundedcutoffs<-c(15000,100000,1000000,30000000)
 CompleteContracts$qCeiling <- cut2(CompleteContracts$UnmodifiedContractBaseAndAllOptionsValue,cuts=roundedcutoffs)
 rm(roundedcutoffs)
 
+CompleteContracts$qLinked <- cut2(CompleteContracts$LinkedContracts,cuts=c(1,750))
+
+CompleteContracts$qNChg <- cut2(CompleteContracts$SumOfisChangeOrder,c(1,2,3))
+
+CompleteContracts$qCRais <- cut2(
+    CompleteContracts$pChangeOrderObligated,c(
+                                              -0.001,
+#                                               min(subset(
+#                                                   CompleteContracts$pChangeOrderObligated,
+#                                                   CompleteContracts$pChangeOrderObligated>0)),
+0.001,
+                                                                          0.12))
+summary(subset(CompleteContracts$qCRais,CompleteContracts$SumOfisChangeOrder>0    ))
+
 CompleteContracts<-subset(CompleteContracts,select=-c(
     UnmodifiedDays,
     MinOfEffectiveDate,
@@ -361,12 +375,12 @@ CompleteContracts<-subset(CompleteContracts,select=-c(
     UnmodifiedIsFullAndOpen,
     UnmodifiedIsOnlyOneSource,
     UnmodifiedIsFollowonToCompetedAction,
-    Unmodifiedmultipleorsingleawardidc,
-    Unmodifiedaddmultipleorsingawardidc,
+#     Unmodifiedmultipleorsingleawardidc,
+#     Unmodifiedaddmultipleorsingawardidc,
     IsFullAndOpen,
-    IsFollowonToCompetedAction,
-    multipleorsingleawardidc,
-    AddMultipleOrSingleAwardIDC
+    IsFollowonToCompetedAction
+#     multipleorsingleawardidc,
+#     AddMultipleOrSingleAwardIDC
     )
     )
 
@@ -592,7 +606,27 @@ CompleteContracts$SubCustomer.sum[
                                                 c("Army", "Navy", "Air Force","Other DoD")]
 
 
+CompleteContracts$SimpleVehicle<-NA
+CompleteContracts$SimpleVehicle[CompleteContracts$AwardOrIDVcontractActionType %in% c("Definitive Contract",
+                                                                       "Purchase Order")]<-"Def/Pur"
+CompleteContracts$SimpleVehicle[CompleteContracts$AwardOrIDVcontractActionType 
+                                %in% c("Basic Ordering Agreement",
+                                       "Blanket Purchase Agreement",
+                                       "Federal Supply Schedule",
+                                       "Government Wide Acquisition Contract")]<-"Other IDV"
+CompleteContracts$SimpleVehicle[CompleteContracts$AwardOrIDVcontractActionType == "Letter Contract"]<-"Letter"
+CompleteContracts$SimpleVehicle[CompleteContracts$AwardOrIDVcontractActionType %in%
+                                    c("Indefinite Delivery Contract",
+                                      "Delivery Order")]<-
+    as.character(CompleteContracts$multipleorsingleawardidc[CompleteContracts$AwardOrIDVcontractActionType %in%
+                                    c("Indefinite Delivery Contract",
+                                      "Delivery Order")])
 
+CompleteContracts$SimpleVehicle<-factor(CompleteContracts$SimpleVehicle)
+summary(CompleteContracts$SimpleVehicle)
+str(CompleteContracts$SimpleVehicle)
+
+summary(CompleteContracts[is.na(CompleteContracts$SimpleVehicle),"AwardOrIDVcontractActionType"])
 
 
 
@@ -603,7 +637,7 @@ CompleteContracts$SubCustomer.sum[
 CompleteModel<-subset(CompleteContracts,select=c(IsIDV,
     FixedOrCost,
     UnmodifiedIsSomeCompetition,
-    #                                 Comp,
+    #                         Comp,
     qLinked,
     SubCustomer.sum,
     PlatformPortfolio.sum,
@@ -613,7 +647,7 @@ CompleteModel<-subset(CompleteContracts,select=c(IsIDV,
     qDuration,
     SingleOffer,
     qOffers,
-    IsTerminated
+    IsTerminated,
     )
     )
 # 
@@ -671,6 +705,8 @@ CompleteModelAndDetail<-subset(CompleteContracts,select=c(IsIDV,
     qDuration,
     SingleOffer,
     qOffers,
+    IsIDV,
+        SimpleVehicle,
     UnmodifiedNumberOfOffersReceived,
     IsTerminated,
     UnmodifiedContractBaseAndAllOptionsValue,
@@ -695,6 +731,8 @@ colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qDuration"]<
 colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SingleOffer"]<-"One"
 colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qOffers"]<-"Offr"
 colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsTerminated"]<-"Term"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleVehicle"]<-"Veh"
+
 
 write.table(CompleteModelAndDetail
             ,file=paste("data\\defense_contract_CSIScontractID_detail.csv"

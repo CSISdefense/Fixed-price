@@ -1,7 +1,16 @@
- Dod Fixed-Price Study: Is Terminated exploration
+---
+title: "ContractTermination"
+author: "Greg Sanders"
+date: "Friday, March 20, 2015"
+output:
+  html_document:
+    keep_md: yes
+--- 
+
+Dod Fixed-Price Study: Is Terminated exploration
 ============================================================================
 
-```{r echo = TRUE}
+```{r InputFiles, echo = TRUE}
 ##install.packages("ggplot2")
 
 ##library("ggplot2")
@@ -47,8 +56,7 @@ These four catetegories and the "Close Out" category are used to mark a contract
 
 
 
-```{r echo = TRUE}
-setwd("K:\\Development\\Fixed-price")
+```{r ReadInData, echo = TRUE}
 
 ContractWeighted  <- read.csv(
     paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv", sep = ""),
@@ -87,9 +95,10 @@ CompleteModelAndDetail$Ceil<-factor(CompleteModelAndDetail$Ceil,
 
 **A Histogram of the IsTerminated data** showing the distribution of whether or not a contract was terminated each year from 2007.  
 
-```{r echo = TRUE}
+```{r ShowGraphs, echo = TRUE, fig.width=4.5,fig.height=6}
 
-library("ggplot2")
+require("ggplot2")
+require(scales)
 
 ContractWeighted<-subset(ContractWeighted, StartFiscal_Year>=2007)
 
@@ -117,7 +126,7 @@ ggplot(
   data = subset(CompleteModelAndDetail,Term=="Terminated"),
   aes_string(x = "Ceil")
   )+ geom_bar()+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value")+scale_y_continuous("Number of Partially or Completely \nTerminated Contracts")
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+scale_y_continuous("Number of Partially or Completely \nTerminated Contracts")
 
 
 
@@ -138,7 +147,7 @@ ggplot(
   data = subset(CompleteModelAndDetail,Term=="Terminated"),
   aes_string(x = "Ceil",weight="Action.Obligation")
   )+ geom_bar()+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value")+scale_y_continuous("Total Obligated Value of Partially or Completely Terminated Contracts")
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+scale_y_continuous("Total Obligated Value of Partially or Completely Terminated Contracts")
 
 
 ggplot(
@@ -172,12 +181,12 @@ ggplot(
 #                                     ,NA
 #                                     )
 
-
-+ 
-    facet_grid( Ceil ~ .,
-                scales = "free_y",
-                space = "free_y") 
-
+# 
+# + 
+#     facet_grid( Ceil ~ .,
+#                 scales = "free_y",
+#                 space = "free_y") 
+# 
 
 head(CompleteModelAndDetail)
 ```
