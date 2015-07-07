@@ -72,7 +72,8 @@ CompleteContracts<-read_and_join(Path
                                  ,"data\\"
                                  ,by="CSIScontractID"
                                  )
-CompleteContracts<-standardize_variable_names(CompleteContracts)
+
+CompleteContracts<-standardize_variable_names(Path,CompleteContracts)
 
 CompleteContracts<-subset(CompleteContracts,select=-c(
     SumOfnumberOfActions,
@@ -103,7 +104,7 @@ CompleteContracts<-read_and_join(Path,
                                  "data\\",
                                  by="CSIScontractID"
                                  )
-CompleteContracts<-standardize_variable_names(CompleteContracts)
+CompleteContracts<-standardize_variable_names(Path,CompleteContracts)
 
 #Add up interlinked values
 CompleteContracts$ContractingOfficePlatformInterlinked[is.na(CompleteContracts$ContractingOfficePlatformInterlinked)]<-0
@@ -132,7 +133,7 @@ CompleteContracts<-read_and_join(Path
                                  ,"data\\"
                                  ,by="CSIScontractID"
                                  )
-CompleteContracts<-standardize_variable_names(CompleteContracts)
+CompleteContracts<-standardize_variable_names(Path,CompleteContracts)
 
 CompleteContracts$ChangeOrderObligatedAmount<-FactorToNumber(CompleteContracts$ChangeOrderObligatedAmount)
 CompleteContracts$ChangeOrderBaseAndAllOptionsValue<-FactorToNumber(CompleteContracts$ChangeOrderBaseAndAllOptionsValue)
@@ -163,7 +164,7 @@ CompleteContracts<-read_and_join(Path
                                  ,"data\\"
                                  ,by="CSIScontractID"
                                  )
-CompleteContracts<-standardize_variable_names(CompleteContracts)
+CompleteContracts<-standardize_variable_names(Path,CompleteContracts)
 
 CompleteContracts$ObligatedAmountIsInternational<-FactorToNumber(CompleteContracts$ObligatedAmountIsInternational)
 
@@ -201,7 +202,7 @@ CompleteContracts<-read_and_join(Path
                                  ,"data\\"
                                  ,by="CSIScontractID"
                                  )
-CompleteContracts<-standardize_variable_names(CompleteContracts)
+CompleteContracts<-standardize_variable_names(Path,CompleteContracts)
 
 CompleteContracts$UnmodifiedCurrentCompletionDate<-
     strptime(CompleteContracts$UnmodifiedCurrentCompletionDate,"%Y-%m-%d") 
@@ -254,7 +255,7 @@ CompleteContracts<-read_and_join(Path
                                  ,"data\\"
                                  ,by="CSIScontractID"
                                  )
-CompleteContracts<-standardize_variable_names(CompleteContracts)
+CompleteContracts<-standardize_variable_names(Path,CompleteContracts)
 
 CompleteContracts$ObligatedAmountIsProducts<-FactorToNumber(CompleteContracts$ObligatedAmountIsProducts)
 
@@ -353,7 +354,7 @@ CompleteContracts<-read_and_join(Path
                                  ,"data\\"
                                  ,by="CSIScontractID"
                                  )
-CompleteContracts<-standardize_variable_names(CompleteContracts)
+CompleteContracts<-standardize_variable_names(Path,CompleteContracts)
 
 CompleteContracts$UnmodifiedNumberOfOffersReceived<-FactorToNumber(CompleteContracts$UnmodifiedNumberOfOffersReceived)
 
@@ -393,7 +394,7 @@ CompleteContracts<-read_and_join(Path
                                  ,"data\\"
                                  ,by="CSIScontractID"
                                  )
-CompleteContracts<-standardize_variable_names(CompleteContracts)
+CompleteContracts<-standardize_variable_names(Path,CompleteContracts)
 
 
 CompleteContracts$ObligatedAmountIsArmy<-FactorToNumber(CompleteContracts$ObligatedAmountIsArmy)
@@ -440,7 +441,7 @@ names(CompleteContracts)
 #                                  ,"data\\"
 #                                  ,by="CSIScontractID"
 #                                  )
-#CompleteContracts<-standardize_variable_names(CompleteContracts)
+#CompleteContracts<-standardize_variable_names(Path,CompleteContracts)
 # subset(CompleteContracts,select=-c("isAnyRnD1to5","obligatedAmountRnD1to5","firstSignedDateRnD1to5","UnmodifiedRnD1to5"))
 # CompleteContracts<-CompleteContracts[,!names(CompleteContracts) %in% c("isAnyRnD1to5","obligatedAmountRnD1to5","firstSignedDateRnD1to5","UnmodifiedRnD1to5")]
 ```
@@ -454,7 +455,7 @@ CompleteContracts<-read_and_join(Path
                                  ,"data\\"
                                  ,by="CSIScontractID"
                                  )
-CompleteContracts<-standardize_variable_names(CompleteContracts)
+CompleteContracts<-standardize_variable_names(Path,CompleteContracts)
 
 
 CompleteContracts$ObligatedAmountIsFixedPrice<-FactorToNumber(CompleteContracts$ObligatedAmountIsFixedPrice)

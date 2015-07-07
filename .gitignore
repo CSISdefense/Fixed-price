@@ -1,2 +1,5 @@
 1st Deliverable Archives/
 *.Rhistory
+.RDataTmp
+SharePoint.lnk
+Data/defense_contract_CSIScontractID_detail.zip
