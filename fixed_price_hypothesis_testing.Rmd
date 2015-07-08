@@ -21,10 +21,10 @@ require(reshape2)
 #source("http://bioconductor.org/biocLite.R");
 #biocLite("Rgraphviz")
 # biocLite("RBGL")
-# setwd("K:\\Development\\Fixed-price")
-setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
-# Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
-Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
+setwd("K:\\Development\\Fixed-price")
+# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
+# Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
 source(paste(Path,"lookups.r",sep=""))
 
 
@@ -210,21 +210,43 @@ querygrain(AircraftFind,nodes=c("FxCb","Offr"), type="joint")
 querygrain(AircraftFind,nodes=c("FxCb","NChg"), type="joint")
 querygrain(AircraftFind,nodes=c("FxCb","CRai"), type="joint")
 
-AircraftDF<-querygrain(AircraftFind,nodes=c("FxCb","Term"), type="joint",result="data.frame")
-AircraftDF<-ddply(AircraftDF,.(FxCb),transform,p=Freq/sum(Freq))
+TermDF<-querygrain(AircraftFind,nodes=c("FxCb","Ceil","Term"), type="joint",result="data.frame")
+TermDF<-ddply(TermDF,.(FxCb,Ceil),transform,p=Freq/sum(Freq))
 # querygrain(AircraftFind, nodes=c("Offr","NChg","CRai","Term"), type="marginal")
-AircraftDF<-dcast(AircraftDF,Term ~ FxCb, sum, value.var="p")
-AircraftDF$FixedCostMargin<-AircraftDF[,"Fixed-Price"]/AircraftDF[,"Cost-Based"]
-AircraftDF$FixedCombMargin<-AircraftDF[,"Fixed-Price"]/AircraftDF[,"Combination \nor Other"]
+TermDF<-dcast(TermDF,Term + Ceil ~ FxCb, sum, value.var="p")
+TermDF$FixedCostMargin<-TermDF[,"Fixed-Price"]/TermDF[,"Cost-Based"]
+TermDF$FixedCombMargin<-TermDF[,"Fixed-Price"]/TermDF[,"Combination \nor Other"]
+colnames(TermDF)[colnames(TermDF)=="Term"]<-"Variable"
+
+expNChgDF<-querygrain(AircraftFind,nodes=c("FxCb","Ceil","NChg"), type="joint",result="data.frame")
+expNChgDF<-ddply(expNChgDF,.(FxCb,"Ceil),transform,p=Freq/sum(Freq))
+expNChgDF$expNChg[expNChgDF$NChg=="   0"]<-0
+expNChgDF$expNChg[expNChgDF$NChg=="   1"]<-1*expNChgDF$p[expNChgDF$NChg=="   1"]
+expNChgDF$expNChg[expNChgDF$NChg=="   2"]<-2*expNChgDF$p[expNChgDF$NChg=="   2"]
+expNChgDF$expNChg[expNChgDF$NChg=="[   3,1040]"]<-3*expNChgDF$p[expNChgDF$NChg=="[   3,1040]"]
+expNChgDF<-ddply(expNChgDF,.(FxCb),summarise,expNChg=sum(expNChg))
+expNChgDF<-dcast(expNChgDF, . ~ FxCb, sum, value.var="expNChg")
+expNChgDF$Variable<-"Expected Number of Changes"
+expNChgDF$FixedCostMargin<-expNChgDF[,"Fixed-Price"]/expNChgDF[,"Cost-Based"]
+expNChgDF$FixedCombMargin<-expNChgDF[,"Fixed-Price"]/expNChgDF[,"Combination \nor Other"]
+expNChgDF<-subset(expNChgDF,select=-c(.))
+
+expCRaiDF<-querygrain(AircraftFind,nodes=c("FxCb","CRai"), type="joint",result="data.frame")
+expCRaiDF<-ddply(expCRaiDF,.(FxCb),transform,p=Freq/sum(Freq))
+expCRaiDF$expCRai[expCRaiDF$CRai=="[-0.001, 0.001)"]<-0
+expCRaiDF$expCRai[expCRaiDF$CRai=="[  -Inf,-0.001)"]<- -0.001*expCRaiDF$p[expCRaiDF$CRai=="[  -Inf,-0.001)"]
+expCRaiDF$expCRai[expCRaiDF$CRai=="[ 0.001, 0.120)"]<-0.001*expCRaiDF$p[expCRaiDF$CRai=="[ 0.001, 0.120)"]
+expCRaiDF$expCRai[expCRaiDF$CRai=="[ 0.120,   Inf]"]<-0.12*expCRaiDF$p[expCRaiDF$CRai=="[ 0.120,   Inf]"]
+expCRaiDF<-ddply(expCRaiDF,.(FxCb),summarise,expCRai=sum(expCRai))
+expCRaiDF<-dcast(expCRaiDF, . ~ FxCb, sum, value.var="expCRai")
+expCRaiDF$Variable<-"Ceiling Raising Change Orders %"
+expCRaiDF$FixedCostMargin<-expCRaiDF[,"Fixed-Price"]/expCRaiDF[,"Cost-Based"]
+expCRaiDF$FixedCombMargin<-expCRaiDF[,"Fixed-Price"]/expCRaiDF[,"Combination \nor Other"]
+expCRaiDF<-subset(expCRaiDF,select=-c(.))
 
 
-AircraftDF<-querygrain(AircraftFind,nodes=c("FxCb","NChg"), type="joint",result="data.frame")
-AircraftDF<-ddply(AircraftDF,.(FxCb),transform,p=Freq/sum(Freq))
-AircraftDF$expNChg[AircraftDF$NChg=="   0"]<-0
-AircraftDF$expNChg[AircraftDF$NChg=="   1"]<-1*AircraftDF$p[AircraftDF$NChg=="   1"]
-AircraftDF$expNChg[AircraftDF$NChg=="   2"]<-2*AircraftDF$p[AircraftDF$NChg=="   2"]
-AircraftDF$expNChg[AircraftDF$NChg=="[   3,1040]"]<-3*AircraftDF$p[AircraftDF$NChg=="[   3,1040]"]
-AircraftDF<-ddply(AircraftDF,.(FxCb),summarise,expNChg=sum(expNChg))
+outcomes<-rbind(TermDF,expNChgDF,expCRaiDF)
+
 
 querygrain(AircraftFind,nodes=c("FxCb","NChg"), type="joint",result="data.frame")
 
