@@ -17,13 +17,14 @@ require(gRbase)
 require(methods)
 require(bnlearn)
 require(Rgraphviz)
+require(reshape2)
 #source("http://bioconductor.org/biocLite.R");
 #biocLite("Rgraphviz")
 # biocLite("RBGL")
-setwd("K:\\Development\\Fixed-price")
-# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
-Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
-# Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
+# setwd("K:\\Development\\Fixed-price")
+setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+# Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
+Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
 source(paste(Path,"lookups.r",sep=""))
 
 
@@ -176,7 +177,7 @@ As expected, numbers of offers are far higher with non-aircraft, for both compet
 
 ```{r C1Aircraft}
 
-levels(ContractModel$Term)
+# levels(ContractModel$Term)
 TermFind<- setEvidence(compGin, 
                         nodes=c("Term"),
                         states=c("Terminated")
@@ -184,7 +185,7 @@ TermFind<- setEvidence(compGin,
 pEvidence(TermFind)
 getEvidence(TermFind)
 
-levels(ContractModel$What)
+# levels(ContractModel$What)
 
 AircraftFind<- setEvidence(compGin, 
                         nodes=c("What"),
@@ -208,10 +209,24 @@ querygrain(AircraftFind,"Offr")
 querygrain(AircraftFind,nodes=c("FxCb","Offr"), type="joint")
 querygrain(AircraftFind,nodes=c("FxCb","NChg"), type="joint")
 querygrain(AircraftFind,nodes=c("FxCb","CRai"), type="joint")
+
 AircraftDF<-querygrain(AircraftFind,nodes=c("FxCb","Term"), type="joint",result="data.frame")
 AircraftDF<-ddply(AircraftDF,.(FxCb),transform,p=Freq/sum(Freq))
 # querygrain(AircraftFind, nodes=c("Offr","NChg","CRai","Term"), type="marginal")
 AircraftDF<-dcast(AircraftDF,Term ~ FxCb, sum, value.var="p")
+AircraftDF$FixedCostMargin<-AircraftDF[,"Fixed-Price"]/AircraftDF[,"Cost-Based"]
+AircraftDF$FixedCombMargin<-AircraftDF[,"Fixed-Price"]/AircraftDF[,"Combination \nor Other"]
+
+
+AircraftDF<-querygrain(AircraftFind,nodes=c("FxCb","NChg"), type="joint",result="data.frame")
+AircraftDF<-ddply(AircraftDF,.(FxCb),transform,p=Freq/sum(Freq))
+AircraftDF$expNChg[AircraftDF$NChg=="   0"]<-0
+AircraftDF$expNChg[AircraftDF$NChg=="   1"]<-1*AircraftDF$p[AircraftDF$NChg=="   1"]
+AircraftDF$expNChg[AircraftDF$NChg=="   2"]<-2*AircraftDF$p[AircraftDF$NChg=="   2"]
+AircraftDF$expNChg[AircraftDF$NChg=="[   3,1040]"]<-3*AircraftDF$p[AircraftDF$NChg=="[   3,1040]"]
+AircraftDF<-ddply(AircraftDF,.(FxCb),summarise,expNChg=sum(expNChg))
+
+querygrain(AircraftFind,nodes=c("FxCb","NChg"), type="joint",result="data.frame")
 
 getEvidence(AircraftCompFind)
 querygrain(AircraftCompFind,"Offr")
