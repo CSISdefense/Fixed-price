@@ -38,7 +38,7 @@ Describe contract vehicle here.
 
 
 ```{r BayesianCompilation, echo = TRUE}
-compGin<-load("Output\\compGin.Rdata")
+load("Output\\compGin.Rdata",.GlobalEnv)
 # cad.cpt <- extractCPT(ContractModel, as.graphNEL(CompetitionNetwork), smooth = 0.001)
 # compGin <- grain(compileCPT(cad.cpt))
 
@@ -208,10 +208,10 @@ querygrain(AircraftFind,"Offr")
 querygrain(AircraftFind,nodes=c("FxCb","Offr"), type="joint")
 querygrain(AircraftFind,nodes=c("FxCb","NChg"), type="joint")
 querygrain(AircraftFind,nodes=c("FxCb","CRai"), type="joint")
-test<-querygrain(AircraftFind,nodes=c("FxCb","Term"), type="joint",result="data.frame")
-
-querygrain(AircraftFind, nodes=c("Offr","NChg","CRai","Term"), type="marginal")
-
+AircraftDF<-querygrain(AircraftFind,nodes=c("FxCb","Term"), type="joint",result="data.frame")
+AircraftDF<-ddply(AircraftDF,.(FxCb),transform,p=Freq/sum(Freq))
+# querygrain(AircraftFind, nodes=c("Offr","NChg","CRai","Term"), type="marginal")
+AircraftDF<-dcast(AircraftDF,Term ~ FxCb, sum, value.var="p")
 
 getEvidence(AircraftCompFind)
 querygrain(AircraftCompFind,"Offr")
