@@ -1,0 +1,826 @@
+---
+output:
+  html_document:
+    self_contained: no
+    keep_md: yes
+--- 
+
+```{r hiddensetup, echo = FALSE}
+require(ggplot2)
+require(stringr)
+require(graph)
+require(plyr)
+require(Hmisc)
+require(Matrix)
+require(gRain)
+require(gRbase)
+require(methods)
+require(bnlearn)
+require(Rgraphviz)
+#source("http://bioconductor.org/biocLite.R");
+#biocLite("Rgraphviz")
+# biocLite("RBGL")
+setwd("K:\\Development\\Fixed-price")
+# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
+# Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
+source(paste(Path,"lookups.r",sep=""))
+
+
+
+```
+
+Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
+
+##Studying contract vehicle within the sample.
+Describe contract vehicle here.
+
+
+
+```{r BayesianCompilation, echo = TRUE}
+compGin<-load("Output\\compGin.Rdata")
+# cad.cpt <- extractCPT(ContractModel, as.graphNEL(CompetitionNetwork), smooth = 0.001)
+# compGin <- grain(compileCPT(cad.cpt))
+
+summary(compGin)
+# str(compGin$universe$levels["FxCb"])
+# cost.list <- list(nodes = c("FxCb"),
+#                         states = c("Cost-Based"))
+# cost.find <- setEvidence(compGin, 
+#                         nodes=cost.list$nodes,
+#                         states=cost.list$states)
+# fixed.list<-list(nodes = c("FxCb"),
+#                         states = c("Fixed-Price"))
+# fixed.find <- setEvidence(compGin, 
+#                         nodes=fixed.list$nodes,
+#                         states=fixed.list$states)
+# 
+
+
+QueryCrossSectionOnNode<-function(
+                        gin,
+                        PivotNode,
+                        QueryNode
+                        )
+    {
+    looper<-NULL
+    for(x in unlist(gin$universe$levels[PivotNode])){
+        looper<-rbind(looper,list(evidence=getEvidence(setEvidence(gin,
+                                                                 nodes = c(PivotNode),
+                                                                 states = c(x)
+                                                     
+                                                     )),
+                                result=querygrain(setEvidence(gin,
+                                                              nodes = c(PivotNode),
+                                                              states = c(x))
+                                                  , nodes = c(QueryNode)
+                                                  )
+                                )
+              )
+        }
+    looper
+    }
+# 
+# 
+# querygrain(cost.find, nodes = c("Offr"))
+# querygrain(fixed.find, nodes = c("Offr"),states=c("1"))
+# 
+# qCostCeil<-QueryCrossSectionOnNode(cost.find,"Ceil","Offr")
+# qFixedCeil<-QueryCrossSectionOnNode(fixed.find,"Ceil","Offr")
+# 
+# # debug(QueryCrossSectionOnNode)
+# qCostWhat<-QueryCrossSectionOnNode(cost.find,"What","Offr")
+# qFixedWhat<-QueryCrossSectionOnNode(ContractModel,fixed.find,"What","Offr")
+# row(qCostWhat)
+# qCostWhat[6,]
+# qFixedWhat[6,]
+# 
+# qCostPSR<-QueryCrossSectionOnNode(cost.find,"PSR","Offr")
+# qFixedPSR<-QueryCrossSectionOnNode(fixed.find,"PSR","Offr")
+# 
+# qCostPSR[2,]
+# qFixedPSR[2,]
+# 
+# for(x in 1:ncol(eCeil)){
+#     
+#     print(getEvidence(eCeil[,x]))
+#     print(querygrain(eCeil[[,x]],nodes=c("Offr")))
+#     }
+# 
+# 
+# eCeil<-CompleteEvidenceLists(ContractModel,compGin,"Ceil",gin2.list)
+# for(x in 1:ncol(eCeil)){
+#     
+#     print(getEvidence(eCeil[,x]))
+#     print(querygrain(eCeil[[,x]],nodes=c("Offr")))
+#     }
+# 
+# 
+# test<-eCeil[,1]
+# querygrain(test,nodes=c("Offr"))
+
+# 
+# CeilingFrames<-sapply(levels(ContractModel$Ceil),function(x) list(nodes = c(gin2.list$nodes,"Ceil"),
+#                         states = c(gin2.list$states, x))
+# 
+#     
+#     
+#     data.frame(nodes = c("Comp","FxCb","Ceil"),
+#                         states = c( "Comp.","Fixed-Price",x)))
+# result<-list()
+# for(x in 1:ncol(CeilingFrames )){
+#     test <- setFinding(compGin, CeilingFrames[,x])
+#     result<-rbind(result,list(CeilingFrames[,x],querygrain(test, nodes = c("Offr"))))
+# }
+# ncol(CeilingFrames )
+# 
+# test2<-setEvidence(compGin, CeilingFrames[,2])
+# getEvidence(test2)
+# # str(test2)
+# 
+# str(gin2.find)
+# # str(eCeil[,1])
+# 
+# # as.dateCeil[,1]
+# querygrain(gin2.find,nodes=c("Offr"))
+# # querygrain(eCeil[,1],nodes=c("Offr"))
+# # getEvidence(test2)
+
+
+# 
+# 
+# ceiltest<-sapply(levels(ContractModel$Ceil),
+#                  function(x)  setFinding(compGin, nodes = c("Comp","FxCb","Ceil"),
+#                         states = c( "Comp.","Fixed-Price",x)))
+# 
+# sapply(unlist(ceiltest, function(x) querygrain(x, nodes = c("Offr")))
+
+```
+
+
+
+##C1 Aircraft encounter
+
+ *    Aircraft have a 22 point corresponding effect on total contract growth that is explained by schedule and cost overruns. The report looked at time, schedule, and differences between major commands, but not contract pricing mechanism. (Performance of the Defense Acquisition System 2013)
+ *	"During the Second World War leading belligerents such as Britain, the United States, and Germany, favored the use of fixed-price contracts for purchasing military aircraft. These contracts were believed to encourage economical and efficient production. Yet only Britain succeeded in developing contractual procedures based primarily upon the fixed-price. This was primarily driven by the degree of organization by the weapons companies." (The Price of Air Power: Technological Change, Industrial Policy, and Military Aircraft Contracts in the Era of British Rearmament, 1935-39)
+ *	Dependent Variables:
+ *	Single offer competition, contract termination, number of change orders, and cost of change orders.
+ *	Initial Taxonomy:
+ *	The sample will include all contracts with a 50 percent or greater share of obligations in the Aircraft and Drone platform portfolio.
+
+#Changes
+The model incorporated a 75% threshold for classification as a given Platform under What. This excludes some contracts, but captured the vast majority of contracts with a mix of platforms.
+
+#Results
+As expected, numbers of offers are far higher with non-aircraft, for both competed and for all contracts.
+
+```{r C1Aircraft}
+
+levels(ContractModel$Term)
+TermFind<- setEvidence(compGin, 
+                        nodes=c("Term"),
+                        states=c("Terminated")
+)
+pEvidence(TermFind)
+getEvidence(TermFind)
+
+levels(ContractModel$What)
+
+AircraftFind<- setEvidence(compGin, 
+                        nodes=c("What"),
+                        states=c("Aircraft and Drones")
+)
+
+AircraftCompFind<- setEvidence(AircraftFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(AircraftFind)
+querygrain(AircraftFind,"Offr")
+querygrain(AircraftFind,"NChg")
+querygrain(AircraftFind,"CRai")
+querygrain(AircraftFind,"Term")
+
+querygrain(AircraftFind,"Offr")
+
+querygrain(AircraftFind,nodes=c("FxCb","Offr"), type="joint")
+querygrain(AircraftFind,nodes=c("FxCb","NChg"), type="joint")
+querygrain(AircraftFind,nodes=c("FxCb","CRai"), type="joint")
+test<-querygrain(AircraftFind,nodes=c("FxCb","Term"), type="joint",result="data.frame")
+
+querygrain(AircraftFind, nodes=c("Offr","NChg","CRai","Term"), type="marginal")
+
+
+getEvidence(AircraftCompFind)
+querygrain(AircraftCompFind,"Offr")
+
+
+
+NotAircraftFind<- setEvidence(compGin, 
+                        nodes=c("What"),
+                        states=c(list(
+                            levels(ContractModel$What)[levels(ContractModel$What)!=
+                                                           "Aircraft and Drones"]))
+                        )
+
+getEvidence(NotAircraftFind)
+querygrain(NotAircraftFind,"Offr")
+querygrain(NotAircraftFind,"NChg")
+querygrain(NotAircraftFind,"CRai")
+querygrain(NotAircraftFind,"Term")
+
+
+
+
+NotAircraftCompFind<- setEvidence(NotAircraftFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(NotAircraftCompFind)
+querygrain(NotAircraftCompFind,"Offr")
+
+``` 
+
+
+##C2: Undefinitized contract actions (UCAs) in development will encounter more problems
+ *	"For example, analysis is revealing that UCAs can be successfully employed in early production but are concerns for developmental work" (Performance of the Defense Acquisition System 2013)
+ *	"UCAs increase development cycle time by increasing schedule growth." GAO Study
+ *	"The contractor has little incentive to control costs during this period.". (GAO study?)
+ *	DOD has had difficulty overseeing the use of UCAs on at least three levels: (1) how and when to use UCAs, (2) definitizing UCAs in a timely fashion and 3) documenting the basis for negotiated profit or fees (GAO study?)
+ *	Dependent Variables:
+ *	Single offer competition, contract termination, number of change orders, and cost of change orders.
+ *	Initial Taxonomy:
+ *	UCA status will be defined as those contracts labeled as "Letter Contracts."
+ *	The first five phases of R&D as defined by product or service code will be included. This excluding R&D management and support and operational system development. 
+ *	Contracts will be included in the sample if more than 50 percent of obligations in any given year meet the above criteria.
+
+###Next steps: 
+UCA status will be added to IDV. Since the contract type will not be known at the offset, the information lost will primarily be information not available to the contracting officer at contract start. However, theres no available proxy until that information is added.
+
+##Contracts that are initially expected to be very large contracts will encounter more problems.
+ *	For overall DoD contracting in 2013, contracts with an annual value of $500 or more saw the lowest rate of competition with three or more offers- 20 percent. The next lowest rate for contracts between $100 million and $500 million (26 percent). (CSIS Analysis of FPDS Data).
+ *	Dependent Variables:
+ *	Single offer competition, contract termination, number of change orders, and cost of change orders.
+ *	Initial Taxonomy:
+ *	The sample will include all contracts with an initial annualized base and all options amount of at least $500 million, or a initial base and exercised options amount of at least $500 million.
+
+###Placeholder and next steps.
+$500M contracts is not a level of granularity yet available in the Ceil variable, so the lower $30M threshold will be used for the initial analysis. In addition, the criteria we are using is base and all values alone, but that should always match or exceed the base and exercised value. 
+
+
+###Initial results.
+At the $30M ceil level the results were ambigious. For all contracts, single offer is slightly more common among large contracts but competition with 3-4 and 5+. For contracts that were competed, large contracts actually received more offers.
+
+```{r C2Large}
+
+levels(ContractModel$Ceil)
+
+LargeCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c("[30m+]")
+)
+
+LargeCeilCompFind<- setEvidence(LargeCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(LargeCeilFind)
+querygrain(LargeCeilFind,"Offr")
+querygrain(LargeCeilFind,"NChg")
+querygrain(LargeCeilFind,"CRai")
+querygrain(LargeCeilFind,"Term")
+
+
+getEvidence(LargeCeilCompFind)
+querygrain(LargeCeilCompFind,"Offr")
+
+
+NotLargeCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c(list(
+                            levels(ContractModel$Ceil)[levels(ContractModel$Ceil)!=
+                                                           "[30m+]"]))
+                        )
+
+getEvidence(NotLargeCeilFind)
+querygrain(NotLargeCeilFind,"Offr")
+
+
+NotLargeCeilCompFind<- setEvidence(NotLargeCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(NotLargeCeilCompFind)
+querygrain(NotLargeCeilCompFind,"Offr")
+
+``` 
+
+##Contracts initially expected to have smaller values will receive more offers.
+ *	For overall DoD contracting in 2013, contracts with an annual value of less than $250,000 saw the highest rate of competition with two or more offers (62 percent), and that rate generally declines as size of contract increases. (CSIS Analysis of FPDS Data). This phenomenon is reversed with services contracts which have less competition when the size is smaller.
+ *	Dependent Variables:
+ *	Single offer competition.
+ *	Initial Taxonomy:
+ *	The independent variable will be the base and all exercised options amount for the contract. This value will not be annualized, as the steady rate of exercising options means that the initial value has severe limitations when predicting total contract value.
+ 
+ For small contracts, the pattern 
+ 
+  ###Initial results
+ The hypothesis does hold weakly for contracts under $15k, although larger contracts have more 5+ offer. The hypothesis does not hold for contracts under $100k and again 5+ offer contracts are remain more common among larger contracts.  If the dividing line is instead $1 million, then the analysis does hold, with contracts of $1m and lower having more competition at every level of analysis.
+ 
+
+```{r C3Small}
+
+levels(ContractModel$Ceil)
+
+SmallCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c(list(c("[0,15k)","[15k,100k)")))
+)
+
+SmallCeilCompFind<- setEvidence(SmallCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(SmallCeilFind)
+querygrain(SmallCeilFind,"Offr")
+
+getEvidence(SmallCeilCompFind)
+querygrain(SmallCeilCompFind,"Offr")
+
+
+NotSmallCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c(list(
+                            levels(ContractModel$Ceil)[!levels(ContractModel$Ceil) %in%
+                                                           c("[0,15k)","[15k,100k)")]))
+                        )
+
+getEvidence(NotSmallCeilFind)
+querygrain(NotSmallCeilFind,"Offr")
+
+
+NotSmallCeilCompFind<- setEvidence(NotSmallCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(NotSmallCeilCompFind)
+querygrain(NotSmallCeilCompFind,"Offr")
+
+VerySmallCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c("[0,15k)")
+)
+
+VerySmallCeilCompFind<- setEvidence(VerySmallCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(VerySmallCeilFind)
+querygrain(VerySmallCeilFind,"Offr")
+
+getEvidence(VerySmallCeilCompFind)
+querygrain(VerySmallCeilCompFind,"Offr")
+
+
+NotVerySmallCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c(list(
+                            levels(ContractModel$Ceil)[levels(ContractModel$Ceil)!=c("[0,15k)")]))
+                        )
+
+getEvidence(NotVerySmallCeilFind)
+querygrain(NotVerySmallCeilFind,"Offr")
+
+
+NotVerySmallCeilCompFind<- setEvidence(NotVerySmallCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(NotVerySmallCeilCompFind)
+querygrain(NotVerySmallCeilCompFind,"Offr")
+
+
+#1M
+
+Under1mCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c(list(c("[0,15k)","[15k,100k)","[100k,1m)")))
+)
+
+Under1mCeilCompFind<- setEvidence(Under1mCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(Under1mCeilFind)
+querygrain(Under1mCeilFind,"Offr")
+
+getEvidence(Under1mCeilCompFind)
+querygrain(Under1mCeilCompFind,"Offr")
+
+
+NotUnder1mCeilFind<- setEvidence(compGin, 
+                        nodes=c("Ceil"),
+                        states=c(list(
+                            levels(ContractModel$Ceil)[!levels(ContractModel$Ceil) %in%
+                                                           c("[0,15k)","[15k,100k)","[100k,1m)")]))
+                        )
+
+getEvidence(NotUnder1mCeilFind)
+querygrain(NotUnder1mCeilFind,"Offr")
+
+
+NotUnder1mCeilCompFind<- setEvidence(NotUnder1mCeilFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+getEvidence(NotUnder1mCeilCompFind)
+querygrain(NotUnder1mCeilCompFind,"Offr")
+
+``` 
+
+##Contracts using purchase orders and "Other Indefinite Delivery Contracts (IDCs)" are more likely to receive a single offer.
+ *	Past CSIS research has found that contracts using a purchase orders and "Other IDCs" (Other IDCs includes Federal Supply Schedule, Basic Ordering Agreements, Blanket Purchasing Agreements, Government-Wide Acquisition Contracts) have notably higher  rates of single offer competition than other vehicles. (CSIS, Federal Services Contracting and the Supporting Industrial Base, 2000-2012)
+ *	Dependent Variables:
+ *	Single offer competition.
+ *	Initial Taxonomy:
+ *	The sample will include contracts with a 50 percent or greater share of obligations reporting purchase orders or "Other IDCs".
+
+###Placeholders and next steps
+At present, the vehicle variable only has granularity to look at at IDVs versus definitive and purchase orders. Multi-award IDVs have the highest number of offers, so they will be used as the place holder until greater granularity is available.
+
+The analysis indicates validates this past finding, IDVs are marketedly more likely to be competed and to receive more offers when competed.
+
+
+
+
+```{r C4IDV}
+
+levels(ContractModel$IDV)
+
+IDVFind<- setEvidence(compGin, 
+                        nodes=c("IDV"),
+                        states=c("IDV")
+)
+
+IDVCompFind<- setEvidence(IDVFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(IDVFind)
+querygrain(IDVFind,"Offr")
+
+getEvidence(IDVCompFind)
+querygrain(IDVCompFind,"Offr")
+
+
+NotIDVFind<- setEvidence(compGin, 
+                        nodes=c("IDV"),
+                        states=c(list(
+                            levels(ContractModel$IDV)[levels(ContractModel$IDV)!=
+                                                           "IDV"]))
+                        )
+
+getEvidence(NotIDVFind)
+querygrain(NotIDVFind,"Offr")
+
+
+NotIDVCompFind<- setEvidence(NotIDVFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(NotIDVCompFind)
+querygrain(NotIDVCompFind,"Offr")
+
+``` 
+
+##Contracts with longer initially expected periods of performance will encounter more problems.
+ *	Past CSIS research on cost overruns in major defense acquisition projects have found that cost growth is correlated with contract duration. "If cost increases accrue over time, then programs with an older baseline estimate would tend to accumulate relatively higher cost increases. The data for the analyzed programs show that older programs indeed experience larger overruns... this growth correlation not only provides further evidence for the assertion that cost growth occurs steadily throughout the program lifespan, but it also suggests that younger programs are not performing better than older programs." (David Berteau et al.: Cost and Time Overruns for Major Defense Acquisition Programs (2011))
+ *	Dependent Variables:
+ *	Contract termination, number of change orders, and cost of change orders.
+ *	Initial Taxonomy:
+ *	Period of performance will be measured as expected contract duration in 4-week months, rounding up.
+ *	Note: CSIS is including a separate hypothesis (Slide 9) to test whether fixed-price contracts encounter an even greater number of problems under contracts with longer expected periods of performance 
+
+
+```{r C5LongDur}
+        
+        levels(ContractModel$Dur)
+        
+        LongDurFind<- setEvidence(compGin, 
+                                nodes=c("Dur"),
+                                states=c("[  366,33192]")
+        )
+        
+        getEvidence(LongDurFind)
+        
+        LongDurCompFind<- setEvidence(LongDurFind, 
+                                nodes=c("Comp"),
+                                states=c("Comp.")
+        )
+        getEvidence(LongDurCompFind)
+        
+
+getEvidence(LongDurFind)
+querygrain( LongDurFind,"Offr")
+
+getEvidence(LongDurCompFind)
+querygrain(LongDurCompFind,"Offr")
+
+
+NotLongDurFind<- setEvidence(compGin, 
+                        nodes=c("Dur"),
+                        states=c(list(
+                            levels(ContractModel$Dur)[levels(ContractModel$Dur)!=
+                                                           "[  366,33192]"]))
+                        )
+
+getEvidence(NotLongDurFind)
+querygrain(NotLongDurFind,"Offr")
+
+
+NotLongDurCompFind<- setEvidence(NotLongDurFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+
+getEvidence(NotLongDurCompFind)
+querygrain(NotLongDurCompFind,"Offr")
+
+``` 
+
+
+##Incentive Fee contracts experience fewer problems than other forms of contracts.
+ *	"Incentive formula-type contracts had lower cost growth at the median (i.e., its central tendency), shared savings with the government, and earned slightly lower margins than CPAF/CPFF/CS/other (O) contracts. In other words, to achieve about the same margin on incentive formula-type contracts, contractors had to control cost growth better-and they did so." (Performance of the Defense Acquisition System, 2014) This finding is in line with multiple earlier policy statements from Undersecretary Kendall emphasizing fixed-price incentive fee contracts and vendor motivation. 
+ *	One study uses the F-35 as a case study to examine when to utilize different types of contract incentive structures. The model presented in this study could provide insight into the use of different types of fixed-price contracts. (The Effect of Processes and Incentives on Acquisition Cost Growth)
+ *	Dependent Variables:
+ *	Contract termination, number of change orders, and cost of change orders.
+ *	Initial Taxonomy:
+ *	The sample will include contracts with a 50 percent or greater share of obligations reporting cost-plus incentive fee or fixed-price incentive fee as the pricing mechanism.
+
+##Next steps
+Incentive was not included in the initial model because it made up a small proportion of all contracts. Fee structure should probably be included as a seperate node entirely. Initial analysis at the aggregate dollar levels for the competition study found did not support the hypothesis.
+
+
+
+
+
+
+
+##H1: Large Research and Development (R&D) contracts will encounter challenges under fixed-price contracts. (On Contracting for Uncertain R&D) 
+
+ *    Dependent Variables:
+ *	Single offer competition, contract termination, number of change orders, and cost of change orders.
+ *	Initial Taxonomy:
+ *	The first five phases of R&D as defined by product or service code will be included. This step excludes R&D management, support and operational system development. 
+ *	The sample will include all contracts with a value of at least $25 million in either initial annualized base and all options amount of initial base and exercised options amount.
+
+##Changes: 
+The study team chose to use different contract size breakdowns than those used in past CSIS work (Contract_Ceiling). As a result, the closest available dividing point in the model is $30M. In this case, the $25M has no firmer theoretical basis and the $30M dividing line has the advantage of representing the weighted average contract ceiling. Thus the study team is updating the hypothesis to use the $30M standard instead.
+
+For this example, we're still using usual R&D rather than excluding R&d7
+
+##Results
+The hypothesis is supported with regard to number of offers. Larger fixed-price contracts are more likely to experience single offer competition and are less likely to experience competition with three or more offers. Combination tracks more closely with fixed-price than cost-plus.
+
+```{r H1LargeR&D}
+
+levels(ContractModel$Ceil)
+
+largeRnDfind<- setEvidence(compGin, 
+                        nodes=c("PSR","Ceil"),
+                        states=c("R&D","[30m+]")
+)
+
+getEvidence(largeRnDfind)
+
+largeRnDcompFind<- setEvidence(largeRnDfind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+getEvidence(largeRnDcompFind)
+
+FxCBresult<-QueryCrossSectionOnNode(largeRnDcompFind,"FxCb","Offr")
+
+#Combination
+FxCBresult[1,1]
+FxCBresult[1,2]
+#Cost-plus
+FxCBresult[2,1]
+FxCBresult[2,2]
+#Fixed-price
+FxCBresult[3,1]
+FxCBresult[3,2]
+
+
+``` 
+
+##H2: Due to design uncertainty Pre-Milestone B Major Defense Acquisition Programs (MDAPs) are potentially more likely to encounter problems than other fixed-price contracts
+ *	Prerequisites for use of fixed-price: "Design content is established and the components are mature technologies. There are no signifi???cant unresolved design issues, no major integration risk, the external interfaces are well defined, and no serious risk exists of unknowns surfacing in developmental testing and causing major redesign." (Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.) {Emphasis added}
+ *	Dependent Variables:
+ *	Single offer competition, contract termination, number of change orders, and cost of change orders.
+ *	Initial Taxonomy:
+ *	Using past CSIS research on Major Defense Acquisition Programs, CSIS will include in the sample System Equipment Codes for MDAPs that also include Pre-Milestone B spending. 
+ *	Contracts will be included if greater than 50% of obligations are classified with a relevant System Equipment Code and/or if they are manually labeled as belonging to that MDAP.
+ *	Note: This criteria will capture a similar sample to the prior R&D hypothesis. The study team would like to also include Major Automated Information Systems, but cannot because they are not labeled in FPDS.
+
+#Temporary changes and next steps
+MDAP specific classification is not yet included because it represents such a small portion of total contracts. It is presently planned to be incorporated through the Interlinked Variable. As an intermediate step.
+
+#Initial results
+The hypothesis was not supported with regard to number of offers, but this should be treated as a soft negative finding until the more precise question is tested.
+
+```{r H2MDAP}
+
+levels(ContractModel$Link)
+
+HighLinkFind<- setEvidence(compGin, 
+                        nodes=c("Link"),
+                        states=c("[  750,67263]")
+)
+
+getEvidence(HighLinkFind)
+
+HighLinkCompFind<- setEvidence(HighLinkFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+getEvidence(HighLinkCompFind)
+
+FxCBresult<-QueryCrossSectionOnNode(HighLinkCompFind,"FxCb","Offr")
+
+#Combination
+FxCBresult[1,1]
+FxCBresult[1,2]
+#Cost-plus
+FxCBresult[2,1]
+FxCBresult[2,2]
+#Fixed-price
+FxCBresult[3,1]
+FxCBresult[3,2]
+
+
+``` 
+
+
+
+##H3: Contracts with longer schedules will encounter greater problems with fixed-price contracts.
+ *	"But price redetermination might be used whenever contingency charges otherwise would be included in a contract price due to such factors as prolonged delivery schedules, unstable market conditions for material or labor, or uncertainty as to cost of performance." (Fixed-prices and Price Redetermination in Defense Contracts)
+ *	Dependent Variables:
+ *	Single offer competition, contract termination, number of change orders, and cost of change orders.
+ *	Initial Taxonomy:
+ *	Period of performance will be measured by expected contract duration in 4-week months (rounded up).
+
+#Placeholder variable and next steps
+This was initially expected to be tested with a continuous value for length rather than a discrete value. In addition the test would benefit from having more granularity at the high end of contract lengths. The next step will be to expand Dur's granularity in the greater than 1 year category.
+
+#Initial results
+The hypothesis regarding number of offers was not supported at the greater than 1 year level. Further subdivision into 2 year plus or other breakdowns might show a different result. Combination resembled fixed-price, but did not do as well with 5 or more offers.
+
+```{r H3MDAP}
+        
+        levels(ContractModel$Dur)
+        
+        LongDurFind<- setEvidence(compGin, 
+                                nodes=c("Dur"),
+                                states=c("[  366,33192]")
+        )
+        
+        getEvidence(LongDurFind)
+        
+        LongDurCompFind<- setEvidence(LongDurFind, 
+                                nodes=c("Comp"),
+                                states=c("Comp.")
+        )
+        getEvidence(LongDurCompFind)
+        
+        
+        FxCBresult<-QueryCrossSectionOnNode(LongDurCompFind,"FxCb","Offr")
+        
+        #Combination
+        FxCBresult[1,1]
+        FxCBresult[1,2]
+        #Cost-plus
+        FxCBresult[2,1]
+        FxCBresult[2,2]
+        #Fixed-price
+        FxCBresult[3,1]
+        FxCBresult[3,2]
+
+
+``` 
+
+
+
+##H4: Fixed-price contracts with the potential competition for multiple offers will encounter fewer challenges.
+ *	"[Principals] would prefer a fixed-price contract when the number of bidders increases." (On Contracting for Uncertain R&D)
+ *	Complicating this relationship, are recent revisions to the DFAR that reduced the emphasis on seeking additional offers as long as a fair competitive price can be verified. (DFAR 215.371)
+ *	Dependent Variables:
+ *	Contract termination, number of change orders, and cost of change orders.
+ *	Initial Taxonomy:
+ *	Due to limitations in available data, CSIS will use whether or not a contract is initially competed as a broad proxy for whether competition with multiple offers is available. CSIS will follow standard DoD procedures in identifying competed contracts.
+ *	Note: Testing for this hypothesis is constrained by a lack of relevant data in  FPDS. The number of offers requested field was dispensed with when the DoD contract system was folded into FPDS. (See "Hypotheses which raise causality concerns" (slide 21-22) for further discussion.) 
+
+#Next steps.
+
+This hypothesis is requires incorporation of the next two dependent variables into the Bayesian Network.
+
+
+
+##H5: Fixed-price are preferred by vendors for larger software contracts
+ *	"We hypothesize that the vendor's ability to leverage information asymmetry about capabilities and experiences translates into the vendor preferring Fixed-Price contract to secure larger information rents. Our results support this hypothesis and suggest that the vendor would prefer the FP contract for larger and longer projects with larger teams. However, vendors would prefer a [Time and Materials] contract when the risk of employee attrition from the project team is high." (Research Note: On Vendor Preferences for Contract Types in Offshore Software Projects: The Case of fixed-price vs. Time and Materials Contracts)
+ *	Dependent Variables:
+ *	Single offer competition and contract termination. 
+ *	Initial Taxonomy:
+ *	Past CSIS research has found that software contracts are not all contained within the Automated Data Processing category of the product or service codes. CSIS tentatively plans to include contracts with greater than 50% by value content in the Information and Communication Technology services category
+ *	Note: This hypothesis tests commercial vendor practices, but contradicts other government-focused observations. This is because this study does not seek to construct only consistent hypotheses, but instead to test a range of ideas from the literature.
+Hypotheses regarding general contract performance that may be used as controls
+Contracts for aircraft have more challenges than other contracts
+
+#Placeholder and next steps
+Software is typically classified as a service under PSR, though also could be under R&D, and is especially prominent in electronics in communication under What. Given that all sorts of platforms have software, PSR would be the best place to incorporate it under the present model, possibly linking software services and software R&D. NAICS codes may also assist. Software is not particularly easy to identify in FPDS as it is often incorporated into larger contracts, but there should be a number of clearcut cases.
+
+#Initial results
+
+Electronics and communications services do have a slight preference for fixed-price contracts when it comes to number of offers. However, when R&D is also included, the advantage switches to Cost-based.
+
+```{r H5Software}
+
+levels(ContractModel$PSR)
+    
+    SoftwareFind<- setEvidence(compGin, 
+                            nodes=c("What","PSR"),
+                            states=c("Electronics and Communications","Services"))
+    
+    
+    getEvidence(SoftwareFind)
+    
+    SoftwareCompFind<- setEvidence(SoftwareFind, 
+                            nodes=c("Comp"),
+                            states=c("Comp.")
+    )
+    getEvidence(SoftwareCompFind)
+    
+    
+            FxCBresult<-QueryCrossSectionOnNode(SoftwareCompFind,"FxCb","Offr")
+            
+            #Combination
+            FxCBresult[1,1]
+            FxCBresult[1,2]
+            #Cost-plus
+            FxCBresult[2,1]
+            FxCBresult[2,2]
+            #Fixed-price
+            FxCBresult[3,1]
+            FxCBresult[3,2]
+
+SoftwareFind<- setEvidence(compGin, 
+                        nodes=c("What","PSR"),
+                        states=c("Electronics and Communications",list(c("Services","R&D")))
+)
+getEvidence(SoftwareFind)
+
+SoftwareCompFind<- setEvidence(SoftwareFind, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+)
+
+FxCBresult<-QueryCrossSectionOnNode(SoftwareCompFind,"FxCb","Offr")
+        
+
+
+        #Combination
+        FxCBresult[1,1]
+        FxCBresult[1,2]
+        #Cost-plus
+        FxCBresult[2,1]
+        FxCBresult[2,2]
+        #Fixed-price
+        FxCBresult[3,1]
+        FxCBresult[3,2]
+
+``` 
+
