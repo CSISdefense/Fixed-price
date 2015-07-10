@@ -80,6 +80,13 @@ ContractModel$Offr<-factor(ContractModel$Offr,
                            ordered=TRUE
                            )
 
+
+ContractModel$Ceil<-factor(ContractModel$Ceil, 
+                           levels=c("[0,15k)","[15k,100k)","[100k,1m)","[1m,30m)","[30m+]"),
+                           ordered=TRUE
+                           )
+
+
 nrow(ContractModel)
 ```
 

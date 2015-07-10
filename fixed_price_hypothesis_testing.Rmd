@@ -59,12 +59,28 @@ summary(compGin)
 
 
 TerminationHypothesisTester<-function(varGin){
+
+    
     
     TermDF<-querygrain(varGin,nodes=c("FxCb","Ceil","Term"), type="joint",result="data.frame")
     colnames(TermDF)[colnames(TermDF)=="Ceil"]<-"iVariable"
+
+    NewDF<-querygrain(setEvidence(varGin, 
+                            nodes=c("Ceil"),
+                            states=c(list(c("[0,15k)","[15k,100k)")))
+                            ),
+                      nodes=c("FxCb","PSR","Term"), type="joint",result="data.frame")
+    colnames(NewDF)[colnames(NewDF)=="PSR"]<-"iVariable"
+    NewDF$iVariable<-factors(TermDF$iVariable,levels=c("Products","R&D","Services"),
+                             labels=c("Products <100K","R&D <100K","Services <100K"))
+    TermDF<-rbind(TermDF,NewDF)
+    
     NewDF<-querygrain(varGin,nodes=c("FxCb","PSR","Term"), type="joint",result="data.frame")
     colnames(NewDF)[colnames(NewDF)=="PSR"]<-"iVariable"
     TermDF<-rbind(TermDF,NewDF)
+    
+    
+    
     TermDF<-ddply(TermDF,.(FxCb,iVariable),transform,p=Freq/sum(Freq))
     # querygrain(varGin, nodes=c("Offr","NChg","CRai","Term"), type="marginal")
     TermDF<-dcast(TermDF,Term + iVariable ~ FxCb, sum, value.var="p")
@@ -72,6 +88,17 @@ TerminationHypothesisTester<-function(varGin){
     TermDF$FixedCombMargin<-TermDF[,"Fixed-Price"]/TermDF[,"Combination \nor Other"]
     colnames(TermDF)[colnames(TermDF)=="Term"]<-"dVariable"
     TermDF<-subset(TermDF,dVariable=="Terminated")
+    
+    
+#   
+# NotSmallCeilFind<- setEvidence(compGin, 
+#                                nodes=c("Ceil"),
+#                                states=list(
+#                                    compGin[[1]]$levels$Ceil[!compGin[[1]]$levels$Ceil %in%
+#                                                                         c("[0,15k)","[15k,100k)")])
+#                                )
+# 
+#     
     
     
     TermDF
@@ -312,7 +339,7 @@ NotAircraftDF<-ContractHypothesisTester(NotAircraftFind)
 
 
 # undebug(ContractHypothesisTester)
-
+debug(TerminationHypothesisTester)
 TermAircraftDF<-TerminationHypothesisTester(AircraftFind)
 NotTermAircraftDF<-TerminationHypothesisTester(NotAircraftFind)
 TermAircraftDF$Control<-"Aircraft"
@@ -416,13 +443,6 @@ NotLargeCeilFind<- setEvidence(compGin,
 getEvidence(NotLargeCeilFind)
 
 
-
-
-
-
-
-
-
 # undebug(ContractHypothesisTester)
 
 TermLargeCeilDF<-TerminationHypothesisTester(LargeCeilFind)
@@ -455,7 +475,7 @@ ggplot(BothChangeOrdersLargeCeilDF,
 
 
 
-debug(OffersHypothesisTester)
+
 OffersLargeCeilDF<-OffersHypothesisTester(LargeCeilFind)
 NotOfferLargeCeilDF<-OffersHypothesisTester(NotLargeCeilFind)
 OffersLargeCeilDF$Control<-"LargeCeil"
@@ -489,6 +509,7 @@ The hypothesis does hold weakly for contracts under $15k, although larger contra
 ```{r C3Small}
 
 compGin[[1]]$levels$Ceil
+compGin[[1]]$levels$PSR
 
 SmallCeilFind<- setEvidence(compGin, 
                             nodes=c("Ceil"),
@@ -497,20 +518,71 @@ SmallCeilFind<- setEvidence(compGin,
 
 getEvidence(SmallCeilFind)
 
-SmallCeilFind<-ContractHypothesisTester(SmallCeilFind)
 
 
 NotSmallCeilFind<- setEvidence(compGin, 
                                nodes=c("Ceil"),
-                               states=c(list(
-                                   levels(compGin[[1]]$levels$Ceil)[!levels(compGin[[1]]$levels$Ceil) %in%
-                                                                        c("[0,15k)","[15k,100k)")]))
+                               states=list(
+                                   compGin[[1]]$levels$Ceil[!compGin[[1]]$levels$Ceil %in%
+                                                                        c("[0,15k)","[15k,100k)")])
                                )
+
 
 getEvidence(NotSmallCeilFind)
 
-NotSmallCeilFind<-ContractHypothesisTester(NotSmallCeilFind)
 
+
+TermSmallCeilDF<-TerminationHypothesisTester(SmallCeilFind)
+NotTermSmallCeilDF<-TerminationHypothesisTester(NotSmallCeilFind)
+TermSmallCeilDF$Control<-"SmallCeil"
+NotTermSmallCeilDF$Control<-"Not SmallCeil"
+BothTermSmallCeilDF<-rbind(TermSmallCeilDF,NotTermSmallCeilDF)
+
+ggplot(BothTermSmallCeilDF,
+       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+
+
+
+ChangeOrderSmallCeilDF<-ChangeOrdersHypothesisTester(SmallCeilFind)
+NotChangeOrderSmallCeilDF<-ChangeOrdersHypothesisTester(NotSmallCeilFind)
+ChangeOrderSmallCeilDF$Control<-"SmallCeil"
+NotChangeOrderSmallCeilDF$Control<-"Not SmallCeil"
+BothChangeOrdersSmallCeilDF<-rbind(ChangeOrderSmallCeilDF,NotChangeOrderSmallCeilDF)
+
+ggplot(BothChangeOrdersSmallCeilDF,
+       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+
+
+
+
+
+
+OffersSmallCeilDF<-OffersHypothesisTester(SmallCeilFind)
+NotOfferSmallCeilDF<-OffersHypothesisTester(NotSmallCeilFind)
+OffersSmallCeilDF$Control<-"SmallCeil"
+NotOfferSmallCeilDF$Control<-"Not SmallCeil"
+BothOffersSmallCeilDF<-rbind(OffersSmallCeilDF,NotOfferSmallCeilDF)
+
+ggplot(BothOffersSmallCeilDF,
+       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+
+
+
+```
+
+
+
+```{r C3VerySmall}
+compGin[[1]]$levels$Ceil
 
 VerySmallCeilFind<- setEvidence(compGin, 
                                 nodes=c("Ceil"),
@@ -519,18 +591,70 @@ VerySmallCeilFind<- setEvidence(compGin,
 
 getEvidence(VerySmallCeilFind)
 
-VerySmallCeilFind<-ContractHypothesisTester(VerySmallCeilFind)
-
-
 
 NotVerySmallCeilFind<- setEvidence(compGin, 
                                    nodes=c("Ceil"),
-                                   states=c(list(
-                                       levels(compGin[[1]]$levels$Ceil)[levels(compGin[[1]]$levels$Ceil)!=c("[0,15k)")]))
+                                   states=list(
+                                       compGin[[1]]$levels$Ceil[compGin[[1]]$levels$Ceil!=c("[0,15k)")])
                                    )
 
 getEvidence(NotVerySmallCeilFind)
-NotVerySmallCeilFind<-ContractHypothesisTester(NotVerySmallCeilFind)
+
+
+
+
+TermVerySmallCeilDF<-TerminationHypothesisTester(VerySmallCeilFind)
+NotTermVerySmallCeilDF<-TerminationHypothesisTester(NotVerySmallCeilFind)
+TermVerySmallCeilDF$Control<-"VerySmallCeil"
+NotTermVerySmallCeilDF$Control<-"Not VerySmallCeil"
+BothTermVerySmallCeilDF<-rbind(TermVerySmallCeilDF,NotTermVerySmallCeilDF)
+
+ggplot(BothTermVerySmallCeilDF,
+       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+
+
+
+ChangeOrderVerySmallCeilDF<-ChangeOrdersHypothesisTester(VerySmallCeilFind)
+NotChangeOrderVerySmallCeilDF<-ChangeOrdersHypothesisTester(NotVerySmallCeilFind)
+ChangeOrderVerySmallCeilDF$Control<-"VerySmallCeil"
+NotChangeOrderVerySmallCeilDF$Control<-"Not VerySmallCeil"
+BothChangeOrdersVerySmallCeilDF<-rbind(ChangeOrderVerySmallCeilDF,NotChangeOrderVerySmallCeilDF)
+
+ggplot(BothChangeOrdersVerySmallCeilDF,
+       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+
+
+
+
+
+
+OffersVerySmallCeilDF<-OffersHypothesisTester(VerySmallCeilFind)
+NotOfferVerySmallCeilDF<-OffersHypothesisTester(NotVerySmallCeilFind)
+OffersVerySmallCeilDF$Control<-"VerySmallCeil"
+NotOfferVerySmallCeilDF$Control<-"Not VerySmallCeil"
+BothOffersVerySmallCeilDF<-rbind(OffersVerySmallCeilDF,NotOfferVerySmallCeilDF)
+
+ggplot(BothOffersVerySmallCeilDF,
+       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+
+
+```
+
+
+
+
+
+
+```{r C3Under1mCeil}
 
 
 #1M
@@ -542,6 +666,7 @@ Under1mCeilFind<- setEvidence(compGin,
 
 
 getEvidence(Under1mCeilFind)
+
 Under1mCeilFind<-ContractHypothesisTester(Under1mCeilFind)
 
 
@@ -553,9 +678,53 @@ NotUnder1mCeilFind<- setEvidence(compGin,
                                  )
 
 getEvidence(NotUnder1mCeilFind)
-NotUnder1mCeilFind<-ContractHypothesisTester(NotUnder1mCeilFind)
 
 
+
+
+
+TermUnder1mCeilDF<-TerminationHypothesisTester(Under1mCeilFind)
+NotTermUnder1mCeilDF<-TerminationHypothesisTester(NotUnder1mCeilFind)
+TermUnder1mCeilDF$Control<-"Under1mCeil"
+NotTermUnder1mCeilDF$Control<-"Not Under1mCeil"
+BothTermUnder1mCeilDF<-rbind(TermUnder1mCeilDF,NotTermUnder1mCeilDF)
+
+ggplot(BothTermUnder1mCeilDF,
+       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+
+
+
+ChangeOrderUnder1mCeilDF<-ChangeOrdersHypothesisTester(Under1mCeilFind)
+NotChangeOrderUnder1mCeilDF<-ChangeOrdersHypothesisTester(NotUnder1mCeilFind)
+ChangeOrderUnder1mCeilDF$Control<-"Under1mCeil"
+NotChangeOrderUnder1mCeilDF$Control<-"Not Under1mCeil"
+BothChangeOrdersUnder1mCeilDF<-rbind(ChangeOrderUnder1mCeilDF,NotChangeOrderUnder1mCeilDF)
+
+ggplot(BothChangeOrdersUnder1mCeilDF,
+       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+
+
+
+
+
+
+OffersUnder1mCeilDF<-OffersHypothesisTester(Under1mCeilFind)
+NotOfferUnder1mCeilDF<-OffersHypothesisTester(NotUnder1mCeilFind)
+OffersUnder1mCeilDF$Control<-"Under1mCeil"
+NotOfferUnder1mCeilDF$Control<-"Not Under1mCeil"
+BothOffersUnder1mCeilDF<-rbind(OffersUnder1mCeilDF,NotOfferUnder1mCeilDF)
+
+ggplot(BothOffersUnder1mCeilDF,
+       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_wrap(~dVariable,ncol=1)+ coord_flip()
 
 ``` 
 

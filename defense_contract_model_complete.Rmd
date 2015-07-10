@@ -562,10 +562,26 @@ CompleteContracts$Comp[CompleteContracts$UnmodifiedIsSomeCompetition=="Comp." &
 CompleteContracts$Comp[CompleteContracts$UnmodifiedIsSomeCompetition=="Comp." & 
                            CompleteContracts$UnmodifiedIsFullAndOpen=="Full & Open"]<-2
 
+
+ContractModel$Offr<-factor(ContractModel$Offr, 
+                           levels=c("  1","  2","[  3,  5)","[  5,999]"),
+                           labels=c("1","2","3-4","5+"),
+                           ordered=TRUE
+                           )
+
 CompleteContracts$Comp<-factor(CompleteContracts$Comp,
                                levels=c(0,1,2),
                                labels=c("No Comp.","Limited\nComp.","Full & Open\nComp.")
                                )
+
+
+
+CompleteContracts$Ceil<-factor(CompleteContracts$Ceil, 
+                           levels=c("[0,15k)","[15k,100k)","[100k,1m)","[1m,30m)","[30m+]"),
+                           ordered=TRUE
+                           )
+
+             
 
 
 CompleteContracts$qOffers[is.na(CompleteContracts$qOffers)&
