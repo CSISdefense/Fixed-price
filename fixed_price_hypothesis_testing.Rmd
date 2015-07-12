@@ -92,24 +92,31 @@ The hypothesis does hold weakly for contracts under $15k, although larger contra
 
 compGin[[1]]$levels$Ceil
 
-LargeCeilFind<- setEvidence(compGin, 
-                            nodes=c("Ceil"),
-                            states=c("[30m+]")
-                            )
+debug(OffersHypothesisTester)
+OffersSizeDF<-OffersHypothesisTester(compGin)
+#No redundant tests to remove
 
-getEvidence(LargeCeilFind)
-
-
-NotLargeCeilFind<- setEvidence(compGin, 
-                               nodes=c("Ceil"),
-                               states=list(compGin[[1]]$levels$Ceil[compGin[[1]]$levels$Ceil!=
-                                                                        "[30m+]"])
-                               )
-
-getEvidence(NotLargeCeilFind)
+# color=Control,shape=Control
+ggplot(OffersSizeDF,
+       aes(x=CrossTab,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
 
 
-# undebug(ContractHypothesisTester)
+# debug(ChangeOrdersHypothesisTester)
+ChangeOrderSizeDF<-ChangeOrdersHypothesisTester(compGin)
+#No redundant tests to remove
+
+# color=Control,shape=Control
+ggplot(ChangeOrderSizeDF,
+       aes(x=CrossTab,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
 
 # undebug(TerminationHypothesisTester)
 TermSizeDF<-TerminationHypothesisTester(compGin)
@@ -121,39 +128,6 @@ ggplot(TermSizeDF,
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
-
-
-
-ChangeOrderLargeCeilDF<-ChangeOrdersHypothesisTester(LargeCeilFind)
-NotChangeOrderLargeCeilDF<-ChangeOrdersHypothesisTester(NotLargeCeilFind)
-ChangeOrderLargeCeilDF$Control<-"LargeCeil"
-NotChangeOrderLargeCeilDF$Control<-"Not LargeCeil"
-BothChangeOrdersLargeCeilDF<-rbind(ChangeOrderLargeCeilDF,NotChangeOrderLargeCeilDF)
-
-ggplot(BothChangeOrdersLargeCeilDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-
-
-
-
-
-OffersLargeCeilDF<-OffersHypothesisTester(LargeCeilFind)
-NotOfferLargeCeilDF<-OffersHypothesisTester(NotLargeCeilFind)
-OffersLargeCeilDF$Control<-"LargeCeil"
-NotOfferLargeCeilDF$Control<-"Not LargeCeil"
-BothOffersLargeCeilDF<-rbind(OffersLargeCeilDF,NotOfferLargeCeilDF)
-
-ggplot(BothOffersLargeCeilDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-
 
 
 ``` 
