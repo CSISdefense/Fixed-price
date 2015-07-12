@@ -21,10 +21,10 @@ require(reshape2)
 #source("http://bioconductor.org/biocLite.R");
 #biocLite("Rgraphviz")
 # biocLite("RBGL")
-# setwd("K:\\Development\\Fixed-price")
-setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
-# Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
-Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
+setwd("K:\\Development\\Fixed-price")
+# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
+Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
+# Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
 source(paste(Path,"lookups.r",sep=""))
 
 source("contract_outcome_gRain.r")
@@ -61,8 +61,105 @@ summary(compGin)
 ```
 
 
+##C1A:  Contracts that are initially expected to be very large contracts will encounter more problems.
+*    For overall DoD contracting in 2013, contracts with an annual value of $500 or more saw the lowest rate of competition with three or more offers- 20 percent. The next lowest rate for contracts between $100 million and $500 million (26 percent). (CSIS Analysis of FPDS Data).
+*	Dependent Variables:
+*	Single offer competition, contract termination, number of change orders, and cost of change orders.
+*	Initial Taxonomy:
+*	The sample will include all contracts with an initial annualized base and all options amount of at least $500 million, or a initial base and exercised options amount of at least $500 million.
 
-##C1 Aircraft encounter
+###Placeholder and next steps.
+$500M contracts is not a level of granularity yet available in the Ceil variable, so the lower $30M threshold will be used for the initial analysis. In addition, the criteria we are using is base and all values alone, but that should always match or exceed the base and exercised value. 
+
+
+###Initial results.
+At the $30M ceil level the results were ambigious. For all contracts, single offer is slightly more common among large contracts but competition with 3-4 and 5+. For contracts that were competed, large contracts actually received more offers.
+
+##C1B Contracts initially expected to have smaller values will receive more offers.
+*    For overall DoD contracting in 2013, contracts with an annual value of less than $250,000 saw the highest rate of competition with two or more offers (62 percent), and that rate generally declines as size of contract increases. (CSIS Analysis of FPDS Data). This phenomenon is reversed with services contracts which have less competition when the size is smaller.
+*	Dependent Variables:
+*	Single offer competition.
+*	Initial Taxonomy:
+*	The independent variable will be the base and all exercised options amount for the contract. This value will not be annualized, as the steady rate of exercising options means that the initial value has severe limitations when predicting total contract value.
+
+For small contracts, the pattern 
+
+###Initial results
+The hypothesis does hold weakly for contracts under $15k, although larger contracts have more 5+ offer. The hypothesis does not hold for contracts under $100k and again 5+ offer contracts are remain more common among larger contracts.  If the dividing line is instead $1 million, then the analysis does hold, with contracts of $1m and lower having more competition at every level of analysis.
+
+
+```{r C1Ceil}
+
+compGin[[1]]$levels$Ceil
+
+LargeCeilFind<- setEvidence(compGin, 
+                            nodes=c("Ceil"),
+                            states=c("[30m+]")
+                            )
+
+getEvidence(LargeCeilFind)
+
+
+NotLargeCeilFind<- setEvidence(compGin, 
+                               nodes=c("Ceil"),
+                               states=list(compGin[[1]]$levels$Ceil[compGin[[1]]$levels$Ceil!=
+                                                                        "[30m+]"])
+                               )
+
+getEvidence(NotLargeCeilFind)
+
+
+# undebug(ContractHypothesisTester)
+
+# undebug(TerminationHypothesisTester)
+TermSizeDF<-TerminationHypothesisTester(compGin)
+#No redundant tests to remove
+
+# color=Control,shape=Control
+ggplot(TermSizeDF,
+       aes(x=CrossTab,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+ChangeOrderLargeCeilDF<-ChangeOrdersHypothesisTester(LargeCeilFind)
+NotChangeOrderLargeCeilDF<-ChangeOrdersHypothesisTester(NotLargeCeilFind)
+ChangeOrderLargeCeilDF$Control<-"LargeCeil"
+NotChangeOrderLargeCeilDF$Control<-"Not LargeCeil"
+BothChangeOrdersLargeCeilDF<-rbind(ChangeOrderLargeCeilDF,NotChangeOrderLargeCeilDF)
+
+ggplot(BothChangeOrdersLargeCeilDF,
+       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+
+
+
+
+
+
+OffersLargeCeilDF<-OffersHypothesisTester(LargeCeilFind)
+NotOfferLargeCeilDF<-OffersHypothesisTester(NotLargeCeilFind)
+OffersLargeCeilDF$Control<-"LargeCeil"
+NotOfferLargeCeilDF$Control<-"Not LargeCeil"
+BothOffersLargeCeilDF<-rbind(OffersLargeCeilDF,NotOfferLargeCeilDF)
+
+ggplot(BothOffersLargeCeilDF,
+       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+
+
+
+
+``` 
+
+
+##C2 Aircraft encounter
 
 *    Aircraft have a 22 point corresponding effect on total contract growth that is explained by schedule and cost overruns. The report looked at time, schedule, and differences between major commands, but not contract pricing mechanism. (Performance of the Defense Acquisition System 2013)
 *	"During the Second World War leading belligerents such as Britain, the United States, and Germany, favored the use of fixed-price contracts for purchasing military aircraft. These contracts were believed to encourage economical and efficient production. Yet only Britain succeeded in developing contractual procedures based primarily upon the fixed-price. This was primarily driven by the degree of organization by the weapons companies." (The Price of Air Power: Technological Change, Industrial Policy, and Military Aircraft Contracts in the Era of British Rearmament, 1935-39)
@@ -77,7 +174,7 @@ The model incorporated a 75% threshold for classification as a given Platform un
 #Results
 As expected, numbers of offers are far higher with non-aircraft, for both competed and for all contracts.
 
-```{r C1Aircraft}
+```{r C2Aircraft}
 
 
 compGin[[1]]$levels$What
@@ -102,19 +199,21 @@ NotAircraftDF<-ContractHypothesisTester(NotAircraftFind)
 
 
 
-# undebug(ContractHypothesisTester)
-debug(TerminationHypothesisTester)
-TermAircraftDF<-TerminationHypothesisTester(AircraftFind)
-NotTermAircraftDF<-TerminationHypothesisTester(NotAircraftFind)
-TermAircraftDF$Control<-"Aircraft"
-NotTermAircraftDF$Control<-"Not Aircraft"
-BothTermAircraftDF<-rbind(TermAircraftDF,NotTermAircraftDF)
 
-ggplot(BothTermAircraftDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
+# undebug(TerminationHypothesisTester)
+TermAircraftDF<-TerminationHypothesisTester(AircraftFind,"Aircraft")
+TermAircraftDF<-rbind(TermAircraftDF,
+      TerminationHypothesisTester(NotAircraftFind,"Not Aircraft")
+      )
+#Remove redundant tests
+TermAircraftDF<-subset(TermAircraftDF,
+                                    !CrossTab %in% unique(TermAircraftDF$Control))
+
+ggplot(TermAircraftDF,
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()
 
 
 
@@ -157,7 +256,7 @@ ggplot(BothOffersAircraftDF,
 ``` 
 
 
-##C2: Undefinitized contract actions (UCAs) in development will encounter more problems
+##C3: Undefinitized contract actions (UCAs) in development will encounter more problems
 *	"For example, analysis is revealing that UCAs can be successfully employed in early production but are concerns for developmental work" (Performance of the Defense Acquisition System 2013)
 *	"UCAs increase development cycle time by increasing schedule growth." GAO Study
 *	"The contractor has little incentive to control costs during this period.". (GAO study?)
@@ -172,325 +271,7 @@ ggplot(BothOffersAircraftDF,
 ###Next steps: 
 UCA status will be added to IDV. Since the contract type will not be known at the offset, the information lost will primarily be information not available to the contracting officer at contract start. However, theres no available proxy until that information is added.
 
-##Contracts that are initially expected to be very large contracts will encounter more problems.
-*	For overall DoD contracting in 2013, contracts with an annual value of $500 or more saw the lowest rate of competition with three or more offers- 20 percent. The next lowest rate for contracts between $100 million and $500 million (26 percent). (CSIS Analysis of FPDS Data).
-*	Dependent Variables:
-*	Single offer competition, contract termination, number of change orders, and cost of change orders.
-*	Initial Taxonomy:
-*	The sample will include all contracts with an initial annualized base and all options amount of at least $500 million, or a initial base and exercised options amount of at least $500 million.
 
-###Placeholder and next steps.
-$500M contracts is not a level of granularity yet available in the Ceil variable, so the lower $30M threshold will be used for the initial analysis. In addition, the criteria we are using is base and all values alone, but that should always match or exceed the base and exercised value. 
-
-
-###Initial results.
-At the $30M ceil level the results were ambigious. For all contracts, single offer is slightly more common among large contracts but competition with 3-4 and 5+. For contracts that were competed, large contracts actually received more offers.
-
-```{r C2Large}
-
-compGin[[1]]$levels$Ceil
-
-LargeCeilFind<- setEvidence(compGin, 
-                            nodes=c("Ceil"),
-                            states=c("[30m+]")
-                            )
-
-getEvidence(LargeCeilFind)
-
-
-NotLargeCeilFind<- setEvidence(compGin, 
-                               nodes=c("Ceil"),
-                               states=list(compGin[[1]]$levels$Ceil[compGin[[1]]$levels$Ceil!=
-                                                                        "[30m+]"])
-                               )
-
-getEvidence(NotLargeCeilFind)
-
-
-# undebug(ContractHypothesisTester)
-
-TermLargeCeilDF<-TerminationHypothesisTester(LargeCeilFind)
-NotTermLargeCeilDF<-TerminationHypothesisTester(NotLargeCeilFind)
-TermLargeCeilDF$Control<-"LargeCeil"
-NotTermLargeCeilDF$Control<-"Not LargeCeil"
-BothTermLargeCeilDF<-rbind(TermLargeCeilDF,NotTermLargeCeilDF)
-
-ggplot(BothTermLargeCeilDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-
-
-ChangeOrderLargeCeilDF<-ChangeOrdersHypothesisTester(LargeCeilFind)
-NotChangeOrderLargeCeilDF<-ChangeOrdersHypothesisTester(NotLargeCeilFind)
-ChangeOrderLargeCeilDF$Control<-"LargeCeil"
-NotChangeOrderLargeCeilDF$Control<-"Not LargeCeil"
-BothChangeOrdersLargeCeilDF<-rbind(ChangeOrderLargeCeilDF,NotChangeOrderLargeCeilDF)
-
-ggplot(BothChangeOrdersLargeCeilDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-
-
-
-
-
-OffersLargeCeilDF<-OffersHypothesisTester(LargeCeilFind)
-NotOfferLargeCeilDF<-OffersHypothesisTester(NotLargeCeilFind)
-OffersLargeCeilDF$Control<-"LargeCeil"
-NotOfferLargeCeilDF$Control<-"Not LargeCeil"
-BothOffersLargeCeilDF<-rbind(OffersLargeCeilDF,NotOfferLargeCeilDF)
-
-ggplot(BothOffersLargeCeilDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-
-
-
-``` 
-
-##Contracts initially expected to have smaller values will receive more offers.
-*	For overall DoD contracting in 2013, contracts with an annual value of less than $250,000 saw the highest rate of competition with two or more offers (62 percent), and that rate generally declines as size of contract increases. (CSIS Analysis of FPDS Data). This phenomenon is reversed with services contracts which have less competition when the size is smaller.
-*	Dependent Variables:
-*	Single offer competition.
-*	Initial Taxonomy:
-*	The independent variable will be the base and all exercised options amount for the contract. This value will not be annualized, as the steady rate of exercising options means that the initial value has severe limitations when predicting total contract value.
-
-For small contracts, the pattern 
-
-###Initial results
-The hypothesis does hold weakly for contracts under $15k, although larger contracts have more 5+ offer. The hypothesis does not hold for contracts under $100k and again 5+ offer contracts are remain more common among larger contracts.  If the dividing line is instead $1 million, then the analysis does hold, with contracts of $1m and lower having more competition at every level of analysis.
-
-
-```{r C3Small}
-
-compGin[[1]]$levels$Ceil
-compGin[[1]]$levels$PSR
-
-SmallCeilFind<- setEvidence(compGin, 
-                            nodes=c("Ceil"),
-                            states=c(list(c("[0,15k)","[15k,100k)")))
-                            )
-
-getEvidence(SmallCeilFind)
-
-
-
-NotSmallCeilFind<- setEvidence(compGin, 
-                               nodes=c("Ceil"),
-                               states=list(
-                                   compGin[[1]]$levels$Ceil[!compGin[[1]]$levels$Ceil %in%
-                                                                        c("[0,15k)","[15k,100k)")])
-                               )
-
-
-getEvidence(NotSmallCeilFind)
-
-
-
-TermSmallCeilDF<-TerminationHypothesisTester(SmallCeilFind)
-NotTermSmallCeilDF<-TerminationHypothesisTester(NotSmallCeilFind)
-TermSmallCeilDF$Control<-"SmallCeil"
-NotTermSmallCeilDF$Control<-"Not SmallCeil"
-BothTermSmallCeilDF<-rbind(TermSmallCeilDF,NotTermSmallCeilDF)
-
-ggplot(BothTermSmallCeilDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-
-
-ChangeOrderSmallCeilDF<-ChangeOrdersHypothesisTester(SmallCeilFind)
-NotChangeOrderSmallCeilDF<-ChangeOrdersHypothesisTester(NotSmallCeilFind)
-ChangeOrderSmallCeilDF$Control<-"SmallCeil"
-NotChangeOrderSmallCeilDF$Control<-"Not SmallCeil"
-BothChangeOrdersSmallCeilDF<-rbind(ChangeOrderSmallCeilDF,NotChangeOrderSmallCeilDF)
-
-ggplot(BothChangeOrdersSmallCeilDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-
-
-
-
-
-OffersSmallCeilDF<-OffersHypothesisTester(SmallCeilFind)
-NotOfferSmallCeilDF<-OffersHypothesisTester(NotSmallCeilFind)
-OffersSmallCeilDF$Control<-"SmallCeil"
-NotOfferSmallCeilDF$Control<-"Not SmallCeil"
-BothOffersSmallCeilDF<-rbind(OffersSmallCeilDF,NotOfferSmallCeilDF)
-
-ggplot(BothOffersSmallCeilDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-
-
-```
-
-
-
-```{r C3VerySmall}
-compGin[[1]]$levels$Ceil
-
-VerySmallCeilFind<- setEvidence(compGin, 
-                                nodes=c("Ceil"),
-                                states=c("[0,15k)")
-                                )
-
-getEvidence(VerySmallCeilFind)
-
-
-NotVerySmallCeilFind<- setEvidence(compGin, 
-                                   nodes=c("Ceil"),
-                                   states=list(
-                                       compGin[[1]]$levels$Ceil[compGin[[1]]$levels$Ceil!=c("[0,15k)")])
-                                   )
-
-getEvidence(NotVerySmallCeilFind)
-
-
-
-
-TermVerySmallCeilDF<-TerminationHypothesisTester(VerySmallCeilFind)
-NotTermVerySmallCeilDF<-TerminationHypothesisTester(NotVerySmallCeilFind)
-TermVerySmallCeilDF$Control<-"VerySmallCeil"
-NotTermVerySmallCeilDF$Control<-"Not VerySmallCeil"
-BothTermVerySmallCeilDF<-rbind(TermVerySmallCeilDF,NotTermVerySmallCeilDF)
-
-ggplot(BothTermVerySmallCeilDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-
-
-ChangeOrderVerySmallCeilDF<-ChangeOrdersHypothesisTester(VerySmallCeilFind)
-NotChangeOrderVerySmallCeilDF<-ChangeOrdersHypothesisTester(NotVerySmallCeilFind)
-ChangeOrderVerySmallCeilDF$Control<-"VerySmallCeil"
-NotChangeOrderVerySmallCeilDF$Control<-"Not VerySmallCeil"
-BothChangeOrdersVerySmallCeilDF<-rbind(ChangeOrderVerySmallCeilDF,NotChangeOrderVerySmallCeilDF)
-
-ggplot(BothChangeOrdersVerySmallCeilDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-
-
-
-
-
-OffersVerySmallCeilDF<-OffersHypothesisTester(VerySmallCeilFind)
-NotOfferVerySmallCeilDF<-OffersHypothesisTester(NotVerySmallCeilFind)
-OffersVerySmallCeilDF$Control<-"VerySmallCeil"
-NotOfferVerySmallCeilDF$Control<-"Not VerySmallCeil"
-BothOffersVerySmallCeilDF<-rbind(OffersVerySmallCeilDF,NotOfferVerySmallCeilDF)
-
-ggplot(BothOffersVerySmallCeilDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-
-```
-
-
-
-
-
-
-```{r C3Under1mCeil}
-
-
-#1M
-
-Under1mCeilFind<- setEvidence(compGin, 
-                              nodes=c("Ceil"),
-                              states=c(list(c("[0,15k)","[15k,100k)","[100k,1m)")))
-                              )
-
-
-getEvidence(Under1mCeilFind)
-
-Under1mCeilFind<-ContractHypothesisTester(Under1mCeilFind)
-
-
-NotUnder1mCeilFind<- setEvidence(compGin, 
-                                 nodes=c("Ceil"),
-                                 states=c(list(
-                                     levels(compGin[[1]]$levels$Ceil)[!levels(compGin[[1]]$levels$Ceil) %in%
-                                                                          c("[0,15k)","[15k,100k)","[100k,1m)")]))
-                                 )
-
-getEvidence(NotUnder1mCeilFind)
-
-
-
-
-
-TermUnder1mCeilDF<-TerminationHypothesisTester(Under1mCeilFind)
-NotTermUnder1mCeilDF<-TerminationHypothesisTester(NotUnder1mCeilFind)
-TermUnder1mCeilDF$Control<-"Under1mCeil"
-NotTermUnder1mCeilDF$Control<-"Not Under1mCeil"
-BothTermUnder1mCeilDF<-rbind(TermUnder1mCeilDF,NotTermUnder1mCeilDF)
-
-ggplot(BothTermUnder1mCeilDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-
-
-ChangeOrderUnder1mCeilDF<-ChangeOrdersHypothesisTester(Under1mCeilFind)
-NotChangeOrderUnder1mCeilDF<-ChangeOrdersHypothesisTester(NotUnder1mCeilFind)
-ChangeOrderUnder1mCeilDF$Control<-"Under1mCeil"
-NotChangeOrderUnder1mCeilDF$Control<-"Not Under1mCeil"
-BothChangeOrdersUnder1mCeilDF<-rbind(ChangeOrderUnder1mCeilDF,NotChangeOrderUnder1mCeilDF)
-
-ggplot(BothChangeOrdersUnder1mCeilDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-
-
-
-
-
-OffersUnder1mCeilDF<-OffersHypothesisTester(Under1mCeilFind)
-NotOfferUnder1mCeilDF<-OffersHypothesisTester(NotUnder1mCeilFind)
-OffersUnder1mCeilDF$Control<-"Under1mCeil"
-NotOfferUnder1mCeilDF$Control<-"Not Under1mCeil"
-BothOffersUnder1mCeilDF<-rbind(OffersUnder1mCeilDF,NotOfferUnder1mCeilDF)
-
-ggplot(BothOffersUnder1mCeilDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-``` 
 
 ##Contracts using purchase orders and "Other Indefinite Delivery Contracts (IDCs)" are more likely to receive a single offer.
 *	Past CSIS research has found that contracts using a purchase orders and "Other IDCs" (Other IDCs includes Federal Supply Schedule, Basic Ordering Agreements, Blanket Purchasing Agreements, Government-Wide Acquisition Contracts) have notably higher  rates of single offer competition than other vehicles. (CSIS, Federal Services Contracting and the Supporting Industrial Base, 2000-2012)
@@ -504,7 +285,9 @@ At present, the vehicle variable only has granularity to look at at IDVs versus 
 
 The analysis indicates validates this past finding, IDVs are marketedly more likely to be competed and to receive more offers when competed.
 
+```{r UCA}
 
+```
 
 
 ```{r C4IDV}
@@ -531,6 +314,23 @@ NotIDVFind<- setEvidence(compGin,
 
 getEvidence(NotIDVFind)
 NotIDVDF<-ContractHypothesisTester(NotIDVFind)
+
+
+TermVehDF<-TerminationHypothesisTester(IDVFind,"IDV")
+TermVehDF<-rbind(TermVehDF,
+      TerminationHypothesisTester(NotIDVFind,"Award")
+      )
+#Remove redundant tests
+TermVehDF<-subset(TermVehDF,
+                                    !CrossTab %in% unique(TermVehDF$Control))
+
+ggplot(TermVehDF,
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
 
 
 
@@ -577,6 +377,22 @@ NotLongDurFind<- setEvidence(compGin,
                                                              "[  366,33192]"]))
                              )
 
+
+# undebug(TerminationHypothesisTester)
+TermLongDurDF<-TerminationHypothesisTester(LongDurFind,"Long Dur.")
+TermLongDurDF<-rbind(TermLongDurDF,
+      TerminationHypothesisTester(NotLongDurFind,"Not Long Dur.")
+      )
+#Remove redundant tests
+TermLongDurDF<-subset(TermLongDurDF,
+                                    !CrossTab %in% unique(TermLongDurDF$Control))
+ggplot(TermLongDurDF,
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
 NotLongDurDF<-ContractHypothesisTester(NotLongDurFind)
 
 getEvidence(NotLongDurDF)
@@ -607,6 +423,58 @@ ggplot(BothLongDurDF,
 ##Next steps
 Incentive was not included in the initial model because it made up a small proportion of all contracts. Fee structure should probably be included as a seperate node entirely. Initial analysis at the aggregate dollar levels for the competition study found did not support the hypothesis.
 
+
+
+```{r C6Comp}
+
+compGin[[1]]$levels$Comp
+
+
+ CompFind<-setEvidence(compGin, 
+                                   nodes=c("Comp"),
+                                   states=c("Comp.")
+    )
+
+getEvidence(CompFind)
+
+ NotCompFind<-setEvidence(compGin, 
+                                   nodes=c("Comp"),
+                                   states=c("No Comp.")
+    )
+getEvidence(NotCompFind)
+
+
+# undebug(TerminationHypothesisTester)
+TermCompDF<-TerminationHypothesisTester(CompFind,"Comp.")
+TermCompDF<-rbind(TermCompDF,
+      TerminationHypothesisTester(NotCompFind,"Not Comp.")
+      )
+#Remove redundant tests
+TermCompDF<-subset(TermCompDF,
+                                    !CrossTab %in% unique(TermCompDF$Control))
+ggplot(TermCompDF,
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+getEvidence(NotCompDF)
+
+
+CompDF$Control<-"Comp"
+NotCompDF$Control<-"Not Comp"
+BothCompDF<-rbind(CompDF,NotCompDF)
+
+ggplot(BothCompDF,
+       aes(x=Ceil,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+
+
+``` 
 
 
 
@@ -711,7 +579,7 @@ This was initially expected to be tested with a continuous value for length rath
 #Initial results
 The hypothesis regarding number of offers was not supported at the greater than 1 year level. Further subdivision into 2 year plus or other breakdowns might show a different result. Combination resembled fixed-price, but did not do as well with 5 or more offers.
 
-```{r H3MDAP}
+```{r H3LongDur}
 
 levels(compGin[[1]]$levels$Dur)
 
@@ -753,7 +621,9 @@ FxCBresult[3,2]
 
 This hypothesis is requires incorporation of the next two dependent variables into the Bayesian Network.
 
+```{r, H4Comp}
 
+``` 
 
 ##H5: Fixed-price are preferred by vendors for larger software contracts
 *	"We hypothesize that the vendor's ability to leverage information asymmetry about capabilities and experiences translates into the vendor preferring Fixed-Price contract to secure larger information rents. Our results support this hypothesis and suggest that the vendor would prefer the FP contract for larger and longer projects with larger teams. However, vendors would prefer a [Time and Materials] contract when the risk of employee attrition from the project team is high." (Research Note: On Vendor Preferences for Contract Types in Offshore Software Projects: The Case of fixed-price vs. Time and Materials Contracts)

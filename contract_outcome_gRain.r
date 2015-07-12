@@ -12,56 +12,156 @@ require(Rgraphviz)
 
 
 
-TerminationHypothesisTester<-function(varGin){
+StandardizeGRainQuery<-function(varGin,
+                                studyVariableCol,
+                                iVariableCol,
+                                dVariableCol,
+                                resultLabel=NA
+){
+    ResultsDF<-querygrain(varGin,
+                          nodes=c(studyVariableCol,iVariableCol,dVariableCol),
+                          type="joint",result="data.frame")
+    colnames(ResultsDF)[colnames(ResultsDF)==iVariableCol]<-"iVariable"
+    if(!is.na(resultLabel)){
+#         ResultsDF$iVariable<-factor(ResultsDF$iVariable,levels=levels(ResultsDF$iVariable),
+#                                     labels=paste(resultLabel,levels(ResultsDF$iVariable)))
+        ResultsDF$CrossTab<-resultLabel
+    }
+    else     ResultsDF$CrossTab<-"Overall"
+    ResultsDF
+}
+
+TerminationHypothesisTester<-function(varGin,ControlLabel=NA){
+    #All contracts by ceiling
+    ResultsDF<-StandardizeGRainQuery(varGin,"FxCb","Ceil","Term")
     
     
+    #R&D contracts by ceiling    
+#     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
+#         setEvidence(varGin, 
+#                     nodes=c("PSR"),
+#                     states=c("R&D")),
+#         "FxCb","Ceil","Term",resultLabel="R&D")
+#     )
+    #   
+    #Aircraft contracts by ceiling
+    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
+        setEvidence(varGin, 
+                    nodes=c("What"),
+                    states=c("Aircraft and Drones")),
+        "FxCb","Ceil","Term",resultLabel="Aircraft")
+    )
     
-    TermDF<-querygrain(varGin,nodes=c("FxCb","Ceil","Term"), type="joint",result="data.frame")
-    colnames(TermDF)[colnames(TermDF)=="Ceil"]<-"iVariable"
+    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
+        setEvidence(varGin, 
+                    nodes=c("What"),
+                    states=list(varGin[[1]]$levels$What[
+                        varGin[[1]]$levels$What!="Aircraft and Drones"])),
+        "FxCb","Ceil","Term",resultLabel="Not Aircraft")
+    )
     
-    #All contracts by PSR
-    NewDF<-querygrain(varGin,
-    nodes=c("FxCb","PSR","Term"), type="joint",result="data.frame")
-    colnames(NewDF)[colnames(NewDF)=="PSR"]<-"iVariable"
-    TermDF<-rbind(TermDF,NewDF)
+#IDV contracts by ceiling
+ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
+    setEvidence(varGin, 
+                nodes=c("IDV"),
+                states=c("IDV")),
+    "FxCb","Ceil","Term",resultLabel="IDV")
+)
+
+ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
+    setEvidence(varGin, 
+                nodes=c("IDV"),
+                states=c(list(
+                    compGin[[1]]$levels$IDV[compGin[[1]]$levels$IDV!=
+                                                "IDV"]))),
+    "FxCb","Ceil","Term",resultLabel="Award")
+)
+
+
+
+    #LongDur contracts by ceiling
+    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
+        setEvidence(varGin, 
+                    nodes=c("Dur"),
+                    states=c("[  366,33192]")
+        ),
+        "FxCb","Ceil","Term",resultLabel="Long Dur.")
+    )
     
-    #30M+ contracts by PSR
-    NewDF<-querygrain(setEvidence(varGin, 
-                                  nodes=c("Ceil"),
-                                  states=c("[30m+]")),
-    nodes=c("FxCb","PSR","Term"), type="joint",result="data.frame")
-    colnames(NewDF)[colnames(NewDF)=="PSR"]<-"iVariable"
-    NewDF$iVariable<-factor(NewDF$iVariable,levels=c("Products","R&D","Services"),
-                            labels=c("Products 30m+","R&D 30m+","Services 30m+"))
-    TermDF<-rbind(TermDF,NewDF)
+    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
+        setEvidence(varGin, 
+                    nodes=c("Dur"),
+                    states=c(list(
+                        varGin[[1]]$levels$Dur[varGin[[1]]$levels$Dur!=
+                                                    "[  366,33192]"]))
+        ),
+        "FxCb","Ceil","Term",resultLabel="Not Long Dur.")
+    )
     
-    #Large contracts by PSR
-    NewDF<-querygrain(setEvidence(varGin, 
-                                  nodes=c("Ceil"),
-                                  states=list(
-                                      varGin[[1]]$levels$Ceil[!varGin[[1]]$levels$Ceil %in%
-                                                                   c("[0,15k)","[15k,100k)")])
+    
+#Contracts competition by ceiling
+ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
+    setEvidence(varGin, 
+                nodes=c("Comp"),
+                states=c("Comp.")
     ),
-    nodes=c("FxCb","PSR","Term"), type="joint",result="data.frame")
-    colnames(NewDF)[colnames(NewDF)=="PSR"]<-"iVariable"
-    NewDF$iVariable<-factor(NewDF$iVariable,levels=c("Products","R&D","Services"),
-                            labels=c("Products 100K+","R&D 100K+","Services 100K+"))
-    TermDF<-rbind(TermDF,NewDF)
-    
-    
-    
-    TermDF<-ddply(TermDF,.(FxCb,iVariable),transform,p=Freq/sum(Freq))
-    # querygrain(varGin, nodes=c("Offr","NChg","CRai","Term"), type="marginal")
-    TermDF<-dcast(TermDF,Term + iVariable ~ FxCb, sum, value.var="p")
-    TermDF$FixedCostMargin<-TermDF[,"Fixed-Price"]/TermDF[,"Cost-Based"]
-    TermDF$FixedCombMargin<-TermDF[,"Fixed-Price"]/TermDF[,"Combination \nor Other"]
-    colnames(TermDF)[colnames(TermDF)=="Term"]<-"dVariable"
-    TermDF<-subset(TermDF,dVariable=="Terminated")
+    "FxCb","Ceil","Term",resultLabel="Comp.")
+)
+
+ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
+    setEvidence(varGin, 
+                    nodes=c("Comp"),
+                    states=c("No Comp.")
+    ),
+    "FxCb","Ceil","Term",resultLabel="No Comp.")
+)
+
 
     
     
     
-    TermDF
+    
+    ResultsDF<-ddply(ResultsDF,.(FxCb,CrossTab,iVariable),transform,p=Freq/sum(Freq))
+    # querygrain(varGin, nodes=c("Offr","NChg","CRai","Term"), type="marginal")
+    ResultsDF<-dcast(ResultsDF,Term + CrossTab + iVariable ~ FxCb, sum, value.var="p")
+    ResultsDF$FixedCostMargin<-ResultsDF[,"Fixed-Price"]/ResultsDF[,"Cost-Based"]
+    ResultsDF$FixedCombMargin<-ResultsDF[,"Fixed-Price"]/ResultsDF[,"Combination \nor Other"]
+    colnames(ResultsDF)[colnames(ResultsDF)=="Term"]<-"dVariable"
+    ResultsDF<-subset(ResultsDF,dVariable=="Terminated")
+    
+    
+    if(!is.na(ControlLabel)) ResultsDF$Control<-ControlLabel
+    
+    
+    #Order the ceilings
+    ResultsDF$iVariable<-factor(ResultsDF$iVariable,
+           levels=c("[30m+]",
+                    "[1m,30m)",
+                    "[100k,1m)",
+                    "[15k,100k)",
+                    "[0,15k)"
+                    ),
+           ordered=TRUE
+    )
+    
+    #Order the crosstabs, reversed is to put the first entry on top.
+    ResultsDF$CrossTab<-factor(ResultsDF$CrossTab,
+           levels=rev(c("Overall",
+#                     "R&D",
+                    "Long Dur.",
+                    "Not Long Dur.",
+"IDV",
+"Award",
+"Comp.",
+"No Comp.",
+                    "Aircraft",
+                    "Not Aircraft")),
+           ordered=TRUE
+    )
+    
+    
+    
+    ResultsDF
 }
 
 
@@ -88,10 +188,10 @@ ChangeOrdersHypothesisTester<-function(varGin){
     NewDF$iVariable<-factor(NewDF$iVariable,levels=c("Products","R&D","Services"),
                             labels=c("Products <100K","R&D <100K","Services <100K"))
     NChgDF<-rbind(NChgDF,NewDF)
-#     NewDF<-querygrain(varGin,nodes=c("FxCb","PSR","NChg"), type="joint",result="data.frame")
-#     colnames(NewDF)[colnames(NewDF)=="PSR"]<-"iVariable"
-#     expNChgDF<-rbind(expNChgDF,NewDF)
-#     
+    #     NewDF<-querygrain(varGin,nodes=c("FxCb","PSR","NChg"), type="joint",result="data.frame")
+    #     colnames(NewDF)[colnames(NewDF)=="PSR"]<-"iVariable"
+    #     expNChgDF<-rbind(expNChgDF,NewDF)
+    #     
     expNChgDF<-ddply(expNChgDF,.(FxCb,iVariable),transform,p=Freq/sum(Freq))
     expNChgDF$expNChg[expNChgDF$NChg=="   0"]<-0
     expNChgDF$expNChg[expNChgDF$NChg=="   1"]<-1*expNChgDF$p[expNChgDF$NChg=="   1"]
@@ -128,13 +228,13 @@ OffersHypothesisTester<-function(varGin){
     
     expOffrDF<-querygrain(varGin,nodes=c("FxCb","Ceil","Offr"), type="joint",result="data.frame")
     colnames(expOffrDF)[colnames(expOffrDF)=="Ceil"]<-"iVariable"
-#     NewDF<-querygrain(varGin,nodes=c("FxCb","PSR","Offr"), type="joint",result="data.frame")
-#     colnames(NewDF)[colnames(NewDF)=="PSR"]<-"iVariable"
-#     expOffrDF<-rbind(expOffrDF,NewDF)
-#     
+    #     NewDF<-querygrain(varGin,nodes=c("FxCb","PSR","Offr"), type="joint",result="data.frame")
+    #     colnames(NewDF)[colnames(NewDF)=="PSR"]<-"iVariable"
+    #     expOffrDF<-rbind(expOffrDF,NewDF)
+    #     
     
-
-
+    
+    
     expOffrDF<-ddply(expOffrDF,.(FxCb,iVariable),transform,p=Freq/sum(Freq))
     expOffrDF$expOffr[expOffrDF$Offr=="1"]<-1*expOffrDF$p[expOffrDF$Offr=="1"]
     expOffrDF$expOffr[expOffrDF$Offr=="2"]<-2*expOffrDF$p[expOffrDF$Offr=="2"]
@@ -148,25 +248,25 @@ OffersHypothesisTester<-function(varGin){
     
     
     
-
-
-OffrDF<-querygrain(setEvidence(varGin, 
+    
+    
+    OffrDF<-querygrain(setEvidence(varGin, 
                                    nodes=c("Comp"),
                                    states=c("Comp.")
     ),
     nodes=c("FxCb","Ceil","Offr"), type="joint",result="data.frame")
     colnames(OffrDF)[colnames(OffrDF)=="Ceil"]<-"iVariable"
     
-
-
-
-# NewDF<-querygrain(setEvidence(varGin, 
-#                                   nodes=c("Comp"),
-#                                   states=c("Comp.")
-#     ),
-#     nodes=c("FxCb","PSR","Offr"), type="joint",result="data.frame")
-#     colnames(NewDF)[colnames(NewDF)=="PSR"]<-"iVariable"
-#     OffrDF<-rbind(OffrDF,NewDF)
+    
+    
+    
+    # NewDF<-querygrain(setEvidence(varGin, 
+    #                                   nodes=c("Comp"),
+    #                                   states=c("Comp.")
+    #     ),
+    #     nodes=c("FxCb","PSR","Offr"), type="joint",result="data.frame")
+    #     colnames(NewDF)[colnames(NewDF)=="PSR"]<-"iVariable"
+    #     OffrDF<-rbind(OffrDF,NewDF)
     
     colnames(OffrDF)[colnames(OffrDF)=="Ceil"]<-"iVariable"
     OffrDF<-ddply(OffrDF,.(FxCb,iVariable),transform,p=Freq/sum(Freq))
