@@ -41,6 +41,7 @@
 ## 
 ## Loading required package: Rgraphviz
 ## Loading required package: reshape2
+## Loading required package: scales
 ```
 
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
@@ -124,10 +125,10 @@ SizeDF<-FixedPriceHypothesisTester(compGin)
 
 #Single Offer Competition
 ggplot(subset(SizeDF,dVariable=="1"),
-       aes(x=CrossTab,y=FixedCostMargin)
+       aes(x=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-1.png) 
@@ -135,10 +136,10 @@ ggplot(subset(SizeDF,dVariable=="1"),
 ```r
 #Expected Number of Offers
 ggplot(subset(SizeDF,dVariable=="Expected Number of Offers"),
-       aes(x=CrossTab,y=FixedCostMargin)
+       aes(x=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-2.png) 
@@ -146,10 +147,10 @@ ggplot(subset(SizeDF,dVariable=="Expected Number of Offers"),
 ```r
 #Expected Number of Changes
 ggplot(subset(SizeDF,dVariable=="Expected Number of Changes"),
-       aes(x=CrossTab,y=FixedCostMargin)
+       aes(x=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-3.png) 
@@ -157,10 +158,10 @@ ggplot(subset(SizeDF,dVariable=="Expected Number of Changes"),
 ```r
 #Ceiling Raising Change Orders %
 ggplot(subset(SizeDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=CrossTab,y=FixedCostMargin)
+       aes(x=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-4.png) 
@@ -168,10 +169,10 @@ ggplot(subset(SizeDF,dVariable=="Ceiling Raising Change Orders %"),
 ```r
 #Terminations
 ggplot(subset(SizeDF,dVariable=="Terminated"),
-       aes(x=CrossTab,y=FixedCostMargin)
+       aes(x=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-5.png) 
@@ -252,15 +253,15 @@ AircraftDF<-rbind(AircraftDF,
 
 #Remove redundant tests
 AircraftDF<-subset(AircraftDF,
-                   !CrossTab %in% unique(AircraftDF$Control))
+                   !Control %in% unique(AircraftDF$Hypothesis))
 
 
 #Single Offer Competition
 ggplot(subset(AircraftDF,dVariable=="1"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-1.png) 
@@ -268,10 +269,10 @@ ggplot(subset(AircraftDF,dVariable=="1"),
 ```r
 #Expected Number of Offers
 ggplot(subset(AircraftDF,dVariable=="Expected Number of Offers"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-2.png) 
@@ -279,10 +280,10 @@ ggplot(subset(AircraftDF,dVariable=="Expected Number of Offers"),
 ```r
 #Expected Number of Changes
 ggplot(subset(AircraftDF,dVariable=="Expected Number of Changes"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-3.png) 
@@ -290,10 +291,10 @@ ggplot(subset(AircraftDF,dVariable=="Expected Number of Changes"),
 ```r
 #Ceiling Raising Change Orders %
 ggplot(subset(AircraftDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-4.png) 
@@ -301,10 +302,10 @@ ggplot(subset(AircraftDF,dVariable=="Ceiling Raising Change Orders %"),
 ```r
 #Terminations
 ggplot(subset(AircraftDF,dVariable=="Terminated"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-5.png) 
@@ -396,15 +397,15 @@ VehicleDF<-rbind(VehicleDF,
 
 #Remove redundant tests
 VehicleDF<-subset(VehicleDF,
-                  !CrossTab %in% unique(VehicleDF$Control))
+                  !Control %in% unique(VehicleDF$Hypothesis))
 
 
 #Single Offer Competition
 ggplot(subset(VehicleDF,dVariable=="1"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-1.png) 
@@ -412,10 +413,10 @@ ggplot(subset(VehicleDF,dVariable=="1"),
 ```r
 #Expected Number of Offers
 ggplot(subset(VehicleDF,dVariable=="Expected Number of Offers"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-2.png) 
@@ -423,10 +424,10 @@ ggplot(subset(VehicleDF,dVariable=="Expected Number of Offers"),
 ```r
 #Expected Number of Changes
 ggplot(subset(VehicleDF,dVariable=="Expected Number of Changes"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-3.png) 
@@ -434,10 +435,10 @@ ggplot(subset(VehicleDF,dVariable=="Expected Number of Changes"),
 ```r
 #Ceiling Raising Change Orders %
 ggplot(subset(VehicleDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-4.png) 
@@ -445,10 +446,10 @@ ggplot(subset(VehicleDF,dVariable=="Ceiling Raising Change Orders %"),
 ```r
 #Terminations
 ggplot(subset(VehicleDF,dVariable=="Terminated"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-5.png) 
@@ -509,15 +510,15 @@ LongDurDF<-rbind(LongDurDF,
 
 #Remove redundant tests
 LongDurDF<-subset(LongDurDF,
-                  !CrossTab %in% unique(LongDurDF$Control))
+                  !Control %in% unique(LongDurDF$Hypothesis))
 
 
 #Single Offer Competition
 ggplot(subset(LongDurDF,dVariable=="1"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-1.png) 
@@ -525,10 +526,10 @@ ggplot(subset(LongDurDF,dVariable=="1"),
 ```r
 #Expected Number of Offers
 ggplot(subset(LongDurDF,dVariable=="Expected Number of Offers"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-2.png) 
@@ -536,10 +537,10 @@ ggplot(subset(LongDurDF,dVariable=="Expected Number of Offers"),
 ```r
 #Expected Number of Changes
 ggplot(subset(LongDurDF,dVariable=="Expected Number of Changes"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-3.png) 
@@ -547,10 +548,10 @@ ggplot(subset(LongDurDF,dVariable=="Expected Number of Changes"),
 ```r
 #Ceiling Raising Change Orders %
 ggplot(subset(LongDurDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-4.png) 
@@ -558,10 +559,10 @@ ggplot(subset(LongDurDF,dVariable=="Ceiling Raising Change Orders %"),
 ```r
 #Terminations
 ggplot(subset(LongDurDF,dVariable=="Terminated"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-5.png) 
@@ -631,19 +632,19 @@ CompDF<-rbind(CompDF,
 
 #Remove redundant tests
 CompDF<-subset(CompDF,
-                  !CrossTab %in% unique(CompDF$Control))
+                  !Control %in% unique(CompDF$Hypothesis))
 #Remove the No Comp for the offer related iVariables
 CompDF<-subset(CompDF,
                   !(dVariable %in% c("1","Expected Number of Offers")&
-                      Control=="Not Comp."))
+                      Hypothesis=="Not Comp."))
 
 
 #Single Offer Competition
 ggplot(subset(CompDF,dVariable=="1"),
-       aes(x=CrossTab,y=FixedCostMargin)
+       aes(x=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-1.png) 
@@ -651,10 +652,10 @@ ggplot(subset(CompDF,dVariable=="1"),
 ```r
 #Expected Number of Offers
 ggplot(subset(CompDF,dVariable=="Expected Number of Offers"),
-       aes(x=CrossTab,y=FixedCostMargin)
+       aes(x=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-2.png) 
@@ -662,10 +663,10 @@ ggplot(subset(CompDF,dVariable=="Expected Number of Offers"),
 ```r
 #Expected Number of Changes
 ggplot(subset(CompDF,dVariable=="Expected Number of Changes"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-3.png) 
@@ -673,10 +674,10 @@ ggplot(subset(CompDF,dVariable=="Expected Number of Changes"),
 ```r
 #Ceiling Raising Change Orders %
 ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-4.png) 
@@ -684,10 +685,10 @@ ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
 ```r
 #Terminations
 ggplot(subset(CompDF,dVariable=="Terminated"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-5.png) 
@@ -732,12 +733,12 @@ RnDfind<- setEvidence(compGin,
                            states=c("R&D")
                            )
 
-NotRnDfind<- setEvidence(compGin, 
-                             nodes=c("PSR"),
-                             states=c(list(
-                                 compGin[[1]]$levels$PSR[compGin[[1]]$levels$PSR!=
-                                                             "R&D"])))
-
+# NotRnDfind<- setEvidence(compGin, 
+#                              nodes=c("PSR"),
+#                              states=c(list(
+#                                  compGin[[1]]$levels$PSR[compGin[[1]]$levels$PSR!=
+#                                                              "R&D"])))
+# 
 
 
 getEvidence(RnDfind)
@@ -752,21 +753,21 @@ getEvidence(RnDfind)
 ```r
 RnDdf<-FixedPriceHypothesisTester(RnDfind,"R&D")
 RnDdf<-rbind(RnDdf,
-                  FixedPriceHypothesisTester(NotRnDfind,"Not R&D")
+                  FixedPriceHypothesisTester(compGin,"Population")
                   )
 
 
 #Remove redundant tests
 RnDdf<-subset(RnDdf,
-                   !CrossTab %in% unique(RnDdf$Control))
+                   !Control %in% unique(RnDdf$Hypothesis))
 
 
 #Single Offer Competition
 ggplot(subset(RnDdf,dVariable=="1"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-1.png) 
@@ -774,10 +775,10 @@ ggplot(subset(RnDdf,dVariable=="1"),
 ```r
 #Expected Number of Offers
 ggplot(subset(RnDdf,dVariable=="Expected Number of Offers"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-2.png) 
@@ -785,10 +786,10 @@ ggplot(subset(RnDdf,dVariable=="Expected Number of Offers"),
 ```r
 #Expected Number of Changes
 ggplot(subset(RnDdf,dVariable=="Expected Number of Changes"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-3.png) 
@@ -796,10 +797,10 @@ ggplot(subset(RnDdf,dVariable=="Expected Number of Changes"),
 ```r
 #Ceiling Raising Change Orders %
 ggplot(subset(RnDdf,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-4.png) 
@@ -807,16 +808,20 @@ ggplot(subset(RnDdf,dVariable=="Ceiling Raising Change Orders %"),
 ```r
 #Terminations
 ggplot(subset(RnDdf,dVariable=="Terminated"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-5.png) 
 
 ```r
 rm(RnDfind,NotRnDfind)
+```
+
+```
+## Warning in rm(RnDfind, NotRnDfind): object 'NotRnDfind' not found
 ```
 
 ##H2: Due to design uncertainty Pre-Milestone B Major Defense Acquisition Programs (MDAPs) are potentially more likely to encounter problems than other fixed-price contracts
@@ -875,15 +880,15 @@ HighLinkDF<-rbind(HighLinkDF,
 
 #Remove redundant tests
 HighLinkDF<-subset(HighLinkDF,
-                   !CrossTab %in% unique(HighLinkDF$Control))
+                   !Control %in% unique(HighLinkDF$Hypothesis))
 
 
 #Single Offer Competition
 ggplot(subset(HighLinkDF,dVariable=="1"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-1.png) 
@@ -891,10 +896,10 @@ ggplot(subset(HighLinkDF,dVariable=="1"),
 ```r
 #Expected Number of Offers
 ggplot(subset(HighLinkDF,dVariable=="Expected Number of Offers"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-2.png) 
@@ -902,10 +907,10 @@ ggplot(subset(HighLinkDF,dVariable=="Expected Number of Offers"),
 ```r
 #Expected Number of Changes
 ggplot(subset(HighLinkDF,dVariable=="Expected Number of Changes"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-3.png) 
@@ -913,10 +918,10 @@ ggplot(subset(HighLinkDF,dVariable=="Expected Number of Changes"),
 ```r
 #Ceiling Raising Change Orders %
 ggplot(subset(HighLinkDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-4.png) 
@@ -924,10 +929,10 @@ ggplot(subset(HighLinkDF,dVariable=="Ceiling Raising Change Orders %"),
 ```r
 #Terminations
 ggplot(subset(HighLinkDF,dVariable=="Terminated"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-5.png) 
@@ -994,15 +999,15 @@ LongDurDF<-rbind(LongDurDF,
 
 #Remove redundant tests
 LongDurDF<-subset(LongDurDF,
-                  !CrossTab %in% c(unique(LongDurDF$Control),"Not Long Dur."))
+                  !Control %in% c(unique(LongDurDF$Hypothesis),"Not Long Dur."))
 
 
 #Single Offer Competition
 ggplot(subset(LongDurDF,dVariable=="1"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-1.png) 
@@ -1010,10 +1015,10 @@ ggplot(subset(LongDurDF,dVariable=="1"),
 ```r
 #Expected Number of Offers
 ggplot(subset(LongDurDF,dVariable=="Expected Number of Offers"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-2.png) 
@@ -1021,10 +1026,10 @@ ggplot(subset(LongDurDF,dVariable=="Expected Number of Offers"),
 ```r
 #Expected Number of Changes
 ggplot(subset(LongDurDF,dVariable=="Expected Number of Changes"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-3.png) 
@@ -1032,10 +1037,10 @@ ggplot(subset(LongDurDF,dVariable=="Expected Number of Changes"),
 ```r
 #Ceiling Raising Change Orders %
 ggplot(subset(LongDurDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-4.png) 
@@ -1043,10 +1048,10 @@ ggplot(subset(LongDurDF,dVariable=="Ceiling Raising Change Orders %"),
 ```r
 #Terminations
 ggplot(subset(LongDurDF,dVariable=="Terminated"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-5.png) 
@@ -1117,7 +1122,7 @@ CompDF<-rbind(CompDF,
 
 #Remove redundant tests
 CompDF<-subset(CompDF,
-                  !CrossTab %in% c(unique(CompDF$Control),"Not Comp."))
+                  !Control %in% c(unique(CompDF$Hypothesis),"Not Comp."))
 #Remove the  iVariables not covered in hypothesis
 CompDF<-subset(CompDF,
                   !dVariable %in% c("1","Expected Number of Offers"))
@@ -1126,10 +1131,10 @@ CompDF<-subset(CompDF,
 
 #Expected Number of Changes
 ggplot(subset(CompDF,dVariable=="Expected Number of Changes"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H4Comp-1.png) 
@@ -1137,10 +1142,10 @@ ggplot(subset(CompDF,dVariable=="Expected Number of Changes"),
 ```r
 #Ceiling Raising Change Orders %
 ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H4Comp-2.png) 
@@ -1148,10 +1153,10 @@ ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
 ```r
 #Terminations
 ggplot(subset(CompDF,dVariable=="Terminated"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H4Comp-3.png) 
@@ -1211,15 +1216,15 @@ SoftwareDF<-rbind(SoftwareDF,
 
 #Remove redundant tests
 SoftwareDF<-subset(SoftwareDF,
-                   !CrossTab %in% unique(SoftwareDF$Control))
+                   !Control %in% unique(SoftwareDF$Hypothesis))
 
 
 #Single Offer Competition
 ggplot(subset(SoftwareDF,dVariable=="1"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5Software-1.png) 
@@ -1227,10 +1232,10 @@ ggplot(subset(SoftwareDF,dVariable=="1"),
 ```r
 #Expected Number of Offers
 ggplot(subset(SoftwareDF,dVariable=="Expected Number of Offers"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5Software-2.png) 
@@ -1238,10 +1243,10 @@ ggplot(subset(SoftwareDF,dVariable=="Expected Number of Offers"),
 ```r
 #Expected Number of Changes
 ggplot(subset(SoftwareDF,dVariable=="Expected Number of Changes"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5Software-3.png) 
@@ -1249,10 +1254,10 @@ ggplot(subset(SoftwareDF,dVariable=="Expected Number of Changes"),
 ```r
 #Ceiling Raising Change Orders %
 ggplot(subset(SoftwareDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5Software-4.png) 
@@ -1260,10 +1265,10 @@ ggplot(subset(SoftwareDF,dVariable=="Ceiling Raising Change Orders %"),
 ```r
 #Terminations
 ggplot(subset(SoftwareDF,dVariable=="Terminated"),
-       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5Software-5.png) 
