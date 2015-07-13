@@ -1,37 +1,46 @@
----
-output:
-  html_document:
-    fig_caption: yes
-    toc: yes
-    self_contained: no
-    keep_md: yes
 
----
 
-```{r hiddensetup, echo = FALSE}
-require(ggplot2)
-require(stringr)
-require(graph)
-require(plyr)
-require(Hmisc)
-require(Matrix)
-require(gRain)
-require(gRbase)
-require(methods)
-require(bnlearn)
-require(Rgraphviz)
-require(reshape2)
-#source("http://bioconductor.org/biocLite.R");
-#biocLite("Rgraphviz")
-# biocLite("RBGL")
-setwd("K:\\Development\\Fixed-price")
-# setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
-Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
-# Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
-source(paste(Path,"lookups.r",sep=""))
-
-source("contract_outcome_gRain.r")
-
+```
+## Loading required package: ggplot2
+## Loading required package: stringr
+## Loading required package: graph
+## Loading required package: plyr
+## 
+## Attaching package: 'plyr'
+## 
+## The following object is masked from 'package:graph':
+## 
+##     join
+## 
+## Loading required package: Hmisc
+## Loading required package: grid
+## Loading required package: lattice
+## Loading required package: survival
+## Loading required package: Formula
+## 
+## Attaching package: 'Hmisc'
+## 
+## The following objects are masked from 'package:plyr':
+## 
+##     is.discrete, summarize
+## 
+## The following objects are masked from 'package:base':
+## 
+##     format.pval, round.POSIXt, trunc.POSIXt, units
+## 
+## Loading required package: Matrix
+## Loading required package: gRain
+## Loading required package: gRbase
+## Loading required package: bnlearn
+## 
+## Attaching package: 'bnlearn'
+## 
+## The following objects are masked from 'package:gRbase':
+## 
+##     children, parents
+## 
+## Loading required package: Rgraphviz
+## Loading required package: reshape2
 ```
 
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
@@ -41,12 +50,22 @@ Describe contract vehicle here.
 
 
 
-```{r BayesianCompilation, echo = TRUE}
+
+```r
 load("Output\\compGin.Rdata",.GlobalEnv)
 # cad.cpt <- extractCPT(ContractModel, as.graphNEL(CompetitionNetwork), smooth = 0.001)
 # compGin <- grain(compileCPT(cad.cpt))
 
 summary(compGin)
+```
+
+```
+## Independence network: Compiled: FALSE Propagated: FALSE 
+##  Nodes : Named chr [1:14] "IDV" "FxCb" "Comp" "Link" "Who" "What" ...
+##  - attr(*, "names")= chr [1:14] "IDV" "FxCb" "Comp" "Link" ...
+```
+
+```r
 # str(compGin$universe$levels["FxCb"])
 # cost.list <- list(nodes = c("FxCb"),
 #                         states = c("Cost-Based"))
@@ -59,8 +78,6 @@ summary(compGin)
 #                         nodes=fixed.list$nodes,
 #                         states=fixed.list$states)
 # 
-
-
 ```
 
 
@@ -91,10 +108,16 @@ For small contracts, the pattern
 The hypothesis does hold weakly for contracts under $15k, although larger contracts have more 5+ offer. The hypothesis does not hold for contracts under $100k and again 5+ offer contracts are remain more common among larger contracts.  If the dividing line is instead $1 million, then the analysis does hold, with contracts of $1m and lower having more competition at every level of analysis.
 
 
-```{r C1Ceil}
 
+```r
 compGin[[1]]$levels$Ceil
+```
 
+```
+## [1] "[0,15k)"    "[100k,1m)"  "[15k,100k)" "[1m,30m)"   "[30m+]"
+```
+
+```r
 # debug(OffersHypothesisTester)
 SizeDF<-FixedPriceHypothesisTester(compGin)
 #No redundant tests to remove
@@ -105,41 +128,53 @@ ggplot(subset(SizeDF,dVariable=="1"),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-1.png) 
 
+```r
 #Expected Number of Offers
 ggplot(subset(SizeDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-2.png) 
+
+```r
 #Expected Number of Changes
 ggplot(subset(SizeDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-3.png) 
 
+```r
 #Ceiling Raising Change Orders %
 ggplot(subset(SizeDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-4.png) 
 
-
+```r
 #Terminations
 ggplot(subset(SizeDF,dVariable=="Terminated"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
-
-``` 
+![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-5.png) 
 
 
 ##C2 Aircraft encounter
@@ -157,20 +192,42 @@ The model incorporated a 75% threshold for classification as a given Platform un
 #Results
 As expected, numbers of offers are far higher with non-aircraft, for both competed and for all contracts.
 
-```{r C2Aircraft}
 
-
+```r
 compGin[[1]]$levels$What
+```
 
+```
+## [1] "Aircraft and Drones"            "Electronics and Communications"
+## [3] "Facilities and Construction"    "Land Vehicles"                 
+## [5] "Missile and Space Systems"      "Other"                         
+## [7] "Ships & Submarines"             "Weapons and Ammunition"
+```
+
+```r
 AircraftFind<- setEvidence(compGin, 
                            nodes=c("What"),
                            states=c("Aircraft and Drones")
                            )
 
 getEvidence(AircraftFind)
+```
+
+```
+## Finding: 
+## What: Aircraft and Drones
+## Pr(Finding)= 0.09632574
+```
+
+```r
 pEvidence(AircraftFind)
+```
 
+```
+## [1] 0.09632574
+```
 
+```r
 NotAircraftFind<- setEvidence(compGin, 
                               nodes=c("What"),
                               states=list(compGin[[1]]$levels$What[
@@ -178,8 +235,15 @@ NotAircraftFind<- setEvidence(compGin,
 
 
 getEvidence(NotAircraftFind)
+```
 
+```
+## Finding: 
+## What: Electronics and Communications, Facilities and Construction, Land Vehicles, Missile and Space Systems, Other, Ships & Submarines, Weapons and Ammunition
+## Pr(Finding)= 0.9036743
+```
 
+```r
 AircraftDF<-FixedPriceHypothesisTester(AircraftFind,"Aircraft")
 AircraftDF<-rbind(AircraftDF,
                   FixedPriceHypothesisTester(NotAircraftFind,"Not Aircraft")
@@ -197,45 +261,57 @@ ggplot(subset(AircraftDF,dVariable=="1"),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-1.png) 
 
+```r
 #Expected Number of Offers
 ggplot(subset(AircraftDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-2.png) 
+
+```r
 #Expected Number of Changes
 ggplot(subset(AircraftDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-3.png) 
 
+```r
 #Ceiling Raising Change Orders %
 ggplot(subset(AircraftDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-4.png) 
 
-
+```r
 #Terminations
 ggplot(subset(AircraftDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-5.png) 
 
-
+```r
 rm(AircraftFind,NotAircraftFind)
-
-
-``` 
+```
 
 
 ##C3: Undefinitized contract actions (UCAs) in development will encounter more problems
@@ -267,24 +343,34 @@ At present, the vehicle variable only has granularity to look at at IDVs versus 
 
 The analysis indicates validates this past finding, IDVs are marketedly more likely to be competed and to receive more offers when competed.
 
-```{r C3UCA}
 
+
+
+
+```r
+compGin[[1]]$levels$IDV
 ```
 
+```
+## [1] "Def/Pur" "IDV"
+```
 
-```{r C4Vehicle}
-
-compGin[[1]]$levels$IDV
-
+```r
 IDVFind<- setEvidence(compGin, 
                       nodes=c("IDV"),
                       states=c("IDV")
                       )
 
 getEvidence(IDVFind)
+```
 
+```
+## Finding: 
+## IDV: IDV
+## Pr(Finding)= 0.6492992
+```
 
-
+```r
 AwardFind<- setEvidence(compGin, 
                         nodes=c("IDV"),
                         states=c(list(
@@ -293,11 +379,15 @@ AwardFind<- setEvidence(compGin,
                         )
 
 getEvidence(AwardFind)
+```
 
+```
+## Finding: 
+## IDV: Def/Pur
+## Pr(Finding)= 0.3507008
+```
 
-
-
-
+```r
 VehicleDF<-FixedPriceHypothesisTester(IDVFind,"IDV")
 VehicleDF<-rbind(VehicleDF,
                  FixedPriceHypothesisTester(AwardFind,"Award")
@@ -315,49 +405,57 @@ ggplot(subset(VehicleDF,dVariable=="1"),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-1.png) 
 
+```r
 #Expected Number of Offers
 ggplot(subset(VehicleDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-2.png) 
+
+```r
 #Expected Number of Changes
 ggplot(subset(VehicleDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-3.png) 
 
+```r
 #Ceiling Raising Change Orders %
 ggplot(subset(VehicleDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-4.png) 
 
-
+```r
 #Terminations
 ggplot(subset(VehicleDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-5.png) 
 
-
-
-
-
-
+```r
 rm(IDVFind,AwardFind)
-
-
-``` 
+```
 
 ##Contracts with longer initially expected periods of performance will encounter more problems.
 *	Past CSIS research on cost overruns in major defense acquisition projects have found that cost growth is correlated with contract duration. "If cost increases accrue over time, then programs with an older baseline estimate would tend to accumulate relatively higher cost increases. The data for the analyzed programs show that older programs indeed experience larger overruns... this growth correlation not only provides further evidence for the assertion that cost growth occurs steadily throughout the program lifespan, but it also suggests that younger programs are not performing better than older programs." (David Berteau et al.: Cost and Time Overruns for Major Defense Acquisition Programs (2011))
@@ -368,18 +466,31 @@ rm(IDVFind,AwardFind)
 *	Note: CSIS is including a separate hypothesis (Slide 9) to test whether fixed-price contracts encounter an even greater number of problems under contracts with longer expected periods of performance 
 
 
-```{r C5LongDur}
 
+```r
 compGin[[1]]$levels$Dur
+```
 
+```
+## [1] "[    0,   61)" "[   61,  214)" "[  214,  366)" "[  366,33192]"
+```
+
+```r
 LongDurFind<- setEvidence(compGin, 
                           nodes=c("Dur"),
                           states=c("[  366,33192]")
                           )
 
 getEvidence(LongDurFind)
+```
 
+```
+## Finding: 
+## Dur: [  366,33192]
+## Pr(Finding)= 0.0508826
+```
 
+```r
 NotLongDurFind<- setEvidence(compGin, 
                              nodes=c("Dur"),
                              states=c(list(
@@ -407,44 +518,57 @@ ggplot(subset(LongDurDF,dVariable=="1"),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-1.png) 
 
+```r
 #Expected Number of Offers
 ggplot(subset(LongDurDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-2.png) 
+
+```r
 #Expected Number of Changes
 ggplot(subset(LongDurDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-3.png) 
 
+```r
 #Ceiling Raising Change Orders %
 ggplot(subset(LongDurDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-4.png) 
 
-
+```r
 #Terminations
 ggplot(subset(LongDurDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-5.png) 
 
-
+```r
 rm(LongDurFind,NotLongDurFind)
-
-``` 
+```
 
 
 ##Incentive Fee contracts experience fewer problems than other forms of contracts.
@@ -460,25 +584,45 @@ Incentive was not included in the initial model because it made up a small propo
 
 
 
-```{r C6Comp}
 
+```r
 compGin[[1]]$levels$Comp
+```
 
+```
+## [1] "Comp."     "No Comp."  "Unlabeled"
+```
 
+```r
 CompFind<-setEvidence(compGin, 
                       nodes=c("Comp"),
                       states=c("Comp.")
                       )
 
 getEvidence(CompFind)
+```
 
+```
+## Finding: 
+## Comp: Comp.
+## Pr(Finding)= 0.8031248
+```
+
+```r
 NotCompFind<-setEvidence(compGin, 
                          nodes=c("Comp"),
                          states=c("No Comp.")
                          )
 getEvidence(NotCompFind)
+```
 
+```
+## Finding: 
+## Comp: No Comp.
+## Pr(Finding)= 0.1968207
+```
 
+```r
 CompDF<-FixedPriceHypothesisTester(CompFind,"Comp.")
 CompDF<-rbind(CompDF,
                  FixedPriceHypothesisTester(NotCompFind,"Not Comp.")
@@ -500,45 +644,57 @@ ggplot(subset(CompDF,dVariable=="1"),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-1.png) 
 
+```r
 #Expected Number of Offers
 ggplot(subset(CompDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-2.png) 
+
+```r
 #Expected Number of Changes
 ggplot(subset(CompDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-3.png) 
 
+```r
 #Ceiling Raising Change Orders %
 ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-4.png) 
 
-
+```r
 #Terminations
 ggplot(subset(CompDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-5.png) 
 
-
+```r
 rm(CompFind,NotCompFind)
-
-
-``` 
+```
 
 
 
@@ -561,10 +717,16 @@ For this example, we're still using usual R&D rather than excluding R&d7
 ##Results
 The hypothesis is supported with regard to number of offers. Larger fixed-price contracts are more likely to experience single offer competition and are less likely to experience competition with three or more offers. Combination tracks more closely with fixed-price than cost-plus.
 
-```{r H1LargeR&D}
 
+```r
 levels(compGin[[1]]$levels$Ceil)
+```
 
+```
+## NULL
+```
+
+```r
 RnDfind<- setEvidence(compGin, 
                            nodes=c("PSR"),
                            states=c("R&D")
@@ -579,7 +741,15 @@ NotRnDfind<- setEvidence(compGin,
 
 
 getEvidence(RnDfind)
+```
 
+```
+## Finding: 
+## PSR: R&D
+## Pr(Finding)= 0.009068309
+```
+
+```r
 RnDdf<-FixedPriceHypothesisTester(RnDfind,"R&D")
 RnDdf<-rbind(RnDdf,
                   FixedPriceHypothesisTester(NotRnDfind,"Not R&D")
@@ -597,45 +767,57 @@ ggplot(subset(RnDdf,dVariable=="1"),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-1.png) 
 
+```r
 #Expected Number of Offers
 ggplot(subset(RnDdf,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-2.png) 
+
+```r
 #Expected Number of Changes
 ggplot(subset(RnDdf,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-3.png) 
 
+```r
 #Ceiling Raising Change Orders %
 ggplot(subset(RnDdf,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-4.png) 
 
-
+```r
 #Terminations
 ggplot(subset(RnDdf,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-5.png) 
 
-
+```r
 rm(RnDfind,NotRnDfind)
-
-
-``` 
+```
 
 ##H2: Due to design uncertainty Pre-Milestone B Major Defense Acquisition Programs (MDAPs) are potentially more likely to encounter problems than other fixed-price contracts
 *	Prerequisites for use of fixed-price: "Design content is established and the components are mature technologies. There are no signifi???cant unresolved design issues, no major integration risk, the external interfaces are well defined, and no serious risk exists of unknowns surfacing in developmental testing and causing major redesign." (Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.) {Emphasis added}
@@ -652,10 +834,16 @@ MDAP specific classification is not yet included because it represents such a sm
 #Initial results
 The hypothesis was not supported with regard to number of offers, but this should be treated as a soft negative finding until the more precise question is tested.
 
-```{r H2MDAP}
 
+```r
 levels(compGin[[1]]$levels$Link)
+```
 
+```
+## NULL
+```
+
+```r
 HighLinkFind<- setEvidence(compGin, 
                            nodes=c("Link"),
                            states=c("[  750,67263]")
@@ -670,9 +858,15 @@ NotHighLinkFind<- setEvidence(compGin,
 
 
 getEvidence(HighLinkFind)
+```
 
+```
+## Finding: 
+## Link: [  750,67263]
+## Pr(Finding)= 0.2440527
+```
 
-
+```r
 HighLinkDF<-FixedPriceHypothesisTester(HighLinkFind,"High Link")
 HighLinkDF<-rbind(HighLinkDF,
                   FixedPriceHypothesisTester(compGin,"Population")
@@ -690,45 +884,57 @@ ggplot(subset(HighLinkDF,dVariable=="1"),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-1.png) 
 
+```r
 #Expected Number of Offers
 ggplot(subset(HighLinkDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-2.png) 
+
+```r
 #Expected Number of Changes
 ggplot(subset(HighLinkDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-3.png) 
 
+```r
 #Ceiling Raising Change Orders %
 ggplot(subset(HighLinkDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-4.png) 
 
-
+```r
 #Terminations
 ggplot(subset(HighLinkDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-5.png) 
 
-
+```r
 rm(HighLinkFind,NotHighLinkFind)
-
-
-``` 
+```
 
 
 
@@ -745,19 +951,31 @@ This was initially expected to be tested with a continuous value for length rath
 #Initial results
 The hypothesis regarding number of offers was not supported at the greater than 1 year level. Further subdivision into 2 year plus or other breakdowns might show a different result. Combination resembled fixed-price, but did not do as well with 5 or more offers.
 
-```{r H3LongDur}
 
+```r
 compGin[[1]]$levels$Dur
+```
 
+```
+## [1] "[    0,   61)" "[   61,  214)" "[  214,  366)" "[  366,33192]"
+```
+
+```r
 LongDurFind<- setEvidence(compGin, 
                           nodes=c("Dur"),
                           states=c("[  366,33192]")
                           )
 
 getEvidence(LongDurFind)
+```
 
+```
+## Finding: 
+## Dur: [  366,33192]
+## Pr(Finding)= 0.0508826
+```
 
-
+```r
 NotLongDurFind<- setEvidence(compGin, 
                              nodes=c("Dur"),
                              states=c(list(
@@ -785,44 +1003,57 @@ ggplot(subset(LongDurDF,dVariable=="1"),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-1.png) 
 
+```r
 #Expected Number of Offers
 ggplot(subset(LongDurDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-2.png) 
+
+```r
 #Expected Number of Changes
 ggplot(subset(LongDurDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-3.png) 
 
+```r
 #Ceiling Raising Change Orders %
 ggplot(subset(LongDurDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-4.png) 
 
-
+```r
 #Terminations
 ggplot(subset(LongDurDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-5.png) 
 
-
+```r
 rm(LongDurFind,NotLongDurFind)
-
-``` 
+```
 
 
 
@@ -839,25 +1070,45 @@ rm(LongDurFind,NotLongDurFind)
 
 This hypothesis is requires incorporation of the next two dependent variables into the Bayesian Network.
 
-```{r H4Comp}
 
+```r
 compGin[[1]]$levels$Comp
+```
 
+```
+## [1] "Comp."     "No Comp."  "Unlabeled"
+```
 
+```r
 CompFind<-setEvidence(compGin, 
                       nodes=c("Comp"),
                       states=c("Comp.")
                       )
 
 getEvidence(CompFind)
+```
 
+```
+## Finding: 
+## Comp: Comp.
+## Pr(Finding)= 0.8031248
+```
+
+```r
 NotCompFind<-setEvidence(compGin, 
                          nodes=c("Comp"),
                          states=c("No Comp.")
                          )
 getEvidence(NotCompFind)
+```
 
+```
+## Finding: 
+## Comp: No Comp.
+## Pr(Finding)= 0.1968207
+```
 
+```r
 CompDF<-FixedPriceHypothesisTester(CompFind,"Comp.")
 CompDF<-rbind(CompDF,
                  FixedPriceHypothesisTester(compGin,"Population")
@@ -879,29 +1130,35 @@ ggplot(subset(CompDF,dVariable=="Expected Number of Changes"),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H4Comp-1.png) 
 
+```r
 #Ceiling Raising Change Orders %
 ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H4Comp-2.png) 
 
-
+```r
 #Terminations
 ggplot(subset(CompDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H4Comp-3.png) 
 
-
+```r
 rm(CompFind,NotCompFind)
-
-``` 
+```
 
 ##H5: Fixed-price are preferred by vendors for larger software contracts
 *	"We hypothesize that the vendor's ability to leverage information asymmetry about capabilities and experiences translates into the vendor preferring Fixed-Price contract to secure larger information rents. Our results support this hypothesis and suggest that the vendor would prefer the FP contract for larger and longer projects with larger teams. However, vendors would prefer a [Time and Materials] contract when the risk of employee attrition from the project team is high." (Research Note: On Vendor Preferences for Contract Types in Offshore Software Projects: The Case of fixed-price vs. Time and Materials Contracts)
@@ -920,21 +1177,32 @@ Software is typically classified as a service under PSR, though also could be un
 
 Electronics and communications services do have a slight preference for fixed-price contracts when it comes to number of offers. However, when R&D is also included, the advantage switches to Cost-based.
 
-```{r H5Software}
 
+```r
 levels(compGin[[1]]$levels$PSR)
+```
 
+```
+## NULL
+```
+
+```r
 SoftwareFind<- setEvidence(compGin, 
                            nodes=c("What","PSR"),
                            states=c("Electronics and Communications","Services"))
 
 
 getEvidence(SoftwareFind)
+```
 
+```
+## Finding: 
+## What: Electronics and Communications
+##  PSR: Services
+## Pr(Finding)= 0.02746502
+```
 
-
-
-
+```r
 SoftwareDF<-FixedPriceHypothesisTester(SoftwareFind,"Software")
 SoftwareDF<-rbind(SoftwareDF,
                   FixedPriceHypothesisTester(compGin,"Population")
@@ -952,42 +1220,55 @@ ggplot(subset(SoftwareDF,dVariable=="1"),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H5Software-1.png) 
 
+```r
 #Expected Number of Offers
 ggplot(subset(SoftwareDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H5Software-2.png) 
+
+```r
 #Expected Number of Changes
 ggplot(subset(SoftwareDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H5Software-3.png) 
 
+```r
 #Ceiling Raising Change Orders %
 ggplot(subset(SoftwareDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H5Software-4.png) 
 
-
+```r
 #Terminations
 ggplot(subset(SoftwareDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
+```
 
+![](fixed_price_hypothesis_testing_files/figure-html/H5Software-5.png) 
 
-
+```r
 rm(SoftwareFind)
-
-``` 
+```
 
