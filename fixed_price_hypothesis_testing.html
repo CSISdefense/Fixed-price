@@ -212,7 +212,7 @@ ggplot(subset(SizeDF,dVariable==&quot;1&quot;),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C1Ceil-1.png" />
 </div>
@@ -221,7 +221,7 @@ ggplot(subset(SizeDF,dVariable==&quot;Expected Number of Offers&quot;),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C1Ceil-2.png" />
 </div>
@@ -230,7 +230,7 @@ ggplot(subset(SizeDF,dVariable==&quot;Expected Number of Changes&quot;),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C1Ceil-3.png" />
 </div>
@@ -239,7 +239,7 @@ ggplot(subset(SizeDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C1Ceil-4.png" />
 </div>
@@ -248,7 +248,7 @@ ggplot(subset(SizeDF,dVariable==&quot;Terminated&quot;),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C1Ceil-5.png" />
 </div>
@@ -314,7 +314,7 @@ ggplot(subset(AircraftDF,dVariable==&quot;1&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-1.png" />
 </div>
@@ -323,7 +323,7 @@ ggplot(subset(AircraftDF,dVariable==&quot;Expected Number of Offers&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-2.png" />
 </div>
@@ -332,7 +332,7 @@ ggplot(subset(AircraftDF,dVariable==&quot;Expected Number of Changes&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-3.png" />
 </div>
@@ -341,7 +341,7 @@ ggplot(subset(AircraftDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;)
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-4.png" />
 </div>
@@ -350,7 +350,7 @@ ggplot(subset(AircraftDF,dVariable==&quot;Terminated&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-5.png" />
 </div>
@@ -425,7 +425,7 @@ ggplot(subset(VehicleDF,dVariable==&quot;1&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-1.png" />
 </div>
@@ -434,7 +434,7 @@ ggplot(subset(VehicleDF,dVariable==&quot;Expected Number of Offers&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-2.png" />
 </div>
@@ -443,7 +443,7 @@ ggplot(subset(VehicleDF,dVariable==&quot;Expected Number of Changes&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-3.png" />
 </div>
@@ -452,7 +452,7 @@ ggplot(subset(VehicleDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-4.png" />
 </div>
@@ -461,7 +461,7 @@ ggplot(subset(VehicleDF,dVariable==&quot;Terminated&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-5.png" />
 </div>
@@ -515,7 +515,7 @@ ggplot(subset(LongDurDF,dVariable==&quot;1&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C5LongDur-1.png" />
 </div>
@@ -524,7 +524,7 @@ ggplot(subset(LongDurDF,dVariable==&quot;Expected Number of Offers&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C5LongDur-2.png" />
 </div>
@@ -533,7 +533,7 @@ ggplot(subset(LongDurDF,dVariable==&quot;Expected Number of Changes&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C5LongDur-3.png" />
 </div>
@@ -542,7 +542,7 @@ ggplot(subset(LongDurDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C5LongDur-4.png" />
 </div>
@@ -551,7 +551,7 @@ ggplot(subset(LongDurDF,dVariable==&quot;Terminated&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C5LongDur-5.png" />
 </div>
@@ -610,7 +610,7 @@ ggplot(subset(CompDF,dVariable==&quot;1&quot;),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C6Comp-1.png" />
 </div>
@@ -619,7 +619,7 @@ ggplot(subset(CompDF,dVariable==&quot;Expected Number of Offers&quot;),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C6Comp-2.png" />
 </div>
@@ -628,7 +628,7 @@ ggplot(subset(CompDF,dVariable==&quot;Expected Number of Changes&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C6Comp-3.png" />
 </div>
@@ -637,7 +637,7 @@ ggplot(subset(CompDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C6Comp-4.png" />
 </div>
@@ -646,7 +646,7 @@ ggplot(subset(CompDF,dVariable==&quot;Terminated&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/C6Comp-5.png" />
 </div>
@@ -705,7 +705,7 @@ ggplot(subset(RnDdf,dVariable==&quot;1&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;D-1.png" />
 </div>
@@ -714,7 +714,7 @@ ggplot(subset(RnDdf,dVariable==&quot;Expected Number of Offers&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;D-2.png" />
 </div>
@@ -723,7 +723,7 @@ ggplot(subset(RnDdf,dVariable==&quot;Expected Number of Changes&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;D-3.png" />
 </div>
@@ -732,7 +732,7 @@ ggplot(subset(RnDdf,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;D-4.png" />
 </div>
@@ -741,7 +741,7 @@ ggplot(subset(RnDdf,dVariable==&quot;Terminated&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;D-5.png" />
 </div>
@@ -802,7 +802,7 @@ ggplot(subset(HighLinkDF,dVariable==&quot;1&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-1.png" />
 </div>
@@ -811,7 +811,7 @@ ggplot(subset(HighLinkDF,dVariable==&quot;Expected Number of Offers&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-2.png" />
 </div>
@@ -820,7 +820,7 @@ ggplot(subset(HighLinkDF,dVariable==&quot;Expected Number of Changes&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-3.png" />
 </div>
@@ -829,7 +829,7 @@ ggplot(subset(HighLinkDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;)
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-4.png" />
 </div>
@@ -838,7 +838,7 @@ ggplot(subset(HighLinkDF,dVariable==&quot;Terminated&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-5.png" />
 </div>
@@ -898,7 +898,7 @@ ggplot(subset(LongDurDF,dVariable==&quot;1&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-1.png" />
 </div>
@@ -907,7 +907,7 @@ ggplot(subset(LongDurDF,dVariable==&quot;Expected Number of Offers&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-2.png" />
 </div>
@@ -916,7 +916,7 @@ ggplot(subset(LongDurDF,dVariable==&quot;Expected Number of Changes&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-3.png" />
 </div>
@@ -925,7 +925,7 @@ ggplot(subset(LongDurDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-4.png" />
 </div>
@@ -934,7 +934,7 @@ ggplot(subset(LongDurDF,dVariable==&quot;Terminated&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-5.png" />
 </div>
@@ -994,7 +994,7 @@ ggplot(subset(CompDF,dVariable==&quot;Expected Number of Changes&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H4Comp-1.png" />
 </div>
@@ -1003,7 +1003,7 @@ ggplot(subset(CompDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H4Comp-2.png" />
 </div>
@@ -1012,7 +1012,7 @@ ggplot(subset(CompDF,dVariable==&quot;Terminated&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H4Comp-3.png" />
 </div>
@@ -1064,7 +1064,7 @@ ggplot(subset(SoftwareDF,dVariable==&quot;1&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-1.png" />
 </div>
@@ -1073,7 +1073,7 @@ ggplot(subset(SoftwareDF,dVariable==&quot;Expected Number of Offers&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-2.png" />
 </div>
@@ -1082,7 +1082,7 @@ ggplot(subset(SoftwareDF,dVariable==&quot;Expected Number of Changes&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-3.png" />
 </div>
@@ -1091,7 +1091,7 @@ ggplot(subset(SoftwareDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;)
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-4.png" />
 </div>
@@ -1100,7 +1100,7 @@ ggplot(subset(SoftwareDF,dVariable==&quot;Terminated&quot;),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()</code></pre>
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-5.png" />
 </div>

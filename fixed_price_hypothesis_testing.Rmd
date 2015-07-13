@@ -104,7 +104,7 @@ ggplot(subset(SizeDF,dVariable=="1"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Expected Number of Offers
@@ -112,14 +112,14 @@ ggplot(subset(SizeDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 #Expected Number of Changes
 ggplot(subset(SizeDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Ceiling Raising Change Orders %
@@ -127,7 +127,7 @@ ggplot(subset(SizeDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -136,7 +136,7 @@ ggplot(subset(SizeDF,dVariable=="Terminated"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 ``` 
@@ -196,7 +196,7 @@ ggplot(subset(AircraftDF,dVariable=="1"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Expected Number of Offers
@@ -204,14 +204,14 @@ ggplot(subset(AircraftDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 #Expected Number of Changes
 ggplot(subset(AircraftDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Ceiling Raising Change Orders %
@@ -219,7 +219,7 @@ ggplot(subset(AircraftDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -228,7 +228,7 @@ ggplot(subset(AircraftDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -314,7 +314,7 @@ ggplot(subset(VehicleDF,dVariable=="1"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Expected Number of Offers
@@ -322,14 +322,14 @@ ggplot(subset(VehicleDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 #Expected Number of Changes
 ggplot(subset(VehicleDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Ceiling Raising Change Orders %
@@ -337,7 +337,7 @@ ggplot(subset(VehicleDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -346,7 +346,7 @@ ggplot(subset(VehicleDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -406,7 +406,7 @@ ggplot(subset(LongDurDF,dVariable=="1"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Expected Number of Offers
@@ -414,14 +414,14 @@ ggplot(subset(LongDurDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 #Expected Number of Changes
 ggplot(subset(LongDurDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Ceiling Raising Change Orders %
@@ -429,7 +429,7 @@ ggplot(subset(LongDurDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -438,7 +438,7 @@ ggplot(subset(LongDurDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -499,7 +499,7 @@ ggplot(subset(CompDF,dVariable=="1"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Expected Number of Offers
@@ -507,14 +507,14 @@ ggplot(subset(CompDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 #Expected Number of Changes
 ggplot(subset(CompDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Ceiling Raising Change Orders %
@@ -522,7 +522,7 @@ ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -531,7 +531,7 @@ ggplot(subset(CompDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -596,7 +596,7 @@ ggplot(subset(RnDdf,dVariable=="1"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Expected Number of Offers
@@ -604,14 +604,14 @@ ggplot(subset(RnDdf,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 #Expected Number of Changes
 ggplot(subset(RnDdf,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Ceiling Raising Change Orders %
@@ -619,7 +619,7 @@ ggplot(subset(RnDdf,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -628,7 +628,7 @@ ggplot(subset(RnDdf,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -689,7 +689,7 @@ ggplot(subset(HighLinkDF,dVariable=="1"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Expected Number of Offers
@@ -697,14 +697,14 @@ ggplot(subset(HighLinkDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 #Expected Number of Changes
 ggplot(subset(HighLinkDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Ceiling Raising Change Orders %
@@ -712,7 +712,7 @@ ggplot(subset(HighLinkDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -721,7 +721,7 @@ ggplot(subset(HighLinkDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -784,7 +784,7 @@ ggplot(subset(LongDurDF,dVariable=="1"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Expected Number of Offers
@@ -792,14 +792,14 @@ ggplot(subset(LongDurDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 #Expected Number of Changes
 ggplot(subset(LongDurDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Ceiling Raising Change Orders %
@@ -807,7 +807,7 @@ ggplot(subset(LongDurDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -816,7 +816,7 @@ ggplot(subset(LongDurDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -878,7 +878,7 @@ ggplot(subset(CompDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Ceiling Raising Change Orders %
@@ -886,7 +886,7 @@ ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -895,7 +895,7 @@ ggplot(subset(CompDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -951,7 +951,7 @@ ggplot(subset(SoftwareDF,dVariable=="1"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Expected Number of Offers
@@ -959,14 +959,14 @@ ggplot(subset(SoftwareDF,dVariable=="Expected Number of Offers"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 #Expected Number of Changes
 ggplot(subset(SoftwareDF,dVariable=="Expected Number of Changes"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 #Ceiling Raising Change Orders %
@@ -974,7 +974,7 @@ ggplot(subset(SoftwareDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
@@ -983,7 +983,7 @@ ggplot(subset(SoftwareDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom")
 
 
 
