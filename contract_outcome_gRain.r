@@ -139,6 +139,133 @@ QueryControlVariables<-function(varGin,
     
 }
 
+
+
+FixedPriceHypothesisTester<-function(varGin,ControlLabel=NA){
+    
+    TermDF<-QueryControlVariables(varGin,
+                                     "FxCb",
+                                     "Ceil",
+                                     "Term"
+    )
+    
+    
+    TermDF<-ddply(TermDF,.(FxCb,CrossTab,iVariable),transform,p=Freq/sum(Freq))
+    # querygrain(varGin, nodes=c("Offr","NChg","CRai","Term"), type="marginal")
+    TermDF<-dcast(TermDF,Term + CrossTab + iVariable ~ FxCb, sum, value.var="p")
+    TermDF$FixedCostMargin<-TermDF[,"Fixed-Price"]/TermDF[,"Cost-Based"]
+    TermDF$FixedCombMargin<-TermDF[,"Fixed-Price"]/TermDF[,"Combination \nor Other"]
+    colnames(TermDF)[colnames(TermDF)=="Term"]<-"dVariable"
+    TermDF<-subset(TermDF,dVariable=="Terminated")
+    
+    
+    
+    
+    
+    
+    
+    expNChgDF<-QueryControlVariables(varGin,
+                                     "FxCb",
+                                     "Ceil",
+                                     "NChg"
+    )
+    
+    expNChgDF<-ddply(expNChgDF,.(FxCb,CrossTab,iVariable),transform,p=Freq/sum(Freq))
+    expNChgDF$expNChg[expNChgDF$NChg=="   0"]<-0
+    expNChgDF$expNChg[expNChgDF$NChg=="   1"]<-1*expNChgDF$p[expNChgDF$NChg=="   1"]
+    expNChgDF$expNChg[expNChgDF$NChg=="   2"]<-2*expNChgDF$p[expNChgDF$NChg=="   2"]
+    expNChgDF$expNChg[expNChgDF$NChg=="[   3,1040]"]<-3*expNChgDF$p[expNChgDF$NChg=="[   3,1040]"]
+    expNChgDF<-ddply(expNChgDF,.(FxCb,CrossTab,iVariable),summarise,expNChg=sum(expNChg))
+    expNChgDF<-dcast(expNChgDF,  iVariable + CrossTab ~ FxCb  , sum, value.var="expNChg")
+    expNChgDF$dVariable<-"Expected Number of Changes"
+    expNChgDF$FixedCostMargin<-expNChgDF[,"Fixed-Price"]/expNChgDF[,"Cost-Based"]
+    expNChgDF$FixedCombMargin<-expNChgDF[,"Fixed-Price"]/expNChgDF[,"Combination \nor Other"]
+    
+    
+    expCRaiDF<-QueryControlVariables(varGin,
+                                     "FxCb",
+                                     "Ceil",
+                                     "CRai"
+    )
+    
+    
+    expCRaiDF<-ddply(expCRaiDF,.(FxCb,CrossTab,iVariable),transform,p=Freq/sum(Freq))
+    expCRaiDF$expCRai[expCRaiDF$CRai=="[-0.001, 0.001)"]<-0
+    expCRaiDF$expCRai[expCRaiDF$CRai=="[  -Inf,-0.001)"]<- -0.001*expCRaiDF$p[expCRaiDF$CRai=="[  -Inf,-0.001)"]
+    expCRaiDF$expCRai[expCRaiDF$CRai=="[ 0.001, 0.120)"]<-0.001*expCRaiDF$p[expCRaiDF$CRai=="[ 0.001, 0.120)"]
+    expCRaiDF$expCRai[expCRaiDF$CRai=="[ 0.120,   Inf]"]<-0.12*expCRaiDF$p[expCRaiDF$CRai=="[ 0.120,   Inf]"]
+    expCRaiDF<-ddply(expCRaiDF,.(FxCb,CrossTab,iVariable),summarise,expCRai=sum(expCRai))
+    expCRaiDF<-dcast(expCRaiDF, iVariable + CrossTab~ FxCb, sum, value.var="expCRai")
+    expCRaiDF$dVariable<-"Ceiling Raising Change Orders %"
+    expCRaiDF$FixedCostMargin<-expCRaiDF[,"Fixed-Price"]/expCRaiDF[,"Cost-Based"]
+    expCRaiDF$FixedCombMargin<-expCRaiDF[,"Fixed-Price"]/expCRaiDF[,"Combination \nor Other"]
+    
+    
+
+#Limit just to competed contracts
+    varGin<-setEvidence(varGin, 
+                        nodes=c("Comp"),
+                        states=c("Comp.")
+    )
+    
+    expOffrDF<-QueryControlVariables(varGin,
+                                     "FxCb",
+                                     "Ceil",
+                                     "Offr"
+    )
+    
+    expOffrDF<-ddply(expOffrDF,.(FxCb,CrossTab,iVariable),transform,p=Freq/sum(Freq))
+    expOffrDF$expOffr[expOffrDF$Offr=="1"]<-1*expOffrDF$p[expOffrDF$Offr=="1"]
+    expOffrDF$expOffr[expOffrDF$Offr=="2"]<-2*expOffrDF$p[expOffrDF$Offr=="2"]
+    expOffrDF$expOffr[expOffrDF$Offr=="3-4"]<-3.5*expOffrDF$p[expOffrDF$Offr=="3-4"]
+    expOffrDF$expOffr[expOffrDF$Offr=="5+"]<-5*expOffrDF$p[expOffrDF$Offr=="5+"]
+    expOffrDF<-ddply(expOffrDF,.(FxCb,CrossTab,iVariable),summarise,expOffr=sum(expOffr))
+    expOffrDF<-dcast(expOffrDF,  iVariable + CrossTab ~ FxCb  , sum, value.var="expOffr")
+    expOffrDF$dVariable<-"Expected Number of Offers"
+    expOffrDF$FixedCostMargin<-expOffrDF[,"Fixed-Price"]/expOffrDF[,"Cost-Based"]
+    expOffrDF$FixedCombMargin<-expOffrDF[,"Fixed-Price"]/expOffrDF[,"Combination \nor Other"]
+    
+    
+    
+    OffrDF<-QueryControlVariables(varGin,
+                                  "FxCb",
+                                  "Ceil",
+                                  "Offr"
+    )
+    
+    
+    colnames(OffrDF)[colnames(OffrDF)=="Ceil"]<-"iVariable"
+    OffrDF<-ddply(OffrDF,.(FxCb,CrossTab,iVariable),transform,p=Freq/sum(Freq))
+    # querygrain(varGin, nodes=c("Offr","NChg","CRai","Offr"), type="marginal")
+    OffrDF<-dcast(OffrDF,Offr + CrossTab + iVariable ~ FxCb, sum, value.var="p")
+    OffrDF$FixedCostMargin<-OffrDF[,"Fixed-Price"]/OffrDF[,"Cost-Based"]
+    OffrDF$FixedCombMargin<-OffrDF[,"Fixed-Price"]/OffrDF[,"Combination \nor Other"]
+    colnames(OffrDF)[colnames(OffrDF)=="Offr"]<-"dVariable"
+    OffrDF<-subset(OffrDF,dVariable=="1")
+    
+    ResultsDF<-rbind(TermDF,expOffrDF,OffrDF,expNChgDF,expCRaiDF)
+
+
+    if(!is.na(ControlLabel)) ResultsDF$Control<-ControlLabel
+    
+    #Order the ceilings
+    ResultsDF$iVariable<-factor(ResultsDF$iVariable,
+                                levels=c("[30m+]",
+                                         "[1m,30m)",
+                                         "[100k,1m)",
+                                         "[15k,100k)",
+                                         "[0,15k)"
+                                ),
+                                ordered=TRUE
+    )
+    
+    
+    ResultsDF
+    
+}
+
+
+
 TerminationHypothesisTester<-function(varGin,ControlLabel=NA){
     
     ResultsDF<-QueryControlVariables(varGin,

@@ -92,24 +92,35 @@ The hypothesis does hold weakly for contracts under $15k, although larger contra
 
 compGin[[1]]$levels$Ceil
 
-debug(OffersHypothesisTester)
-OffersSizeDF<-OffersHypothesisTester(compGin)
+# debug(OffersHypothesisTester)
+SizeDF<-FixedPriceHypothesisTester(compGin)
 #No redundant tests to remove
 
-# color=Control,shape=Control
-ggplot(OffersSizeDF,
+#Single Offer Competition
+ggplot(subset(SizeDF,dVariable=="1"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
 
 
-# debug(ChangeOrdersHypothesisTester)
-ChangeOrderSizeDF<-ChangeOrdersHypothesisTester(compGin)
-#No redundant tests to remove
+#Expected Number of Offers
+ggplot(subset(SizeDF,dVariable=="Expected Number of Offers"),
+       aes(x=CrossTab,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
 
-# color=Control,shape=Control
-ggplot(ChangeOrderSizeDF,
+#Expected Number of Changes
+ggplot(subset(SizeDF,dVariable=="Expected Number of Changes"),
+       aes(x=CrossTab,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Ceiling Raising Change Orders %
+ggplot(subset(SizeDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
@@ -117,13 +128,8 @@ ggplot(ChangeOrderSizeDF,
 
 
 
-
-# undebug(TerminationHypothesisTester)
-TermSizeDF<-TerminationHypothesisTester(compGin)
-#No redundant tests to remove
-
-# color=Control,shape=Control
-ggplot(TermSizeDF,
+#Terminations
+ggplot(subset(SizeDF,dVariable=="Terminated"),
        aes(x=CrossTab,y=FixedCostMargin)
        )+
     geom_point()+
@@ -169,21 +175,44 @@ NotAircraftFind<- setEvidence(compGin,
 
 
 getEvidence(NotAircraftFind)
-NotAircraftDF<-ContractHypothesisTester(NotAircraftFind)
 
 
+AircraftDF<-FixedPriceHypothesisTester(AircraftFind,"Aircraft")
+AircraftDF<-rbind(AircraftDF,
+                  FixedPriceHypothesisTester(NotAircraftFind,"Not Aircraft")
+                  )
 
 
-# undebug(TerminationHypothesisTester)
-TermAircraftDF<-TerminationHypothesisTester(AircraftFind,"Aircraft")
-TermAircraftDF<-rbind(TermAircraftDF,
-      TerminationHypothesisTester(NotAircraftFind,"Not Aircraft")
-      )
 #Remove redundant tests
-TermAircraftDF<-subset(TermAircraftDF,
-                                    !CrossTab %in% unique(TermAircraftDF$Control))
+AircraftDF<-subset(AircraftDF,
+                   !CrossTab %in% unique(AircraftDF$Control))
 
-ggplot(TermAircraftDF,
+
+#Single Offer Competition
+ggplot(subset(AircraftDF,dVariable=="1"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Expected Number of Offers
+ggplot(subset(AircraftDF,dVariable=="Expected Number of Offers"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+#Expected Number of Changes
+ggplot(subset(AircraftDF,dVariable=="Expected Number of Changes"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Ceiling Raising Change Orders %
+ggplot(subset(AircraftDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
@@ -191,41 +220,17 @@ ggplot(TermAircraftDF,
 
 
 
-ChangeOrderAircraftDF<-ChangeOrdersHypothesisTester(AircraftFind)
-NotChangeOrderAircraftDF<-ChangeOrdersHypothesisTester(NotAircraftFind)
-ChangeOrderAircraftDF$Control<-"Aircraft"
-NotChangeOrderAircraftDF$Control<-"Not Aircraft"
-BothChangeOrdersAircraftDF<-rbind(ChangeOrderAircraftDF,NotChangeOrderAircraftDF)
-
-ggplot(BothChangeOrdersAircraftDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
+#Terminations
+ggplot(subset(AircraftDF,dVariable=="Terminated"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()
 
 
 
+rm(AircraftFind,NotAircraftFind)
 
-
-debug(OffersHypothesisTester)
-OffersAircraftDF<-OffersHypothesisTester(AircraftFind)
-NotOfferAircraftDF<-OffersHypothesisTester(NotAircraftFind)
-OffersAircraftDF$Control<-"Aircraft"
-NotOfferAircraftDF$Control<-"Not Aircraft"
-BothOffersAircraftDF<-rbind(OffersAircraftDF,NotOfferAircraftDF)
-
-ggplot(BothOffersAircraftDF,
-       aes(x=iVariable,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
-
-
-
-#                , 
-#                scales="free_y", #The scales actually do stay fixed
-#                space="free_y"
-#                )#But only because the space is free)
 
 ``` 
 
@@ -259,12 +264,12 @@ At present, the vehicle variable only has granularity to look at at IDVs versus 
 
 The analysis indicates validates this past finding, IDVs are marketedly more likely to be competed and to receive more offers when competed.
 
-```{r UCA}
+```{r C3UCA}
 
 ```
 
 
-```{r C4IDV}
+```{r C4Vehicle}
 
 compGin[[1]]$levels$IDV
 
@@ -275,30 +280,66 @@ IDVFind<- setEvidence(compGin,
 
 getEvidence(IDVFind)
 
-IDVDF<-ContractHypothesisTester(IDVFind)
+
+
+AwardFind<- setEvidence(compGin, 
+                        nodes=c("IDV"),
+                        states=c(list(
+                            compGin[[1]]$levels$IDV[compGin[[1]]$levels$IDV!=
+                                                        "IDV"]))
+                        )
+
+getEvidence(AwardFind)
 
 
 
-NotIDVFind<- setEvidence(compGin, 
-                         nodes=c("IDV"),
-                         states=c(list(
-                             compGin[[1]]$levels$IDV[compGin[[1]]$levels$IDV!=
-                                                         "IDV"]))
-                         )
-
-getEvidence(NotIDVFind)
-NotIDVDF<-ContractHypothesisTester(NotIDVFind)
 
 
-TermVehDF<-TerminationHypothesisTester(IDVFind,"IDV")
-TermVehDF<-rbind(TermVehDF,
-      TerminationHypothesisTester(NotIDVFind,"Award")
-      )
+VehicleDF<-FixedPriceHypothesisTester(IDVFind,"IDV")
+VehicleDF<-rbind(VehicleDF,
+                 FixedPriceHypothesisTester(AwardFind,"Award")
+                 )
+
+
 #Remove redundant tests
-TermVehDF<-subset(TermVehDF,
-                                    !CrossTab %in% unique(TermVehDF$Control))
+VehicleDF<-subset(VehicleDF,
+                  !CrossTab %in% unique(VehicleDF$Control))
 
-ggplot(TermVehDF,
+
+#Single Offer Competition
+ggplot(subset(VehicleDF,dVariable=="1"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Expected Number of Offers
+ggplot(subset(VehicleDF,dVariable=="Expected Number of Offers"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+#Expected Number of Changes
+ggplot(subset(VehicleDF,dVariable=="Expected Number of Changes"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Ceiling Raising Change Orders %
+ggplot(subset(VehicleDF,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+#Terminations
+ggplot(subset(VehicleDF,dVariable=="Terminated"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
@@ -309,15 +350,8 @@ ggplot(TermVehDF,
 
 
 
-IDVDF$Control<-"IDV"
-NotIDVDF$Control<-"Not IDV"
-BothIDVDF<-rbind(IDVDF,NotIDVDF)
 
-ggplot(BothIDVDF,
-       aes(x=Ceil,color=Control,shape=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+rm(IDVFind,AwardFind)
 
 
 ``` 
@@ -342,7 +376,6 @@ LongDurFind<- setEvidence(compGin,
 
 getEvidence(LongDurFind)
 
-LongDurDF<-ContractHypothesisTester(LongDurFind)
 
 NotLongDurFind<- setEvidence(compGin, 
                              nodes=c("Dur"),
@@ -352,36 +385,61 @@ NotLongDurFind<- setEvidence(compGin,
                              )
 
 
-# undebug(TerminationHypothesisTester)
-TermLongDurDF<-TerminationHypothesisTester(LongDurFind,"Long Dur.")
-TermLongDurDF<-rbind(TermLongDurDF,
-      TerminationHypothesisTester(NotLongDurFind,"Not Long Dur.")
-      )
+
+
+LongDurDF<-FixedPriceHypothesisTester(LongDurFind,"Long Dur.")
+LongDurDF<-rbind(LongDurDF,
+                 FixedPriceHypothesisTester(NotLongDurFind,"Not Long Dur.")
+                 )
+
+
 #Remove redundant tests
-TermLongDurDF<-subset(TermLongDurDF,
-                                    !CrossTab %in% unique(TermLongDurDF$Control))
-ggplot(TermLongDurDF,
+LongDurDF<-subset(LongDurDF,
+                  !CrossTab %in% unique(LongDurDF$Control))
+
+
+#Single Offer Competition
+ggplot(subset(LongDurDF,dVariable=="1"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()
 
 
-NotLongDurDF<-ContractHypothesisTester(NotLongDurFind)
-
-getEvidence(NotLongDurDF)
-
-
-LongDurDF$Control<-"LongDur"
-NotLongDurDF$Control<-"Not LongDur"
-BothLongDurDF<-rbind(LongDurDF,NotLongDurDF)
-
-ggplot(BothLongDurDF,
-       aes(x=Ceil,color=Control,shape=Control,y=FixedCostMargin)
+#Expected Number of Offers
+ggplot(subset(LongDurDF,dVariable=="Expected Number of Offers"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()
 
+#Expected Number of Changes
+ggplot(subset(LongDurDF,dVariable=="Expected Number of Changes"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Ceiling Raising Change Orders %
+ggplot(subset(LongDurDF,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+#Terminations
+ggplot(subset(LongDurDF,dVariable=="Terminated"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+rm(LongDurFind,NotLongDurFind)
 
 ``` 
 
@@ -404,29 +462,60 @@ Incentive was not included in the initial model because it made up a small propo
 compGin[[1]]$levels$Comp
 
 
- CompFind<-setEvidence(compGin, 
-                                   nodes=c("Comp"),
-                                   states=c("Comp.")
-    )
+CompFind<-setEvidence(compGin, 
+                      nodes=c("Comp"),
+                      states=c("Comp.")
+                      )
 
 getEvidence(CompFind)
 
- NotCompFind<-setEvidence(compGin, 
-                                   nodes=c("Comp"),
-                                   states=c("No Comp.")
-    )
+NotCompFind<-setEvidence(compGin, 
+                         nodes=c("Comp"),
+                         states=c("No Comp.")
+                         )
 getEvidence(NotCompFind)
 
 
-# undebug(TerminationHypothesisTester)
-TermCompDF<-TerminationHypothesisTester(CompFind,"Comp.")
-TermCompDF<-rbind(TermCompDF,
-      TerminationHypothesisTester(NotCompFind,"Not Comp.")
-      )
+CompDF<-FixedPriceHypothesisTester(CompFind,"Comp.")
+CompDF<-rbind(CompDF,
+                 FixedPriceHypothesisTester(NotCompFind,"Not Comp.")
+                 )
+
+
 #Remove redundant tests
-TermCompDF<-subset(TermCompDF,
-                                    !CrossTab %in% unique(TermCompDF$Control))
-ggplot(TermCompDF,
+CompDF<-subset(CompDF,
+                  !CrossTab %in% unique(CompDF$Control))
+#Remove the No Comp for the offer related iVariables
+CompDF<-subset(CompDF,
+                  !(dVariable %in% c("1","Expected Number of Offers")&
+                      Control=="Not Comp."))
+
+
+#Single Offer Competition
+ggplot(subset(CompDF,dVariable=="1"),
+       aes(x=CrossTab,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Expected Number of Offers
+ggplot(subset(CompDF,dVariable=="Expected Number of Offers"),
+       aes(x=CrossTab,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+#Expected Number of Changes
+ggplot(subset(CompDF,dVariable=="Expected Number of Changes"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Ceiling Raising Change Orders %
+ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
@@ -434,18 +523,16 @@ ggplot(TermCompDF,
 
 
 
-getEvidence(NotCompDF)
-
-
-CompDF$Control<-"Comp"
-NotCompDF$Control<-"Not Comp"
-BothCompDF<-rbind(CompDF,NotCompDF)
-
-ggplot(BothCompDF,
-       aes(x=Ceil,color=Control,shape=Control,y=FixedCostMargin)
+#Terminations
+ggplot(subset(CompDF,dVariable=="Terminated"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
        )+
     geom_point()+
-    facet_wrap(~dVariable,ncol=1)+ coord_flip()
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+rm(CompFind,NotCompFind)
 
 
 ``` 
@@ -475,24 +562,74 @@ The hypothesis is supported with regard to number of offers. Larger fixed-price 
 
 levels(compGin[[1]]$levels$Ceil)
 
-largeRnDfind<- setEvidence(compGin, 
-                           nodes=c("PSR","Ceil"),
-                           states=c("R&D","[30m+]")
+RnDfind<- setEvidence(compGin, 
+                           nodes=c("PSR"),
+                           states=c("R&D")
                            )
 
-getEvidence(largeRnDfind)
+NotRnDfind<- setEvidence(compGin, 
+                             nodes=c("PSR"),
+                             states=c(list(
+                                 compGin[[1]]$levels$PSR[compGin[[1]]$levels$PSR!=
+                                                             "R&D"])))
 
-FxCBresult<-QueryCrossSectionOnNode(largeRnDcompFind,"FxCb","Offr")
 
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
+
+getEvidence(RnDfind)
+
+RnDdf<-FixedPriceHypothesisTester(RnDfind,"R&D")
+RnDdf<-rbind(RnDdf,
+                  FixedPriceHypothesisTester(NotRnDfind,"Not R&D")
+                  )
+
+
+#Remove redundant tests
+RnDdf<-subset(RnDdf,
+                   !CrossTab %in% unique(RnDdf$Control))
+
+
+#Single Offer Competition
+ggplot(subset(RnDdf,dVariable=="1"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Expected Number of Offers
+ggplot(subset(RnDdf,dVariable=="Expected Number of Offers"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+#Expected Number of Changes
+ggplot(subset(RnDdf,dVariable=="Expected Number of Changes"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Ceiling Raising Change Orders %
+ggplot(subset(RnDdf,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+#Terminations
+ggplot(subset(RnDdf,dVariable=="Terminated"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+rm(RnDfind,NotRnDfind)
 
 
 ``` 
@@ -521,19 +658,71 @@ HighLinkFind<- setEvidence(compGin,
                            states=c("[  750,67263]")
                            )
 
+
+NotHighLinkFind<- setEvidence(compGin, 
+                             nodes=c("Link"),
+                             states=c(list(
+                                 compGin[[1]]$levels$Link[compGin[[1]]$levels$Link!=
+                                                             "[  750,67263]"])))
+
+
 getEvidence(HighLinkFind)
 
-FxCBresult<-QueryCrossSectionOnNode(HighLinkCompFind,"FxCb","Offr")
 
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
+
+HighLinkDF<-FixedPriceHypothesisTester(HighLinkFind,"High Link")
+HighLinkDF<-rbind(HighLinkDF,
+                  FixedPriceHypothesisTester(CompGin,"Population")
+                  )
+
+
+#Remove redundant tests
+HighLinkDF<-subset(HighLinkDF,
+                   !CrossTab %in% unique(HighLinkDF$Control))
+
+
+#Single Offer Competition
+ggplot(subset(HighLinkDF,dVariable=="1"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Expected Number of Offers
+ggplot(subset(HighLinkDF,dVariable=="Expected Number of Offers"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+#Expected Number of Changes
+ggplot(subset(HighLinkDF,dVariable=="Expected Number of Changes"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Ceiling Raising Change Orders %
+ggplot(subset(HighLinkDF,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+#Terminations
+ggplot(subset(HighLinkDF,dVariable=="Terminated"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+rm(HighLinkFind,NotHighLinkFind)
 
 
 ``` 
@@ -555,7 +744,7 @@ The hypothesis regarding number of offers was not supported at the greater than 
 
 ```{r H3LongDur}
 
-levels(compGin[[1]]$levels$Dur)
+compGin[[1]]$levels$Dur
 
 LongDurFind<- setEvidence(compGin, 
                           nodes=c("Dur"),
@@ -565,18 +754,70 @@ LongDurFind<- setEvidence(compGin,
 getEvidence(LongDurFind)
 
 
-FxCBresult<-QueryCrossSectionOnNode(LongDurCompFind,"FxCb","Offr")
 
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
+NotLongDurFind<- setEvidence(compGin, 
+                             nodes=c("Dur"),
+                             states=c(list(
+                                 compGin[[1]]$levels$Dur[compGin[[1]]$levels$Dur!=
+                                                             "[  366,33192]"]))
+                             )
 
+
+
+
+LongDurDF<-FixedPriceHypothesisTester(LongDurFind,"Long Dur.")
+LongDurDF<-rbind(LongDurDF,
+                 FixedPriceHypothesisTester(CompGin,"Population")
+                 )
+
+
+#Remove redundant tests
+LongDurDF<-subset(LongDurDF,
+                  !CrossTab %in% c(unique(LongDurDF$Control),"Not Long Dur."))
+
+
+#Single Offer Competition
+ggplot(subset(LongDurDF,dVariable=="1"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Expected Number of Offers
+ggplot(subset(LongDurDF,dVariable=="Expected Number of Offers"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+#Expected Number of Changes
+ggplot(subset(LongDurDF,dVariable=="Expected Number of Changes"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Ceiling Raising Change Orders %
+ggplot(subset(LongDurDF,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+#Terminations
+ggplot(subset(LongDurDF,dVariable=="Terminated"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+rm(LongDurFind,NotLongDurFind)
 
 ``` 
 
@@ -595,7 +836,67 @@ FxCBresult[3,2]
 
 This hypothesis is requires incorporation of the next two dependent variables into the Bayesian Network.
 
-```{r, H4Comp}
+```{r H4Comp}
+
+compGin[[1]]$levels$Comp
+
+
+CompFind<-setEvidence(compGin, 
+                      nodes=c("Comp"),
+                      states=c("Comp.")
+                      )
+
+getEvidence(CompFind)
+
+NotCompFind<-setEvidence(compGin, 
+                         nodes=c("Comp"),
+                         states=c("No Comp.")
+                         )
+getEvidence(NotCompFind)
+
+
+CompDF<-FixedPriceHypothesisTester(CompFind,"Comp.")
+CompDF<-rbind(CompDF,
+                 FixedPriceHypothesisTester(compGin,"Population")
+                 )
+
+
+#Remove redundant tests
+CompDF<-subset(CompDF,
+                  !CrossTab %in% c(unique(CompDF$Control),"Not Comp."))
+#Remove the  iVariables not covered in hypothesis
+CompDF<-subset(CompDF,
+                  !dVariable %in% c("1","Expected Number of Offers"))
+
+
+
+#Expected Number of Changes
+ggplot(subset(CompDF,dVariable=="Expected Number of Changes"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Ceiling Raising Change Orders %
+ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+#Terminations
+ggplot(subset(CompDF,dVariable=="Terminated"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+rm(CompFind,NotCompFind)
 
 ``` 
 
@@ -628,42 +929,62 @@ SoftwareFind<- setEvidence(compGin,
 getEvidence(SoftwareFind)
 
 
-FxCBresult<-QueryCrossSectionOnNode(SoftwareCompFind,"FxCb","Offr")
-
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
-
-SoftwareFind<- setEvidence(compGin, 
-                           nodes=c("What","PSR"),
-                           states=c("Electronics and Communications",list(c("Services","R&D")))
-                           )
-getEvidence(SoftwareFind)
-
-SoftwareCompFind<- setEvidence(SoftwareFind, 
-                               nodes=c("Comp"),
-                               states=c("Comp.")
-                               )
-
-FxCBresult<-QueryCrossSectionOnNode(SoftwareCompFind,"FxCb","Offr")
 
 
 
-#Combination
-FxCBresult[1,1]
-FxCBresult[1,2]
-#Cost-plus
-FxCBresult[2,1]
-FxCBresult[2,2]
-#Fixed-price
-FxCBresult[3,1]
-FxCBresult[3,2]
+SoftwareDF<-FixedPriceHypothesisTester(SoftwareFind,"Software")
+SoftwareDF<-rbind(SoftwareDF,
+                  FixedPriceHypothesisTester(compGin,"Population")
+                  )
+
+
+#Remove redundant tests
+SoftwareDF<-subset(SoftwareDF,
+                   !CrossTab %in% unique(SoftwareDF$Control))
+
+
+#Single Offer Competition
+ggplot(subset(SoftwareDF,dVariable=="1"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Expected Number of Offers
+ggplot(subset(SoftwareDF,dVariable=="Expected Number of Offers"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+#Expected Number of Changes
+ggplot(subset(SoftwareDF,dVariable=="Expected Number of Changes"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+#Ceiling Raising Change Orders %
+ggplot(subset(SoftwareDF,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+#Terminations
+ggplot(subset(SoftwareDF,dVariable=="Terminated"),
+       aes(x=CrossTab,color=Control,shape=Control,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()
+
+
+
+rm(SoftwareFind)
 
 ``` 
 
