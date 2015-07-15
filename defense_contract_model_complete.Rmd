@@ -123,6 +123,12 @@ CompleteContracts$qLinked <- cut2(CompleteContracts$LinkedContracts,cuts=c(1,750
 #     ))
 
 summary(CompleteContracts$unmodifiedSystemequipmentcode)
+CompleteContracts$LabeledMDAP[!is.na(CompleteContracts$unmodifiedSystemequipmentcode)]<-"Labeled MDAP"
+CompleteContracts$LabeledMDAP[is.na(CompleteContracts$unmodifiedSystemequipmentcode)]<-"No label"
+if(!is.factor(CompleteContracts$LabeledMDAP)){
+    CompleteContracts$LabeledMDAP<-factor(CompleteContracts$LabeledMDAP,levels=c("Labeled MDAP","No label"))
+}
+summary(CompleteContracts$LabeledMDAP)
 
 ```
 
@@ -749,7 +755,7 @@ CompleteContracts$UCA<-factor(CompleteContracts$MaxOfIsUndefinitizedAction,
                                       levels=c(0,1),
                                       labels=c("Not UCA","UCA")
                                       )
-CompleteModel$SubCustomer.sum<-droplevels(CompleteModel$SubCustomer.sum)
+CompleteContracts$SubCustomer.sum<-droplevels(CompleteContracts$SubCustomer.sum)
 
 
 ```
@@ -761,18 +767,20 @@ CompleteModel<-subset(CompleteContracts,select=c(IsIDV,
     UnmodifiedIsSomeCompetition,
     #                         Comp,
     qLinked,
+    LabeledMDAP,
     SubCustomer.sum,
     PlatformPortfolio.sum,
     AnyInternational,
     SimpleArea,
     qCeiling,
     qDuration,
-    SingleOffer,
     qOffers,
     SimpleVehicle,
     IsTerminated,
     SoftwareEng,
-    UCA
+    UCA,
+    qCRais,
+    qNChg
     )
     )
 # 
@@ -792,6 +800,10 @@ colnames(CompleteModel)[colnames(CompleteModel)=="qOffers"]<-"Offr"
 colnames(CompleteModel)[colnames(CompleteModel)=="IsTerminated"]<-"Term"
 colnames(CompleteModel)[colnames(CompleteModel)=="SoftwareEng"]<-"Soft"
 colnames(CompleteModel)[colnames(CompleteModel)=="SimpleVehicle"]<-"Veh"
+colnames(CompleteModel)[colnames(CompleteModel)=="LabeledMDAP"]<-"MDAP"
+colnames(CompleteModel)[colnames(CompleteModel)=="qNChg"]<-"NChg"
+colnames(CompleteModel)[colnames(CompleteModel)=="qCRais"]<-"CRai"
+
 
 
 CompleteModel$Intl<-droplevels(CompleteModel$Intl)
@@ -814,6 +826,8 @@ write.table(CompleteModel
             , append=FALSE
             )
 
+
+
 ```
 
 
@@ -825,6 +839,8 @@ CompleteModelAndDetail<-subset(CompleteContracts,select=c(CSIScontractID,
     UnmodifiedIsSomeCompetition,
     #                                 Comp,
     qLinked,
+    LabeledMDAP,
+    unmodifiedSystemEquipmentCode
     SubCustomer.sum,
     PlatformPortfolio.sum,
     AnyInternational,
@@ -836,6 +852,8 @@ CompleteModelAndDetail<-subset(CompleteContracts,select=c(CSIScontractID,
     IsIDV,
     SoftwareEng,
     UCA,
+    qCRais,
+    qNChg,
         SimpleVehicle,
     UnmodifiedNumberOfOffersReceived,
     IsTerminated,
@@ -843,7 +861,7 @@ CompleteModelAndDetail<-subset(CompleteContracts,select=c(CSIScontractID,
     SumOfisChangeOrder,
     pChangeOrderUnmodifiedBaseAndAll,
     pChangeOrderObligated,
-    UnmodifiedDays
+    UnmodifiedDays,
     Action.Obligation
     )
     )
@@ -864,6 +882,7 @@ colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qOffers"]<-"
 colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsTerminated"]<-"Term"
 colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleVehicle"]<-"Veh"
 colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SoftwareEng"]<-"Soft"
+colnames(CompleteModel)[colnames(CompleteModel)=="LabeledMDAP"]<-"MDAP"
 
 
 write.table(CompleteModelAndDetail

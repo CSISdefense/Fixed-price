@@ -13,6 +13,7 @@ require(ggplot2)
 require(stringr)
 require(plyr)
 require(Hmisc)
+require(lubridate)
 options(error=recover)
 setwd("K:\\Development\\Fixed-price")
 # setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
@@ -67,8 +68,17 @@ summary(subset(ContractSample,
 
 
 
+as.numeric(as.duration(
+    ymd(Policy$SignedMonth)-Policy$StartFiscalYear)
+    /dyears(1)
+    )
+
+
+
 min(strptime(ContractSample$MinOfEffectiveDate[!is.na(ContractSample$MinOfEffectiveDate)],"%Y-%m-%d"))
 max(strptime(ContractSample$UnmodifiedCurrentCompletionDate[!is.na(ContractSample$UnmodifiedCurrentCompletionDate)],"%Y-%m-%d"))
+
+
 ContractSample$UnmodifiedDays<-as.numeric(difftime(strptime(ContractSample$UnmodifiedCurrentCompletionDate,"%Y-%m-%d")
                                                      , strptime(ContractSample$MinOfEffectiveDate,"%Y-%m-%d")
                                                      , unit="days"
@@ -80,6 +90,10 @@ exp(quantile(log(ContractSample$UnmodifiedDays),c(0.25,0.5,0.75),na.rm=TRUE))
 mean(ContractSample$UnmodifiedDays,na.rm=TRUE)
 exp(mean(log(ContractSample$UnmodifiedDays),na.rm=TRUE))
 ecdf(ContractSample$UnmodifiedDays)(214)
+
+roundedcutoffs<-c(61,214,364,365,366,367,368,729,730,731,732,733,734)
+ecdf(ContractSample$UnmodifiedDays)(roundedcutoffs)
+
 
 ContractComplete  <- read.csv(
     paste(Path,"data\\defense_contract_SP_ContractSampleCriteriaDetailsCustomer.csv", sep = ""),
@@ -95,9 +109,24 @@ ContractComplete  <- read.csv(
 #                                                      , strptime(ContractComplete$MinOfEffectiveDate,"%Y-%m-%d")
 #                                                      , unit="days"
 #         ))+1
-# dayscompletequantile<-quantile(ContractSample$UnmodifiedDays,c(0.25,0.5,0.75),na.rm=TRUE)
-# 
+dayscompletequantile<-quantile(ContractSample$UnmodifiedDays,c(0.25,0.5,0.75,0.95),na.rm=TRUE)
 
+
+
+span <- new_interval(as.POSIXct(ContractSample$UnmodifiedCurrentCompletionDate), 
+                     as.POSIXct(ContractSample$MinOfEffectiveDate)) #interval
+
+eyears(as.period(span))
+as.period(span, units ="years")
+# 2009-01-01 CST--2010-02-02 01:01:01 CST
+as.period(span)
+
+
+dSeconds<-as.duration(strptime(ContractSample$UnmodifiedCurrentCompletionDate,"%Y-%m-%d")-
+                strptime(ContractSample$MinOfEffectiveDate,"%Y-%m-%d"))
+
+summary(dSeconds%/%dyears(1))
+summary(dSeconds/years(1))
 
 
 ggplot(
