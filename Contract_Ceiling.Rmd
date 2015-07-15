@@ -32,7 +32,7 @@ For the purpose of this report, a contract refers to either an award with a uniq
 
 ```{r setup15000, echo = TRUE}
 ContractWeighted  <- read.csv(
-    paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv", sep = ""),
+    paste("data\\defense_contract_CSIScontractID_sample_15000_Action.Obligation.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
     stringsAsFactors = TRUE
@@ -42,37 +42,37 @@ ContractWeighted  <- read.csv(
 ContractWeighted<-apply_lookups(Path,ContractWeighted)
 
 
-ContractComplete  <- read.csv(
+CompleteModelAndDetail  <- read.csv(
     paste(Path,"data\\Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
     stringsAsFactors = TRUE
     )
 
-ContractComplete<-subset(ContractComplete,SumOfUnmodifiedbaseandalloptionsvalue>0 & !is.na(SumOfUnmodifiedbaseandalloptionsvalue))
+CompleteModelAndDetail<-subset(CompleteModelAndDetail,SumOfUnmodifiedbaseandalloptionsvalue>0 & !is.na(SumOfUnmodifiedbaseandalloptionsvalue))
 
 
 nosim <- 1000
 
-MeanBaseAndAll<-log10(mean(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue))
-sdBaseAndAll<-sd(log10(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue+1))
+MeanBaseAndAll<-log10(mean(CompleteModelAndDetail$SumOfUnmodifiedbaseandalloptionsvalue))
+sdBaseAndAll<-sd(log10(CompleteModelAndDetail$SumOfUnmodifiedbaseandalloptionsvalue+1))
 10^(MeanBaseAndAll+sdBaseAndAll)
 # 
 cfunc <- function(x, n) (mean(log10(x)))
 
 
 dat <- data.frame(
-  x = c(apply(matrix(sample(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue, nosim * 10, replace = TRUE,
-                            prob=abs(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)), 
+  x = c(apply(matrix(sample(CompleteModelAndDetail$SumOfUnmodifiedbaseandalloptionsvalue, nosim * 10, replace = TRUE,
+                            prob=abs(CompleteModelAndDetail$SumOfUnmodifiedbaseandalloptionsvalue)), 
                      nosim), 1, cfunc, 10),
-        apply(matrix(sample(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue, nosim * 20, replace = TRUE,
-                            prob=abs(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)), 
+        apply(matrix(sample(CompleteModelAndDetail$SumOfUnmodifiedbaseandalloptionsvalue, nosim * 20, replace = TRUE,
+                            prob=abs(CompleteModelAndDetail$SumOfUnmodifiedbaseandalloptionsvalue)), 
                      nosim), 1, cfunc, 20),
-        apply(matrix(sample(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue, nosim * 30, replace = TRUE,
-                            prob=abs(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)), 
+        apply(matrix(sample(CompleteModelAndDetail$SumOfUnmodifiedbaseandalloptionsvalue, nosim * 30, replace = TRUE,
+                            prob=abs(CompleteModelAndDetail$SumOfUnmodifiedbaseandalloptionsvalue)), 
                      nosim), 1, cfunc, 30),
-        apply(matrix(sample(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue, nosim * 40, replace = TRUE,
-                            prob=abs(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)), 
+        apply(matrix(sample(CompleteModelAndDetail$SumOfUnmodifiedbaseandalloptionsvalue, nosim * 40, replace = TRUE,
+                            prob=abs(CompleteModelAndDetail$SumOfUnmodifiedbaseandalloptionsvalue)), 
                      nosim), 1, cfunc, 40)
         ),
   size = factor(rep(c(10, 20, 30,40), rep(nosim, 4))))
@@ -85,46 +85,46 @@ g + facet_grid(. ~ size)
 
 
 
-ContractComplete  <- read.csv(
+CompleteModelAndDetail  <- read.csv(
     paste(Path,"data\\defense_contract_SP_ContractSampleCriteriaDetailsCustomer.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
     stringsAsFactors = TRUE
     )
-ContractComplete<-subset(ContractComplete,SumofObligatedAmount>0 & !is.na(SumofObligatedAmount) & StartFiscal_Year>=2007)
+CompleteModelAndDetail<-subset(CompleteModelAndDetail,Action.Obligation>0 & !is.na(Action.Obligation) & StartFiscal_Year>=2007)
 
 
-quantile(ContractComplete$SumofObligatedAmount,probs=ContractComplete$SumofObligatedAmount/sum(ContractComplete$SumofObligatedAmount),)
+quantile(CompleteModelAndDetail$Action.Obligation,probs=CompleteModelAndDetail$Action.Obligation/sum(CompleteModelAndDetail$Action.Obligation),)
 
-wtd.quantile(x=ContractComplete$SumofObligatedAmount,weights=ContractComplete$SumofObligatedAmount,prob=c(0.25,0.5,0.75))
+wtd.quantile(x=CompleteModelAndDetail$Action.Obligation,weights=CompleteModelAndDetail$Action.Obligation,prob=c(0.25,0.5,0.75))
 
-wtd.quantile(x=log10(ContractComplete$SumofObligatedAmount),weights=log10(ContractComplete$SumofObligatedAmount),prob=c(0.25,0.5,0.75))
+wtd.quantile(x=log10(CompleteModelAndDetail$Action.Obligation),weights=log10(CompleteModelAndDetail$Action.Obligation),prob=c(0.25,0.5,0.75))
 
-wtd.mean(x=log10(ContractComplete$SumofObligatedAmount),weights=log10(ContractComplete$SumofObligatedAmount))
+wtd.mean(x=log10(CompleteModelAndDetail$Action.Obligation),weights=log10(CompleteModelAndDetail$Action.Obligation))
 WtdLogMean<-
-WtdLogSD<-sqrt(wtd.var(x=log10(ContractComplete$SumofObligatedAmount),weights=ContractComplete$SumofObligatedAmount))
+WtdLogSD<-sqrt(wtd.var(x=log10(CompleteModelAndDetail$Action.Obligation),weights=CompleteModelAndDetail$Action.Obligation))
 
 nosim <- 1000
 
-MeanBaseAndAll<-mean(log10(ContractComplete))
-sdBaseAndAll<-sd(log10(ContractComplete$SumofObligatedAmount))
+MeanBaseAndAll<-mean(log10(CompleteModelAndDetail))
+sdBaseAndAll<-sd(log10(CompleteModelAndDetail$Action.Obligation))
 10^(MeanBaseAndAll+sdBaseAndAll)
 # 
 cfunc <- function(x, n) (mean(log10(x)))
 sdfunc <- function(x, n) (sd(log10(x)))
 set.seed(1)
 dat <- data.frame(
-  x = c(apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 10, replace = TRUE,
-                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+  x = c(apply(matrix(sample(CompleteModelAndDetail$Action.Obligation, nosim * 10, replace = TRUE,
+                            prob=abs(CompleteModelAndDetail$Action.Obligation)), 
                      nosim), 1, cfunc, 10),
-        apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 20, replace = TRUE,
-                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+        apply(matrix(sample(CompleteModelAndDetail$Action.Obligation, nosim * 20, replace = TRUE,
+                            prob=abs(CompleteModelAndDetail$Action.Obligation)), 
                      nosim), 1, cfunc, 20),
-        apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 30, replace = TRUE,
-                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+        apply(matrix(sample(CompleteModelAndDetail$Action.Obligation, nosim * 30, replace = TRUE,
+                            prob=abs(CompleteModelAndDetail$Action.Obligation)), 
                      nosim), 1, cfunc, 30),
-        apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 40, replace = TRUE,
-                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+        apply(matrix(sample(CompleteModelAndDetail$Action.Obligation, nosim * 40, replace = TRUE,
+                            prob=abs(CompleteModelAndDetail$Action.Obligation)), 
                      nosim), 1, cfunc, 40)
         ),
   size = factor(rep(c(10, 20, 30,40), rep(nosim, 4))))
@@ -134,17 +134,17 @@ g + facet_grid(. ~ size)
 
 
 sddat <- data.frame(
-  x = c(apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 10, replace = TRUE,
-                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+  x = c(apply(matrix(sample(CompleteModelAndDetail$Action.Obligation, nosim * 10, replace = TRUE,
+                            prob=abs(CompleteModelAndDetail$Action.Obligation)), 
                      nosim), 1, sdfunc, 10),
-        apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 20, replace = TRUE,
-                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+        apply(matrix(sample(CompleteModelAndDetail$Action.Obligation, nosim * 20, replace = TRUE,
+                            prob=abs(CompleteModelAndDetail$Action.Obligation)), 
                      nosim), 1, sdfunc, 20),
-        apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 30, replace = TRUE,
-                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+        apply(matrix(sample(CompleteModelAndDetail$Action.Obligation, nosim * 30, replace = TRUE,
+                            prob=abs(CompleteModelAndDetail$Action.Obligation)), 
                      nosim), 1, sdfunc, 30),
-        apply(matrix(sample(ContractComplete$SumofObligatedAmount, nosim * 40, replace = TRUE,
-                            prob=abs(ContractComplete$SumofObligatedAmount)), 
+        apply(matrix(sample(CompleteModelAndDetail$Action.Obligation, nosim * 40, replace = TRUE,
+                            prob=abs(CompleteModelAndDetail$Action.Obligation)), 
                      nosim), 1, sdfunc, 40)
         ),
   size = factor(rep(c(10, 20, 30,40), rep(nosim, 4))))
@@ -155,25 +155,33 @@ g + facet_grid(. ~ size)
 weightedmean<-mean(dat$x[sddat$size==40])
 weightedsd<-mean(sddat$x[sddat$size==40])
 
-length(ContractComplete$SumofObligatedAmount[ContractComplete$SumofObligatedAmount>=10^weightedmean])
-length(ContractComplete$SumofObligatedAmount[ContractComplete$SumofObligatedAmount>=10^(weightedmean+weightedsd)])
+length(CompleteModelAndDetail$Action.Obligation[CompleteModelAndDetail$Action.Obligation>=10^weightedmean])
+length(CompleteModelAndDetail$Action.Obligation[CompleteModelAndDetail$Action.Obligation>=10^(weightedmean+weightedsd)])
 10^(weightedmean-weightedsd)
 10^(weightedmean+weightedsd)
-OblMeanLog<-mean(log10(ContractComplete$SumofObligatedAmount))
-OblSDLog<-sd(log10(ContractComplete$SumofObligatedAmount))
+OblMeanLog<-mean(log10(CompleteModelAndDetail$Action.Obligation))
+OblSDLog<-sd(log10(CompleteModelAndDetail$Action.Obligation))
 
 
-cutoffs<-c(10^mean(log10(ContractComplete$SumofObligatedAmount)),
-           10^mean(log10(ContractComplete$SumofObligatedAmount)+sd(log10(ContractComplete$SumofObligatedAmount))),
-#mean(ContractComplete$SumofObligatedAmount),
-10^(wtd.mean(x=log10(ContractComplete$SumofObligatedAmount),weights=ContractComplete$SumofObligatedAmount)-
-        sqrt(wtd.var(x=log10(ContractComplete$SumofObligatedAmount),weights=ContractComplete$SumofObligatedAmount))),
-10^(wtd.mean(x=log10(ContractComplete$SumofObligatedAmount),weights=ContractComplete$SumofObligatedAmount))
+cutoffs<-c(10^mean(log10(CompleteModelAndDetail$Action.Obligation)),
+           10^mean(log10(CompleteModelAndDetail$Action.Obligation)+sd(log10(CompleteModelAndDetail$Action.Obligation))),
+#mean(CompleteModelAndDetail$Action.Obligation),
+10^(wtd.mean(x=log10(CompleteModelAndDetail$Action.Obligation),weights=CompleteModelAndDetail$Action.Obligation)-
+        sqrt(wtd.var(x=log10(CompleteModelAndDetail$Action.Obligation),weights=CompleteModelAndDetail$Action.Obligation))),
+10^(wtd.mean(x=log10(CompleteModelAndDetail$Action.Obligation),weights=CompleteModelAndDetail$Action.Obligation))
 )
-ecdf(ContractComplete$SumofObligatedAmount)(cutoffs)
+ecdf(CompleteModelAndDetail$Action.Obligation)(cutoffs)
 roundedcutoffs<-c(15000,100000,1000000,30000000)
-ecdf(ContractComplete$SumofObligatedAmount)(roundedcutoffs)
-nrow(subset(ContractComplete,SumofObligatedAmount>=30000000))
+roundedcutoffs2<-c(15000,100000,1000000,10000000,75000000)
+ecdf(CompleteModelAndDetail$Action.Obligation)(roundedcutoffs)
+ecdf(CompleteModelAndDetail$Action.Obligation)(roundedcutoffs2)
+CompleteModelAndDetail$LCei<-cut2(CompleteModelAndDetail$UnmodifiedContractBaseAndAllOptionsValue,
+                             cuts=roundedcutoffs2)
+ddply(CompleteModelAndDetail,.(LCei),summarise,sum(Action.Obligation))
+ddply(CompleteModelAndDetail,.(Ceil),summarise,sum(Action.Obligation))
+
+
+nrow(subset(CompleteModelAndDetail,Action.Obligation>=30000000))
 
 10^mean(dat$x[sddat$size==40]))
 
@@ -181,10 +189,10 @@ nrow(subset(ContractComplete,SumofObligatedAmount>=30000000))
 
 10^qnorm(c(0.25,0.5,0.75,0.9,0.95,0.99995),mean=OblMeanLog,sd=OblSDLog)
 
-OblLogMean<-mean(ContractComplete$SumofObligatedAmount)
-OblLogSD<-sd(ContractComplete$SumofObligatedAmount)
+OblLogMean<-mean(CompleteModelAndDetail$Action.Obligation)
+OblLogSD<-sd(CompleteModelAndDetail$Action.Obligation)
 
-summary(ContractComplete$SumOfUnmodifiedbaseandalloptionsvalue)
+summary(CompleteModelAndDetail$SumOfUnmodifiedbaseandalloptionsvalue)
 ```
 
 ##Due to missing contract ceiling data, we have limited the dataset to  fiscal year 2007 and beyond.
@@ -240,7 +248,7 @@ All of the analysis thus far has been done with a set of 15,000 contracts which 
 
 ```{r setup100000, echo = TRUE}
 ContractUnweighted  <- read.csv(
-    paste("data\\defense_contract_CSIScontractID_sample_100000_SumofObligatedAmount.csv", sep = ""),
+    paste("data\\defense_contract_CSIScontractID_sample_100000_Action.Obligation.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
     stringsAsFactors = TRUE

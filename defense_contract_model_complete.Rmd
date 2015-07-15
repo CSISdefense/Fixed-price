@@ -115,12 +115,14 @@ CompleteContracts$LinkedContracts<-CompleteContracts$ContractingOfficePlatformIn
 CompleteContracts$qLinked <- cut2(CompleteContracts$LinkedContracts,cuts=c(1,750))
 
 #Drop the no longer needed variables
-CompleteContracts<-subset(CompleteContracts,select=-c(
-    SystemEquipmentInterlinked,
-    ContractingOfficePlatformInterlinked,
-    LinkedContracts,
-    unmodifiedSystemequipmentcode
-    ))
+# CompleteContracts<-subset(CompleteContracts,select=-c(
+#     SystemEquipmentInterlinked,
+#     ContractingOfficePlatformInterlinked,
+#     LinkedContracts,
+#     unmodifiedSystemequipmentcode
+#     ))
+
+summary(CompleteContracts$unmodifiedSystemequipmentcode)
 
 ```
 
@@ -172,13 +174,15 @@ CompleteContracts$pIsInternational<-CompleteContracts$ObligatedAmountIsInternati
     CompleteContracts$Action.Obligation
 CompleteContracts$pIsInternational[is.na(CompleteContracts$ObligatedAmountIsInternational)] <- 0
 
-CompleteContracts$AnyInternational<-factor(CompleteContracts$AnyInternational,
-                                           exclude=NULL,
-                                           levels=c(0,1,NA),
-                                           labels=c("Just U.S.","Any\nInternational","Unlabeled")
-                                           )
+if(is.numeric(CompleteContracts$AnyInternational)){
+    CompleteContracts$AnyInternational<-factor(CompleteContracts$AnyInternational,
+                                               exclude=NULL,
+                                               levels=c(0,1,NA),
+                                               labels=c("Just U.S.","Any International","Unlabeled")
+                                               )
+    }
 CompleteContracts$AnyInternational[CompleteContracts$pIsInternational<=0 & 
-                                       CompleteContracts$AnyInternational=="Any\nInternational" &
+                                       CompleteContracts$AnyInternational=="Any International" &
                                        CompleteContracts$UnmodifiedIsInternational==0]<-"Just U.S."
 
 
@@ -196,6 +200,7 @@ CompleteContracts<-subset(CompleteContracts,select=-c(
 
 ```{r Outcome}
 #"data\\Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv"
+
 CompleteContracts<-read_and_join(Path
                                  ,"Defense_contract_SP_ContractUnmodifiedandOutcomeDetailsCustomer.csv"
                                  ,CompleteContracts
@@ -215,11 +220,21 @@ CompleteContracts$UnmodifiedDays<-as.numeric(
              ))+1
 
 
+CDuration<-as.duration(strptime(CompleteContracts$UnmodifiedCurrentCompletionDate,"%Y-%m-%d")-
+                strptime(CompleteContracts$MinOfEffectiveDate,"%Y-%m-%d"))
+
+CPeriod<-as.period(
+    CInterval<-new_interval(ymd(CompleteContracts$UnmodifiedCurrentCompletionDate),
+                ymd(CompleteContracts$MinOfEffectiveDate))
+
+%/%dyears(1)
+
+summary(dYears)
 
 #Break the count of days into four categories.
-CompleteContracts$qDuration<-cut2(CompleteContracts$UnmodifiedDays,cuts=c(61,214,366))
-
-roundedcutoffs<-c(15000,100000,1000000,30000000)
+CompleteContracts$qDuration<-cut2(CompleteContracts$UnmodifiedDays,cuts=c(61,214,366,732))
+#(15000,100000,1000000,30000000)
+roundedcutoffs<-c(15000,100000,1000000,10000000,75000000)
 CompleteContracts$qCeiling <- cut2(CompleteContracts$UnmodifiedContractBaseAndAllOptionsValue,cuts=roundedcutoffs)
 rm(roundedcutoffs)
 
@@ -227,19 +242,24 @@ CompleteContracts$qLinked <- cut2(CompleteContracts$LinkedContracts,cuts=c(1,750
 
 CompleteContracts$qNChg <- cut2(CompleteContracts$SumOfisChangeOrder,c(1,2,3))
 
+CompleteContracts$pChangeOrderObligated<-CompleteContracts$ChangeOrderObligatedAmount/CompleteContracts$Action.Obligation
+
 CompleteContracts$qCRais <- cut2(
     CompleteContracts$pChangeOrderObligated,c(
                                               -0.001,
+                                              0.001,
+                                              0.12)
+    )
 #                                               min(subset(
 #                                                   CompleteContracts$pChangeOrderObligated,
 #                                                   CompleteContracts$pChangeOrderObligated>0)),
-0.001,
-                                                                          0.12))
+
 summary(subset(CompleteContracts$qCRais,CompleteContracts$SumOfisChangeOrder>0    ))
 
 CompleteContracts<-subset(CompleteContracts,select=-c(
-    UnmodifiedDays,
-    MinOfEffectiveDate,
+#     UnmodifiedDays,
+#     UnmodifiedCurrentCompletionDate
+#     MinOfEffectiveDate,
     MinOfSignedDate,
     LastUltimateCompletionDate
     ))
@@ -248,9 +268,9 @@ CompleteContracts<-subset(CompleteContracts,select=-c(
 ```
 
 ```{r BucketPlatform}
-#data\\defense_contract_SP_ContractBucketPlatformPortfolioCustomer.csv
+#data\\defense_contract_SP_ContractBucketPlatformCustomer.csv
 CompleteContracts<-read_and_join(Path
-                                 ,"defense_contract_SP_ContractBucketPlatformPortfolioCustomer.csv"
+                                 ,"defense_contract_SP_ContractBucketPlatformCustomer.csv"
                                  ,CompleteContracts
                                  ,"data\\"
                                  ,by="CSIScontractID"
@@ -259,10 +279,7 @@ CompleteContracts<-standardize_variable_names(Path,CompleteContracts)
 
 CompleteContracts$ObligatedAmountIsProducts<-FactorToNumber(CompleteContracts$ObligatedAmountIsProducts)
 
-
 CompleteContracts$ObligatedAmountIsServices<-FactorToNumber(CompleteContracts$ObligatedAmountIsServices)
-
-
 
 CompleteContracts$ObligatedAmountIsRnD<-FactorToNumber(CompleteContracts$ObligatedAmountIsRnD)
 
@@ -315,6 +332,14 @@ CompleteContracts$pIsFRSnC[is.nan(CompleteContracts$pIsFRSnC)|is.infinite(Comple
 
 CompleteContracts$pIsMnS <- CompleteContracts$ObligatedAmountIsMnS/CompleteContracts$Action.Obligation
 CompleteContracts$pIsMnS[is.nan(CompleteContracts$pIsMnS)|is.infinite(CompleteContracts$pIsMnS)|is.na(CompleteContracts$ObligatedAmountIsMnS)] <- 0
+
+
+# TempList<-c("PlatformPortfolio","UnmodifiedPlatformPortfolio","ObligatedAmountIsAir","ObligatedAmountIsEnC","ObligatedAmountIsFRSnC","ObligatedAmountIsLand","ObligatedAmountIsMnS","ObligatedAmountIsOtherPP","ObligatedAmountIsVessel","ObligatedAmountIsWnA","ProductOrServiceArea","UnmodifiedProductOrServiceArea","SimpleArea","UnmodifiedSimpleArea","ObligatedAmountIsProducts","ObligatedAmountIsServices","ObligatedAmountIsRnD","MaxOfIsPossibleSoftwareEngineering")
+
+# TempList<-TempList[TempList %in% names(CompleteContracts)]
+# CompleteContracts<-subset(CompleteContracts,select=-c(PlatformPortfolio,
+#                                                       UnmodifiedPlatformPortfolio,
+#                                                       SimpleArea,UnmodifiedSimpleArea ))
 
 CompleteContracts<-subset(CompleteContracts,select=-c(
     UnmodifiedProductOrServiceArea,
@@ -369,11 +394,12 @@ rm(NAnumberOfOffers)
 
 CompleteContracts$qOffers <- cut2(CompleteContracts$NumberOfOffersReceived,cuts=c(1,2,3,5))
 
-
-CompleteContracts$IsIDV<-factor(CompleteContracts$IsIDV,levels=c(0,1),labels=c("Def/Pur","IDV"))
+if(is.numeric(CompleteContracts$IsIDV)){
+    CompleteContracts$IsIDV<-factor(CompleteContracts$IsIDV,levels=c(0,1),labels=c("Def/Pur","IDV"))
+    }
 
 CompleteContracts<-subset(CompleteContracts,select=-c(
-    UnmodifiedIsFullAndOpen,
+#     UnmodifiedIsFullAndOpen,
     UnmodifiedIsOnlyOneSource,
     UnmodifiedIsFollowonToCompetedAction,
 #     Unmodifiedmultipleorsingleawardidc,
@@ -480,11 +506,11 @@ CompleteContracts$pIsCombination[is.nan(CompleteContracts$ObligatedAmountIsCombi
 
 CompleteContracts$FixedOrCost[CompleteContracts$pIsFixedPrice>0  |
                                   CompleteContracts$pIsCostBased>0 | 
-                                  CompleteContracts$pIsCombination>0]<-"Combination \nor Other"
+                                  CompleteContracts$pIsCombination>0]<-"Combination or Other"
 
 CompleteContracts$FixedOrCost[CompleteContracts$pIsFixedPrice>=0.95|(CompleteContracts$IsFixedPrice==1 & (CompleteContracts$pIsCombination<=0.05 | is.na(CompleteContracts$pIsCombination)))]<-"Fixed-Price"
 CompleteContracts$FixedOrCost[CompleteContracts$pIsCostBased>=0.95|(CompleteContracts$IsCostBased==1 & (CompleteContracts$pIsCombination<=0.05 | is.na(CompleteContracts$pIsCombination)))]<-"Cost-Based"
-CompleteContracts$FixedOrCost<-factor(CompleteContracts$FixedOrCost,levels=c("Fixed-Price","Cost-Based","Combination \nor Other"))
+CompleteContracts$FixedOrCost<-factor(CompleteContracts$FixedOrCost,levels=c("Fixed-Price","Cost-Based","Combination or Other"))
 
 
 CompleteContracts<-subset(CompleteContracts,select=-c(
@@ -536,12 +562,11 @@ CompleteContracts$PlatformPortfolio.sum[CompleteContracts$pIsWnA>=0.75&
 CompleteContracts$PlatformPortfolio.sum[CompleteContracts$pIsMnS>=0.75&
                                             CompleteContracts$PlatformPortfolio.sum=="Unlabeled"]<-"Missile and Space Systems"
 CompleteContracts$PlatformPortfolio.sum[CompleteContracts$pIsEnC>=0.75&
-                                            CompleteContracts$PlatformPortfolio.sum=="Unlabeled"]<-"Electronics and Communication
-s"
+                                            CompleteContracts$PlatformPortfolio.sum=="Unlabeled"]<-"Electronics and Communications"
 CompleteContracts$PlatformPortfolio.sum[CompleteContracts$pIsFRSnC>=0.75&
                                             CompleteContracts$PlatformPortfolio.sum=="Unlabeled"]<-"Facilities and Construction"
 
-CompleteContracts$pChangeOrderObligated<-CompleteContracts$ChangeOrderObligatedAmount/CompleteContracts$Action.Obligation
+
 CompleteContracts$pChangeOrderUnmodifiedBaseAndAll<-CompleteContracts$ChangeOrderBaseAndAllOptionsValue/CompleteContracts$UnmodifiedContractBaseAndAllOptionsValue
 
 
@@ -554,45 +579,109 @@ NAisSomeCompetition<-(is.na(CompleteContracts$UnmodifiedIsSomeCompetition)|
 CompleteContracts$UnmodifiedIsSomeCompetition[NAisSomeCompetition]<-
     CompleteContracts$IsSomeCompetition[NAisSomeCompetition]
 rm(NAisSomeCompetition)
+# Add this later if you want not full & open
+# CompleteContracts$Comp[CompleteContracts$UnmodifiedIsSomeCompetition=="No Comp."]<-"No Comp."
+# CompleteContracts$Comp[CompleteContracts$UnmodifiedIsSomeCompetition=="Comp." & 
+#                            CompleteContracts$UnmodifiedIsFullAndOpen=="Not Full & Open"]<-"Comp."
+# CompleteContracts$Comp[CompleteContracts$UnmodifiedIsSomeCompetition=="Comp." & 
+#                            CompleteContracts$UnmodifiedIsFullAndOpen=="Comp."]<-"Comp."
+# CompleteContracts$Comp[CompleteContracts$UnmodifiedIsSomeCompetition=="Comp."]<-"Comp."
 
 
-CompleteContracts$Comp[CompleteContracts$UnmodifiedIsSomeCompetition=="No Comp."]<-0
-CompleteContracts$Comp[CompleteContracts$UnmodifiedIsSomeCompetition=="Comp." & 
-                           CompleteContracts$UnmodifiedIsFullAndOpen=="Not Full \n& Open"]<-1
-CompleteContracts$Comp[CompleteContracts$UnmodifiedIsSomeCompetition=="Comp." & 
-                           CompleteContracts$UnmodifiedIsFullAndOpen=="Full & Open"]<-2
-
-
-ContractModel$Offr<-factor(ContractModel$Offr, 
-                           levels=c("  1","  2","[  3,  5)","[  5,999]"),
-                           labels=c("1","2","3-4","5+"),
-                           ordered=TRUE
-                           )
-
-CompleteContracts$Comp<-factor(CompleteContracts$Comp,
-                               levels=c(0,1,2),
-                               labels=c("No Comp.","Limited\nComp.","Full & Open\nComp.")
-                               )
+# CompleteContracts$Comp<-factor(CompleteContracts$Comp,
+#                                levels=c("No Comp.","Comp.")
+#                                )
 
 
 
-CompleteContracts$Ceil<-factor(CompleteContracts$Ceil, 
-                           levels=c("[0,15k)","[15k,100k)","[100k,1m)","[1m,30m)","[30m+]"),
-                           ordered=TRUE
-                           )
-
-             
+if (all(levels(CompleteContracts$qOffers)==c("  1","  2","[  3,  5)","[  5,999]"))){
+    CompleteContracts$qOffers<-factor(CompleteContracts$qOffers, 
+                                   levels=c("  1","  2","[  3,  5)","[  5,999]"),
+                                   labels=c("1","2","3-4","5+"),
+                                   ordered=TRUE
+                                   )
+    }
 
 
 CompleteContracts$qOffers[is.na(CompleteContracts$qOffers)&
                           !is.na(CompleteContracts$UnmodifiedIsSomeCompetition)&
                               CompleteContracts$UnmodifiedIsSomeCompetition=="No Comp."
-                          ]<-"  1"
+                          ]<-"1"
+
+
+if (all(levels(CompleteContracts$qCeiling)==c("[0.00e+00,1.50e+04)",
+                                              "[1.50e+04,1.00e+05)",
+                                              "[1.00e+05,1.00e+06)",
+                                              "[1.00e+06,1.00e+07)",
+                                              "[1.00e+07,7.50e+07)",
+                                              "[7.50e+07,3.36e+12]"))){
+    CompleteContracts$qCeiling<-factor(CompleteContracts$qCeiling, 
+                                   
+                                   levels=c("[0.00e+00,1.50e+04)",
+                                              "[1.50e+04,1.00e+05)",
+                                              "[1.00e+05,1.00e+06)",
+                                              "[1.00e+06,1.00e+07)",
+                                              "[1.00e+07,7.50e+07)",
+                                              "[7.50e+07,3.36e+12]"),
+                                   labels=c("[0,15k)",
+                                            "[15k,100k)",
+                                            "[100k,1m)",
+                                            "[1m,10m)",
+                                            "[10m,75m)",
+                                            "[75m+]"),
+                                   ordered=TRUE
+                                   )
+    }
+             
+
+
+if (all(levels(CompleteContracts$qDuration)==c("[    0,   61)",
+                                               "[   61,  214)",
+                                               "[  214,  366)",
+                                               "[  366,  732)",
+                                               "[  732,33192]"))){
+    CompleteContracts$qDuration<-factor(CompleteContracts$qDuration, 
+                                   
+                                   levels=c("[    0,   61)",
+                                               "[   61,  214)",
+                                               "[  214,  366)",
+                                               "[  366,  732)",
+                                               "[  732,33192]"),
+                                   labels=c("[0 months,~2 months)",
+                                               "[~2 months,~7 months)",
+                                               "[~7 months-~1 year]",
+                                               "(~1 year,~2 years]",
+                                               "(~2 years+]"),
+                                   ordered=TRUE
+                                   )
+    }
+             
+
+
+
+if (all(levels(CompleteContracts$qLinked)==c("    0",
+                                             "[    1,  750)",
+                                             "[  750,67263]"))){
+    CompleteContracts$qLinked<-factor(CompleteContracts$qLinked, 
+                                   
+                                   levels=c("    0",
+                                             "[    1,  750)",
+                                             "[  750,67263]"),
+                                   labels=c("0",
+                                             "[1,750)",
+                                             "[750+]"),
+                                   ordered=TRUE
+                                   )
+    }
+
 
 CompleteContracts$UnmodifiedNumberOfOffersReceived[is.na(CompleteContracts$UnmodifiedNumberOfOffersReceived)&
                                                        !is.na(CompleteContracts$UnmodifiedIsSomeCompetition)&
                                                        CompleteContracts$UnmodifiedIsSomeCompetition=="No Comp."
                                                    ]<-1
+
+
+
 
 
 CompleteContracts$SingleOffer<-factor(CompleteContracts$UnmodifiedNumberOfOffersReceived==1,
@@ -647,6 +736,22 @@ summary(CompleteContracts[is.na(CompleteContracts$SimpleVehicle),"AwardOrIDVcont
 
 
 
+CompleteContracts$SoftwareEng<-factor(CompleteContracts$MaxOfIsPossibleSoftwareEngineering,
+                                      levels=c(0,1),
+                                      labels=c("Not Software Eng.","Possible Software Eng.")
+                                      )
+
+CompleteContracts$SoftwareEng[is.na(CompleteContracts$SoftwareEng)&
+                                  !is.na(CompleteContracts$SimpleArea)]<-"Not Software Eng."
+
+
+CompleteContracts$UCA<-factor(CompleteContracts$MaxOfIsUndefinitizedAction,
+                                      levels=c(0,1),
+                                      labels=c("Not UCA","UCA")
+                                      )
+CompleteModel$SubCustomer.sum<-droplevels(CompleteModel$SubCustomer.sum)
+
+
 ```
 
 
@@ -664,7 +769,10 @@ CompleteModel<-subset(CompleteContracts,select=c(IsIDV,
     qDuration,
     SingleOffer,
     qOffers,
+    SimpleVehicle,
     IsTerminated,
+    SoftwareEng,
+    UCA
     )
     )
 # 
@@ -682,6 +790,8 @@ colnames(CompleteModel)[colnames(CompleteModel)=="qDuration"]<-"Dur"
 # colnames(CompleteModel)[colnames(CompleteModel)=="SingleOffer"]<-"One"
 colnames(CompleteModel)[colnames(CompleteModel)=="qOffers"]<-"Offr"
 colnames(CompleteModel)[colnames(CompleteModel)=="IsTerminated"]<-"Term"
+colnames(CompleteModel)[colnames(CompleteModel)=="SoftwareEng"]<-"Soft"
+colnames(CompleteModel)[colnames(CompleteModel)=="SimpleVehicle"]<-"Veh"
 
 
 CompleteModel$Intl<-droplevels(CompleteModel$Intl)
@@ -709,7 +819,8 @@ write.table(CompleteModel
 
 
 ```{r Detailed}
-CompleteModelAndDetail<-subset(CompleteContracts,select=c(IsIDV,
+CompleteModelAndDetail<-subset(CompleteContracts,select=c(CSIScontractID,
+    IsIDV,
     FixedOrCost,
     UnmodifiedIsSomeCompetition,
     #                                 Comp,
@@ -723,6 +834,8 @@ CompleteModelAndDetail<-subset(CompleteContracts,select=c(IsIDV,
     SingleOffer,
     qOffers,
     IsIDV,
+    SoftwareEng,
+    UCA,
         SimpleVehicle,
     UnmodifiedNumberOfOffersReceived,
     IsTerminated,
@@ -730,6 +843,7 @@ CompleteModelAndDetail<-subset(CompleteContracts,select=c(IsIDV,
     SumOfisChangeOrder,
     pChangeOrderUnmodifiedBaseAndAll,
     pChangeOrderObligated,
+    UnmodifiedDays
     Action.Obligation
     )
     )
@@ -749,6 +863,7 @@ colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SingleOffer"
 colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qOffers"]<-"Offr"
 colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsTerminated"]<-"Term"
 colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleVehicle"]<-"Veh"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SoftwareEng"]<-"Soft"
 
 
 write.table(CompleteModelAndDetail
