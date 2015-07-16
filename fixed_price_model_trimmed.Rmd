@@ -50,13 +50,17 @@ ContractModel  <- read.csv(
     na.strings = c("NULL","NA",""),
     stringsAsFactors = TRUE
     )
-ContractModel<-subset(ContractModel,select=-c(IDV))
+ContractModel<-subset(ContractModel,select=-c(IDV,LowCeil))
 
 
 # 
 # nrow(ContractModel)
 # nrow(subset(ContractModel,complete.cases(ContractModel)))
 # summary(subset(ContractModel,complete.cases(ContractModel)))
+#   .(FxCb,Comp,Link,MDAP,Who,What,Intl,PSR,Ceil,Dur,Offr,Veh,Term,Soft,UCA,CRai,NChg),# 
+
+ContractModel$Count<-1
+names(ContractModel)
 
 
 
@@ -699,6 +703,45 @@ querygrain(ReducedFixedPriceGin,
 
 prop<-table(subset(ContractModel,  select = CRai))
 prop/sum(prop)
+
+
+StandardizeTableChiSquared(ContractModel,
+                           FixedPriceGin, 
+                           "Term"
+                           )
+
+
+StandardizeTableChiSquared(ContractModel,
+                           ReducedFixedPriceGin, 
+                           "Term"
+                           )
+
+StandardizeTableChiSquared(ContractModel,
+                           ReducedFixedPriceGin, 
+                           "Term"
+                           )
+
+
+
+StandardizeTableChiSquared(ContractModel,
+                           FixedPriceGin, 
+                           "CRai"
+                           )
+
+StandardizeTableChiSquared(ContractModel,
+                           FixedPriceGin, 
+                           "NChg"
+                           )
+
+StandardizeTableChiSquared(ContractModel,
+                           ReducedFixedPriceGin, 
+                           "CRai"
+                           )
+
+StandardizeTableChiSquared(ContractModel,
+                           ReducedFixedPriceGin, 
+                           "NChg"
+                           )
 
 
 querygrain(FixedPriceGin,

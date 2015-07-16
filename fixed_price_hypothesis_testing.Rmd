@@ -1,12 +1,12 @@
 ---
 output:
-  html_document:
-    fig_caption: yes
-    fig_height: 3
-    fig_width: 7.5
-    keep_md: yes
-    self_contained: no
-    toc: yes
+html_document:
+fig_caption: yes
+fig_height: 3
+fig_width: 7.5
+keep_md: yes
+self_contained: no
+toc: yes
 ---
 
 ```{r hiddensetup, echo = FALSE}
@@ -33,6 +33,7 @@ Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 source(paste(Path,"lookups.r",sep=""))
 
 source("contract_outcome_gRain.r")
+source("contract_outcome_table.r")
 
 ```
 
@@ -48,7 +49,7 @@ load("Output\\FixedPriceGin.Rdata",.GlobalEnv)
 load("Output\\compGin.Rdata",.GlobalEnv)
 
 zipfile<-unz("Data\\defense_contract_CSIScontractID_model.zip",
-        "defense_contract_CSIScontractID_model.csv")
+             "defense_contract_CSIScontractID_model.csv")
 
 CompleteModel  <- read.csv(
     zipfile,
@@ -57,6 +58,17 @@ CompleteModel  <- read.csv(
     stringsAsFactors = TRUE
     )
 ContractModel<-subset(ContractModel,select=-c(IDV))
+
+
+ModelSummary<-ddply(ContractModel,
+                    .(FxCb,Comp,Link,MDAP,Who,What,Intl,PSR,Ceil,Dur,Offr,Veh,Term,Soft,UCA,CRai,NChg),
+                    summarise,
+                    Count=sum(Count)
+                    )
+
+ModelSummary$Freq<-ModelSummary$Count/sum(ModelSummary$Count)
+
+
 
 
 summary(FixedPriceGin)
@@ -81,8 +93,8 @@ summary(FixedPriceGin)
 
 short_cb = table(subset(ContractModel, Dur == "(~2 years+]" & FxCb == "Cost-Based", select = Offr))
 short_fx =  
-
-Compare sort_cb/sum(short_cb), for example, to the output of the Bayes net when the Dur and FxCb evidence are set appropriately
+    
+    Compare sort_cb/sum(short_cb), for example, to the output of the Bayes net when the Dur and FxCb evidence are set appropriately
 
 The way to check that they are identical is to use the vector or Offr probabilities p_short_cb (of size 4) produced by the Bayes net
 
@@ -105,6 +117,56 @@ You could then say, for example, that switching from the Cost-Based to Fixed-Pri
 more offers.
 
 You could slice the dice the dataset by fixing more variables.  In each case it would be good to compare the Bayes net output to pure counts.
+
+
+PopulationLongDF<-FixedPriceComparison(FixedPriceGin,"Population")
+StandardizeTableChiSquared(ContractModel,
+                           FixedPriceGin,
+                           "Term"
+                           )
+
+StandardizeTableChiSquared(ContractModel,
+                           FixedPriceGin,
+                           "Offr"
+                           )
+
+StandardizeTableChiSquared(ContractModel,
+                           FixedPriceGin,
+                           "CRai"
+                           )
+
+StandardizeTableChiSquared(subset(ContractModel,PSR=="R&D"&FxCb=="Fixed-Price"),
+                           setEvidence(FixedPriceGin, 
+                           nodes=c("PSR","FxCb"),
+                           states=c("R&D","Cost-Based")
+                           ),
+                           "Term"
+                           )
+debug(StandardizeTableChiSquared)
+StandardizeTableChiSquared(subset(ContractModel,PSR=="Products"&FxCb=="Fixed-Price"),
+                           setEvidence(FixedPriceGin, 
+                           nodes=c("PSR","FxCb"),
+                           states=c("R&D","Cost-Based")
+                           ),
+                           "Term"
+                           )
+
+
+StandardizeTableChiSquared(subset(ContractModel,PSR=="R&D"&FxCb=="Cost-Based"),
+                           setEvidence(FixedPriceGin, 
+                           nodes=c("PSR","FxCb"),
+                           states=c("R&D","Cost-Based")
+                           ),
+                           "Term"
+                           )
+
+StandardizeTableChiSquared(subset(ContractModel,PSR=="R&D"&FxCb=="Fixed-Price"),
+                           setEvidence(FixedPriceGin, 
+                           nodes=c("PSR","FxCb"),
+                           states=c("R&D","Fixed-Price")
+                           ),
+                           "Term"
+                           )
 
 
 
@@ -150,42 +212,42 @@ inuous(labels = percent_format())
 
 #Single Offer Competition
 ggplot(subset(SizeDF,dVariable=="% Single Offer Competition"),
-       aes(x=Control,y=FixedCostMargin)
+       aes(x=Control,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Expected Number of Offers
 ggplot(subset(SizeDF,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,y=FixedCostMargin)
+       aes(x=Control,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 #Expected Number of Changes
 ggplot(subset(SizeDF,dVariable="Average Number of Change Orders"),
-       aes(x=Control,y=FixedCostMargin)
+       aes(x=Control,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Ceiling Raising Change Orders %
 ggplot(subset(SizeDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,y=FixedCostMargin)
+       aes(x=Control,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
 #Terminations
 ggplot(subset(SizeDF,dVariable=="Terminated"),
-       aes(x=Control,y=FixedCostMargin)
+       aes(x=Control,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 ``` 
@@ -211,10 +273,8 @@ As expected, numbers of offers are far higher with non-aircraft, for both compet
 
 FixedPriceGin[[1]]$levels$What
 
-AircraftFind<- setEvidence(FixedPriceGin, 
-                           nodes=c("What"),
-                           states=c("Aircraft and Drones")
-                           )
+AircraftFind<- subset(FixedPriceGin, What=="Aircraft and Drones")
+                           
 
 getEvidence(AircraftFind)
 pEvidence(AircraftFind)
@@ -242,42 +302,42 @@ AircraftDF<-subset(AircraftDF,
 
 #Single Offer Competition
 ggplot(subset(AircraftDF,dVariable=="% Single Offer Competition"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Expected Number of Offers
 ggplot(subset(AircraftDF,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 #Expected Number of Changes
 ggplot(subset(AircraftDF,dVariable="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Ceiling Raising Change Orders %
 ggplot(subset(AircraftDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
 #Terminations
 ggplot(subset(AircraftDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
@@ -330,9 +390,9 @@ UCAFind<- setEvidence(FixedPriceGin,
 getEvidence(UCAFind)
 
 NotUCAFind<- setEvidence(FixedPriceGin, 
-                      nodes=c("UCA"),
-                      states= list(c( "Not UCA" ))
-                      )
+                         nodes=c("UCA"),
+                         states= list(c( "Not UCA" ))
+                         )
 
 getEvidence(NotUCAFind)
 
@@ -342,53 +402,53 @@ getEvidence(NotUCAFind)
 # undebug(FixedPriceHypothesisTester)
 UCAdf<-FixedPriceHypothesisTester(UCAFind,"UCA")
 UCAdf<-rbind(UCAdf,
-                 FixedPriceHypothesisTester(NotUCAFind,"Not UCA")
-                 )
+             FixedPriceHypothesisTester(NotUCAFind,"Not UCA")
+             )
 
 
 #Remove redundant tests
 UCAdf<-subset(UCAdf,
-                  !Control %in% unique(UCAdf$Hypothesis))
+              !Control %in% unique(UCAdf$Hypothesis))
 
 
 #Single Offer Competition
 ggplot(subset(UCAdf,dVariable=="% Single Offer Competition"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Expected Number of Offers
 ggplot(subset(UCAdf,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 #Expected Number of Changes
 ggplot(subset(UCAdf,dVariable="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Ceiling Raising Change Orders %
 ggplot(subset(UCAdf,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
 #Terminations
 ggplot(subset(UCAdf,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
@@ -409,9 +469,9 @@ SACFind<- setEvidence(FixedPriceGin,
 getEvidence(SACFind)
 
 OtherIDVFind<- setEvidence(FixedPriceGin, 
-                      nodes=c("Veh"),
-                      states= list(c( "MULTIPLE AWARD", "Other IDV" ))
-                      )
+                           nodes=c("Veh"),
+                           states= list(c( "MULTIPLE AWARD", "Other IDV" ))
+                           )
 
 getEvidence(OtherIDVFind)
 
@@ -442,42 +502,42 @@ VehicleDF<-subset(VehicleDF,
 
 #Single Offer Competition
 ggplot(subset(VehicleDF,dVariable=="% Single Offer Competition"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Expected Number of Offers
 ggplot(subset(VehicleDF,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 #Expected Number of Changes
 ggplot(subset(VehicleDF,dVariable="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Ceiling Raising Change Orders %
 ggplot(subset(VehicleDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
 #Terminations
 ggplot(subset(VehicleDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
@@ -527,42 +587,42 @@ LongDurDF<-subset(LongDurDF,
 
 #Single Offer Competition
 ggplot(subset(LongDurDF,dVariable=="% Single Offer Competition"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Expected Number of Offers
 ggplot(subset(LongDurDF,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 #Expected Number of Changes
 ggplot(subset(LongDurDF,dVariable="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Ceiling Raising Change Orders %
 ggplot(subset(LongDurDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
 #Terminations
 ggplot(subset(LongDurDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
@@ -601,57 +661,57 @@ getEvidence(CompFind)
 
 CompDF<-FixedPriceHypothesisTester(CompFind,"Comp.")
 CompDF<-rbind(CompDF,
-                 FixedPriceHypothesisTester("Comp.","Population")
-                 )
+              FixedPriceHypothesisTester("Comp.","Population")
+              )
 
 
 #Remove redundant tests
 CompDF<-subset(CompDF,
-                  !Control %in% unique(CompDF$Hypothesis))
+               !Control %in% unique(CompDF$Hypothesis))
 #Remove the No Comp for the offer related iVariables
 CompDF<-subset(CompDF,
-                  !(dVariable %in% c("1","Expected Number of Offers")&
-                      Hypothesis=="Not Comp."))
+               !(dVariable %in% c("1","Expected Number of Offers")&
+                     Hypothesis=="Not Comp."))
 
 
 #Single Offer Competition
 ggplot(subset(CompDF,dVariable=="% Single Offer Competition"),
-       aes(x=Control,y=FixedCostMargin)
+       aes(x=Control,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Expected Number of Offers
 ggplot(subset(CompDF,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,y=FixedCostMargin)
+       aes(x=Control,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 #Expected Number of Changes
 ggplot(subset(CompDF,dVariable="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Ceiling Raising Change Orders %
 ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
 #Terminations
 ggplot(subset(CompDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
@@ -686,10 +746,14 @@ The hypothesis is supported with regard to number of offers. Larger fixed-price 
 
 FixedPriceGin[[1]]$levels$Ceil
 
+
+
 RnDfind<- setEvidence(FixedPriceGin, 
-                           nodes=c("PSR"),
-                           states=c("R&D")
-                           )
+                      nodes=c("PSR"),
+                      states=c("R&D")
+                      )
+
+getEvidence(RnDfind)
 
 # NotRnDfind<- setEvidence(FixedPriceGin, 
 #                              nodes=c("PSR"),
@@ -698,18 +762,20 @@ RnDfind<- setEvidence(FixedPriceGin,
 #                                                              "R&D"])))
 # 
 
-
-getEvidence(RnDfind)
-debug(FixedPriceComparison)
-RnDlongDF<-FixedPriceComparison(RnDfind,"R&D")
-
-
+debug(FixedPriceComparisonTable)
+debug(QueryControlVariablesTable)
+RnDlongDF<-FixedPriceComparisonTable(subset(ModelSummary,PSR=="R&D"),
+                                "R&D")
 
 
 
+# undebug(FixedPriceComparison)
+# RnDlongDF<-FixedPriceComparison(RnDfind,"R&D")
+
+debug(StandardizeGRainQuery)
 
 #Single Offer Competition
-ggplot(subset(RnDlongDF,dVariable=="% Single Offer Competition"),
+ggplot(subset(RnDlongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
        aes(x=Control,color=FxCb,shape=FxCb,y=Freq)
        )+
     geom_point()+
@@ -717,14 +783,14 @@ ggplot(subset(RnDlongDF,dVariable=="% Single Offer Competition"),
 
 
 #Expected Number of Offers
-ggplot(subset(RnDlongDF,dVariable=="Average Number of Offers for Competed Contracts"),
+ggplot(subset(RnDlongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
        aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())
 
 #Expected Number of Changes
-ggplot(subset(RnDlongDF,dVariable=="Average Number of Change Orders"),
+ggplot(subset(RnDlongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
        aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
@@ -732,14 +798,14 @@ ggplot(subset(RnDlongDF,dVariable=="Average Number of Change Orders"),
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(RnDlongDF,dVariable=="Ceiling Raising Change Orders %"),
-        aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+ggplot(subset(RnDlongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
 
 #Terminations
-ggplot(subset(RnDlongDF,dVariable=="Terminated"),
+ggplot(subset(RnDlongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
        aes(x=Control,color=FxCb,shape=FxCb,y=p)
        )+
     geom_point()+
@@ -747,7 +813,7 @@ ggplot(subset(RnDlongDF,dVariable=="Terminated"),
 
 
 
-rm(RnDfind,NotRnDfind)
+rm(RnDfind)
 
 
 ``` 
@@ -755,76 +821,67 @@ rm(RnDfind,NotRnDfind)
 
 ```{r H1LargeR&D}
 
-FixedPriceGin[[1]]$levels$Ceil
-
-RnDfind<- setEvidence(FixedPriceGin, 
-                           nodes=c("PSR"),
-                           states=c("R&D")
-                           )
-
-# NotRnDfind<- setEvidence(FixedPriceGin, 
-#                              nodes=c("PSR"),
-#                              states=c(list(
-#                                  FixedPriceGin[[1]]$levels$PSR[FixedPriceGin[[1]]$levels$PSR!=
-#                                                              "R&D"])))
-# 
 
 
-getEvidence(RnDfind)
-
-RnDdf<-FixedPriceHypothesisTester(RnDfind,"R&D")
-RnDdf<-rbind(RnDdf,
-                  FixedPriceHypothesisTester(FixedPriceGin,"Population")
-                  )
+RnDwideDF<-FixedPriceCast(rbind(RnDlongDF,PopulationLongDF))
 
 
 #Remove redundant tests
-RnDdf<-subset(RnDdf,
-                   !Control %in% unique(RnDdf$Hypothesis))
-RnDdf$Hypothesis<-factor(RnDdf$Hypothesis,levels=c("R&D","Population"),ordered=TRUE)
+RnDwideDF<-subset(RnDwideDF,
+                  !Control %in% unique(RnDwideDF$Hypothesis))
+RnDwideDF$Hypothesis<-factor(RnDwideDF$Hypothesis,levels=c("R&D","Population"),ordered=TRUE)
 
 #Single Offer Competition
-ggplot(subset(RnDdf,dVariable=="% Single Offer Competition"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(RnDwideDF,dVariable=="% Single Offer Competition"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Expected Number of Offers
-ggplot(subset(RnDdf,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(RnDwideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 #Expected Number of Changes
-ggplot(subset(RnDdf,dVariable="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(RnDwideDF,dVariable="Average Number of Change Orders"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(RnDdf,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(RnDwideDF,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
 #Terminations
-ggplot(subset(RnDdf,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(RnDwideDF,dVariable=="Terminated"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
-rm(RnDfind,NotRnDfind)
+write.csv(RnDwideDF,paste("Output\\",
+                          paste("RnD"
+                                ,"Fixed_Price"
+                                ,"Hypothesis_Testing"
+                                ,"2007-2013"
+                                ,sep="_"
+                                )
+                          ,".csv",
+                          sep=""))
+
 
 
 ``` 
@@ -845,81 +902,126 @@ MDAP specific classification is not yet included because it represents such a sm
 #Initial results
 The hypothesis was not supported with regard to number of offers, but this should be treated as a soft negative finding until the more precise question is tested.
 
-```{r H2MDAP}
 
-FixedPriceGin[[1]]$levels$MDAP
+
+```{r H2MDAPabsolute}
+
+
 
 MDAPFind<- setEvidence(FixedPriceGin, 
-                           nodes=c("MDAP"),
-                           states=c( "Labeled MDAP" )
-                           )
+                       nodes=c("MDAP"),
+                       states=c( "Labeled MDAP" ))
 
-
-NotMDAPFind<- setEvidence(FixedPriceGin, 
-                             nodes=c("MDAP"),
-                             states=c("No label"))
-
-
-getEvidence(MDAPFind)
-
-
-
-MDAPdf<-FixedPriceHypothesisTester(MDAPFind,"MDAP")
-MDAPdf<-rbind(MDAPdf,
-                  FixedPriceHypothesisTester(FixedPriceGin,"Population")
-                  )
-MDAPdf$Hypothesis<-factor(MDAPdf$Hypothesis,levels=c("MDAP","Population"),ordered=TRUE)
 
 #Remove redundant tests
-MDAPdf<-subset(MDAPdf,
-                   !Control %in% unique(MDAPdf$Hypothesis))
-
+MDAPwideDF<-subset(MDAPwideDF,
+                   !Control %in% unique(MDAPwideDF$Hypothesis))
+MDAPwideDF$Hypothesis<-factor(MDAPwideDF$Hypothesis,levels=c("MDAP","Population"),ordered=TRUE)
 
 #Single Offer Competition
-ggplot(subset(MDAPdf,dVariable=="% Single Offer Competition"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(MDAPwideDF,dVariable=="% Single Offer Competition"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Expected Number of Offers
-ggplot(subset(MDAPdf,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(MDAPwideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 #Expected Number of Changes
-ggplot(subset(MDAPdf,dVariable="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(MDAPwideDF,dVariable="Average Number of Change Orders"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(MDAPdf,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(MDAPwideDF,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
 #Terminations
-ggplot(subset(MDAPdf,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(MDAPwideDF,dVariable=="Terminated"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+
+
+```                      
+
+
+```{r H2MDAP}
+
+FixedPriceGin[[1]]$levels$MDAP
+
+MDAPwideDF<-FixedPriceCast(rbind(MDAPlongDF,PopulationLongDF))
+
+MDAPwideDF<-rbind(MDAPwideDF,
+                  FixedPriceHypothesisTester(FixedPriceGin,"Population")
+                  )
+MDAPwideDF$Hypothesis<-factor(MDAPwideDF$Hypothesis,levels=c("MDAP","Population"),ordered=TRUE)
+
+#Remove redundant tests
+MDAPwideDF<-subset(MDAPwideDF,
+                   !Control %in% unique(MDAPwideDF$Hypothesis))
+
+
+#Single Offer Competition
+ggplot(subset(MDAPwideDF,dVariable=="% Single Offer Competition"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+
+
+#Expected Number of Offers
+ggplot(subset(MDAPwideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+
+#Expected Number of Changes
+ggplot(subset(MDAPwideDF,dVariable="Average Number of Change Orders"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+
+
+#Ceiling Raising Change Orders %
+ggplot(subset(MDAPwideDF,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+
+
+
+#Terminations
+ggplot(subset(MDAPwideDF,dVariable=="Terminated"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
 rm(MDAPFind,NotMDAPFind)
 
 
-``` 
+```                       
 
 
 
@@ -964,42 +1066,42 @@ LongDurDF<-subset(LongDurDF,
 
 #Single Offer Competition
 ggplot(subset(LongDurDF,dVariable=="% Single Offer Competition"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Expected Number of Offers
 ggplot(subset(LongDurDF,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 #Expected Number of Changes
 ggplot(subset(LongDurDF,dVariable="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Ceiling Raising Change Orders %
 ggplot(subset(LongDurDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
 #Terminations
 ggplot(subset(LongDurDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
@@ -1038,44 +1140,44 @@ getEvidence(CompFind)
 
 CompDF<-FixedPriceHypothesisTester(CompFind,"Comp.")
 CompDF<-rbind(CompDF,
-                 FixedPriceHypothesisTester(FixedPriceGin,"Population")
-                 )
+              FixedPriceHypothesisTester(FixedPriceGin,"Population")
+              )
 
 
 CompDF$Hypothesis<-factor(CompDF$Hypothesis,levels=c("Comp.","Population"),ordered=TRUE)
 
 #Remove redundant tests
 CompDF<-subset(CompDF,
-                  !Control %in% c(unique(CompDF$Hypothesis),"Not Comp."))
+               !Control %in% c(unique(CompDF$Hypothesis),"Not Comp."))
 #Remove the  iVariables not covered in hypothesis
 CompDF<-subset(CompDF,
-                  !dVariable %in% c("1","Expected Number of Offers"))
+               !dVariable %in% c("1","Expected Number of Offers"))
 
 
 
 #Expected Number of Changes
 ggplot(subset(CompDF,dVariable="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Ceiling Raising Change Orders %
 ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
 #Terminations
 ggplot(subset(CompDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
@@ -1130,42 +1232,42 @@ SoftwareDF<-subset(SoftwareDF,
 
 #Single Offer Competition
 ggplot(subset(SoftwareDF,dVariable=="% Single Offer Competition"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Expected Number of Offers
 ggplot(subset(SoftwareDF,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 #Expected Number of Changes
 ggplot(subset(SoftwareDF,dVariable="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 #Ceiling Raising Change Orders %
 ggplot(subset(SoftwareDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 
 #Terminations
 ggplot(subset(SoftwareDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
 

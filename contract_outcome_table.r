@@ -4,34 +4,46 @@ require(graph)
 require(plyr)
 require(Hmisc)
 require(Matrix)
-require(gRain)
-require(gRbase)
 require(methods)
 require(bnlearn)
-require(Rgraphviz)
 
 
 
 
 
 
-StandardizeGRainQuery<-function(varGin,
+
+StandardizeTableQuery<-function(varTable,
                                 studyVariableCol,
                                 iVariableCol,
                                 dVariableCol,
                                 resultLabel=NA
 ){
+    
     #All contracts by ceiling
-    ResultsDF<-querygrain(varGin,
-                          nodes=c(studyVariableCol,iVariableCol,dVariableCol),
-                          type="joint",result="data.frame")
-    colnames(ResultsDF)[colnames(ResultsDF)==iVariableCol]<-"iVariable"
-    if(!is.na(resultLabel)){
-        #         ResultsDF$iVariable<-factor(ResultsDF$iVariable,levels=levels(ResultsDF$iVariable),
-        #                                     labels=paste(resultLabel,levels(ResultsDF$iVariable)))
-        ResultsDF$Control<-resultLabel
+    ResultsDF<-varTable[,names(varTable) %in% c(studyVariableCol,
+                                                iVariableCol,
+                                                dVariableCol,
+                                                "Freq")]
+    if(nrow(varTable)>0){
+        #     ResultsDF<-querygrain(varTable,
+        #                           nodes=c(studyVariableCol,iVariableCol,dVariableCol),
+        #                           type="joint",result="data.frame")
+        ResultsDF<-ddply(ResultsDF,
+                         c(studyVariableCol,
+                           iVariableCol,
+                           dVariableCol),
+                         summarise,
+                         Freq=sum(Freq))
+        
+        colnames(ResultsDF)[colnames(ResultsDF)==iVariableCol]<-"iVariable"
+        if(!is.na(resultLabel)){
+            #         ResultsDF$iVariable<-factor(ResultsDF$iVariable,levels=levels(ResultsDF$iVariable),
+            #                                     labels=paste(resultLabel,levels(ResultsDF$iVariable)))
+            ResultsDF$Control<-resultLabel
+        }
+        else     ResultsDF$Control<-"Overall"
     }
-    else     ResultsDF$Control<-"Overall"
     ResultsDF
 }    
     
@@ -67,25 +79,7 @@ StandardizeGRainQuery<-function(varGin,
 
 
 
-StandardizeTableQuery<-function(varGin,
-                                studyVariableCol,
-                                iVariableCol,
-                                dVariableCol,
-                                resultLabel=NA
-){
-    #All contracts by ceiling
-    ResultsDF<-querygrain(varGin,
-                          nodes=c(studyVariableCol,iVariableCol,dVariableCol),
-                          type="joint",result="data.frame")
-    colnames(ResultsDF)[colnames(ResultsDF)==iVariableCol]<-"iVariable"
-    if(!is.na(resultLabel)){
-        #         ResultsDF$iVariable<-factor(ResultsDF$iVariable,levels=levels(ResultsDF$iVariable),
-        #                                     labels=paste(resultLabel,levels(ResultsDF$iVariable)))
-        ResultsDF$Control<-resultLabel
-    }
-    else     ResultsDF$Control<-"Overall"
-    ResultsDF
-}
+
     
     #     subset(ContractModel)
     #     
@@ -119,283 +113,78 @@ StandardizeTableQuery<-function(varGin,
 # }
 
 
-StandardizeTableChiSquared<-function(varRaw,
-                                     varGin,
-#                                 studyVariableCol,
-#                                 iVariableCol,
-                                dVariableCol
-#                                 resultLabel=NA
-){
-    bayesian<-querygrain(varGin,
-                         nodes=c(dVariableCol),
-                         type="marginal",
-                         result="array")[[dVariableCol]]
-    raw<- table(varRaw[,dVariableCol])
-    chisq.test(raw, 
-               p = c(0.8,0.2 )
-    )
-}
-# 
-# QueryControlVariablesRaw<-function(varModel,
-# #                                 studyVaruableCol,
-# #                                 iVariableCol,
-#                                 dVariableCol
-# ){
-#     ResultsDF<-StandardizeGRainQuery(varGin,studyVaruableCol,iVariableCol,dVariableCol)
-#     
-#     
-#     querygrain(FixedPriceGin,
-#                nodes=c(dVariableCol),
-#                type="marginal")
-#     
-#     table(varModel[,dVariableCol])
-# #     
-#     chisq.test(table(varModel[Ceil==,"dVariableCol"]), 
-#                p = querygrain(FixedPriceGin,
-#                               nodes=c(dVariableCol),
-#                               type="marginal",
-#                               result="array")$Term
-#     )
-#     
-#     
-#     table(varModel[varModel[,"FxCb"]=="Fixed-Price",dVariableCol])
-#     table(varModel[varModel[,"FxCb"]=="Cost-Based",dVariableCol])
-#     
-    #     short_cb = table(subset(ContractModel, Dur == "(~2 years+]" & FxCb == "Cost-Based", select = Offr))
-    #     short_fx =  
-    #         
-    #         Compare sort_cb/sum(short_cb), for example, to the output of the Bayes net when the Dur and FxCb evidence are set appropriately
-    #     
-    #     The way to check that they are identical is to use the vector or Offr probabilities p_short_cb (of size 4) produced by the Bayes net
-    #     
-    #     chisq.test(short_cb, p = p_short_cb)
-    #     
-    
-    #R&D contracts by ceiling    
-    #     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-    #         setEvidence(varGin, 
-    #                     nodes=c("PSR"),
-    #                     states=c("R&D")),
-    #         studyVaruableCol,iVariableCol,dVariableCol,resultLabel="R&D")
-    #     )
-    #   
-    #Aircraft contracts by ceiling
-#     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-#         setEvidence(varGin, 
-#                     nodes=c("What"),
-#                     states=c("Aircraft and Drones")),
-#         studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Aircraft")
-#     )
-#     
-#     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-#         setEvidence(varGin, 
-#                     nodes=c("What"),
-#                     states=list(varGin[[1]]$levels$What[
-#                         varGin[[1]]$levels$What!="Aircraft and Drones"])),
-#         studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Not Aircraft")
-#     )
-#     
-#     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-#         setEvidence(varGin, 
-#                     nodes=c("UCA"),
-#                     states=c("UCA")),
-#         studyVaruableCol,iVariableCol,dVariableCol,resultLabel="UCA")
-#     )
-#     
-#     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-#         setEvidence(varGin, 
-#                     nodes=c("UCA"),
-#                     states=c("Not UCA")),
-#         studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Not UCA")
-#     )
-#     
-#     #IDV contracts by ceiling
-#     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-#         setEvidence(varGin, 
-#                     nodes=c("Veh"),
-#                     states=c("SINGLE AWARD" )),
-#         studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Single-Award IDV")
-#     )
-#     
-#     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-#         setEvidence(varGin, 
-#                     nodes=c("Veh"),
-#                     states= list(c( "MULTIPLE AWARD", "Other IDV" ))),
-#         studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Other IDV")
-#     )
-#     
-#     
-#     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-#         setEvidence(varGin, 
-#                     nodes=c("Veh"),
-#                     states= list(c( "Def/Pur" ))),
-#         studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Def./Pur.")
-#     )
-#     
-#     #LongDur contracts by ceiling
-#     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-#         setEvidence(varGin, 
-#                     nodes=c("Dur"),
-#                     states=c("(~2 years+]")
-#         ),
-#         studyVaruableCol,iVariableCol,dVariableCol,resultLabel=       "2+ Year Dur.")
-#     )
-#     
-#     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-#         setEvidence(varGin, 
-#                     nodes=c("Dur"),
-#                     states=c(list(
-#                         varGin[[1]]$levels$Dur[varGin[[1]]$levels$Dur!=
-#                                                    "(~2 years+"]))
-#         ),
-#         studyVaruableCol,iVariableCol,dVariableCol,resultLabel="<2 Year Dur.")
-#     )
-#     
-#     
-#     #Contracts competition by ceiling
-#     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-#         setEvidence(varGin, 
-#                     nodes=c("Comp"),
-#                     states=c("Comp.")
-#         ),
-#         studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Comp.")
-#     )
-#     
-#     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-#         setEvidence(varGin, 
-#                     nodes=c("Comp"),
-#                     states=c("No Comp.")
-#         ),
-#         studyVaruableCol,iVariableCol,dVariableCol,resultLabel="No Comp.")
-#     )
-#     
-#     
-#     #Order the Controls, reversed is to put the first entry on top.
-#     ResultsDF$Control<-factor(ResultsDF$Control,
-#                               levels=rev(c("Overall",
-#                                            "Aircraft",
-#                                            "Not Aircraft",
-#                                            "UCA",
-#                                            "Not UCA",
-#                                            "2+ Year Dur.",
-#                                            "<2 Year Dur.",
-#                                            "Single-Award IDV",
-#                                            "Other IDV",
-#                                            "Def./Pur.",
-#                                            "Comp.",
-#                                            "No Comp."
-#                               )),
-#                               ordered=TRUE
-#     )
-#     ResultsDF
-#     
-# }
 
 
-QueryControlVariablesBayesian<-function(varGin,
-                                studyVaruableCol,
+QueryControlVariablesTable<-function(varTable,
+                                studyVariableCol,
                                 iVariableCol,
                                 dVariableCol
 ){
-    ResultsDF<-StandardizeGRainQuery(varGin,studyVaruableCol,iVariableCol,dVariableCol)
+    ResultsDF<-StandardizeTableQuery(varTable,studyVariableCol,iVariableCol,dVariableCol)
     
     
-    #R&D contracts by ceiling    
-    #     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-    #         setEvidence(varGin, 
-    #                     nodes=c("PSR"),
-    #                     states=c("R&D")),
-    #         studyVaruableCol,iVariableCol,dVariableCol,resultLabel="R&D")
-    #     )
-    #   
     #Aircraft contracts by ceiling
-    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-        setEvidence(varGin, 
-                    nodes=c("What"),
-                    states=c("Aircraft and Drones")),
-        studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Aircraft")
+    ResultsDF<-rbind(ResultsDF,StandardizeTableQuery(
+        subset(varTable, 
+                    What=="Aircraft and Drones"),
+        studyVariableCol,iVariableCol,dVariableCol,resultLabel="Aircraft")
     )
     
-    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-        setEvidence(varGin, 
-                    nodes=c("What"),
-                    states=list(varGin[[1]]$levels$What[
-                        varGin[[1]]$levels$What!="Aircraft and Drones"])),
-        studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Not Aircraft")
+    ResultsDF<-rbind(ResultsDF,StandardizeTableQuery(
+        subset(varTable, What %in% levels(varTable$What)[
+            levels(varTable$What)!="Aircraft and Drones"]),
+        studyVariableCol,iVariableCol,dVariableCol,resultLabel="Not Aircraft")
     )
     
-    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-        setEvidence(varGin, 
-                    nodes=c("UCA"),
-                    states=c("UCA")),
-        studyVaruableCol,iVariableCol,dVariableCol,resultLabel="UCA")
+    ResultsDF<-rbind(ResultsDF,StandardizeTableQuery(
+        subset(varTable, UCA=="UCA"),
+        studyVariableCol,iVariableCol,dVariableCol,resultLabel="UCA")
     )
     
-    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-        setEvidence(varGin, 
-                    nodes=c("UCA"),
-                    states=c("Not UCA")),
-        studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Not UCA")
+    ResultsDF<-rbind(ResultsDF,StandardizeTableQuery(
+        subset(varTable, UCA=="Not UCA"),
+        studyVariableCol,iVariableCol,dVariableCol,resultLabel="Not UCA")
     )
     
     #IDV contracts by ceiling
-    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-        setEvidence(varGin, 
-                    nodes=c("Veh"),
-                    states=c("SINGLE AWARD" )),
-        studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Single-Award IDV")
+    ResultsDF<-rbind(ResultsDF,StandardizeTableQuery(
+        subset(varTable, Veh=="SINGLE AWARD" ),
+        studyVariableCol,iVariableCol,dVariableCol,resultLabel="Single-Award IDV")
     )
     
-    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-        setEvidence(varGin, 
-                    nodes=c("Veh"),
-                    states= list(c( "MULTIPLE AWARD", "Other IDV" ))),
-        studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Other IDV")
+    ResultsDF<-rbind(ResultsDF,StandardizeTableQuery(
+        subset(varTable, Veh %in% c( "MULTIPLE AWARD", "Other IDV" )),
+        studyVariableCol,iVariableCol,dVariableCol,resultLabel="Other IDV")
     )
     
     
-    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-        setEvidence(varGin, 
-                    nodes=c("Veh"),
-                    states= list(c( "Def/Pur" ))),
-        studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Def./Pur.")
+    ResultsDF<-rbind(ResultsDF,StandardizeTableQuery(
+        subset(varTable, Veh =="Def/Pur" ),
+        studyVariableCol,iVariableCol,dVariableCol,resultLabel="Def./Pur.")
     )
     
     #LongDur contracts by ceiling
-    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-        setEvidence(varGin, 
-                    nodes=c("Dur"),
-                    states=c("(~2 years+]")
-        ),
-        studyVaruableCol,iVariableCol,dVariableCol,resultLabel=       "2+ Year Dur.")
+    ResultsDF<-rbind(ResultsDF,StandardizeTableQuery(
+        subset(varTable, Dur=="(~2 years+]"),
+        studyVariableCol,iVariableCol,dVariableCol,resultLabel=       "2+ Year Dur.")
     )
     
-    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-        setEvidence(varGin, 
-                    nodes=c("Dur"),
-                    states=c(list(
-                        varGin[[1]]$levels$Dur[varGin[[1]]$levels$Dur!=
-                                                   "(~2 years+"]))
-        ),
-        studyVaruableCol,iVariableCol,dVariableCol,resultLabel="<2 Year Dur.")
+    ResultsDF<-rbind(ResultsDF,StandardizeTableQuery(
+        subset(varTable, Dur %in% levels(varTable$Dur)[
+            levels(varTable$What)!="(~2 years+"]),
+        studyVariableCol,iVariableCol,dVariableCol,resultLabel="<2 Year Dur.")
     )
     
     
     #Contracts competition by ceiling
-    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-        setEvidence(varGin, 
-                    nodes=c("Comp"),
-                    states=c("Comp.")
-        ),
-        studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Comp.")
+    ResultsDF<-rbind(ResultsDF,StandardizeTableQuery(
+        subset(varTable, Comp=="Comp."),
+        studyVariableCol,iVariableCol,dVariableCol,resultLabel="Comp.")
     )
     
-    ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
-        setEvidence(varGin, 
-                    nodes=c("Comp"),
-                    states=c("No Comp.")
-        ),
-        studyVaruableCol,iVariableCol,dVariableCol,resultLabel="No Comp.")
+    ResultsDF<-rbind(ResultsDF,StandardizeTableQuery(
+        subset(varTable, Comp=="No Comp."),
+        studyVariableCol,iVariableCol,dVariableCol,resultLabel="No Comp.")
     )
     
     
@@ -422,9 +211,9 @@ QueryControlVariablesBayesian<-function(varGin,
 
 
 
-FixedPriceComparison<-function(varGin,HypothesisLabel=NA){
+FixedPriceComparisonTable<-function(varTable,HypothesisLabel=NA){
     
-    TermDF<-QueryControlVariables(varGin,
+    TermDF<-QueryControlVariablesTable(varTable,
                                   "FxCb",
                                   "Ceil",
                                   "Term"
@@ -437,7 +226,7 @@ FixedPriceComparison<-function(varGin,HypothesisLabel=NA){
     TermDF$Average<-NA
     
     
-    expNChgDF<-QueryControlVariables(varGin,
+    expNChgDF<-QueryControlVariablesTable(varTable,
                                      "FxCb",
                                      "Ceil",
                                      "NChg"
@@ -451,7 +240,7 @@ FixedPriceComparison<-function(varGin,HypothesisLabel=NA){
     expNChgDF<-ddply(expNChgDF,.(FxCb,Control,iVariable),summarise,Average=sum(Average),p=sum(p),Freq=sum(Freq))
     expNChgDF$dVariable<-"Average Number of Change Orders"
     
-    expCRaiDF<-QueryControlVariables(varGin,
+    expCRaiDF<-QueryControlVariablesTable(varTable,
                                      "FxCb",
                                      "Ceil",
                                      "CRai"
@@ -468,12 +257,10 @@ FixedPriceComparison<-function(varGin,HypothesisLabel=NA){
     
     
     #Limit just to competed contracts
-    varGin<-setEvidence(varGin, 
-                        nodes=c("Comp"),
-                        states=c("Comp.")
-    )
+    varTable<-subset(varTable, Comp=="Comp.")
     
-    expOffrDF<-QueryControlVariables(varGin,
+    
+    expOffrDF<-QueryControlVariablesTable(varTable,
                                      "FxCb",
                                      "Ceil",
                                      "Offr"
@@ -489,7 +276,7 @@ FixedPriceComparison<-function(varGin,HypothesisLabel=NA){
     
     
     
-    OffrDF<-QueryControlVariables(varGin,
+    OffrDF<-QueryControlVariablesTable(varTable,
                                   "FxCb",
                                   "Ceil",
                                   "Offr"
@@ -526,33 +313,9 @@ FixedPriceComparison<-function(varGin,HypothesisLabel=NA){
 
 
 
-
-FixedPriceCast<-function(ResultsDF){
+FixedPriceHypothesisTable<-function(varTable,HypothesisLabel=NA){
     
-    ResultsDF<-melt(ResultsDF,id=c("Control" , "dVariable" , "Hypothesis" , "iVariable","FxCb"))
-    ResultsDF<-dcast(ResultsDF, Control + dVariable + Hypothesis + iVariable  ~ FxCb +variable
-                     , sum
-                     , value.var="value"
-    )
-    ResultsDF$FixedCostMargin_p<-(ResultsDF[,"Fixed-Price_p"]-ResultsDF[,"Cost-Based_p"])/
-        ResultsDF[,"Cost-Based_p"]
-    ResultsDF$FixedCombMargin_p<-(ResultsDF[,"Fixed-Price_p"]-ResultsDF[,"Combination or Other_p"])/
-        ResultsDF[,"Combination or Other_p"]
-    
-    ResultsDF$FixedCostMargin_Average<-(ResultsDF[,"Fixed-Price_Average"]-ResultsDF[,"Cost-Based_Average"])/
-        ResultsDF[,"Cost-Based_Average"]
-    ResultsDF$FixedCombMargin_Average<-(ResultsDF[,"Fixed-Price_Average"]-ResultsDF[,"Combination or Other_Average"])/
-        ResultsDF[,"Combination or Other_Average"]
-    
-    
-    ResultsDF
-    
-}
-
-
-FixedPriceHypothesisTester<-function(varGin,HypothesisLabel=NA){
-    
-    TermDF<-QueryControlVariables(varGin,
+    TermDF<-QueryControlVariablesTable(varTable,
                                   "FxCb",
                                   "Ceil",
                                   "Term"
@@ -572,7 +335,7 @@ FixedPriceHypothesisTester<-function(varGin,HypothesisLabel=NA){
     
     
     
-    expNChgDF<-QueryControlVariables(varGin,
+    expNChgDF<-QueryControlVariablesTable(varTable,
                                      "FxCb",
                                      "Ceil",
                                      "NChg"
@@ -590,7 +353,7 @@ FixedPriceHypothesisTester<-function(varGin,HypothesisLabel=NA){
     expNChgDF$FixedCombMargin<-expNChgDF[,"Fixed-Price"]/expNChgDF[,"Combination or Other"]
     
     
-    expCRaiDF<-QueryControlVariables(varGin,
+    expCRaiDF<-QueryControlVariablesTable(varTable,
                                      "FxCb",
                                      "Ceil",
                                      "CRai"
@@ -611,12 +374,10 @@ FixedPriceHypothesisTester<-function(varGin,HypothesisLabel=NA){
     
     
     #Limit just to competed contracts
-    varGin<-setEvidence(varGin, 
-                        nodes=c("Comp"),
-                        states=c("Comp.")
-    )
+    varTable<-subset(varTable, Comp=="Comp.")
     
-    expOffrDF<-QueryControlVariables(varGin,
+    
+    expOffrDF<-QueryControlVariablesTable(varTable,
                                      "FxCb",
                                      "Ceil",
                                      "Offr"
@@ -635,7 +396,7 @@ FixedPriceHypothesisTester<-function(varGin,HypothesisLabel=NA){
     
     
     
-    OffrDF<-QueryControlVariables(varGin,
+    OffrDF<-QueryControlVariablesTable(varTable,
                                   "FxCb",
                                   "Ceil",
                                   "Offr"

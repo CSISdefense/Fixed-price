@@ -630,7 +630,7 @@ if (all(levels(CompleteContracts$qHighCeiling)==c("[0.00e+00,1.50e+04)",
                                               "[1.00e+06,1.00e+07)",
                                               "[1.00e+07,7.50e+07)",
                                               "[7.50e+07,3.36e+12]"))){
-    CompleteContracts$qCeiling<-factor(CompleteContracts$qHighCeiling, 
+    CompleteContracts$qHighCeiling<-factor(CompleteContracts$qHighCeiling, 
                                    
                                    levels=c("[0.00e+00,1.50e+04)",
                                               "[1.50e+04,1.00e+05)",
@@ -653,7 +653,7 @@ if (all(levels(CompleteContracts$qLowCeiling)==c("[0.00e+00,1.50e+04)",
                                               "[1.00e+05,1.00e+06)",
                                               "[1.00e+06,3.00e+07)",
                                               "[3.00e+07,3.36e+12]"))){
-    CompleteContracts$qCeiling<-factor(CompleteContracts$qLowCeiling, 
+    CompleteContracts$qLowCeiling<-factor(CompleteContracts$qLowCeiling, 
                                    
                                    levels=c("[0.00e+00,1.50e+04)",
                                               "[1.50e+04,1.00e+05)",
@@ -790,7 +790,7 @@ CompleteContracts$SubCustomer.sum<-droplevels(CompleteContracts$SubCustomer.sum)
 ```
 
 
-```{r Output}
+```{r ModelOutput}
 CompleteModel<-subset(CompleteContracts,select=c(IsIDV,
     FixedOrCost,
     UnmodifiedIsSomeCompetition,
@@ -863,7 +863,7 @@ write.table(CompleteModel
 
 
 
-```{r Detailed}
+```{r DetailedOutput}
 CompleteModelAndDetail<-subset(CompleteContracts,select=c(CSIScontractID,
     IsIDV,
     FixedOrCost,
