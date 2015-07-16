@@ -681,6 +681,78 @@ For this example, we're still using usual R&D rather than excluding R&d7
 ##Results
 The hypothesis is supported with regard to number of offers. Larger fixed-price contracts are more likely to experience single offer competition and are less likely to experience competition with three or more offers. Combination tracks more closely with fixed-price than cost-plus.
 
+
+```{r H1LargeR&Dabsolute}
+
+FixedPriceGin[[1]]$levels$Ceil
+
+RnDfind<- setEvidence(FixedPriceGin, 
+                           nodes=c("PSR"),
+                           states=c("R&D")
+                           )
+
+# NotRnDfind<- setEvidence(FixedPriceGin, 
+#                              nodes=c("PSR"),
+#                              states=c(list(
+#                                  FixedPriceGin[[1]]$levels$PSR[FixedPriceGin[[1]]$levels$PSR!=
+#                                                              "R&D"])))
+# 
+
+
+getEvidence(RnDfind)
+debug(FixedPriceComparison)
+RnDlongDF<-FixedPriceComparison(RnDfind,"R&D")
+
+
+
+
+
+
+#Single Offer Competition
+ggplot(subset(RnDlongDF,dVariable=="% Single Offer Competition"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Freq)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+
+
+#Expected Number of Offers
+ggplot(subset(RnDlongDF,dVariable=="Average Number of Offers for Competed Contracts"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+
+#Expected Number of Changes
+ggplot(subset(RnDlongDF,dVariable=="Average Number of Change Orders"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+#Ceiling Raising Change Orders %
+ggplot(subset(RnDlongDF,dVariable=="Ceiling Raising Change Orders %"),
+        aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+
+#Terminations
+ggplot(subset(RnDlongDF,dVariable=="Terminated"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=p)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+
+
+
+rm(RnDfind,NotRnDfind)
+
+
+``` 
+
+
 ```{r H1LargeR&D}
 
 FixedPriceGin[[1]]$levels$Ceil
@@ -757,78 +829,6 @@ rm(RnDfind,NotRnDfind)
 
 ``` 
 
-
-```{r H1LargeR&Dabsolute}
-
-FixedPriceGin[[1]]$levels$Ceil
-
-
-
-RnDfind<- setEvidence(FixedPriceGin, 
-                           nodes=c("PSR"),
-                           states=c("R&D")
-                           )
-
-# NotRnDfind<- setEvidence(FixedPriceGin, 
-#                              nodes=c("PSR"),
-#                              states=c(list(
-#                                  FixedPriceGin[[1]]$levels$PSR[FixedPriceGin[[1]]$levels$PSR!=
-#                                                              "R&D"])))
-# 
-
-
-getEvidence(RnDfind)
-debug(FixedPriceComparison)
-RnDlongDF<-FixedPriceComparison(RnDfind,"R&D")
-
-
-
-
-
-
-#Single Offer Competition
-ggplot(subset(RnDlongDF,dVariable=="% Single Offer Competition"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Freq)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
-
-
-#Expected Number of Offers
-ggplot(subset(RnDlongDF,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
-
-#Expected Number of Changes
-ggplot(subset(RnDlongDF,dVariable=="Average Number of Change Orders"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
-
-
-#Ceiling Raising Change Orders %
-ggplot(subset(RnDlongDF,dVariable=="Ceiling Raising Change Orders %"),
-        aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
-
-#Terminations
-ggplot(subset(RnDlongDF,dVariable=="Terminated"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
-
-
-
-rm(RnDfind,NotRnDfind)
-
-
-``` 
 
 ##H2: Due to design uncertainty Pre-Milestone B Major Defense Acquisition Programs (MDAPs) are potentially more likely to encounter problems than other fixed-price contracts
 *	Prerequisites for use of fixed-price: "Design content is established and the components are mature technologies. There are no signifi???cant unresolved design issues, no major integration risk, the external interfaces are well defined, and no serious risk exists of unknowns surfacing in developmental testing and causing major redesign." (Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.) {Emphasis added}

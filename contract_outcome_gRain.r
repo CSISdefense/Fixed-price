@@ -36,9 +36,9 @@ StandardizeGRainQuery<-function(varGin,
 }
 
 QueryControlVariables<-function(varGin,
-                        studyVaruableCol,
-                        iVariableCol,
-                        dVariableCol
+                                studyVaruableCol,
+                                iVariableCol,
+                                dVariableCol
 ){
     ResultsDF<-StandardizeGRainQuery(varGin,studyVaruableCol,iVariableCol,dVariableCol)
     
@@ -96,14 +96,14 @@ QueryControlVariables<-function(varGin,
         studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Other IDV")
     )
     
-
+    
     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
         setEvidence(varGin, 
                     nodes=c("Veh"),
                     states= list(c( "Def/Pur" ))),
         studyVaruableCol,iVariableCol,dVariableCol,resultLabel="Def./Pur.")
     )
-
+    
     #LongDur contracts by ceiling
     ResultsDF<-rbind(ResultsDF,StandardizeGRainQuery(
         setEvidence(varGin, 
@@ -144,20 +144,20 @@ QueryControlVariables<-function(varGin,
     
     #Order the Controls, reversed is to put the first entry on top.
     ResultsDF$Control<-factor(ResultsDF$Control,
-                               levels=rev(c("Overall",
-                                            "Aircraft",
-                                            "Not Aircraft",
-                                            "UCA",
-                                            "Not UCA",
-                                            "2+ Year Dur.",
-                                            "<2 Year Dur.",
-                                            "Single-Award IDV",
-                                            "Other IDV",
-                                            "Def./Pur.",
-                                            "Comp.",
-                                            "No Comp."
-                                            )),
-                               ordered=TRUE
+                              levels=rev(c("Overall",
+                                           "Aircraft",
+                                           "Not Aircraft",
+                                           "UCA",
+                                           "Not UCA",
+                                           "2+ Year Dur.",
+                                           "<2 Year Dur.",
+                                           "Single-Award IDV",
+                                           "Other IDV",
+                                           "Def./Pur.",
+                                           "Comp.",
+                                           "No Comp."
+                              )),
+                              ordered=TRUE
     )
     ResultsDF
     
@@ -248,7 +248,7 @@ FixedPriceComparison<-function(varGin,HypothesisLabel=NA){
     OffrDF$dVariable<-"% Single Offer Competition"
     OffrDF$Average<-NA
     ResultsDF<-rbind(TermDF,expOffrDF,OffrDF,expNChgDF,expCRaiDF)
-  
+    
     
     if(!is.na(HypothesisLabel)) ResultsDF$Hypothesis<-HypothesisLabel
     
@@ -273,39 +273,12 @@ FixedPriceComparison<-function(varGin,HypothesisLabel=NA){
 
 
 FixedPriceCast<-function(ResultsDF){
-    
-    TermDF<-QueryControlVariables(varGin,
-                                  "FxCb",
-                                  "Ceil",
-                                  "Term"
+    ResultsDF<-dcast(ResultsDF, Control + dVariable + iVariable ~ FxCb
+                     , identity
+                     , value.var=c("p","Freq","Average")
     )
-    
-    
-    ResultsDF<-dcast(ResultsDF,dVariable + Control + iVariable ~ FxCb
-                     , sum
-                     , value.var="p")
-    TermDF$FixedCostMargin<-TermDF[,"Fixed-Price"]/TermDF[,"Cost-Based"]
-    TermDF$FixedCombMargin<-TermDF[,"Fixed-Price"]/TermDF[,"Combination or Other"]
-        
-    expNChgDF<-dcast(expNChgDF,  iVariable + Control ~ FxCb  , sum, value.var="expNChg")
-    expNChgDF$FixedCostMargin<-expNChgDF[,"Fixed-Price"]/expNChgDF[,"Cost-Based"]
-    expNChgDF$FixedCombMargin<-expNChgDF[,"Fixed-Price"]/expNChgDF[,"Combination or Other"]
-    
-    expCRaiDF<-dcast(expCRaiDF, iVariable + Control~ FxCb, sum, value.var="expCRai")
-    expCRaiDF$FixedCostMargin<-expCRaiDF[,"Fixed-Price"]/expCRaiDF[,"Cost-Based"]
-    expCRaiDF$FixedCombMargin<-expCRaiDF[,"Fixed-Price"]/expCRaiDF[,"Combination or Other"]
-    
-    expOffrDF<-dcast(expOffrDF,  iVariable + Control ~ FxCb  , sum, value.var="expOffr")
-    
-    expOffrDF$FixedCostMargin<-expOffrDF[,"Fixed-Price"]/expOffrDF[,"Cost-Based"]
-    expOffrDF$FixedCombMargin<-expOffrDF[,"Fixed-Price"]/expOffrDF[,"Combination or Other"]
-    
-    # querygrain(varGin, nodes=c("Offr","NChg","CRai","Offr"), type="marginal")
-    OffrDF<-dcast(OffrDF,Offr + Control + iVariable ~ FxCb, sum, value.var="p")
-    OffrDF$FixedCostMargin<-OffrDF[,"Fixed-Price"]/OffrDF[,"Cost-Based"]
-    OffrDF$FixedCombMargin<-OffrDF[,"Fixed-Price"]/OffrDF[,"Combination or Other"]
-    
-    ResultsDF<-rbind(TermDF,expOffrDF,OffrDF,expNChgDF,expCRaiDF)
+    ResultsDF$FixedCostMargin<-ResultsDF[,"Fixed-Price"]/TermDF[,"Cost-Based"]-1
+    ResultsDF$FixedCombMargin<-ResultsDF[,"Fixed-Price"]/TermDF[,"Combination or Other"]-1
     
     
     
@@ -317,9 +290,9 @@ FixedPriceCast<-function(ResultsDF){
 FixedPriceHypothesisTester<-function(varGin,HypothesisLabel=NA){
     
     TermDF<-QueryControlVariables(varGin,
-                                     "FxCb",
-                                     "Ceil",
-                                     "Term"
+                                  "FxCb",
+                                  "Ceil",
+                                  "Term"
     )
     
     
@@ -374,8 +347,8 @@ FixedPriceHypothesisTester<-function(varGin,HypothesisLabel=NA){
     expCRaiDF$FixedCombMargin<-expCRaiDF[,"Fixed-Price"]/expCRaiDF[,"Combination or Other"]
     
     
-
-#Limit just to competed contracts
+    
+    #Limit just to competed contracts
     varGin<-setEvidence(varGin, 
                         nodes=c("Comp"),
                         states=c("Comp.")
@@ -415,11 +388,11 @@ FixedPriceHypothesisTester<-function(varGin,HypothesisLabel=NA){
     OffrDF$FixedCombMargin<-OffrDF[,"Fixed-Price"]/OffrDF[,"Combination or Other"]
     colnames(OffrDF)[colnames(OffrDF)=="Offr"]<-"dVariable"
     OffrDF<-subset(OffrDF,dVariable=="1")
-expNChgDF$dVariable<-"% Single Offer Competition"
+    expNChgDF$dVariable<-"% Single Offer Competition"
     
     ResultsDF<-rbind(TermDF,expOffrDF,OffrDF,expNChgDF,expCRaiDF)
-
-
+    
+    
     if(!is.na(HypothesisLabel)) ResultsDF$Hypothesis<-HypothesisLabel
     
     #Order the ceilings
