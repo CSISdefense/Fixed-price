@@ -190,13 +190,31 @@ quantile(subset(CompleteModelAndDetail$SumOfisChangeOrder,CompleteModelAndDetail
 ecdf(subset(CompleteModelAndDetail$SumOfisChangeOrder,CompleteModelAndDetail$SumOfisChangeOrder>0))(c(0,1,2,3,4))
 
 
+quantile(subset(CompleteModelAndDetail$pChangeOrderUnmodifiedBaseAndAll,CompleteModelAndDetail$SumOfisChangeOrder>0),c(0.25,0.5,0.75,0.9),na.rm=TRUE)
+
 quantile(subset(CompleteModelAndDetail$pChangeOrderObligated,CompleteModelAndDetail$SumOfisChangeOrder>0),c(0.25,0.5,0.75,0.9),na.rm=TRUE)
 
 
-ecdf(subset(CompleteModelAndDetail$pChangeOrderObligated,CompleteModelAndDetail$SumOfisChangeOrder>0))(c(-0.001,0,001,0.05,0.075,0.15))
+ecdf(subset(CompleteModelAndDetail$pChangeOrderUnmodifiedBaseAndAll,CompleteModelAndDetail$SumOfisChangeOrder>0))(
+    c(-0.001,0,0.001,0.05,0.075,0.1,0.11,0.12,0.15))
+
+ecdf(subset(CompleteModelAndDetail$pChangeOrderObligated,CompleteModelAndDetail$SumOfisChangeOrder>0))(
+    c(-0.001,0,0.001,0.05,0.075,0.1,0.11,0.12,0.15))
+
+pChangeOrderUnmodifiedBaseAndAll
 
 
-pChangeOrderObligated
+CompleteModelAndDetail$qCRais <- cut2(
+    CompleteModelAndDetail$pChangeOrderUnmodifiedBaseAndAll,c(
+                                              -0.001,
+                                              0.001,
+                                              0.15)
+    )
+#                                               min(subset(
+#                                                   CompleteContracts$pChangeOrderObligated,
+#                                                   CompleteContracts$pChangeOrderObligated>0)),
+
+summary(subset(CompleteModelAndDetail$qCRais,CompleteContracts$SumOfisChangeOrder>0    ))
 ```
 
 
@@ -224,7 +242,7 @@ The % Growth in Base and All Options Value Amount form Change Orders is calculat
 
 ggplot(
   data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
-  aes_string(x = "pChangeOrderObligated"),
+  aes_string(x = "pChangeOrderUnmodifiedBaseAndAll"),
   ) + geom_bar(bin=0.01) + 
     facet_grid( Ceil ~ .,
                 scales = "free_y",
@@ -238,7 +256,7 @@ names(CompleteModelAndDetail)
 
 ggplot(
   data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
-  aes_string(x = "pChangeOrderObligated")
+  aes_string(x = "pChangeOrderUnmodifiedBaseAndAll")
   )+ geom_bar()+
 #     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)")
     scale_y_continuous("Number of Contracts with Change Orders")+
@@ -250,7 +268,7 @@ ggplot(
 
 ggplot(
   data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
-  aes_string(x = "pChangeOrderObligated",weight="pContract")
+  aes_string(x = "pChangeOrderUnmodifiedBaseAndAll",weight="pContract")
   )+ geom_bar()+
 #     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)")
     scale_y_continuous("Percent of Contracts with Change Orders", labels=percent)+

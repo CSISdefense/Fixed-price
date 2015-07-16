@@ -225,36 +225,47 @@ CompleteContracts$UnmodifiedDays<-as.numeric(
              , unit="days"
              ))+1
 
-
-CDuration<-as.duration(strptime(CompleteContracts$UnmodifiedCurrentCompletionDate,"%Y-%m-%d")-
-                strptime(CompleteContracts$MinOfEffectiveDate,"%Y-%m-%d"))
-
-CPeriod<-as.period(
-    CInterval<-new_interval(ymd(CompleteContracts$UnmodifiedCurrentCompletionDate),
-                ymd(CompleteContracts$MinOfEffectiveDate))
-
-%/%dyears(1)
-
-summary(dYears)
+# 
+# CDuration<-as.duration(strptime(CompleteContracts$UnmodifiedCurrentCompletionDate,"%Y-%m-%d")-
+#                 strptime(CompleteContracts$MinOfEffectiveDate,"%Y-%m-%d"))
+# 
+# CPeriod<-as.period(
+#     CInterval<-new_interval(ymd(CompleteContracts$UnmodifiedCurrentCompletionDate),
+#                 ymd(CompleteContracts$MinOfEffectiveDate))
+# 
+# 
+# 
+# summary(dYears)
 
 #Break the count of days into four categories.
 CompleteContracts$qDuration<-cut2(CompleteContracts$UnmodifiedDays,cuts=c(61,214,366,732))
-#(15000,100000,1000000,30000000)
-roundedcutoffs<-c(15000,100000,1000000,10000000,75000000)
-CompleteContracts$qCeiling <- cut2(CompleteContracts$UnmodifiedContractBaseAndAllOptionsValue,cuts=roundedcutoffs)
-rm(roundedcutoffs)
+lowroundedcutoffs<-c(15000,100000,1000000,30000000)
+highroundedcutoffs<-c(15000,100000,1000000,10000000,75000000)
+CompleteContracts$qLowCeiling <- cut2(CompleteContracts$UnmodifiedContractBaseAndAllOptionsValue,cuts=lowroundedcutoffs)
+CompleteContracts$qHighCeiling <- cut2(CompleteContracts$UnmodifiedContractBaseAndAllOptionsValue,cuts=highroundedcutoffs)
+rm(lowroundedcutoffs,highroundedcutoffs)
+
 
 CompleteContracts$qLinked <- cut2(CompleteContracts$LinkedContracts,cuts=c(1,750))
 
 CompleteContracts$qNChg <- cut2(CompleteContracts$SumOfisChangeOrder,c(1,2,3))
 
-CompleteContracts$pChangeOrderObligated<-CompleteContracts$ChangeOrderObligatedAmount/CompleteContracts$Action.Obligation
+
+CompleteContracts$pChangeOrderObligated<-CompleteContracts$ChangeOrderObligatedAmount/
+    CompleteContracts$Action.Obligation
+CompleteContracts$pChangeOrderObligated[is.na(CompleteContracts$pChangeOrderObligated)&
+                                            CompleteContracts$SumOfisChangeOrder==0]<-0
+CompleteContracts$pChangeOrderUnmodifiedBaseAndAll<-CompleteContracts$ChangeOrderBaseAndAllOptionsValue/
+    CompleteContracts$UnmodifiedContractBaseAndAllOptionsValue
+CompleteContracts$pChangeOrderUnmodifiedBaseAndAll[is.na(CompleteContracts$pChangeOrderUnmodifiedBaseAndAll)&
+                                            CompleteContracts$SumOfisChangeOrder==0]<-0
+
 
 CompleteContracts$qCRais <- cut2(
-    CompleteContracts$pChangeOrderObligated,c(
+    CompleteContracts$pChangeOrderUnmodifiedBaseAndAll,c(
                                               -0.001,
                                               0.001,
-                                              0.12)
+                                              0.15)
     )
 #                                               min(subset(
 #                                                   CompleteContracts$pChangeOrderObligated,
@@ -573,8 +584,6 @@ CompleteContracts$PlatformPortfolio.sum[CompleteContracts$pIsFRSnC>=0.75&
                                             CompleteContracts$PlatformPortfolio.sum=="Unlabeled"]<-"Facilities and Construction"
 
 
-CompleteContracts$pChangeOrderUnmodifiedBaseAndAll<-CompleteContracts$ChangeOrderBaseAndAllOptionsValue/CompleteContracts$UnmodifiedContractBaseAndAllOptionsValue
-
 
 
 #IsSomeCompetition Impute missing values when labeled entries have a consistent value.
@@ -615,13 +624,13 @@ CompleteContracts$qOffers[is.na(CompleteContracts$qOffers)&
                           ]<-"1"
 
 
-if (all(levels(CompleteContracts$qCeiling)==c("[0.00e+00,1.50e+04)",
+if (all(levels(CompleteContracts$qHighCeiling)==c("[0.00e+00,1.50e+04)",
                                               "[1.50e+04,1.00e+05)",
                                               "[1.00e+05,1.00e+06)",
                                               "[1.00e+06,1.00e+07)",
                                               "[1.00e+07,7.50e+07)",
                                               "[7.50e+07,3.36e+12]"))){
-    CompleteContracts$qCeiling<-factor(CompleteContracts$qCeiling, 
+    CompleteContracts$qCeiling<-factor(CompleteContracts$qHighCeiling, 
                                    
                                    levels=c("[0.00e+00,1.50e+04)",
                                               "[1.50e+04,1.00e+05)",
@@ -638,7 +647,27 @@ if (all(levels(CompleteContracts$qCeiling)==c("[0.00e+00,1.50e+04)",
                                    ordered=TRUE
                                    )
     }
-             
+
+if (all(levels(CompleteContracts$qLowCeiling)==c("[0.00e+00,1.50e+04)",
+                                              "[1.50e+04,1.00e+05)",
+                                              "[1.00e+05,1.00e+06)",
+                                              "[1.00e+06,3.00e+07)",
+                                              "[3.00e+07,3.36e+12]"))){
+    CompleteContracts$qCeiling<-factor(CompleteContracts$qLowCeiling, 
+                                   
+                                   levels=c("[0.00e+00,1.50e+04)",
+                                              "[1.50e+04,1.00e+05)",
+                                              "[1.00e+05,1.00e+06)",
+                                              "[1.00e+06,3.00e+07)",
+                                              "[3.00e+07,3.36e+12]"),
+                                   labels=c("[0,15k)",
+                                            "[15k,100k)",
+                                            "[100k,1m)",
+                                            "[1m,30m)",
+                                            "[30m+]"),
+                                   ordered=TRUE
+                                   )
+    }
 
 
 if (all(levels(CompleteContracts$qDuration)==c("[    0,   61)",
@@ -772,7 +801,8 @@ CompleteModel<-subset(CompleteContracts,select=c(IsIDV,
     PlatformPortfolio.sum,
     AnyInternational,
     SimpleArea,
-    qCeiling,
+    qLowCeiling,
+    qHighCeiling,
     qDuration,
     qOffers,
     SimpleVehicle,
@@ -792,7 +822,8 @@ colnames(CompleteModel)[colnames(CompleteModel)=="IsIDV"]<-"IDV"
 colnames(CompleteModel)[colnames(CompleteModel)=="FixedOrCost"]<-"FxCb"
 colnames(CompleteModel)[colnames(CompleteModel)=="AnyInternational"]<-"Intl"
 colnames(CompleteModel)[colnames(CompleteModel)=="SimpleArea"]<-"PSR"
-colnames(CompleteModel)[colnames(CompleteModel)=="qCeiling"]<-"Ceil"
+colnames(CompleteModel)[colnames(CompleteModel)=="qLowCeiling"]<-"LowCeil"
+colnames(CompleteModel)[colnames(CompleteModel)=="qHighCeiling"]<-"Ceil"
 colnames(CompleteModel)[colnames(CompleteModel)=="qLinked"]<-"Link"
 colnames(CompleteModel)[colnames(CompleteModel)=="qDuration"]<-"Dur"
 # colnames(CompleteModel)[colnames(CompleteModel)=="SingleOffer"]<-"One"
@@ -840,12 +871,13 @@ CompleteModelAndDetail<-subset(CompleteContracts,select=c(CSIScontractID,
     #                                 Comp,
     qLinked,
     LabeledMDAP,
-    unmodifiedSystemEquipmentCode
+    unmodifiedSystemequipmentcode,
     SubCustomer.sum,
     PlatformPortfolio.sum,
     AnyInternational,
     SimpleArea,
-    qCeiling,
+    qLowCeiling,
+    qHighCeiling,
     qDuration,
     SingleOffer,
     qOffers,
@@ -867,22 +899,22 @@ CompleteModelAndDetail<-subset(CompleteContracts,select=c(CSIScontractID,
     )
 # 
     names(CompleteContracts)
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SubCustomer.sum"]<-"Who"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="UnmodifiedIsSomeCompetition"]<-"Comp"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="PlatformPortfolio.sum"]<-"What"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsIDV"]<-"IDV"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="FixedOrCost"]<-"FxCb"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="AnyInternational"]<-"Intl"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleArea"]<-"PSR"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qCeiling"]<-"Ceil"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qLinked"]<-"Link"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qDuration"]<-"Dur"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SingleOffer"]<-"One"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qOffers"]<-"Offr"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsTerminated"]<-"Term"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleVehicle"]<-"Veh"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SoftwareEng"]<-"Soft"
-colnames(CompleteModel)[colnames(CompleteModel)=="LabeledMDAP"]<-"MDAP"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SubCustomer.sum"]<-"Who"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="UnmodifiedIsSomeCompetition"]<-"Comp"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="PlatformPortfolio.sum"]<-"What"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsIDV"]<-"IDV"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="FixedOrCost"]<-"FxCb"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="AnyInternational"]<-"Intl"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleArea"]<-"PSR"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qCeiling"]<-"Ceil"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qLinked"]<-"Link"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qDuration"]<-"Dur"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SingleOffer"]<-"One"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qOffers"]<-"Offr"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsTerminated"]<-"Term"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleVehicle"]<-"Veh"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SoftwareEng"]<-"Soft"
+# colnames(CompleteModel)[colnames(CompleteModel)=="LabeledMDAP"]<-"MDAP"
 
 
 write.table(CompleteModelAndDetail

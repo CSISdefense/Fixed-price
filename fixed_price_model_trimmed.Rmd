@@ -114,7 +114,7 @@ ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="FxCb"))
 ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="Link"))
 ContractWL<-rbind(ContractWL,data.frame(from="FxCb",to="Offr"))
 ContractWL<-rbind(ContractWL,data.frame(from="What",to="Link"))
-# ContractWL<-rbind(ContractWL,data.frame(from="Who",to="Intl"))
+
 ContractWL<-rbind(ContractWL,data.frame(from="Who",to="What"))
 ContractWL<-rbind(ContractWL,data.frame(from="Veh",to="Ceil"))
 ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="FxCb"))
@@ -122,6 +122,10 @@ ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="FxCb"))
 ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="Soft"))
 ContractWL<-rbind(ContractWL,data.frame(from="UCA",to="Veh"))
 ContractWL<-rbind(ContractWL,data.frame(from="MDAP",to="Link"))
+#Adding links to offers
+ContractWL<-rbind(ContractWL,data.frame(from="UCA",to="Offr")) #Less appealing
+ContractWL<-rbind(ContractWL,data.frame(from="MDAP",to="Offr")) #Fewer eligible vendors
+ContractWL<-rbind(ContractWL,data.frame(from="Soft",to="Offr")) #Fewer eligible vendors
 
 
 #Adding links to Terminations
@@ -131,27 +135,28 @@ ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="Term")) #Bigger, termina
 ContractWL<-rbind(ContractWL,data.frame(from="CRai",to="Term")) #Overruns increase risk of termination
 ContractWL<-rbind(ContractWL,data.frame(from="Intl",to="Term")) #Outside factors can drive international cancellation
 
-ContractWL<-rbind(ContractWL,data.frame(from="Soft",to="Term")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="UCA",to="Term")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="What",to="Term")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="Veh",to="Term")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="Term")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="MDAP",to="Term")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="Comp",to="Term")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="Soft",to="Term")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="UCA",to="Term")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="What",to="Term")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="Veh",to="Term")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="Term")) #Covering all hypotheses and controls
+ContractWL<-rbind(ContractWL,data.frame(from="MDAP",to="Term")) #Major cancellations can cascade
+# ContractWL<-rbind(ContractWL,data.frame(from="Comp",to="Term")) #Covering all hypotheses and controls
 
 #Adding links to Number of Change Orders
 ContractWL<-rbind(ContractWL,data.frame(from="Dur",to="NChg")) #Longer greater risk of cancellation
 ContractWL<-rbind(ContractWL,data.frame(from="FxCb",to="NChg")) #Less flexible contract type
 ContractWL<-rbind(ContractWL,data.frame(from="Intl",to="NChg")) #Outside factors can drive international cancellation
+ContractWL<-rbind(ContractWL,data.frame(from="UCA",to="NChg")) #Greater uncertainty with UCAs
 
-ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="NChg"))  #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="Soft",to="NChg")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="UCA",to="NChg")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="What",to="NChg")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="Veh",to="NChg")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="NChg")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="MDAP",to="NChg")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="Comp",to="NChg")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="NChg"))  #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="Soft",to="NChg")) #Covering all hypotheses and controls
+
+# ContractWL<-rbind(ContractWL,data.frame(from="What",to="NChg")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="Veh",to="NChg")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="NChg")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="MDAP",to="NChg")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="Comp",to="NChg")) #Covering all hypotheses and controls
 
 
 #Adding links to Number of Ceiling Raising Change orders
@@ -161,14 +166,14 @@ ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="CRai")) #Large contracts
 
 
 
-ContractWL<-rbind(ContractWL,data.frame(from="Dur",to="CRai")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="Soft",to="CRai")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="UCA",to="CRai")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="What",to="CRai")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="Veh",to="CRai")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="CRai")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="MDAP",to="CRai")) #Covering all hypotheses and controls
-ContractWL<-rbind(ContractWL,data.frame(from="Comp",to="CRai")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="Dur",to="CRai")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="Soft",to="CRai")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="UCA",to="CRai")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="What",to="CRai")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="Veh",to="CRai")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="PSR",to="CRai")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="MDAP",to="CRai")) #Covering all hypotheses and controls
+# ContractWL<-rbind(ContractWL,data.frame(from="Comp",to="CRai")) #Covering all hypotheses and controls
 
 
 bnWhitelist <- empty.graph(nodes = names(ContractModel))
@@ -397,7 +402,7 @@ With those two connections in hand, all three Bayesian Learning algorith were ap
 ```{r FirstTest, echo = TRUE}
 #White list, connections that must occur
 iamb_dug<-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=TRUE, alpha=0.001)
-
+undirected.arcs(iamb_dug)
 attrs<-list(node=list(fontsize=27))
 graphviz.plot(iamb_dug,main="First Test")
 
@@ -418,10 +423,11 @@ The first round produces multiple warnings because the networks produced produce
 #White list, connections that must occur
 
 #Resolving cases where one or both arcs are oriented in opposite directions.
-ContractWL<-rbind(ContractWL,data.frame(from="Veh",to="FxCb"))
+# ContractWL<-rbind(ContractWL,data.frame(from="Veh",to="FxCb"))
 ContractWL<-rbind(ContractWL,data.frame(from="Veh",to="Dur"))
-ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="Dur"))
-
+# ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="Dur"))
+ContractWL<-rbind(ContractWL,data.frame(from="Who",to="Intl"))
+ContractWL<-rbind(ContractWL,data.frame(to="Intl",from="What"))
 ``` 
 
 
@@ -547,7 +553,7 @@ The other alternative within the package, a min-max parents and childrens approa
 
 ```{r BayesianExecutionRd3, echo = TRUE}
 
-uinteriamb3_dug00001<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.000001)
+uinteriamb3_dug00001<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.01)
  
 # all.equal(uinteriamb3_dug00001,iamb_dug)
 
@@ -580,7 +586,7 @@ graphviz.plot(uinteriamb3_dug00001,main="Unoptimized Interleaved Incremental Ass
 ```{r BayesianCompilation, echo = TRUE}
 FixedPriceNetwork<-uinteriamb3_dug00001
 modelstring(FixedPriceNetwork)
-
+# plot(FixedPriceNetwork,"dot")
 # CompetitionFitted<-bn.fit(x=FixedNetwork,data=ContractModel,method="bayes")
 # summary(ContractModel)
 # cpquery(CompetitionFitted, 
@@ -636,9 +642,76 @@ require(gRain)
 # cad.cpt <- extractCPT(ContractModel, as.graphNEL(FixedNetwork), smooth = 0.001)
 # FixedPriceGin <- grain(compileCPT(cad.cpt))
 
-FixedPriceGin <- grain(as.graphNEL(FixedPriceNetwork), data=ContractModel, smooth = 0.0000001)
+FixedPriceGin <- grain(as.graphNEL(FixedPriceNetwork), data=ContractModel, smooth = 0.000000001)
 summary(FixedPriceGin)
 save(FixedPriceGin,file="Output//FixedPriceGin.RData")
 ```
 
+```{r Fewervariables}
+
+names(ContractModel)
+
+reduced<-subset(ContractModel,select=-c(Soft,MDAP))
+droplist<-c("Soft","MDAP","IDV","UCA")
+reducedWhitelist<-subset(ContractWL,(!from %in% droplist) & (!to %in% droplist)  )
+reducedBlacklist<-subset(ContractBL,(!from %in% droplist) & (!to %in% droplist)  )
+
+reduceduinteriamb3_dug<-inter.iamb(reduced,blacklist=reducedBlacklist,whitelist=reducedWhitelist,optimized=FALSE)
+modelstring(reduceduinteriamb3_dug)
+undirected.arcs(reduceduinteriamb3_dug)
+ReducedFixedPriceGin <- grain(as.graphNEL(reduceduinteriamb3_dug), data=ContractModel, smooth = 0.00000001)
+save(ReducedFixedPriceGin,file="Output//ReducedFixedPriceGin.RData")
+is.pdag(reduceduinteriamb3_dug)
+
+querygrain(FixedPriceGin,
+           nodes=c("Offr"),
+           type="marginal")
+
+
+querygrain(ReducedFixedPriceGin,
+           nodes=c("Offr"),
+           type="marginal")
+prop<-table(subset(ContractModel,  select = Offr))
+prop/sum(prop)
+
+
+querygrain(FixedPriceGin,
+           nodes=c("NChg"),
+           type="marginal")
+
+querygrain(ReducedFixedPriceGin,
+           nodes=c("NChg"),
+           type="marginal")
+
+prop<-table(subset(ContractModel,  select = NChg))
+prop/sum(prop)
+
+
+querygrain(FixedPriceGin,
+           nodes=c("CRai"),
+           type="marginal")
+
+
+querygrain(ReducedFixedPriceGin,
+           nodes=c("CRai"),
+           type="marginal")
+
+
+prop<-table(subset(ContractModel,  select = CRai))
+prop/sum(prop)
+
+
+querygrain(FixedPriceGin,
+           nodes=c("Term"),
+           type="marginal")
+
+querygrain(ReducedFixedPriceGin,
+           nodes=c("Term"),
+           type="marginal")
+
+prop<-table(subset(ContractModel,  select = Term))
+prop/sum(prop)
+
+
+```
 

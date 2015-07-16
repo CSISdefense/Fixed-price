@@ -44,23 +44,68 @@ Describe contract vehicle here.
 
 
 ```{r BayesianCompilation, echo = TRUE}
+load("Output\\FixedPriceGin.Rdata",.GlobalEnv)
 load("Output\\compGin.Rdata",.GlobalEnv)
-# cad.cpt <- extractCPT(ContractModel, as.graphNEL(CompetitionNetwork), smooth = 0.001)
-# compGin <- grain(compileCPT(cad.cpt))
 
-summary(compGin)
-# str(compGin$universe$levels["FxCb"])
+zipfile<-unz("Data\\defense_contract_CSIScontractID_model.zip",
+        "defense_contract_CSIScontractID_model.csv")
+
+CompleteModel  <- read.csv(
+    zipfile,
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+ContractModel<-subset(ContractModel,select=-c(IDV))
+
+
+summary(FixedPriceGin)
+# str(FixedPriceGin$universe$levels["FxCb"])
 # cost.list <- list(nodes = c("FxCb"),
 #                         states = c("Cost-Based"))
-# cost.find <- setEvidence(compGin, 
+# cost.find <- setEvidence(FixedPriceGin, 
 #                         nodes=cost.list$nodes,
 #                         states=cost.list$states)
 # fixed.list<-list(nodes = c("FxCb"),
 #                         states = c("Fixed-Price"))
-# fixed.find <- setEvidence(compGin, 
+# fixed.find <- setEvidence(FixedPriceGin, 
 #                         nodes=fixed.list$nodes,
 #                         states=fixed.list$states)
 # 
+
+
+# read in the data and convert to a data frame (the csv file being read does not have the header row)
+
+# select subsets of rows fixing a pair of variables 
+# and count occurrences of Offr bins
+
+short_cb = table(subset(ContractModel, Dur == "(~2 years+]" & FxCb == "Cost-Based", select = Offr))
+short_fx =  
+
+Compare sort_cb/sum(short_cb), for example, to the output of the Bayes net when the Dur and FxCb evidence are set appropriately
+
+The way to check that they are identical is to use the vector or Offr probabilities p_short_cb (of size 4) produced by the Bayes net
+
+chisq.test(short_cb, p = p_short_cb)
+
+To compare the effect of the pricing structure on the number of offers one could compute
+
+chisq.test(short_cb, p = short_fx/sum(short_fx))
+
+In my experience, the subsets are so large that most p-values will be vanishingly small so all differences are significant.
+
+# compute the approximate average number of offers
+mean_short_cb = (short_cb[1] + 2*short_cb[2] + 4*short_cb[3] + 5*short_cb[4])/sum(short_cb)
+mean_short_fx = (short_fx[1] + 2*short_fx[2] + 4*short_fx[3] + 5*short_fx[4])/sum(short_fx)
+
+You could then say, for example, that switching from the Cost-Based to Fixed-Priced model will get you on average
+
+100*(mean_short_fx - mean_short_cb)/mean_short_cb % 
+
+more offers.
+
+You could slice the dice the dataset by fixing more variables.  In each case it would be good to compare the Bayes net output to pure counts.
+
 
 
 ```
@@ -95,14 +140,16 @@ The hypothesis does hold weakly for contracts under $15k, although larger contra
 
 ```{r C1Ceil}
 
-compGin[[1]]$levels$Ceil
+FixedPriceGin[[1]]$levels$Ceil
 
 # debug(OffersHypothesisTester)
-SizeDF<-FixedPriceHypothesisTester(compGin)
+SizeDF<-FixedPriceHypothesisTester(FixedPriceGin)
 #No redundant tests to remove
+inuous(labels = percent_format())
+
 
 #Single Offer Competition
-ggplot(subset(SizeDF,dVariable=="1"),
+ggplot(subset(SizeDF,dVariable=="% Single Offer Competition"),
        aes(x=Control,y=FixedCostMargin)
        )+
     geom_point()+
@@ -110,14 +157,14 @@ ggplot(subset(SizeDF,dVariable=="1"),
 
 
 #Expected Number of Offers
-ggplot(subset(SizeDF,dVariable=="Expected Number of Offers"),
+ggplot(subset(SizeDF,dVariable=="Average Number of Offers for Competed Contracts"),
        aes(x=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 
 #Expected Number of Changes
-ggplot(subset(SizeDF,dVariable=="Expected Number of Changes"),
+ggplot(subset(SizeDF,dVariable="Average Number of Change Orders"),
        aes(x=Control,y=FixedCostMargin)
        )+
     geom_point()+
@@ -162,9 +209,9 @@ As expected, numbers of offers are far higher with non-aircraft, for both compet
 ```{r C2Aircraft}
 
 
-compGin[[1]]$levels$What
+FixedPriceGin[[1]]$levels$What
 
-AircraftFind<- setEvidence(compGin, 
+AircraftFind<- setEvidence(FixedPriceGin, 
                            nodes=c("What"),
                            states=c("Aircraft and Drones")
                            )
@@ -173,10 +220,10 @@ getEvidence(AircraftFind)
 pEvidence(AircraftFind)
 
 
-NotAircraftFind<- setEvidence(compGin, 
+NotAircraftFind<- setEvidence(FixedPriceGin, 
                               nodes=c("What"),
-                              states=list(compGin[[1]]$levels$What[
-                                  compGin[[1]]$levels$What!="Aircraft and Drones"]))
+                              states=list(FixedPriceGin[[1]]$levels$What[
+                                  FixedPriceGin[[1]]$levels$What!="Aircraft and Drones"]))
 
 
 getEvidence(NotAircraftFind)
@@ -194,7 +241,7 @@ AircraftDF<-subset(AircraftDF,
 
 
 #Single Offer Competition
-ggplot(subset(AircraftDF,dVariable=="1"),
+ggplot(subset(AircraftDF,dVariable=="% Single Offer Competition"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -202,14 +249,14 @@ ggplot(subset(AircraftDF,dVariable=="1"),
 
 
 #Expected Number of Offers
-ggplot(subset(AircraftDF,dVariable=="Expected Number of Offers"),
+ggplot(subset(AircraftDF,dVariable=="Average Number of Offers for Competed Contracts"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 
 #Expected Number of Changes
-ggplot(subset(AircraftDF,dVariable=="Expected Number of Changes"),
+ggplot(subset(AircraftDF,dVariable="Average Number of Change Orders"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -271,27 +318,108 @@ The analysis indicates validates this past finding, IDVs are marketedly more lik
 
 ```{r C3UCA}
 
+FixedPriceGin[[1]]$levels$UCA
+
+
+
+UCAFind<- setEvidence(FixedPriceGin, 
+                      nodes=c("UCA"),
+                      states=c("UCA" )
+                      )
+
+getEvidence(UCAFind)
+
+NotUCAFind<- setEvidence(FixedPriceGin, 
+                      nodes=c("UCA"),
+                      states= list(c( "Not UCA" ))
+                      )
+
+getEvidence(NotUCAFind)
+
+
+
+
+# undebug(FixedPriceHypothesisTester)
+UCAdf<-FixedPriceHypothesisTester(UCAFind,"UCA")
+UCAdf<-rbind(UCAdf,
+                 FixedPriceHypothesisTester(NotUCAFind,"Not UCA")
+                 )
+
+
+#Remove redundant tests
+UCAdf<-subset(UCAdf,
+                  !Control %in% unique(UCAdf$Hypothesis))
+
+
+#Single Offer Competition
+ggplot(subset(UCAdf,dVariable=="% Single Offer Competition"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+
+
+#Expected Number of Offers
+ggplot(subset(UCAdf,dVariable=="Average Number of Offers for Competed Contracts"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+
+#Expected Number of Changes
+ggplot(subset(UCAdf,dVariable="Average Number of Change Orders"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+
+
+#Ceiling Raising Change Orders %
+ggplot(subset(UCAdf,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+
+
+
+#Terminations
+ggplot(subset(UCAdf,dVariable=="Terminated"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+
+
+
 ```
 
 
 ```{r C4Vehicle}
 
-compGin[[1]]$levels$IDV
+FixedPriceGin[[1]]$levels$Veh
 
-IDVFind<- setEvidence(compGin, 
-                      nodes=c("IDV"),
-                      states=c("IDV")
+
+
+SACFind<- setEvidence(FixedPriceGin, 
+                      nodes=c("Veh"),
+                      states=c("SINGLE AWARD" )
                       )
 
-getEvidence(IDVFind)
+getEvidence(SACFind)
+
+OtherIDVFind<- setEvidence(FixedPriceGin, 
+                      nodes=c("Veh"),
+                      states= list(c( "MULTIPLE AWARD", "Other IDV" ))
+                      )
+
+getEvidence(OtherIDVFind)
 
 
 
-AwardFind<- setEvidence(compGin, 
-                        nodes=c("IDV"),
-                        states=c(list(
-                            compGin[[1]]$levels$IDV[compGin[[1]]$levels$IDV!=
-                                                        "IDV"]))
+AwardFind<- setEvidence(FixedPriceGin, 
+                        nodes=c("Veh"),
+                        states=c( "Def/Pur" )
                         )
 
 getEvidence(AwardFind)
@@ -300,8 +428,9 @@ getEvidence(AwardFind)
 
 
 
-VehicleDF<-FixedPriceHypothesisTester(IDVFind,"IDV")
+VehicleDF<-FixedPriceHypothesisTester(SACFind,"Single-Award IDV")
 VehicleDF<-rbind(VehicleDF,
+                 FixedPriceHypothesisTester(OtherIDVFind,"Other IDV"),
                  FixedPriceHypothesisTester(AwardFind,"Award")
                  )
 
@@ -312,7 +441,7 @@ VehicleDF<-subset(VehicleDF,
 
 
 #Single Offer Competition
-ggplot(subset(VehicleDF,dVariable=="1"),
+ggplot(subset(VehicleDF,dVariable=="% Single Offer Competition"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -320,14 +449,14 @@ ggplot(subset(VehicleDF,dVariable=="1"),
 
 
 #Expected Number of Offers
-ggplot(subset(VehicleDF,dVariable=="Expected Number of Offers"),
+ggplot(subset(VehicleDF,dVariable=="Average Number of Offers for Competed Contracts"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 
 #Expected Number of Changes
-ggplot(subset(VehicleDF,dVariable=="Expected Number of Changes"),
+ggplot(subset(VehicleDF,dVariable="Average Number of Change Orders"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -372,29 +501,22 @@ rm(IDVFind,AwardFind)
 
 ```{r C5LongDur}
 
-compGin[[1]]$levels$Dur
+FixedPriceGin[[1]]$levels$Dur
 
-LongDurFind<- setEvidence(compGin, 
+LongDurFind<- setEvidence(FixedPriceGin, 
                           nodes=c("Dur"),
-                          states=c("[  366,33192]")
+                          states=c("(~2 years+]")
                           )
 
 getEvidence(LongDurFind)
 
-
-NotLongDurFind<- setEvidence(compGin, 
-                             nodes=c("Dur"),
-                             states=c(list(
-                                 compGin[[1]]$levels$Dur[compGin[[1]]$levels$Dur!=
-                                                             "[  366,33192]"]))
-                             )
 
 
 
 
 LongDurDF<-FixedPriceHypothesisTester(LongDurFind,"Long Dur.")
 LongDurDF<-rbind(LongDurDF,
-                 FixedPriceHypothesisTester(NotLongDurFind,"Not Long Dur.")
+                 FixedPriceHypothesisTester(FixedPriceGin,"Population")
                  )
 
 
@@ -404,7 +526,7 @@ LongDurDF<-subset(LongDurDF,
 
 
 #Single Offer Competition
-ggplot(subset(LongDurDF,dVariable=="1"),
+ggplot(subset(LongDurDF,dVariable=="% Single Offer Competition"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -412,14 +534,14 @@ ggplot(subset(LongDurDF,dVariable=="1"),
 
 
 #Expected Number of Offers
-ggplot(subset(LongDurDF,dVariable=="Expected Number of Offers"),
+ggplot(subset(LongDurDF,dVariable=="Average Number of Offers for Competed Contracts"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 
 #Expected Number of Changes
-ggplot(subset(LongDurDF,dVariable=="Expected Number of Changes"),
+ggplot(subset(LongDurDF,dVariable="Average Number of Change Orders"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -444,7 +566,7 @@ ggplot(subset(LongDurDF,dVariable=="Terminated"),
 
 
 
-rm(LongDurFind,NotLongDurFind)
+rm(LongDurFind)
 
 ``` 
 
@@ -464,26 +586,22 @@ Incentive was not included in the initial model because it made up a small propo
 
 ```{r C6Comp}
 
-compGin[[1]]$levels$Comp
+FixedPriceGin[[1]]$levels$Comp
 
 
-CompFind<-setEvidence(compGin, 
+CompFind<-setEvidence(FixedPriceGin, 
                       nodes=c("Comp"),
                       states=c("Comp.")
                       )
 
 getEvidence(CompFind)
 
-NotCompFind<-setEvidence(compGin, 
-                         nodes=c("Comp"),
-                         states=c("No Comp.")
-                         )
-getEvidence(NotCompFind)
+
 
 
 CompDF<-FixedPriceHypothesisTester(CompFind,"Comp.")
 CompDF<-rbind(CompDF,
-                 FixedPriceHypothesisTester(NotCompFind,"Not Comp.")
+                 FixedPriceHypothesisTester("Comp.","Population")
                  )
 
 
@@ -497,7 +615,7 @@ CompDF<-subset(CompDF,
 
 
 #Single Offer Competition
-ggplot(subset(CompDF,dVariable=="1"),
+ggplot(subset(CompDF,dVariable=="% Single Offer Competition"),
        aes(x=Control,y=FixedCostMargin)
        )+
     geom_point()+
@@ -505,14 +623,14 @@ ggplot(subset(CompDF,dVariable=="1"),
 
 
 #Expected Number of Offers
-ggplot(subset(CompDF,dVariable=="Expected Number of Offers"),
+ggplot(subset(CompDF,dVariable=="Average Number of Offers for Competed Contracts"),
        aes(x=Control,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 
 #Expected Number of Changes
-ggplot(subset(CompDF,dVariable=="Expected Number of Changes"),
+ggplot(subset(CompDF,dVariable="Average Number of Change Orders"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -565,17 +683,17 @@ The hypothesis is supported with regard to number of offers. Larger fixed-price 
 
 ```{r H1LargeR&D}
 
-levels(compGin[[1]]$levels$Ceil)
+FixedPriceGin[[1]]$levels$Ceil
 
-RnDfind<- setEvidence(compGin, 
+RnDfind<- setEvidence(FixedPriceGin, 
                            nodes=c("PSR"),
                            states=c("R&D")
                            )
 
-# NotRnDfind<- setEvidence(compGin, 
+# NotRnDfind<- setEvidence(FixedPriceGin, 
 #                              nodes=c("PSR"),
 #                              states=c(list(
-#                                  compGin[[1]]$levels$PSR[compGin[[1]]$levels$PSR!=
+#                                  FixedPriceGin[[1]]$levels$PSR[FixedPriceGin[[1]]$levels$PSR!=
 #                                                              "R&D"])))
 # 
 
@@ -584,17 +702,17 @@ getEvidence(RnDfind)
 
 RnDdf<-FixedPriceHypothesisTester(RnDfind,"R&D")
 RnDdf<-rbind(RnDdf,
-                  FixedPriceHypothesisTester(compGin,"Population")
+                  FixedPriceHypothesisTester(FixedPriceGin,"Population")
                   )
 
 
 #Remove redundant tests
 RnDdf<-subset(RnDdf,
                    !Control %in% unique(RnDdf$Hypothesis))
-
+RnDdf$Hypothesis<-factor(RnDdf$Hypothesis,levels=c("R&D","Population"),ordered=TRUE)
 
 #Single Offer Competition
-ggplot(subset(RnDdf,dVariable=="1"),
+ggplot(subset(RnDdf,dVariable=="% Single Offer Competition"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -602,14 +720,14 @@ ggplot(subset(RnDdf,dVariable=="1"),
 
 
 #Expected Number of Offers
-ggplot(subset(RnDdf,dVariable=="Expected Number of Offers"),
+ggplot(subset(RnDdf,dVariable=="Average Number of Offers for Competed Contracts"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 
 #Expected Number of Changes
-ggplot(subset(RnDdf,dVariable=="Expected Number of Changes"),
+ggplot(subset(RnDdf,dVariable="Average Number of Change Orders"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -639,6 +757,79 @@ rm(RnDfind,NotRnDfind)
 
 ``` 
 
+
+```{r H1LargeR&Dabsolute}
+
+FixedPriceGin[[1]]$levels$Ceil
+
+
+
+RnDfind<- setEvidence(FixedPriceGin, 
+                           nodes=c("PSR"),
+                           states=c("R&D")
+                           )
+
+# NotRnDfind<- setEvidence(FixedPriceGin, 
+#                              nodes=c("PSR"),
+#                              states=c(list(
+#                                  FixedPriceGin[[1]]$levels$PSR[FixedPriceGin[[1]]$levels$PSR!=
+#                                                              "R&D"])))
+# 
+
+
+getEvidence(RnDfind)
+debug(FixedPriceComparison)
+RnDlongDF<-FixedPriceComparison(RnDfind,"R&D")
+
+
+
+
+
+
+#Single Offer Competition
+ggplot(subset(RnDlongDF,dVariable=="% Single Offer Competition"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Freq)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+
+
+#Expected Number of Offers
+ggplot(subset(RnDlongDF,dVariable=="Average Number of Offers for Competed Contracts"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+
+#Expected Number of Changes
+ggplot(subset(RnDlongDF,dVariable=="Average Number of Change Orders"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+#Ceiling Raising Change Orders %
+ggplot(subset(RnDlongDF,dVariable=="Ceiling Raising Change Orders %"),
+        aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+
+#Terminations
+ggplot(subset(RnDlongDF,dVariable=="Terminated"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=p)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+
+
+
+rm(RnDfind,NotRnDfind)
+
+
+``` 
+
 ##H2: Due to design uncertainty Pre-Milestone B Major Defense Acquisition Programs (MDAPs) are potentially more likely to encounter problems than other fixed-price contracts
 *	Prerequisites for use of fixed-price: "Design content is established and the components are mature technologies. There are no signifi???cant unresolved design issues, no major integration risk, the external interfaces are well defined, and no serious risk exists of unknowns surfacing in developmental testing and causing major redesign." (Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.) {Emphasis added}
 *	Dependent Variables:
@@ -656,38 +847,36 @@ The hypothesis was not supported with regard to number of offers, but this shoul
 
 ```{r H2MDAP}
 
-levels(compGin[[1]]$levels$Link)
+FixedPriceGin[[1]]$levels$MDAP
 
-HighLinkFind<- setEvidence(compGin, 
-                           nodes=c("Link"),
-                           states=c("[  750,67263]")
+MDAPFind<- setEvidence(FixedPriceGin, 
+                           nodes=c("MDAP"),
+                           states=c( "Labeled MDAP" )
                            )
 
 
-NotHighLinkFind<- setEvidence(compGin, 
-                             nodes=c("Link"),
-                             states=c(list(
-                                 compGin[[1]]$levels$Link[compGin[[1]]$levels$Link!=
-                                                             "[  750,67263]"])))
+NotMDAPFind<- setEvidence(FixedPriceGin, 
+                             nodes=c("MDAP"),
+                             states=c("No label"))
 
 
-getEvidence(HighLinkFind)
+getEvidence(MDAPFind)
 
 
 
-HighLinkDF<-FixedPriceHypothesisTester(HighLinkFind,"High Link")
-HighLinkDF<-rbind(HighLinkDF,
-                  FixedPriceHypothesisTester(compGin,"Population")
+MDAPdf<-FixedPriceHypothesisTester(MDAPFind,"MDAP")
+MDAPdf<-rbind(MDAPdf,
+                  FixedPriceHypothesisTester(FixedPriceGin,"Population")
                   )
-
+MDAPdf$Hypothesis<-factor(MDAPdf$Hypothesis,levels=c("MDAP","Population"),ordered=TRUE)
 
 #Remove redundant tests
-HighLinkDF<-subset(HighLinkDF,
-                   !Control %in% unique(HighLinkDF$Hypothesis))
+MDAPdf<-subset(MDAPdf,
+                   !Control %in% unique(MDAPdf$Hypothesis))
 
 
 #Single Offer Competition
-ggplot(subset(HighLinkDF,dVariable=="1"),
+ggplot(subset(MDAPdf,dVariable=="% Single Offer Competition"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -695,14 +884,14 @@ ggplot(subset(HighLinkDF,dVariable=="1"),
 
 
 #Expected Number of Offers
-ggplot(subset(HighLinkDF,dVariable=="Expected Number of Offers"),
+ggplot(subset(MDAPdf,dVariable=="Average Number of Offers for Competed Contracts"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 
 #Expected Number of Changes
-ggplot(subset(HighLinkDF,dVariable=="Expected Number of Changes"),
+ggplot(subset(MDAPdf,dVariable="Average Number of Change Orders"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -710,7 +899,7 @@ ggplot(subset(HighLinkDF,dVariable=="Expected Number of Changes"),
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(HighLinkDF,dVariable=="Ceiling Raising Change Orders %"),
+ggplot(subset(MDAPdf,dVariable=="Ceiling Raising Change Orders %"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -719,7 +908,7 @@ ggplot(subset(HighLinkDF,dVariable=="Ceiling Raising Change Orders %"),
 
 
 #Terminations
-ggplot(subset(HighLinkDF,dVariable=="Terminated"),
+ggplot(subset(MDAPdf,dVariable=="Terminated"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -727,7 +916,7 @@ ggplot(subset(HighLinkDF,dVariable=="Terminated"),
 
 
 
-rm(HighLinkFind,NotHighLinkFind)
+rm(MDAPFind,NotMDAPFind)
 
 
 ``` 
@@ -749,32 +938,24 @@ The hypothesis regarding number of offers was not supported at the greater than 
 
 ```{r H3LongDur}
 
-compGin[[1]]$levels$Dur
+FixedPriceGin[[1]]$levels$Dur
 
-LongDurFind<- setEvidence(compGin, 
+LongDurFind<- setEvidence(FixedPriceGin, 
                           nodes=c("Dur"),
-                          states=c("[  366,33192]")
+                          states=c("(~2 years+]")
                           )
 
 getEvidence(LongDurFind)
 
 
 
-NotLongDurFind<- setEvidence(compGin, 
-                             nodes=c("Dur"),
-                             states=c(list(
-                                 compGin[[1]]$levels$Dur[compGin[[1]]$levels$Dur!=
-                                                             "[  366,33192]"]))
-                             )
-
-
-
-
 LongDurDF<-FixedPriceHypothesisTester(LongDurFind,"Long Dur.")
 LongDurDF<-rbind(LongDurDF,
-                 FixedPriceHypothesisTester(compGin,"Population")
+                 FixedPriceHypothesisTester(FixedPriceGin,"Population")
                  )
 
+
+LongDurDF$Hypothesis<-factor(LongDurDFf$Hypothesis,levels=c("Long Dur.","Population"),ordered=TRUE)
 
 #Remove redundant tests
 LongDurDF<-subset(LongDurDF,
@@ -782,7 +963,7 @@ LongDurDF<-subset(LongDurDF,
 
 
 #Single Offer Competition
-ggplot(subset(LongDurDF,dVariable=="1"),
+ggplot(subset(LongDurDF,dVariable=="% Single Offer Competition"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -790,14 +971,14 @@ ggplot(subset(LongDurDF,dVariable=="1"),
 
 
 #Expected Number of Offers
-ggplot(subset(LongDurDF,dVariable=="Expected Number of Offers"),
+ggplot(subset(LongDurDF,dVariable=="Average Number of Offers for Competed Contracts"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 
 #Expected Number of Changes
-ggplot(subset(LongDurDF,dVariable=="Expected Number of Changes"),
+ggplot(subset(LongDurDF,dVariable="Average Number of Change Orders"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -843,28 +1024,25 @@ This hypothesis is requires incorporation of the next two dependent variables in
 
 ```{r H4Comp}
 
-compGin[[1]]$levels$Comp
+FixedPriceGin[[1]]$levels$Comp
 
 
-CompFind<-setEvidence(compGin, 
+CompFind<-setEvidence(FixedPriceGin, 
                       nodes=c("Comp"),
                       states=c("Comp.")
                       )
 
 getEvidence(CompFind)
 
-NotCompFind<-setEvidence(compGin, 
-                         nodes=c("Comp"),
-                         states=c("No Comp.")
-                         )
-getEvidence(NotCompFind)
 
 
 CompDF<-FixedPriceHypothesisTester(CompFind,"Comp.")
 CompDF<-rbind(CompDF,
-                 FixedPriceHypothesisTester(compGin,"Population")
+                 FixedPriceHypothesisTester(FixedPriceGin,"Population")
                  )
 
+
+CompDF$Hypothesis<-factor(CompDF$Hypothesis,levels=c("Comp.","Population"),ordered=TRUE)
 
 #Remove redundant tests
 CompDF<-subset(CompDF,
@@ -876,7 +1054,7 @@ CompDF<-subset(CompDF,
 
 
 #Expected Number of Changes
-ggplot(subset(CompDF,dVariable=="Expected Number of Changes"),
+ggplot(subset(CompDF,dVariable="Average Number of Change Orders"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -924,11 +1102,11 @@ Electronics and communications services do have a slight preference for fixed-pr
 
 ```{r H5Software}
 
-levels(compGin[[1]]$levels$PSR)
+FixedPriceGin[[1]]$levels$Soft
 
-SoftwareFind<- setEvidence(compGin, 
-                           nodes=c("What","PSR"),
-                           states=c("Electronics and Communications","Services"))
+SoftwareFind<- setEvidence(FixedPriceGin, 
+                           nodes=c("Soft"),
+                           states=c("Possible Software Eng."))
 
 
 getEvidence(SoftwareFind)
@@ -937,11 +1115,13 @@ getEvidence(SoftwareFind)
 
 
 
-SoftwareDF<-FixedPriceHypothesisTester(SoftwareFind,"Software")
+SoftwareDF<-FixedPriceHypothesisTester(SoftwareFind,"Possible Software Eng.")
 SoftwareDF<-rbind(SoftwareDF,
-                  FixedPriceHypothesisTester(compGin,"Population")
+                  FixedPriceHypothesisTester(FixedPriceGin,"Population")
                   )
 
+
+SoftwareDF$Hypothesis<-factor(SoftwareDF$Hypothesis,levels=c("Comp.","Possible Software Eng."),ordered=TRUE)
 
 #Remove redundant tests
 SoftwareDF<-subset(SoftwareDF,
@@ -949,7 +1129,7 @@ SoftwareDF<-subset(SoftwareDF,
 
 
 #Single Offer Competition
-ggplot(subset(SoftwareDF,dVariable=="1"),
+ggplot(subset(SoftwareDF,dVariable=="% Single Offer Competition"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
@@ -957,14 +1137,14 @@ ggplot(subset(SoftwareDF,dVariable=="1"),
 
 
 #Expected Number of Offers
-ggplot(subset(SoftwareDF,dVariable=="Expected Number of Offers"),
+ggplot(subset(SoftwareDF,dVariable=="Average Number of Offers for Competed Contracts"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
 
 #Expected Number of Changes
-ggplot(subset(SoftwareDF,dVariable=="Expected Number of Changes"),
+ggplot(subset(SoftwareDF,dVariable="Average Number of Change Orders"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
        )+
     geom_point()+
