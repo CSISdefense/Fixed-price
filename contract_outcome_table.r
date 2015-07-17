@@ -205,10 +205,61 @@ QueryControlVariablesTable<-function(varTable,
                               )),
                               ordered=TRUE
     )
+    ResultsDF<-AddZerosForMissingFreqs(ResultsDF,dVariableCol)
+    
+    
+
+    
+    ResultsDF$iVariable<-revalue(ResultsDF$iVariable, c("[15k,100k)"="[0,100k)","[0,15k)"="[0,100k)"))
+    
+    
+    
+    #Order the ceilings
+    ResultsDF$iVariable<-factor(ResultsDF$iVariable,
+                                levels=c("[75m+]",
+                                         "[10m,75m)",
+                                         "[1m,10m)",
+                                         "[100k,1m)",
+                                         "[0,100k)"
+                                         
+                                         
+                                ),
+                                labels=c("[75m+]",
+                                         "[10m,75m)",
+                                         "[1m,10m)",
+                                         "[100k,1m)",
+                                         "[0,100k)"
+                                         ),
+                                ordered=TRUE
+    )
+    
+    ResultsDF<-ddply(ResultsDF,c("FxCb","Control","iVariable",dVariableCol),summarise,Freq=sum(Freq))
+    
+    
     ResultsDF
+
+    
     
 }
 
+
+AddZerosForMissingFreqs<-function(resultsDF,dVariableCol){
+    
+    
+    #Add rows with zeros for combinations that do not exist in the model, e.g. terminated cost plus $75+
+    #but that do have corresponding contracts in other categoreis.
+    zeroDF<-ddply(resultsDF,.(FxCb,Control,iVariable),summarise,Freq=0)
+    #     blankDF<-resultsDF[0,]
+    for(i in levels(resultsDF[,dVariableCol])){
+        newrows<-zeroDF
+        newrows[,dVariableCol]<-i
+        resultsDF<-rbind(resultsDF,
+                         newrows)
+    }
+    #Merge those zero lines into existing rows. This means most of them go away.
+    resultsDF<-ddply(resultsDF,c("FxCb","Control","iVariable",dVariableCol),summarise,Freq=sum(Freq))
+    resultsDF
+}
 
 
 FixedPriceComparisonTable<-function(varTable,HypothesisLabel=NA){
@@ -219,7 +270,7 @@ FixedPriceComparisonTable<-function(varTable,HypothesisLabel=NA){
                                   "Term"
     )
     
-    
+        
     TermDF<-ddply(TermDF,.(FxCb,Control,iVariable),transform,p=Freq/sum(Freq))
     colnames(TermDF)[colnames(TermDF)=="Term"]<-"dVariable"
     TermDF<-subset(TermDF,dVariable=="Terminated")
@@ -231,6 +282,8 @@ FixedPriceComparisonTable<-function(varTable,HypothesisLabel=NA){
                                      "Ceil",
                                      "NChg"
     )
+
+    
     
     expNChgDF<-ddply(expNChgDF,.(FxCb,Control,iVariable),transform,p=Freq/sum(Freq))
     expNChgDF$Average[expNChgDF$NChg=="   0"]<-0
@@ -283,7 +336,6 @@ FixedPriceComparisonTable<-function(varTable,HypothesisLabel=NA){
     )
     
     
-    colnames(OffrDF)[colnames(OffrDF)=="Ceil"]<-"iVariable"
     OffrDF<-ddply(OffrDF,.(FxCb,Control,iVariable),transform,p=Freq/sum(Freq))
     colnames(OffrDF)[colnames(OffrDF)=="Offr"]<-"dVariable"
     OffrDF<-subset(OffrDF,dVariable=="1")
@@ -294,17 +346,6 @@ FixedPriceComparisonTable<-function(varTable,HypothesisLabel=NA){
     
     if(!is.na(HypothesisLabel)) ResultsDF$Hypothesis<-HypothesisLabel
     
-    #Order the ceilings
-    ResultsDF$iVariable<-factor(ResultsDF$iVariable,
-                                levels=c("[75m+]",
-                                         "[10m,75m)",
-                                         "[1m,10m)",
-                                         "[100k,1m)",
-                                         "[15k,100k)",
-                                         "[0,15k)"
-                                ),
-                                ordered=TRUE
-    )
     
     
     ResultsDF
@@ -417,18 +458,7 @@ FixedPriceHypothesisTable<-function(varTable,HypothesisLabel=NA){
     
     if(!is.na(HypothesisLabel)) ResultsDF$Hypothesis<-HypothesisLabel
     
-    #Order the ceilings
-    ResultsDF$iVariable<-factor(ResultsDF$iVariable,
-                                levels=c("[75m+]",
-                                         "[10m,75m)",
-                                         "[1m,10m)", 
-                                         "[100k,1m)",
-                                         "[15k,100k)",
-                                         "[0,15k)"
-                                ),
-                                ordered=TRUE
-    )
-    
+
     
     ResultsDF
     
