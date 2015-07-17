@@ -1,12 +1,12 @@
 ---
 output:
-html_document:
-fig_caption: yes
-fig_height: 3
-fig_width: 7.5
-keep_md: yes
-self_contained: no
-toc: yes
+  html_document:
+    fig_caption: yes
+    fig_height: 3.5
+    fig_width: 7.5
+    keep_md: yes
+    self_contained: no
+    toc: yes
 ---
 
 ```{r hiddensetup, echo = FALSE}
@@ -48,16 +48,37 @@ Describe contract vehicle here.
 load("Output\\FixedPriceGin.Rdata",.GlobalEnv)
 load("Output\\compGin.Rdata",.GlobalEnv)
 
-zipfile<-unz("Data\\defense_contract_CSIScontractID_model.zip",
-             "defense_contract_CSIScontractID_model.csv")
+# zipfile<-unz("Data\\defense_contract_CSIScontractID_model.zip",
+#              "defense_contract_CSIScontractID_model.csv")
 
-CompleteModel  <- read.csv(
-    zipfile,
+ContractModel  <- read.csv(
+#     zipfile,
+    "Data\\defense_contract_CSIScontractID_model.csv",
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
     stringsAsFactors = TRUE
     )
-ContractModel<-subset(ContractModel,select=-c(IDV))
+
+ContractModel$Count<-1
+names(ContractModel)
+
+dropped<-subset(ContractModel,!complete.cases(ContractModel)|
+                    Intl=="Unlabeled"|
+                    PSR =="Mixed or Unlabeled" |
+                    Who=="Uncategorized" |
+                    What =="Unlabeled")
+
+ContractModel<-subset(ContractModel,complete.cases(ContractModel)&
+                          Intl!="Unlabeled"&
+                          PSR !="Mixed or Unlabeled"&
+                          Who!="Uncategorized" & 
+                          What!="Unlabeled")
+
+ContractModel$Intl<-droplevels(ContractModel$Intl)
+ContractModel$PSR<-droplevels(ContractModel$PSR)
+ContractModel$Who<-droplevels(ContractModel$Who)
+ContractModel$What<-droplevels(ContractModel$What)
+ContractModel$Comp<-droplevels(ContractModel$Comp)
 
 
 ModelSummary<-ddply(ContractModel,
@@ -119,7 +140,9 @@ summary(FixedPriceGin)
 # You could slice the dice the dataset by fixing more variables.  In each case it would be good to compare the Bayes net output to pure counts.
 # 
 # 
-# PopulationLongDF<-FixedPriceComparison(FixedPriceGin,"Population")
+
+PopulationLongDF<-FixedPriceComparisonTable(ModelSummary,
+                                "Population")
 # StandardizeTableChiSquared(ContractModel,
 #                            FixedPriceGin,
 #                            "Term"
@@ -894,54 +917,52 @@ MDAPFind<- setEvidence(FixedPriceGin,
                        nodes=c("MDAP"),
                        states=c( "Labeled MDAP" ))
 
-MDAPlongDF<-FixedPriceComparisonTable(subset(ModelSummary,PSR=="MDAP"),
+MDAPlongDF<-FixedPriceComparisonTable(subset(ModelSummary,MDAP=="Labeled MDAP"),
                                 "Labeled MDAP")
 
 
 
 #Remove redundant tests
-MDAPwideDF<-subset(MDAPwideDF,
-                   !Control %in% unique(MDAPwideDF$Hypothesis))
-MDAPwideDF$Hypothesis<-factor(MDAPwideDF$Hypothesis,levels=c("MDAP","Population"),ordered=TRUE)
+MDAPlongDF<-subset(MDAPlongDF,
+                   !Control %in% unique(MDAPlongDF$Hypothesis))
+MDAPlongDF$Hypothesis<-factor(MDAPlongDF$Hypothesis,levels=c("MDAP","Population"),ordered=TRUE)
 
 #Single Offer Competition
-ggplot(subset(MDAPwideDF,dVariable=="% Single Offer Competition"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+ggplot(subset(MDAPlongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Freq)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
 
 
 #Average Number of Offers
-ggplot(subset(MDAPwideDF,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+ggplot(subset(MDAPlongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())
 
 #Average Number of Changes
-ggplot(subset(MDAPwideDF,dVariable="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+ggplot(subset(MDAPlongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(MDAPwideDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+ggplot(subset(MDAPlongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
-
-
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
 
 #Terminations
-ggplot(subset(MDAPwideDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+ggplot(subset(MDAPlongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
 
 
 ```                      
@@ -949,7 +970,7 @@ ggplot(subset(MDAPwideDF,dVariable=="Terminated"),
 
 ```{r H2MDAP}
 
-RnDwideDF<-FixedPriceCast(rbind(MDAPlongDF,PopulationLongDF))
+MDAPwideDF<-FixedPriceCast(rbind(MDAPlongDF,PopulationLongDF))
 
 MDAPwideDF$Hypothesis<-factor(MDAPwideDF$Hypothesis,levels=c("MDAP","Population"),ordered=TRUE)
 
@@ -999,7 +1020,7 @@ ggplot(subset(MDAPwideDF,dVariable=="Terminated"),
 
 
 
-rm(MDAPFind,NotMDAPFind)
+rm(MDAPFind)
 
 
 ```                       
@@ -1032,13 +1053,13 @@ LongDurFind<- setEvidence(FixedPriceGin,
 
 getEvidence(LongDurFind)
 
-LongDurLongDF<-FixedPriceComparisonTable(subset(ModelSummary,PSR=="Dur"),
-                                "(~2 years+]")
+LongDurLongDF<-FixedPriceComparisonTable(subset(ModelSummary,Dur=="(~2 years+]"),
+                                "Long Dur")
 
 
 
 
-LongDurLongDF$Hypothesis<-factor(LongDurLongDFf$Hypothesis,levels=c("Long Dur.","Population"),ordered=TRUE)
+LongDurLongDF$Hypothesis<-factor(LongDurLongDF$Hypothesis,levels=c("Long Dur.","Population"),ordered=TRUE)
 
 #Remove redundant tests
 LongDurLongDF<-subset(LongDurLongDF,
@@ -1046,56 +1067,54 @@ LongDurLongDF<-subset(LongDurLongDF,
 
 
 #Single Offer Competition
-ggplot(subset(LongDurLongDF,dVariable=="% Single Offer Competition"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+ggplot(subset(LongDurLongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Freq)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
 
 
 #Average Number of Offers
-ggplot(subset(LongDurLongDF,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+ggplot(subset(LongDurLongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())
 
 #Average Number of Changes
-ggplot(subset(LongDurLongDF,dVariable="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+ggplot(subset(LongDurLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(LongDurLongDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+ggplot(subset(LongDurLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
-
-
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
 
 #Terminations
-ggplot(subset(LongDurLongDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+ggplot(subset(LongDurLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
 
 
 
-rm(LongDurFind,NotLongDurFind)
+rm(LongDurFind)
 
 ``` 
 
 ```{r H3LongDur}
 
-LongDurwideDF<-FixedPriceCast(rbind(LongDurlongDF,PopulationLongDF))
+LongDurWideDF<-FixedPriceCast(rbind(LongDurLongDF,PopulationLongDF))
 
 
-LongDurWideDF$Hypothesis<-factor(LongDurWideDFf$Hypothesis,levels=c("Long Dur.","Population"),ordered=TRUE)
+LongDurWideDF$Hypothesis<-factor(LongDurWideDF$Hypothesis,levels=c("Long Dur.","Population"),ordered=TRUE)
 
 #Remove redundant tests
 LongDurWideDF<-subset(LongDurWideDF,
@@ -1143,7 +1162,6 @@ ggplot(subset(LongDurWideDF,dVariable=="Terminated"),
 
 
 
-rm(LongDurFind,NotLongDurFind)
 
 ``` 
 
@@ -1177,13 +1195,11 @@ getEvidence(CompFind)
 
 
 
-CompLongDF<-FixedPriceHypothesisTester(CompFind,"Comp.")
-CompLongDF<-rbind(CompLongDF,
-              FixedPriceHypothesisTester(FixedPriceGin,"Population")
-              )
+CompLongDF<-FixedPriceComparisonTable(subset(ModelSummary,Comp=="Comp."),
+                                      "Comp.")
 
 
-CompLongDF$Hypothesis<-factor(CompLongDF$Hypothesis,levels=c("Comp.","Population"),ordered=TRUE)
+
 
 #Remove redundant tests
 CompLongDF<-subset(CompLongDF,
@@ -1195,47 +1211,39 @@ CompLongDF<-subset(CompLongDF,
 
 
 #Average Number of Changes
-ggplot(subset(CompLongDF,dVariable="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+ggplot(subset(CompLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(CompLongDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+ggplot(subset(CompLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
-
-
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
 
 #Terminations
-ggplot(subset(CompLongDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+ggplot(subset(CompLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
 
 
 
-rm(CompFind,NotCompFind)
+rm(CompFind)
 
 ``` 
 
 
 ```{r H4Comp}
 
-LongDurwideDF<-FixedPriceCast(rbind(LongDurlongDF,
-                                    subset(PopulationLongDF,Comp=="Comp."))
+CompWideDF<-FixedPriceCast(rbind(CompLongDF,
+                                    PopulationLongDF))
 
-CompFind<-setEvidence(FixedPriceGin, 
-                      nodes=c("Comp"),
-                      states=c("Comp.")
-                      )
-
-getEvidence(CompFind)
 
 
 CompWideDF$Hypothesis<-factor(CompWideDF$Hypothesis,levels=c("Comp.","Population"),ordered=TRUE)
@@ -1310,11 +1318,10 @@ getEvidence(SoftwareFind)
 
 
 
+SoftwareLongDF<-FixedPriceComparisonTable(subset(ModelSummary,Soft=="Possible Software Eng."),
+                                      "Possible \nSoftware Eng.")
 
-SoftwareLongDF<-FixedPriceHypothesisTester(SoftwareFind,"Possible Software Eng.")
-SoftwareLongDF<-rbind(SoftwareLongDF,
-                  FixedPriceHypothesisTester(FixedPriceGin,"Population")
-                  )
+
 
 
 SoftwareLongDF$Hypothesis<-factor(SoftwareLongDF$Hypothesis,levels=c("Comp.","Possible Software Eng."),ordered=TRUE)
@@ -1325,44 +1332,41 @@ SoftwareLongDF<-subset(SoftwareLongDF,
 
 
 #Single Offer Competition
-ggplot(subset(SoftwareLongDF,dVariable=="% Single Offer Competition"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+ggplot(subset(SoftwareLongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Freq)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
 
 
 #Average Number of Offers
-ggplot(subset(SoftwareLongDF,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+ggplot(subset(SoftwareLongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())
 
 #Average Number of Changes
-ggplot(subset(SoftwareLongDF,dVariable="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+ggplot(subset(SoftwareLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(SoftwareLongDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+ggplot(subset(SoftwareLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
-
-
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
 
 #Terminations
-ggplot(subset(SoftwareLongDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+ggplot(subset(SoftwareLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
-
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
 
 
 rm(SoftwareFind)
@@ -1372,26 +1376,11 @@ rm(SoftwareFind)
 
 ```{r H5Software}
 
-FixedPriceGin[[1]]$levels$Soft
 
-SoftwareFind<- setEvidence(FixedPriceGin, 
-                           nodes=c("Soft"),
-                           states=c("Possible Software Eng."))
+SoftwareWideDF<-FixedPriceCast(rbind(SoftwareLongDF,PopulationLongDF))
 
 
-getEvidence(SoftwareFind)
-
-
-
-
-
-SoftwareWideDF<-FixedPriceHypothesisTester(SoftwareFind,"Possible Software Eng.")
-SoftwareWideDF<-rbind(SoftwareWideDF,
-                  FixedPriceHypothesisTester(FixedPriceGin,"Population")
-                  )
-
-
-SoftwareWideDF$Hypothesis<-factor(SoftwareWideDF$Hypothesis,levels=c("Comp.","Possible Software Eng."),ordered=TRUE)
+SoftwareWideDF$Hypothesis<-factor(SoftwareWideDF$Hypothesis,levels=c("Possible \nSoftware Eng.","Population"),ordered=TRUE)
 
 #Remove redundant tests
 SoftwareWideDF<-subset(SoftwareWideDF,
@@ -1438,8 +1427,6 @@ ggplot(subset(SoftwareWideDF,dVariable=="Terminated"),
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
-
-rm(SoftwareFind)
 
 ``` 
 

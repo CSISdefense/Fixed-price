@@ -297,8 +297,8 @@ FixedPriceComparisonTable<-function(varTable,HypothesisLabel=NA){
     #Order the ceilings
     ResultsDF$iVariable<-factor(ResultsDF$iVariable,
                                 levels=c("[75m+]",
-                                         "[1m,10m)", 
                                          "[10m,75m)",
+                                         "[1m,10m)",
                                          "[100k,1m)",
                                          "[15k,100k)",
                                          "[0,15k)"
