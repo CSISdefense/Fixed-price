@@ -53,31 +53,168 @@ Describe contract vehicle here.
 
 
 ```r
+load("Output\\FixedPriceGin.Rdata",.GlobalEnv)
 load("Output\\compGin.Rdata",.GlobalEnv)
-# cad.cpt <- extractCPT(ContractModel, as.graphNEL(CompetitionNetwork), smooth = 0.001)
-# compGin <- grain(compileCPT(cad.cpt))
 
-summary(compGin)
+# zipfile<-unz("Data\\defense_contract_CSIScontractID_model.zip",
+#              "defense_contract_CSIScontractID_model.csv")
+
+ContractModel  <- read.csv(
+#     zipfile,
+    "Data\\defense_contract_CSIScontractID_model.csv",
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+
+ContractModel$Count<-1
+names(ContractModel)
+```
+
+```
+##  [1] "IDV"     "FxCb"    "Comp"    "Link"    "MDAP"    "Who"     "What"   
+##  [8] "Intl"    "PSR"     "LowCeil" "Ceil"    "Dur"     "Offr"    "Veh"    
+## [15] "Term"    "Soft"    "UCA"     "CRai"    "NChg"    "Count"
+```
+
+```r
+dropped<-subset(ContractModel,!complete.cases(ContractModel)|
+                    Intl=="Unlabeled"|
+                    PSR =="Mixed or Unlabeled" |
+                    Who=="Uncategorized" |
+                    What =="Unlabeled")
+
+ContractModel<-subset(ContractModel,complete.cases(ContractModel)&
+                          Intl!="Unlabeled"&
+                          PSR !="Mixed or Unlabeled"&
+                          Who!="Uncategorized" & 
+                          What!="Unlabeled")
+
+ContractModel$Intl<-droplevels(ContractModel$Intl)
+ContractModel$PSR<-droplevels(ContractModel$PSR)
+ContractModel$Who<-droplevels(ContractModel$Who)
+ContractModel$What<-droplevels(ContractModel$What)
+ContractModel$Comp<-droplevels(ContractModel$Comp)
+
+
+ModelSummary<-ddply(ContractModel,
+                    .(FxCb,Comp,Link,MDAP,Who,What,Intl,PSR,Ceil,Dur,Offr,Veh,Term,Soft,UCA,CRai,NChg),
+                    summarise,
+                    Count=sum(Count)
+                    )
+
+ModelSummary$Freq<-ModelSummary$Count/sum(ModelSummary$Count)
+
+
+
+
+summary(FixedPriceGin)
 ```
 
 ```
 ## Independence network: Compiled: FALSE Propagated: FALSE 
-##  Nodes : Named chr [1:14] "IDV" "FxCb" "Comp" "Link" "Who" "What" ...
-##  - attr(*, "names")= chr [1:14] "IDV" "FxCb" "Comp" "Link" ...
+##  Nodes : Named chr [1:17] "FxCb" "Comp" "Link" "MDAP" "Who" "What" ...
+##  - attr(*, "names")= chr [1:17] "FxCb" "Comp" "Link" "MDAP" ...
 ```
 
 ```r
-# str(compGin$universe$levels["FxCb"])
+# str(FixedPriceGin$universe$levels["FxCb"])
 # cost.list <- list(nodes = c("FxCb"),
 #                         states = c("Cost-Based"))
-# cost.find <- setEvidence(compGin, 
+# cost.find <- setEvidence(FixedPriceGin, 
 #                         nodes=cost.list$nodes,
 #                         states=cost.list$states)
 # fixed.list<-list(nodes = c("FxCb"),
 #                         states = c("Fixed-Price"))
-# fixed.find <- setEvidence(compGin, 
+# fixed.find <- setEvidence(FixedPriceGin, 
 #                         nodes=fixed.list$nodes,
 #                         states=fixed.list$states)
+# 
+
+
+# read in the data and convert to a data frame (the csv file being read does not have the header row)
+
+# select subsets of rows fixing a pair of variables 
+# and count occurrences of Offr bins
+# 
+# short_cb = table(subset(ContractModel, Dur == "(~2 years+]" & FxCb == "Cost-Based", select = Offr))
+# short_fx =  
+#     
+#     Compare sort_cb/sum(short_cb), for example, to the output of the Bayes net when the Dur and FxCb evidence are set appropriately
+# 
+# The way to check that they are identical is to use the vector or Offr probabilities p_short_cb (of size 4) produced by the Bayes net
+# 
+# chisq.test(short_cb, p = p_short_cb)
+# 
+# To compare the effect of the pricing structure on the number of offers one could compute
+# 
+# chisq.test(short_cb, p = short_fx/sum(short_fx))
+# 
+# In my experience, the subsets are so large that most p-values will be vanishingly small so all differences are significant.
+# 
+# # compute the approximate average number of offers
+# mean_short_cb = (short_cb[1] + 2*short_cb[2] + 4*short_cb[3] + 5*short_cb[4])/sum(short_cb)
+# mean_short_fx = (short_fx[1] + 2*short_fx[2] + 4*short_fx[3] + 5*short_fx[4])/sum(short_fx)
+# 
+# You could then say, for example, that switching from the Cost-Based to Fixed-Priced model will get you on average
+# 
+# 100*(mean_short_fx - mean_short_cb)/mean_short_cb % 
+# 
+# more offers.
+# 
+# You could slice the dice the dataset by fixing more variables.  In each case it would be good to compare the Bayes net output to pure counts.
+# 
+# 
+
+PopulationLongDF<-FixedPriceComparisonTable(ModelSummary,
+                                "Population")
+# StandardizeTableChiSquared(ContractModel,
+#                            FixedPriceGin,
+#                            "Term"
+#                            )
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            FixedPriceGin,
+#                            "Offr"
+#                            )
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            FixedPriceGin,
+#                            "CRai"
+#                            )
+# 
+# StandardizeTableChiSquared(subset(ContractModel,PSR=="R&D"&FxCb=="Fixed-Price"),
+#                            setEvidence(FixedPriceGin, 
+#                            nodes=c("PSR","FxCb"),
+#                            states=c("R&D","Cost-Based")
+#                            ),
+#                            "Term"
+#                            )
+# debug(StandardizeTableChiSquared)
+# StandardizeTableChiSquared(subset(ContractModel,PSR=="Products"&FxCb=="Fixed-Price"),
+#                            setEvidence(FixedPriceGin, 
+#                            nodes=c("PSR","FxCb"),
+#                            states=c("R&D","Cost-Based")
+#                            ),
+#                            "Term"
+#                            )
+# 
+# 
+# StandardizeTableChiSquared(subset(ContractModel,PSR=="R&D"&FxCb=="Cost-Based"),
+#                            setEvidence(FixedPriceGin, 
+#                            nodes=c("PSR","FxCb"),
+#                            states=c("R&D","Cost-Based")
+#                            ),
+#                            "Term"
+#                            )
+# 
+# StandardizeTableChiSquared(subset(ContractModel,PSR=="R&D"&FxCb=="Fixed-Price"),
+#                            setEvidence(FixedPriceGin, 
+#                            nodes=c("PSR","FxCb"),
+#                            states=c("R&D","Fixed-Price")
+#                            ),
+#                            "Term"
+#                            )
 # 
 ```
 
@@ -111,71 +248,55 @@ The hypothesis does hold weakly for contracts under $15k, although larger contra
 
 
 ```r
-compGin[[1]]$levels$Ceil
+# 
+# FixedPriceGin[[1]]$levels$Ceil
+# 
+# # debug(OffersHypothesisTester)
+# SizeDF<-FixedPriceHypothesisTester(FixedPriceGin)
+# #No redundant tests to remove
+# inuous(labels = percent_format())
+# 
+# 
+# #Single Offer Competition
+# ggplot(subset(SizeDF,dVariable=="% Single Offer Competition"),
+#        aes(x=Control,y=FixedCostMargin_p)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# #Average Number of Offers
+# ggplot(subset(SizeDF,dVariable=="Average Number of Offers for Competed Contracts"),
+#        aes(x=Control,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# #Average Number of Changes
+# ggplot(subset(SizeDF,dVariable="Average Number of Change Orders"),
+#        aes(x=Control,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# #Ceiling Raising Change Orders %
+# ggplot(subset(SizeDF,dVariable=="Ceiling Raising Change Orders %"),
+#        aes(x=Control,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# 
+# #Terminations
+# ggplot(subset(SizeDF,dVariable=="Terminated"),
+#        aes(x=Control,y=FixedCostMargin_p)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
 ```
-
-```
-## [1] "[0,15k)"    "[100k,1m)"  "[15k,100k)" "[1m,30m)"   "[30m+]"
-```
-
-```r
-# debug(OffersHypothesisTester)
-SizeDF<-FixedPriceHypothesisTester(compGin)
-#No redundant tests to remove
-
-#Single Offer Competition
-ggplot(subset(SizeDF,dVariable=="1"),
-       aes(x=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-1.png) 
-
-```r
-#Expected Number of Offers
-ggplot(subset(SizeDF,dVariable=="Expected Number of Offers"),
-       aes(x=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-2.png) 
-
-```r
-#Expected Number of Changes
-ggplot(subset(SizeDF,dVariable=="Expected Number of Changes"),
-       aes(x=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-3.png) 
-
-```r
-#Ceiling Raising Change Orders %
-ggplot(subset(SizeDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-4.png) 
-
-```r
-#Terminations
-ggplot(subset(SizeDF,dVariable=="Terminated"),
-       aes(x=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C1Ceil-5.png) 
 
 
 ##C2 Aircraft encounter
@@ -195,123 +316,79 @@ As expected, numbers of offers are far higher with non-aircraft, for both compet
 
 
 ```r
-compGin[[1]]$levels$What
-```
-
-```
-## [1] "Aircraft and Drones"            "Electronics and Communications"
-## [3] "Facilities and Construction"    "Land Vehicles"                 
-## [5] "Missile and Space Systems"      "Other"                         
-## [7] "Ships & Submarines"             "Weapons and Ammunition"
-```
-
-```r
-AircraftFind<- setEvidence(compGin, 
-                           nodes=c("What"),
-                           states=c("Aircraft and Drones")
-                           )
-
-getEvidence(AircraftFind)
-```
-
-```
-## Finding: 
-## What: Aircraft and Drones
-## Pr(Finding)= 0.09632574
-```
-
-```r
-pEvidence(AircraftFind)
-```
-
-```
-## [1] 0.09632574
-```
-
-```r
-NotAircraftFind<- setEvidence(compGin, 
-                              nodes=c("What"),
-                              states=list(compGin[[1]]$levels$What[
-                                  compGin[[1]]$levels$What!="Aircraft and Drones"]))
-
-
-getEvidence(NotAircraftFind)
-```
-
-```
-## Finding: 
-## What: Electronics and Communications, Facilities and Construction, Land Vehicles, Missile and Space Systems, Other, Ships & Submarines, Weapons and Ammunition
-## Pr(Finding)= 0.9036743
-```
-
-```r
-AircraftDF<-FixedPriceHypothesisTester(AircraftFind,"Aircraft")
-AircraftDF<-rbind(AircraftDF,
-                  FixedPriceHypothesisTester(NotAircraftFind,"Not Aircraft")
-                  )
-
-
-#Remove redundant tests
-AircraftDF<-subset(AircraftDF,
-                   !Control %in% unique(AircraftDF$Hypothesis))
-
-
-#Single Offer Competition
-ggplot(subset(AircraftDF,dVariable=="1"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-1.png) 
-
-```r
-#Expected Number of Offers
-ggplot(subset(AircraftDF,dVariable=="Expected Number of Offers"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-2.png) 
-
-```r
-#Expected Number of Changes
-ggplot(subset(AircraftDF,dVariable=="Expected Number of Changes"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-3.png) 
-
-```r
-#Ceiling Raising Change Orders %
-ggplot(subset(AircraftDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-4.png) 
-
-```r
-#Terminations
-ggplot(subset(AircraftDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C2Aircraft-5.png) 
-
-```r
-rm(AircraftFind,NotAircraftFind)
+# 
+# FixedPriceGin[[1]]$levels$What
+# 
+# AircraftFind<- subset(FixedPriceGin, What=="Aircraft and Drones")
+#                            
+# 
+# getEvidence(AircraftFind)
+# pEvidence(AircraftFind)
+# 
+# 
+# NotAircraftFind<- setEvidence(FixedPriceGin, 
+#                               nodes=c("What"),
+#                               states=list(FixedPriceGin[[1]]$levels$What[
+#                                   FixedPriceGin[[1]]$levels$What!="Aircraft and Drones"]))
+# 
+# 
+# getEvidence(NotAircraftFind)
+# 
+# 
+# AircraftDF<-FixedPriceHypothesisTester(AircraftFind,"Aircraft")
+# AircraftDF<-rbind(AircraftDF,
+#                   FixedPriceHypothesisTester(NotAircraftFind,"Not Aircraft")
+#                   )
+# 
+# 
+# #Remove redundant tests
+# AircraftDF<-subset(AircraftDF,
+#                    !Control %in% unique(AircraftDF$Hypothesis))
+# 
+# 
+# #Single Offer Competition
+# ggplot(subset(AircraftDF,dVariable=="% Single Offer Competition"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# #Average Number of Offers
+# ggplot(subset(AircraftDF,dVariable=="Average Number of Offers for Competed Contracts"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# #Average Number of Changes
+# ggplot(subset(AircraftDF,dVariable="Average Number of Change Orders"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# #Ceiling Raising Change Orders %
+# ggplot(subset(AircraftDF,dVariable=="Ceiling Raising Change Orders %"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# 
+# #Terminations
+# ggplot(subset(AircraftDF,dVariable=="Terminated"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# 
+# rm(AircraftFind,NotAircraftFind)
+# 
 ```
 
 
@@ -345,117 +422,176 @@ At present, the vehicle variable only has granularity to look at at IDVs versus 
 The analysis indicates validates this past finding, IDVs are marketedly more likely to be competed and to receive more offers when competed.
 
 
+```r
+# 
+# FixedPriceGin[[1]]$levels$UCA
+# 
+# 
+# 
+# UCAFind<- setEvidence(FixedPriceGin, 
+#                       nodes=c("UCA"),
+#                       states=c("UCA" )
+#                       )
+# 
+# getEvidence(UCAFind)
+# 
+# NotUCAFind<- setEvidence(FixedPriceGin, 
+#                          nodes=c("UCA"),
+#                          states= list(c( "Not UCA" ))
+#                          )
+# 
+# getEvidence(NotUCAFind)
+# 
+# 
+# 
+# 
+# # undebug(FixedPriceHypothesisTester)
+# UCAdf<-FixedPriceHypothesisTester(UCAFind,"UCA")
+# UCAdf<-rbind(UCAdf,
+#              FixedPriceHypothesisTester(NotUCAFind,"Not UCA")
+#              )
+# 
+# 
+# #Remove redundant tests
+# UCAdf<-subset(UCAdf,
+#               !Control %in% unique(UCAdf$Hypothesis))
+# 
+# 
+# #Single Offer Competition
+# ggplot(subset(UCAdf,dVariable=="% Single Offer Competition"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# #Average Number of Offers
+# ggplot(subset(UCAdf,dVariable=="Average Number of Offers for Competed Contracts"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# #Average Number of Changes
+# ggplot(subset(UCAdf,dVariable="Average Number of Change Orders"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# #Ceiling Raising Change Orders %
+# ggplot(subset(UCAdf,dVariable=="Ceiling Raising Change Orders %"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# 
+# #Terminations
+# ggplot(subset(UCAdf,dVariable=="Terminated"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+```
 
 
 
 ```r
-compGin[[1]]$levels$IDV
-```
-
-```
-## [1] "Def/Pur" "IDV"
-```
-
-```r
-IDVFind<- setEvidence(compGin, 
-                      nodes=c("IDV"),
-                      states=c("IDV")
-                      )
-
-getEvidence(IDVFind)
-```
-
-```
-## Finding: 
-## IDV: IDV
-## Pr(Finding)= 0.6492992
-```
-
-```r
-AwardFind<- setEvidence(compGin, 
-                        nodes=c("IDV"),
-                        states=c(list(
-                            compGin[[1]]$levels$IDV[compGin[[1]]$levels$IDV!=
-                                                        "IDV"]))
-                        )
-
-getEvidence(AwardFind)
-```
-
-```
-## Finding: 
-## IDV: Def/Pur
-## Pr(Finding)= 0.3507008
-```
-
-```r
-VehicleDF<-FixedPriceHypothesisTester(IDVFind,"IDV")
-VehicleDF<-rbind(VehicleDF,
-                 FixedPriceHypothesisTester(AwardFind,"Award")
-                 )
-
-
-#Remove redundant tests
-VehicleDF<-subset(VehicleDF,
-                  !Control %in% unique(VehicleDF$Hypothesis))
-
-
-#Single Offer Competition
-ggplot(subset(VehicleDF,dVariable=="1"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-1.png) 
-
-```r
-#Expected Number of Offers
-ggplot(subset(VehicleDF,dVariable=="Expected Number of Offers"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-2.png) 
-
-```r
-#Expected Number of Changes
-ggplot(subset(VehicleDF,dVariable=="Expected Number of Changes"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-3.png) 
-
-```r
-#Ceiling Raising Change Orders %
-ggplot(subset(VehicleDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-4.png) 
-
-```r
-#Terminations
-ggplot(subset(VehicleDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C4Vehicle-5.png) 
-
-```r
-rm(IDVFind,AwardFind)
+# 
+# FixedPriceGin[[1]]$levels$Veh
+# 
+# 
+# 
+# SACFind<- setEvidence(FixedPriceGin, 
+#                       nodes=c("Veh"),
+#                       states=c("SINGLE AWARD" )
+#                       )
+# 
+# getEvidence(SACFind)
+# 
+# OtherIDVFind<- setEvidence(FixedPriceGin, 
+#                            nodes=c("Veh"),
+#                            states= list(c( "MULTIPLE AWARD", "Other IDV" ))
+#                            )
+# 
+# getEvidence(OtherIDVFind)
+# 
+# 
+# 
+# AwardFind<- setEvidence(FixedPriceGin, 
+#                         nodes=c("Veh"),
+#                         states=c( "Def/Pur" )
+#                         )
+# 
+# getEvidence(AwardFind)
+# 
+# 
+# 
+# 
+# 
+# VehicleDF<-FixedPriceHypothesisTester(SACFind,"Single-Award IDV")
+# VehicleDF<-rbind(VehicleDF,
+#                  FixedPriceHypothesisTester(OtherIDVFind,"Other IDV"),
+#                  FixedPriceHypothesisTester(AwardFind,"Award")
+#                  )
+# 
+# 
+# #Remove redundant tests
+# VehicleDF<-subset(VehicleDF,
+#                   !Control %in% unique(VehicleDF$Hypothesis))
+# 
+# 
+# #Single Offer Competition
+# ggplot(subset(VehicleDF,dVariable=="% Single Offer Competition"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# #Average Number of Offers
+# ggplot(subset(VehicleDF,dVariable=="Average Number of Offers for Competed Contracts"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# #Average Number of Changes
+# ggplot(subset(VehicleDF,dVariable="Average Number of Change Orders"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# #Ceiling Raising Change Orders %
+# ggplot(subset(VehicleDF,dVariable=="Ceiling Raising Change Orders %"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# 
+# #Terminations
+# ggplot(subset(VehicleDF,dVariable=="Terminated"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# rm(IDVFind,AwardFind)
 ```
 
 ##Contracts with longer initially expected periods of performance will encounter more problems.
@@ -469,106 +605,73 @@ rm(IDVFind,AwardFind)
 
 
 ```r
-compGin[[1]]$levels$Dur
-```
-
-```
-## [1] "[    0,   61)" "[   61,  214)" "[  214,  366)" "[  366,33192]"
-```
-
-```r
-LongDurFind<- setEvidence(compGin, 
-                          nodes=c("Dur"),
-                          states=c("[  366,33192]")
-                          )
-
-getEvidence(LongDurFind)
-```
-
-```
-## Finding: 
-## Dur: [  366,33192]
-## Pr(Finding)= 0.0508826
-```
-
-```r
-NotLongDurFind<- setEvidence(compGin, 
-                             nodes=c("Dur"),
-                             states=c(list(
-                                 compGin[[1]]$levels$Dur[compGin[[1]]$levels$Dur!=
-                                                             "[  366,33192]"]))
-                             )
-
-
-
-
-LongDurDF<-FixedPriceHypothesisTester(LongDurFind,"Long Dur.")
-LongDurDF<-rbind(LongDurDF,
-                 FixedPriceHypothesisTester(NotLongDurFind,"Not Long Dur.")
-                 )
-
-
-#Remove redundant tests
-LongDurDF<-subset(LongDurDF,
-                  !Control %in% unique(LongDurDF$Hypothesis))
-
-
-#Single Offer Competition
-ggplot(subset(LongDurDF,dVariable=="1"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-1.png) 
-
-```r
-#Expected Number of Offers
-ggplot(subset(LongDurDF,dVariable=="Expected Number of Offers"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-2.png) 
-
-```r
-#Expected Number of Changes
-ggplot(subset(LongDurDF,dVariable=="Expected Number of Changes"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-3.png) 
-
-```r
-#Ceiling Raising Change Orders %
-ggplot(subset(LongDurDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-4.png) 
-
-```r
-#Terminations
-ggplot(subset(LongDurDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C5LongDur-5.png) 
-
-```r
-rm(LongDurFind,NotLongDurFind)
+# 
+# FixedPriceGin[[1]]$levels$Dur
+# 
+# LongDurFind<- setEvidence(FixedPriceGin, 
+#                           nodes=c("Dur"),
+#                           states=c("(~2 years+]")
+#                           )
+# 
+# getEvidence(LongDurFind)
+# 
+# 
+# 
+# 
+# 
+# LongDurWideDF<-FixedPriceHypothesisTester(LongDurFind,"Long Dur.")
+# LongDurWideDF<-rbind(LongDurWideDF,
+#                  FixedPriceHypothesisTester(FixedPriceGin,"Population")
+#                  )
+# 
+# 
+# #Remove redundant tests
+# LongDurWideDF<-subset(LongDurWideDF,
+#                   !Control %in% unique(LongDurWideDF$Hypothesis))
+# 
+# 
+# #Single Offer Competition
+# ggplot(subset(LongDurWideDF,dVariable=="% Single Offer Competition"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# #Average Number of Offers
+# ggplot(subset(LongDurWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# #Average Number of Changes
+# ggplot(subset(LongDurWideDF,dVariable="Average Number of Change Orders"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# #Ceiling Raising Change Orders %
+# ggplot(subset(LongDurWideDF,dVariable=="Ceiling Raising Change Orders %"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# 
+# #Terminations
+# ggplot(subset(LongDurWideDF,dVariable=="Terminated"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# 
+# rm(LongDurFind)
 ```
 
 
@@ -587,114 +690,78 @@ Incentive was not included in the initial model because it made up a small propo
 
 
 ```r
-compGin[[1]]$levels$Comp
-```
-
-```
-## [1] "Comp."     "No Comp."  "Unlabeled"
-```
-
-```r
-CompFind<-setEvidence(compGin, 
-                      nodes=c("Comp"),
-                      states=c("Comp.")
-                      )
-
-getEvidence(CompFind)
-```
-
-```
-## Finding: 
-## Comp: Comp.
-## Pr(Finding)= 0.8031248
-```
-
-```r
-NotCompFind<-setEvidence(compGin, 
-                         nodes=c("Comp"),
-                         states=c("No Comp.")
-                         )
-getEvidence(NotCompFind)
-```
-
-```
-## Finding: 
-## Comp: No Comp.
-## Pr(Finding)= 0.1968207
-```
-
-```r
-CompDF<-FixedPriceHypothesisTester(CompFind,"Comp.")
-CompDF<-rbind(CompDF,
-                 FixedPriceHypothesisTester(NotCompFind,"Not Comp.")
-                 )
-
-
-#Remove redundant tests
-CompDF<-subset(CompDF,
-                  !Control %in% unique(CompDF$Hypothesis))
-#Remove the No Comp for the offer related iVariables
-CompDF<-subset(CompDF,
-                  !(dVariable %in% c("1","Expected Number of Offers")&
-                      Hypothesis=="Not Comp."))
-
-
-#Single Offer Competition
-ggplot(subset(CompDF,dVariable=="1"),
-       aes(x=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-1.png) 
-
-```r
-#Expected Number of Offers
-ggplot(subset(CompDF,dVariable=="Expected Number of Offers"),
-       aes(x=Control,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-2.png) 
-
-```r
-#Expected Number of Changes
-ggplot(subset(CompDF,dVariable=="Expected Number of Changes"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-3.png) 
-
-```r
-#Ceiling Raising Change Orders %
-ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-4.png) 
-
-```r
-#Terminations
-ggplot(subset(CompDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
-```
-
-![](fixed_price_hypothesis_testing_files/figure-html/C6Comp-5.png) 
-
-```r
-rm(CompFind,NotCompFind)
+# 
+# FixedPriceGin[[1]]$levels$Comp
+# 
+# 
+# CompFind<-setEvidence(FixedPriceGin, 
+#                       nodes=c("Comp"),
+#                       states=c("Comp.")
+#                       )
+# 
+# getEvidence(CompFind)
+# 
+# 
+# 
+# 
+# CompDF<-FixedPriceHypothesisTester(CompFind,"Comp.")
+# CompDF<-rbind(CompDF,
+#               FixedPriceHypothesisTester("Comp.","Population")
+#               )
+# 
+# 
+# #Remove redundant tests
+# CompDF<-subset(CompDF,
+#                !Control %in% unique(CompDF$Hypothesis))
+# #Remove the No Comp for the offer related iVariables
+# CompDF<-subset(CompDF,
+#                !(dVariable %in% c("1","Average Number of Offers")&
+#                      Hypothesis=="Not Comp."))
+# 
+# 
+# #Single Offer Competition
+# ggplot(subset(CompDF,dVariable=="% Single Offer Competition"),
+#        aes(x=Control,y=FixedCostMargin_p)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# #Average Number of Offers
+# ggplot(subset(CompDF,dVariable=="Average Number of Offers for Competed Contracts"),
+#        aes(x=Control,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# #Average Number of Changes
+# ggplot(subset(CompDF,dVariable="Average Number of Change Orders"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# #Ceiling Raising Change Orders %
+# ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# 
+# #Terminations
+# ggplot(subset(CompDF,dVariable=="Terminated"),
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        )+
+#     geom_point()+
+#     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+# 
+# 
+# 
+# rm(CompFind,NotCompFind)
+# 
 ```
 
 
@@ -719,27 +786,21 @@ For this example, we're still using usual R&D rather than excluding R&d7
 The hypothesis is supported with regard to number of offers. Larger fixed-price contracts are more likely to experience single offer competition and are less likely to experience competition with three or more offers. Combination tracks more closely with fixed-price than cost-plus.
 
 
-```r
-levels(compGin[[1]]$levels$Ceil)
-```
-
-```
-## NULL
-```
 
 ```r
-RnDfind<- setEvidence(compGin, 
-                           nodes=c("PSR"),
-                           states=c("R&D")
-                           )
+FixedPriceGin[[1]]$levels$Ceil
+```
 
-# NotRnDfind<- setEvidence(compGin, 
-#                              nodes=c("PSR"),
-#                              states=c(list(
-#                                  compGin[[1]]$levels$PSR[compGin[[1]]$levels$PSR!=
-#                                                              "R&D"])))
-# 
+```
+## [1] "[0,15k)"    "[15k,100k)" "[100k,1m)"  "[1m,10m)"   "[10m,75m)" 
+## [6] "[75m+]"
+```
 
+```r
+RnDfind<- setEvidence(FixedPriceGin, 
+                      nodes=c("PSR"),
+                      states=c("R&D")
+                      )
 
 getEvidence(RnDfind)
 ```
@@ -747,82 +808,270 @@ getEvidence(RnDfind)
 ```
 ## Finding: 
 ## PSR: R&D
-## Pr(Finding)= 0.009068309
+## Pr(Finding)= 0.009186456
 ```
 
 ```r
-RnDdf<-FixedPriceHypothesisTester(RnDfind,"R&D")
-RnDdf<-rbind(RnDdf,
-                  FixedPriceHypothesisTester(compGin,"Population")
-                  )
-
-
-#Remove redundant tests
-RnDdf<-subset(RnDdf,
-                   !Control %in% unique(RnDdf$Hypothesis))
+RnDlongDF<-FixedPriceComparisonTable(subset(ModelSummary,PSR=="R&D"),
+                                "R&D")
 
 
 #Single Offer Competition
-ggplot(subset(RnDdf,dVariable=="1"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(RnDlongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Freq)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&Dabsolute-1.png) 
+
+```r
+#Average Number of Offers
+ggplot(subset(RnDlongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&Dabsolute-2.png) 
+
+```r
+#Average Number of Changes
+ggplot(subset(RnDlongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&Dabsolute-3.png) 
+
+```r
+#Ceiling Raising Change Orders %
+ggplot(subset(RnDlongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&Dabsolute-4.png) 
+
+```r
+#Terminations
+ggplot(subset(RnDlongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=p)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&Dabsolute-5.png) 
+
+```r
+rm(RnDfind)
+```
+
+
+
+```r
+RnDwideDF<-FixedPriceCast(rbind(RnDlongDF,PopulationLongDF))
+
+
+
+#Remove redundant tests
+RnDwideDF<-subset(RnDwideDF,
+                  !Control %in% unique(RnDwideDF$Hypothesis))
+RnDwideDF$Hypothesis<-factor(RnDwideDF$Hypothesis,levels=c("R&D","Population"),ordered=TRUE)
+
+#Single Offer Competition
+ggplot(subset(RnDwideDF,dVariable=="% Single Offer Competition"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
+## (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-1.png) 
 
 ```r
-#Expected Number of Offers
-ggplot(subset(RnDdf,dVariable=="Expected Number of Offers"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+#Average Number of Offers
+ggplot(subset(RnDwideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
+## (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-2.png) 
 
 ```r
-#Expected Number of Changes
-ggplot(subset(RnDdf,dVariable=="Expected Number of Changes"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+#Average Number of Changes
+ggplot(subset(RnDwideDF,dVariable="Average Number of Change Orders"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 24 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 23 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 24 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 23 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 23 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 20 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
+## (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-3.png) 
 
 ```r
 #Ceiling Raising Change Orders %
-ggplot(subset(RnDdf,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(RnDwideDF,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
+## (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-4.png) 
 
 ```r
 #Terminations
-ggplot(subset(RnDdf,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(RnDwideDF,dVariable=="Terminated"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
+## (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&D-5.png) 
 
 ```r
-rm(RnDfind,NotRnDfind)
+write.csv(RnDwideDF,paste("Output\\",
+                          paste("RnD"
+                                ,"Fixed_Price"
+                                ,"Hypothesis_Testing"
+                                ,"2007-2013"
+                                ,sep="_"
+                                )
+                          ,".csv",
+                          sep=""))
 ```
 
-```
-## Warning in rm(RnDfind, NotRnDfind): object 'NotRnDfind' not found
-```
 
 ##H2: Due to design uncertainty Pre-Milestone B Major Defense Acquisition Programs (MDAPs) are potentially more likely to encounter problems than other fixed-price contracts
 *	Prerequisites for use of fixed-price: "Design content is established and the components are mature technologies. There are no signifi???cant unresolved design issues, no major integration risk, the external interfaces are well defined, and no serious risk exists of unknowns surfacing in developmental testing and causing major redesign." (Frank Kendall, Use of Fixed-Price Incentive Firm (FPIF) Contracts in Development and Production. Defense AT&L, (March-April 2013) pp 2-4.) {Emphasis added}
@@ -840,105 +1089,415 @@ MDAP specific classification is not yet included because it represents such a sm
 The hypothesis was not supported with regard to number of offers, but this should be treated as a soft negative finding until the more precise question is tested.
 
 
-```r
-levels(compGin[[1]]$levels$Link)
-```
 
-```
-## NULL
-```
 
 ```r
-HighLinkFind<- setEvidence(compGin, 
-                           nodes=c("Link"),
-                           states=c("[  750,67263]")
-                           )
+MDAPFind<- setEvidence(FixedPriceGin, 
+                       nodes=c("MDAP"),
+                       states=c( "Labeled MDAP" ))
 
+MDAPlongDF<-FixedPriceComparisonTable(subset(ModelSummary,MDAP=="Labeled MDAP"),
+                                "Labeled MDAP")
 
-NotHighLinkFind<- setEvidence(compGin, 
-                             nodes=c("Link"),
-                             states=c(list(
-                                 compGin[[1]]$levels$Link[compGin[[1]]$levels$Link!=
-                                                             "[  750,67263]"])))
-
-
-getEvidence(HighLinkFind)
-```
-
-```
-## Finding: 
-## Link: [  750,67263]
-## Pr(Finding)= 0.2440527
-```
-
-```r
-HighLinkDF<-FixedPriceHypothesisTester(HighLinkFind,"High Link")
-HighLinkDF<-rbind(HighLinkDF,
-                  FixedPriceHypothesisTester(compGin,"Population")
-                  )
 
 
 #Remove redundant tests
-HighLinkDF<-subset(HighLinkDF,
-                   !Control %in% unique(HighLinkDF$Hypothesis))
+MDAPlongDF<-subset(MDAPlongDF,
+                   !Control %in% unique(MDAPlongDF$Hypothesis))
+MDAPlongDF$Hypothesis<-factor(MDAPlongDF$Hypothesis,levels=c("MDAP","Population"),ordered=TRUE)
+
+#Single Offer Competition
+ggplot(subset(MDAPlongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Freq)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-1.png) 
+
+```r
+#Average Number of Offers
+ggplot(subset(MDAPlongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-2.png) 
+
+```r
+#Average Number of Changes
+ggplot(subset(MDAPlongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-3.png) 
+
+```r
+#Ceiling Raising Change Orders %
+ggplot(subset(MDAPlongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-4.png) 
+
+```r
+#Terminations
+ggplot(subset(MDAPlongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=p)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-5.png) 
+
+
+
+```r
+MDAPwideDF<-FixedPriceCast(rbind(MDAPlongDF,PopulationLongDF))
+
+MDAPwideDF$Hypothesis<-factor(MDAPwideDF$Hypothesis,levels=c("MDAP","Population"),ordered=TRUE)
+
+#Remove redundant tests
+MDAPwideDF<-subset(MDAPwideDF,
+                   !Control %in% unique(MDAPwideDF$Hypothesis))
 
 
 #Single Offer Competition
-ggplot(subset(HighLinkDF,dVariable=="1"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(MDAPwideDF,dVariable=="% Single Offer Competition"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-1.png) 
 
 ```r
-#Expected Number of Offers
-ggplot(subset(HighLinkDF,dVariable=="Expected Number of Offers"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+#Average Number of Offers
+ggplot(subset(MDAPwideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-2.png) 
 
 ```r
-#Expected Number of Changes
-ggplot(subset(HighLinkDF,dVariable=="Expected Number of Changes"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+#Average Number of Changes
+ggplot(subset(MDAPwideDF,dVariable="Average Number of Change Orders"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 24 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 24 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 24 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 24 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 23 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 21 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-3.png) 
 
 ```r
 #Ceiling Raising Change Orders %
-ggplot(subset(HighLinkDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(MDAPwideDF,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-4.png) 
 
 ```r
 #Terminations
-ggplot(subset(HighLinkDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(MDAPwideDF,dVariable=="Terminated"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-5.png) 
 
 ```r
-rm(HighLinkFind,NotHighLinkFind)
+rm(MDAPFind)
 ```
 
 
@@ -957,18 +1516,21 @@ This was initially expected to be tested with a continuous value for length rath
 The hypothesis regarding number of offers was not supported at the greater than 1 year level. Further subdivision into 2 year plus or other breakdowns might show a different result. Combination resembled fixed-price, but did not do as well with 5 or more offers.
 
 
+
+
 ```r
-compGin[[1]]$levels$Dur
+FixedPriceGin[[1]]$levels$Dur
 ```
 
 ```
-## [1] "[    0,   61)" "[   61,  214)" "[  214,  366)" "[  366,33192]"
+## [1] "[0 months,~2 months)"  "[~2 months,~7 months)" "[~7 months-~1 year]"  
+## [4] "(~1 year,~2 years]"    "(~2 years+]"
 ```
 
 ```r
-LongDurFind<- setEvidence(compGin, 
+LongDurFind<- setEvidence(FixedPriceGin, 
                           nodes=c("Dur"),
-                          states=c("[  366,33192]")
+                          states=c("(~2 years+]")
                           )
 
 getEvidence(LongDurFind)
@@ -976,89 +1538,417 @@ getEvidence(LongDurFind)
 
 ```
 ## Finding: 
-## Dur: [  366,33192]
-## Pr(Finding)= 0.0508826
+## Dur: (~2 years+]
+## Pr(Finding)= 0.006950983
 ```
 
 ```r
-NotLongDurFind<- setEvidence(compGin, 
-                             nodes=c("Dur"),
-                             states=c(list(
-                                 compGin[[1]]$levels$Dur[compGin[[1]]$levels$Dur!=
-                                                             "[  366,33192]"]))
-                             )
+LongDurLongDF<-FixedPriceComparisonTable(subset(ModelSummary,Dur=="(~2 years+]"),
+                                "Long Dur")
 
 
 
 
-LongDurDF<-FixedPriceHypothesisTester(LongDurFind,"Long Dur.")
-LongDurDF<-rbind(LongDurDF,
-                 FixedPriceHypothesisTester(compGin,"Population")
-                 )
-
+LongDurLongDF$Hypothesis<-factor(LongDurLongDF$Hypothesis,levels=c("Long Dur.","Population"),ordered=TRUE)
 
 #Remove redundant tests
-LongDurDF<-subset(LongDurDF,
-                  !Control %in% c(unique(LongDurDF$Hypothesis),"Not Long Dur."))
+LongDurLongDF<-subset(LongDurLongDF,
+                  !Control %in% c(unique(LongDurLongDF$Hypothesis),"Not Long Dur."))
 
 
 #Single Offer Competition
-ggplot(subset(LongDurDF,dVariable=="1"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(LongDurLongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Freq)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-1.png) 
+
+```r
+#Average Number of Offers
+ggplot(subset(LongDurLongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-2.png) 
+
+```r
+#Average Number of Changes
+ggplot(subset(LongDurLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-3.png) 
+
+```r
+#Ceiling Raising Change Orders %
+ggplot(subset(LongDurLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-4.png) 
+
+```r
+#Terminations
+ggplot(subset(LongDurLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=p)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-5.png) 
+
+```r
+rm(LongDurFind)
+```
+
+
+```r
+LongDurWideDF<-FixedPriceCast(rbind(LongDurLongDF,PopulationLongDF))
+
+
+LongDurWideDF$Hypothesis<-factor(LongDurWideDF$Hypothesis,levels=c("Long Dur.","Population"),ordered=TRUE)
+
+#Remove redundant tests
+LongDurWideDF<-subset(LongDurWideDF,
+                  !Control %in% c(unique(LongDurWideDF$Hypothesis),"Not Long Dur."))
+
+
+#Single Offer Competition
+ggplot(subset(LongDurWideDF,dVariable=="% Single Offer Competition"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-1.png) 
 
 ```r
-#Expected Number of Offers
-ggplot(subset(LongDurDF,dVariable=="Expected Number of Offers"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+#Average Number of Offers
+ggplot(subset(LongDurWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-2.png) 
 
 ```r
-#Expected Number of Changes
-ggplot(subset(LongDurDF,dVariable=="Expected Number of Changes"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+#Average Number of Changes
+ggplot(subset(LongDurWideDF,dVariable="Average Number of Change Orders"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 23 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 23 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 24 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 24 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 23 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 24 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-3.png) 
 
 ```r
 #Ceiling Raising Change Orders %
-ggplot(subset(LongDurDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(LongDurWideDF,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-4.png) 
 
 ```r
 #Terminations
-ggplot(subset(LongDurDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(LongDurWideDF,dVariable=="Terminated"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-5.png) 
-
-```r
-rm(LongDurFind,NotLongDurFind)
-```
 
 
 
@@ -1076,8 +1966,9 @@ rm(LongDurFind,NotLongDurFind)
 This hypothesis is requires incorporation of the next two dependent variables into the Bayesian Network.
 
 
+
 ```r
-compGin[[1]]$levels$Comp
+FixedPriceGin[[1]]$levels$Comp
 ```
 
 ```
@@ -1085,7 +1976,7 @@ compGin[[1]]$levels$Comp
 ```
 
 ```r
-CompFind<-setEvidence(compGin, 
+CompFind<-setEvidence(FixedPriceGin, 
                       nodes=c("Comp"),
                       states=c("Comp.")
                       )
@@ -1096,73 +1987,182 @@ getEvidence(CompFind)
 ```
 ## Finding: 
 ## Comp: Comp.
-## Pr(Finding)= 0.8031248
+## Pr(Finding)= 0.8009173
 ```
 
 ```r
-NotCompFind<-setEvidence(compGin, 
-                         nodes=c("Comp"),
-                         states=c("No Comp.")
-                         )
-getEvidence(NotCompFind)
-```
+CompLongDF<-FixedPriceComparisonTable(subset(ModelSummary,Comp=="Comp."),
+                                      "Comp.")
 
-```
-## Finding: 
-## Comp: No Comp.
-## Pr(Finding)= 0.1968207
-```
 
-```r
-CompDF<-FixedPriceHypothesisTester(CompFind,"Comp.")
-CompDF<-rbind(CompDF,
-                 FixedPriceHypothesisTester(compGin,"Population")
-                 )
 
 
 #Remove redundant tests
-CompDF<-subset(CompDF,
-                  !Control %in% c(unique(CompDF$Hypothesis),"Not Comp."))
+CompLongDF<-subset(CompLongDF,
+               !Control %in% c(unique(CompLongDF$Hypothesis),"Not Comp."))
 #Remove the  iVariables not covered in hypothesis
-CompDF<-subset(CompDF,
-                  !dVariable %in% c("1","Expected Number of Offers"))
+CompLongDF<-subset(CompLongDF,
+               !dVariable %in% c("1","Average Number of Offers"))
 
 
 
-#Expected Number of Changes
-ggplot(subset(CompDF,dVariable=="Expected Number of Changes"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+#Average Number of Changes
+ggplot(subset(CompLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H4CompAbsolute-1.png) 
+
+```r
+#Ceiling Raising Change Orders %
+ggplot(subset(CompLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H4CompAbsolute-2.png) 
+
+```r
+#Terminations
+ggplot(subset(CompLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=p)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H4CompAbsolute-3.png) 
+
+```r
+rm(CompFind)
+```
+
+
+
+```r
+CompWideDF<-FixedPriceCast(rbind(CompLongDF,
+                                    PopulationLongDF))
+
+
+
+CompWideDF$Hypothesis<-factor(CompWideDF$Hypothesis,levels=c("Comp.","Population"),ordered=TRUE)
+
+#Remove redundant tests
+CompWideDF<-subset(CompWideDF,
+               !Control %in% c(unique(CompWideDF$Hypothesis),"Not Comp."))
+#Remove the  iVariables not covered in hypothesis
+CompWideDF<-subset(CompWideDF,
+               !dVariable %in% c("1","Average Number of Offers"))
+
+
+
+#Average Number of Changes
+ggplot(subset(CompWideDF,dVariable="Average Number of Change Orders"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 21 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 21 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 21 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 21 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 21 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 21 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 21 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H4Comp-1.png) 
 
 ```r
 #Ceiling Raising Change Orders %
-ggplot(subset(CompDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(CompWideDF,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H4Comp-2.png) 
 
 ```r
 #Terminations
-ggplot(subset(CompDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(CompWideDF,dVariable=="Terminated"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H4Comp-3.png) 
 
 ```r
 rm(CompFind,NotCompFind)
+```
+
+```
+## Warning in rm(CompFind, NotCompFind): object 'CompFind' not found
+```
+
+```
+## Warning in rm(CompFind, NotCompFind): object 'NotCompFind' not found
 ```
 
 ##H5: Fixed-price are preferred by vendors for larger software contracts
@@ -1184,17 +2184,17 @@ Electronics and communications services do have a slight preference for fixed-pr
 
 
 ```r
-levels(compGin[[1]]$levels$PSR)
+FixedPriceGin[[1]]$levels$Soft
 ```
 
 ```
-## NULL
+## [1] "Not Software Eng."      "Possible Software Eng."
 ```
 
 ```r
-SoftwareFind<- setEvidence(compGin, 
-                           nodes=c("What","PSR"),
-                           states=c("Electronics and Communications","Services"))
+SoftwareFind<- setEvidence(FixedPriceGin, 
+                           nodes=c("Soft"),
+                           states=c("Possible Software Eng."))
 
 
 getEvidence(SoftwareFind)
@@ -1202,78 +2202,416 @@ getEvidence(SoftwareFind)
 
 ```
 ## Finding: 
-## What: Electronics and Communications
-##  PSR: Services
-## Pr(Finding)= 0.02746502
+## Soft: Possible Software Eng.
+## Pr(Finding)= 0.003934603
 ```
 
 ```r
-SoftwareDF<-FixedPriceHypothesisTester(SoftwareFind,"Software")
-SoftwareDF<-rbind(SoftwareDF,
-                  FixedPriceHypothesisTester(compGin,"Population")
-                  )
+SoftwareLongDF<-FixedPriceComparisonTable(subset(ModelSummary,Soft=="Possible Software Eng."),
+                                      "Possible \nSoftware Eng.")
 
+
+
+
+SoftwareLongDF$Hypothesis<-factor(SoftwareLongDF$Hypothesis,levels=c("Comp.","Possible Software Eng."),ordered=TRUE)
 
 #Remove redundant tests
-SoftwareDF<-subset(SoftwareDF,
-                   !Control %in% unique(SoftwareDF$Hypothesis))
+SoftwareLongDF<-subset(SoftwareLongDF,
+                   !Control %in% unique(SoftwareLongDF$Hypothesis))
 
 
 #Single Offer Competition
-ggplot(subset(SoftwareDF,dVariable=="1"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(SoftwareLongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Freq)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-1.png) 
+
+```r
+#Average Number of Offers
+ggplot(subset(SoftwareLongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-2.png) 
+
+```r
+#Average Number of Changes
+ggplot(subset(SoftwareLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-3.png) 
+
+```r
+#Ceiling Raising Change Orders %
+ggplot(subset(SoftwareLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-4.png) 
+
+```r
+#Terminations
+ggplot(subset(SoftwareLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+       aes(x=Control,color=FxCb,shape=FxCb,y=p)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+```
+
+![](fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-5.png) 
+
+```r
+rm(SoftwareFind)
+```
+
+
+
+```r
+SoftwareWideDF<-FixedPriceCast(rbind(SoftwareLongDF,PopulationLongDF))
+
+
+SoftwareWideDF$Hypothesis<-factor(SoftwareWideDF$Hypothesis,levels=c("Possible \nSoftware Eng.","Population"),ordered=TRUE)
+
+#Remove redundant tests
+SoftwareWideDF<-subset(SoftwareWideDF,
+                   !Control %in% unique(SoftwareWideDF$Hypothesis))
+
+
+#Single Offer Competition
+ggplot(subset(SoftwareWideDF,dVariable=="% Single Offer Competition"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+       )+
+    geom_point()+
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 6 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5Software-1.png) 
 
 ```r
-#Expected Number of Offers
-ggplot(subset(SoftwareDF,dVariable=="Expected Number of Offers"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+#Average Number of Offers
+ggplot(subset(SoftwareWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5Software-2.png) 
 
 ```r
-#Expected Number of Changes
-ggplot(subset(SoftwareDF,dVariable=="Expected Number of Changes"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+#Average Number of Changes
+ggplot(subset(SoftwareWideDF,dVariable="Average Number of Change Orders"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 19 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 19 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 21 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 23 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 23 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 17 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 20 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 22 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5Software-3.png) 
 
 ```r
 #Ceiling Raising Change Orders %
-ggplot(subset(SoftwareDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(SoftwareWideDF,dVariable=="Ceiling Raising Change Orders %"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5Software-4.png) 
 
 ```r
 #Terminations
-ggplot(subset(SoftwareDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin)
+ggplot(subset(SoftwareWideDF,dVariable=="Terminated"),
+       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
        )+
     geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=1))  
+    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+## values (geom_point).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
+## values (geom_point).
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5Software-5.png) 
-
-```r
-rm(SoftwareFind)
-```
 
