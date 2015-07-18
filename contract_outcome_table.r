@@ -24,7 +24,8 @@ StandardizeTableQuery<-function(varTable,
     ResultsDF<-varTable[,names(varTable) %in% c(studyVariableCol,
                                                 iVariableCol,
                                                 dVariableCol,
-                                                "Freq")]
+                                                "Freq",
+                                                "Count")]
     if(nrow(varTable)>0){
         #     ResultsDF<-querygrain(varTable,
         #                           nodes=c(studyVariableCol,iVariableCol,dVariableCol),
@@ -34,7 +35,8 @@ StandardizeTableQuery<-function(varTable,
                            iVariableCol,
                            dVariableCol),
                          summarise,
-                         Freq=sum(Freq))
+                         Freq=sum(Freq),
+                         Count=sum(Count))
         
         colnames(ResultsDF)[colnames(ResultsDF)==iVariableCol]<-"iVariable"
         if(!is.na(resultLabel)){
@@ -121,6 +123,8 @@ QueryControlVariablesTable<-function(varTable,
                                 dVariableCol
 ){
     ResultsDF<-StandardizeTableQuery(varTable,studyVariableCol,iVariableCol,dVariableCol)
+    
+    
     
     
     #Aircraft contracts by ceiling
