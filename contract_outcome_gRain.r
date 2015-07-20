@@ -529,11 +529,41 @@ FixedPriceComparison<-function(varGin,HypothesisLabel=NA){
 
 FixedPriceCast<-function(ResultsDF){
     
-    ResultsDF<-melt(ResultsDF,id=c("Control" , "dVariable" , "Hypothesis" , "iVariable","FxCb"))
+    ResultsDF<-melt(ResultsDF,id=c("Control" , "dVariable" , "Hypothesis" , "iVariable",
+                                   "FxCb"),
+                    factorsAsStrings=T) # , "parameter","p.value","method", "statistic",
     ResultsDF<-dcast(ResultsDF, Control + dVariable + Hypothesis + iVariable  ~ FxCb +variable
-                     , sum
+#                      , sum    +statistic+ parameter+p.value+method
                      , value.var="value"
     )
+    ResultsDF<-ResultsDF[!names(ResultsDF) %in% c("Fixed-Price_statistic",
+                               "Fixed-Price_parameter",
+                               "Fixed-Price_p.value",
+                               "Fixed-Price_method",
+                               "Fixed-Price_Significance"),]
+ResultsDF[,"Fixed-Price_Freq"]<-FactorToNumber(ResultsDF[,"Fixed-Price_Freq"])
+ResultsDF[,"Fixed-Price_Count"]<-FactorToNumber(ResultsDF[,"Fixed-Price_Count"])
+ResultsDF[,"Fixed-Price_p"]<-FactorToNumber(ResultsDF[,"Fixed-Price_p"])
+ResultsDF[,"Fixed-Price_Average"]<-FactorToNumber(ResultsDF[,"Fixed-Price_Average"])
+ResultsDF[,"Cost-Based_statistic"]<-FactorToNumber(ResultsDF[,"Cost-Based_statistic"])
+ResultsDF[,"Cost-Based_parameter"]<-factor(ResultsDF[,"Cost-Based_parameter"])
+ResultsDF[,"Cost-Based_p.value"]<-FactorToNumber(ResultsDF[,"Cost-Based_p.value"])
+ResultsDF[,"Cost-Based_method"]<-factor(ResultsDF[,"Cost-Based_method"])
+ResultsDF[,"Cost-Based_Significance"]<-factor(ResultsDF[,"Cost-Based_Significance"])
+ResultsDF[,"Cost-Based_Freq"]<-FactorToNumber(ResultsDF[,"Cost-Based_Freq"])
+ResultsDF[,"Cost-Based_Count"]<-FactorToNumber(ResultsDF[,"Cost-Based_Count"])
+ResultsDF[,"Cost-Based_p"]<-FactorToNumber(ResultsDF[,"Cost-Based_p"])
+ResultsDF[,"Cost-Based_Average"]<-FactorToNumber(ResultsDF[,"Cost-Based_Average"])
+ResultsDF[,"Combination or Other_statistic"]<-FactorToNumber(ResultsDF[,"Combination or Other_statistic"])
+ResultsDF[,"Combination or Other_parameter"]<-factor(ResultsDF[,"Combination or Other_parameter"])
+ResultsDF[,"Combination or Other_p.value"]<-FactorToNumber(ResultsDF[,"Combination or Other_p.value"])
+ResultsDF[,"Combination or Other_method"]<-factor(ResultsDF[,"Combination or Other_method"])
+ResultsDF[,"Combination or Other_Significance"]<-factor(ResultsDF[,"Combination or Other_Significance"])
+ResultsDF[,"Combination or Other_Freq"]<-FactorToNumber(ResultsDF[,"Combination or Other_Freq"])
+ResultsDF[,"Combination or Other_Count"]<-FactorToNumber(ResultsDF[,"Combination or Other_Count"])
+ResultsDF[,"Combination or Other_p"]<-FactorToNumber(ResultsDF[,"Combination or Other_p"])
+ResultsDF[,"Combination or Other_Average"]<-FactorToNumber(ResultsDF[,"Combination or Other_Average"])
+
     ResultsDF$FixedCostMargin_p<-(ResultsDF[,"Fixed-Price_p"]-ResultsDF[,"Cost-Based_p"])/
         ResultsDF[,"Cost-Based_p"]
     ResultsDF$FixedCombMargin_p<-(ResultsDF[,"Fixed-Price_p"]-ResultsDF[,"Combination or Other_p"])/

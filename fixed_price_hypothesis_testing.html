@@ -188,6 +188,30 @@ ContractModel$What&lt;-droplevels(ContractModel$What)
 ContractModel$Comp&lt;-droplevels(ContractModel$Comp)
 
 
+ContractModel$Ceil&lt;-revalue(ContractModel$Ceil, c(&quot;[15k,100k)&quot;=&quot;[0,100k)&quot;,&quot;[0,15k)&quot;=&quot;[0,100k)&quot;))
+    
+    
+    
+    #Order the ceilings
+    ContractModel$Ceil&lt;-factor(ContractModel$Ceil,
+                                levels=c(&quot;[75m+]&quot;,
+                                         &quot;[10m,75m)&quot;,
+                                         &quot;[1m,10m)&quot;,
+                                         &quot;[100k,1m)&quot;,
+                                         &quot;[0,100k)&quot;
+                                         
+                                         
+                                ),
+                                labels=c(&quot;[75m+]&quot;,
+                                         &quot;[10m,75m)&quot;,
+                                         &quot;[1m,10m)&quot;,
+                                         &quot;[100k,1m)&quot;,
+                                         &quot;[0,100k)&quot;
+                                ),
+                                ordered=TRUE
+    )
+    
+
 ModelSummary&lt;-ddply(ContractModel,
                     .(FxCb,Comp,Link,MDAP,Who,What,Intl,PSR,Ceil,Dur,Offr,Veh,Term,Soft,UCA,CRai,NChg),
                     summarise,
@@ -304,58 +328,93 @@ summary(FixedPriceGin)</code></pre>
 PopulationLongDF&lt;-FixedPriceComparisonTable(ModelSummary,&quot;Population&quot;)
 
 
+Coloration&lt;-NULL
+
+
 #Single Offer Competition
-ggplot(subset(PopulationLongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;% of Contracts Receiving Single Offer Competition&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationLongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;p&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/PopulationAbsolute-1.png" />
 </div>
 <pre class="r"><code>#Average Number of Offers
-ggplot(subset(PopulationLongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Number of Offers&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationLongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;Average&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/PopulationAbsolute-2.png" />
 </div>
 <pre class="r"><code>#Average Number of Changes
-ggplot(subset(PopulationLongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationLongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;Average&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/PopulationAbsolute-3.png" />
 </div>
 <pre class="r"><code>#Ceiling Raising Change Orders %
-ggplot(subset(PopulationLongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Ceiling Raising Change Order %&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationLongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;Average&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/PopulationAbsolute-4.png" />
 </div>
 <pre class="r"><code>#Terminations
-ggplot(subset(PopulationLongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;% of Terminated Contracts&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationLongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;p&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/PopulationAbsolute-5.png" />
 </div>
-<pre class="r"><code>rm(RnDfind)</code></pre>
-<pre><code>## Warning in rm(RnDfind): object &#39;RnDfind&#39; not found</code></pre>
-<pre class="r"><code>PopulationWideDF&lt;-FixedPriceCast(PopulationLongDF)
-
-
-
-#Remove redundant tests
+<pre class="r"><code>PopulationWideDF&lt;-FixedPriceCast(PopulationLongDF)</code></pre>
+<pre><code>## Warning: attributes are not identical across measure variables; they will
+## be dropped</code></pre>
+<pre class="r"><code>#Remove redundant tests
 PopulationWideDF&lt;-subset(PopulationWideDF,
                   !Control %in% unique(PopulationWideDF$Hypothesis))
 # PopulationWideDF$Hypothesis&lt;-factor(PopulationWideDF$Hypothesis,levels=c(&quot;R&amp;D&quot;,&quot;Population&quot;),ordered=TRUE)
@@ -393,8 +452,6 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Ceiling Raising Change Orders %&
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format(),limits=c(-1,6))+geom_hline(aes(yintercept=0))</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/PopulationDivision-4.png" />
 </div>
@@ -982,197 +1039,107 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
                       states=c(&quot;R&amp;D&quot;)
                       )
 
+
+
 getEvidence(RnDfind)</code></pre>
 <pre><code>## Finding: 
 ## PSR: R&amp;D
 ## Pr(Finding)= 0.009186456</code></pre>
-<pre class="r"><code>debug(FixedPriceComparisonTable)
+<pre class="r"><code># debug(ChiSquaredFixedPriceCostBased)
+# debug(FixedPriceComparisonTable)
 RnDlongDF&lt;-FixedPriceComparisonTable(subset(ModelSummary,PSR==&quot;R&amp;D&quot;),
-                                &quot;R&amp;D&quot;)</code></pre>
-<pre><code>## debugging in: FixedPriceComparisonTable(subset(ModelSummary, PSR == &quot;R&amp;D&quot;), 
-##     &quot;R&amp;D&quot;)
-## debug: {
-##     TermDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##         &quot;Term&quot;)
-##     TermDF &lt;- ddply(TermDF, .(FxCb, Control, iVariable), transform, 
-##         p = Freq/sum(Freq))
-##     colnames(TermDF)[colnames(TermDF) == &quot;Term&quot;] &lt;- &quot;dVariable&quot;
-##     TermDF &lt;- subset(TermDF, dVariable == &quot;Terminated&quot;)
-##     TermDF$Average &lt;- NA
-##     expNChgDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;NChg&quot;)
-##     expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   0&quot;] &lt;- 0
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   1&quot;] &lt;- 1 * expNChgDF$p[expNChgDF$NChg == 
-##         &quot;   1&quot;]
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   2&quot;] &lt;- 2 * expNChgDF$p[expNChgDF$NChg == 
-##         &quot;   2&quot;]
-##     expNChgDF$Average[expNChgDF$NChg == &quot;[   3,1040]&quot;] &lt;- 3 * 
-##         expNChgDF$p[expNChgDF$NChg == &quot;[   3,1040]&quot;]
-##     expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expNChgDF$dVariable &lt;- &quot;Average Number of Change Orders&quot;
-##     expCRaiDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;CRai&quot;)
-##     expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[-0.001, 0.001)&quot;] &lt;- 0
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;] &lt;- -0.001 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;]
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;] &lt;- 0.001 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;]
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;] &lt;- 0.15 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;]
-##     expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expCRaiDF$dVariable &lt;- &quot;Ceiling Raising Change Orders %&quot;
-##     varTable &lt;- subset(varTable, Comp == &quot;Comp.&quot;)
-##     expOffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;Offr&quot;)
-##     expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expOffrDF$Average[expOffrDF$Offr == &quot;1&quot;] &lt;- 1 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;1&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;2&quot;] &lt;- 2 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;2&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;3-4&quot;] &lt;- 3.5 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;3-4&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;5+&quot;] &lt;- 5 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;5+&quot;]
-##     expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expOffrDF$dVariable &lt;- &quot;Average Number of Offers for Competed Contracts&quot;
-##     OffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##         &quot;Offr&quot;)
-##     OffrDF &lt;- ddply(OffrDF, .(FxCb, Control, iVariable), transform, 
-##         p = Freq/sum(Freq))
-##     colnames(OffrDF)[colnames(OffrDF) == &quot;Offr&quot;] &lt;- &quot;dVariable&quot;
-##     OffrDF &lt;- subset(OffrDF, dVariable == &quot;1&quot;)
-##     OffrDF$dVariable &lt;- &quot;% Single Offer Competition&quot;
-##     OffrDF$Average &lt;- NA
-##     ResultsDF &lt;- rbind(TermDF, expOffrDF, OffrDF, expNChgDF, 
-##         expCRaiDF)
-##     if (!is.na(HypothesisLabel)) 
-##         ResultsDF$Hypothesis &lt;- HypothesisLabel
-##     ResultsDF
-## }
-## debug: TermDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Term&quot;)
-## debug: TermDF &lt;- ddply(TermDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: colnames(TermDF)[colnames(TermDF) == &quot;Term&quot;] &lt;- &quot;dVariable&quot;
-## debug: TermDF &lt;- subset(TermDF, dVariable == &quot;Terminated&quot;)
-## debug: TermDF$Average &lt;- NA
-## debug: expNChgDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;NChg&quot;)
-## debug: expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   0&quot;] &lt;- 0
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   1&quot;] &lt;- 1 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;   1&quot;]
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   2&quot;] &lt;- 2 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;   2&quot;]
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;[   3,1040]&quot;] &lt;- 3 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;[   3,1040]&quot;]
-## debug: expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expNChgDF$dVariable &lt;- &quot;Average Number of Change Orders&quot;
-## debug: expCRaiDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;CRai&quot;)
-## debug: expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[-0.001, 0.001)&quot;] &lt;- 0
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;] &lt;- -0.001 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;]
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;] &lt;- 0.001 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;]
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;] &lt;- 0.15 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;]
-## debug: expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expCRaiDF$dVariable &lt;- &quot;Ceiling Raising Change Orders %&quot;
-## debug: varTable &lt;- subset(varTable, Comp == &quot;Comp.&quot;)
-## debug: expOffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Offr&quot;)
-## debug: expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;1&quot;] &lt;- 1 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;1&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;2&quot;] &lt;- 2 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;2&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;3-4&quot;] &lt;- 3.5 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;3-4&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;5+&quot;] &lt;- 5 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;5+&quot;]
-## debug: expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expOffrDF$dVariable &lt;- &quot;Average Number of Offers for Competed Contracts&quot;
-## debug: OffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Offr&quot;)
-## debug: OffrDF &lt;- ddply(OffrDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: colnames(OffrDF)[colnames(OffrDF) == &quot;Offr&quot;] &lt;- &quot;dVariable&quot;
-## debug: OffrDF &lt;- subset(OffrDF, dVariable == &quot;1&quot;)
-## debug: OffrDF$dVariable &lt;- &quot;% Single Offer Competition&quot;
-## debug: OffrDF$Average &lt;- NA
-## debug: ResultsDF &lt;- rbind(TermDF, expOffrDF, OffrDF, expNChgDF, expCRaiDF)
-## debug: if (!is.na(HypothesisLabel)) ResultsDF$Hypothesis &lt;- HypothesisLabel
-## debug: ResultsDF$Hypothesis &lt;- HypothesisLabel
-## debug: ResultsDF
-## exiting from: FixedPriceComparisonTable(subset(ModelSummary, PSR == &quot;R&amp;D&quot;), 
-##     &quot;R&amp;D&quot;)</code></pre>
-<pre class="r"><code>#Single Offer Competition
-ggplot(subset(RnDlongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())</code></pre>
+                                &quot;R&amp;D&quot;)
+
+
+Coloration&lt;-NULL
+
+
+#Single Offer Competition
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;% of Contracts Receiving Single Offer Competition&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDlongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;p&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;Dabsolute-1.png" />
 </div>
 <pre class="r"><code>#Average Number of Offers
-ggplot(subset(RnDlongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Number of Offers&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDlongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;Average&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;Dabsolute-2.png" />
 </div>
 <pre class="r"><code>#Average Number of Changes
-ggplot(subset(RnDlongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDlongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;Average&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;Dabsolute-3.png" />
 </div>
 <pre class="r"><code>#Ceiling Raising Change Orders %
-ggplot(subset(RnDlongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Ceiling Raising Change Order %&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDlongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;Average&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;Dabsolute-4.png" />
 </div>
 <pre class="r"><code>#Terminations
-ggplot(subset(RnDlongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;% of Terminated Contracts&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDlongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;p&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;Dabsolute-5.png" />
 </div>
 <pre class="r"><code>rm(RnDfind)</code></pre>
-<pre class="r"><code>RnDwideDF&lt;-FixedPriceCast(rbind(RnDlongDF,PopulationLongDF))
-
-
-
-#Remove redundant tests
+<pre class="r"><code># debug(FixedPriceCast)
+RnDwideDF&lt;-FixedPriceCast(rbind(RnDlongDF,PopulationLongDF))</code></pre>
+<pre><code>## Warning: attributes are not identical across measure variables; they will
+## be dropped</code></pre>
+<pre class="r"><code>#Remove redundant tests
 RnDwideDF&lt;-subset(RnDwideDF,
                   !Control %in% unique(RnDwideDF$Hypothesis))
 RnDwideDF$Hypothesis&lt;-factor(RnDwideDF$Hypothesis,levels=c(&quot;R&amp;D&quot;,&quot;Population&quot;),ordered=TRUE)
@@ -1205,7 +1172,7 @@ ggplot(subset(RnDwideDF,dVariable==&quot;Average Number of Change Orders&quot;),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;D-3.png" />
@@ -1216,9 +1183,7 @@ ggplot(subset(RnDwideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;D-4.png" />
@@ -1273,193 +1238,99 @@ ggplot(subset(RnDwideDF,dVariable==&quot;Terminated&quot;),
                        states=c( &quot;Labeled MDAP&quot; ))
 
 MDAPlongDF&lt;-FixedPriceComparisonTable(subset(ModelSummary,MDAP==&quot;Labeled MDAP&quot;),
-                                &quot;Labeled MDAP&quot;)</code></pre>
-<pre><code>## debugging in: FixedPriceComparisonTable(subset(ModelSummary, MDAP == &quot;Labeled MDAP&quot;), 
-##     &quot;Labeled MDAP&quot;)
-## debug: {
-##     TermDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##         &quot;Term&quot;)
-##     TermDF &lt;- ddply(TermDF, .(FxCb, Control, iVariable), transform, 
-##         p = Freq/sum(Freq))
-##     colnames(TermDF)[colnames(TermDF) == &quot;Term&quot;] &lt;- &quot;dVariable&quot;
-##     TermDF &lt;- subset(TermDF, dVariable == &quot;Terminated&quot;)
-##     TermDF$Average &lt;- NA
-##     expNChgDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;NChg&quot;)
-##     expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   0&quot;] &lt;- 0
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   1&quot;] &lt;- 1 * expNChgDF$p[expNChgDF$NChg == 
-##         &quot;   1&quot;]
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   2&quot;] &lt;- 2 * expNChgDF$p[expNChgDF$NChg == 
-##         &quot;   2&quot;]
-##     expNChgDF$Average[expNChgDF$NChg == &quot;[   3,1040]&quot;] &lt;- 3 * 
-##         expNChgDF$p[expNChgDF$NChg == &quot;[   3,1040]&quot;]
-##     expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expNChgDF$dVariable &lt;- &quot;Average Number of Change Orders&quot;
-##     expCRaiDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;CRai&quot;)
-##     expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[-0.001, 0.001)&quot;] &lt;- 0
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;] &lt;- -0.001 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;]
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;] &lt;- 0.001 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;]
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;] &lt;- 0.15 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;]
-##     expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expCRaiDF$dVariable &lt;- &quot;Ceiling Raising Change Orders %&quot;
-##     varTable &lt;- subset(varTable, Comp == &quot;Comp.&quot;)
-##     expOffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;Offr&quot;)
-##     expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expOffrDF$Average[expOffrDF$Offr == &quot;1&quot;] &lt;- 1 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;1&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;2&quot;] &lt;- 2 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;2&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;3-4&quot;] &lt;- 3.5 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;3-4&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;5+&quot;] &lt;- 5 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;5+&quot;]
-##     expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expOffrDF$dVariable &lt;- &quot;Average Number of Offers for Competed Contracts&quot;
-##     OffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##         &quot;Offr&quot;)
-##     OffrDF &lt;- ddply(OffrDF, .(FxCb, Control, iVariable), transform, 
-##         p = Freq/sum(Freq))
-##     colnames(OffrDF)[colnames(OffrDF) == &quot;Offr&quot;] &lt;- &quot;dVariable&quot;
-##     OffrDF &lt;- subset(OffrDF, dVariable == &quot;1&quot;)
-##     OffrDF$dVariable &lt;- &quot;% Single Offer Competition&quot;
-##     OffrDF$Average &lt;- NA
-##     ResultsDF &lt;- rbind(TermDF, expOffrDF, OffrDF, expNChgDF, 
-##         expCRaiDF)
-##     if (!is.na(HypothesisLabel)) 
-##         ResultsDF$Hypothesis &lt;- HypothesisLabel
-##     ResultsDF
-## }
-## debug: TermDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Term&quot;)
-## debug: TermDF &lt;- ddply(TermDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: colnames(TermDF)[colnames(TermDF) == &quot;Term&quot;] &lt;- &quot;dVariable&quot;
-## debug: TermDF &lt;- subset(TermDF, dVariable == &quot;Terminated&quot;)
-## debug: TermDF$Average &lt;- NA
-## debug: expNChgDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;NChg&quot;)
-## debug: expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   0&quot;] &lt;- 0
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   1&quot;] &lt;- 1 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;   1&quot;]
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   2&quot;] &lt;- 2 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;   2&quot;]
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;[   3,1040]&quot;] &lt;- 3 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;[   3,1040]&quot;]
-## debug: expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expNChgDF$dVariable &lt;- &quot;Average Number of Change Orders&quot;
-## debug: expCRaiDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;CRai&quot;)
-## debug: expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[-0.001, 0.001)&quot;] &lt;- 0
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;] &lt;- -0.001 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;]
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;] &lt;- 0.001 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;]
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;] &lt;- 0.15 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;]
-## debug: expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expCRaiDF$dVariable &lt;- &quot;Ceiling Raising Change Orders %&quot;
-## debug: varTable &lt;- subset(varTable, Comp == &quot;Comp.&quot;)
-## debug: expOffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Offr&quot;)
-## debug: expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;1&quot;] &lt;- 1 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;1&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;2&quot;] &lt;- 2 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;2&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;3-4&quot;] &lt;- 3.5 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;3-4&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;5+&quot;] &lt;- 5 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;5+&quot;]
-## debug: expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expOffrDF$dVariable &lt;- &quot;Average Number of Offers for Competed Contracts&quot;
-## debug: OffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Offr&quot;)
-## debug: OffrDF &lt;- ddply(OffrDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: colnames(OffrDF)[colnames(OffrDF) == &quot;Offr&quot;] &lt;- &quot;dVariable&quot;
-## debug: OffrDF &lt;- subset(OffrDF, dVariable == &quot;1&quot;)
-## debug: OffrDF$dVariable &lt;- &quot;% Single Offer Competition&quot;
-## debug: OffrDF$Average &lt;- NA
-## debug: ResultsDF &lt;- rbind(TermDF, expOffrDF, OffrDF, expNChgDF, expCRaiDF)
-## debug: if (!is.na(HypothesisLabel)) ResultsDF$Hypothesis &lt;- HypothesisLabel
-## debug: ResultsDF$Hypothesis &lt;- HypothesisLabel
-## debug: ResultsDF
-## exiting from: FixedPriceComparisonTable(subset(ModelSummary, MDAP == &quot;Labeled MDAP&quot;), 
-##     &quot;Labeled MDAP&quot;)</code></pre>
-<pre class="r"><code>#Remove redundant tests
+                                &quot;Labeled MDAP&quot;)
+
+
+
+#Remove redundant tests
 MDAPlongDF&lt;-subset(MDAPlongDF,
                    !Control %in% unique(MDAPlongDF$Hypothesis))
 MDAPlongDF$Hypothesis&lt;-factor(MDAPlongDF$Hypothesis,levels=c(&quot;MDAP&quot;,&quot;Population&quot;),ordered=TRUE)
 
 #Single Offer Competition
-ggplot(subset(MDAPlongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;MDAP Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;% of Contracts Receiving Single Offer Competition&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPlongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;p&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-1.png" />
 </div>
 <pre class="r"><code>#Average Number of Offers
-ggplot(subset(MDAPlongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;MDAP Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Number of Offers&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPlongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;Average&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-2.png" />
 </div>
 <pre class="r"><code>#Average Number of Changes
-ggplot(subset(MDAPlongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;MDAP Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPlongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;Average&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-3.png" />
 </div>
 <pre class="r"><code>#Ceiling Raising Change Orders %
-ggplot(subset(MDAPlongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;MDAP Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Ceiling Raising Change Order %&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPlongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;Average&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-4.png" />
 </div>
 <pre class="r"><code>#Terminations
-ggplot(subset(MDAPlongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;MDAP Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;% of Terminated Contracts&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPlongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;p&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-5.png" />
 </div>
-<pre class="r"><code>MDAPwideDF&lt;-FixedPriceCast(rbind(MDAPlongDF,PopulationLongDF))
-
-MDAPwideDF$Hypothesis&lt;-factor(MDAPwideDF$Hypothesis,levels=c(&quot;MDAP&quot;,&quot;Population&quot;),ordered=TRUE)
+<pre class="r"><code>MDAPwideDF&lt;-FixedPriceCast(rbind(MDAPlongDF,PopulationLongDF))</code></pre>
+<pre><code>## Warning: attributes are not identical across measure variables; they will
+## be dropped</code></pre>
+<pre class="r"><code>MDAPwideDF$Hypothesis&lt;-factor(MDAPwideDF$Hypothesis,levels=c(&quot;MDAP&quot;,&quot;Population&quot;),ordered=TRUE)
 
 #Remove redundant tests
 MDAPwideDF&lt;-subset(MDAPwideDF,
@@ -1472,16 +1343,16 @@ ggplot(subset(MDAPwideDF,dVariable==&quot;% Single Offer Competition&quot;),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-1.png" />
 </div>
@@ -1491,16 +1362,16 @@ ggplot(subset(MDAPwideDF,dVariable==&quot;Average Number of Offers for Competed 
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-2.png" />
 </div>
@@ -1510,15 +1381,15 @@ ggplot(subset(MDAPwideDF,dVariable==&quot;Average Number of Change Orders&quot;)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
 ## values (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-3.png" />
@@ -1529,15 +1400,15 @@ ggplot(subset(MDAPwideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-4.png" />
@@ -1548,15 +1419,15 @@ ggplot(subset(MDAPwideDF,dVariable==&quot;Terminated&quot;),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-5.png" />
@@ -1588,210 +1459,116 @@ ggplot(subset(MDAPwideDF,dVariable==&quot;Terminated&quot;),
 <div id="initial-results-2" class="section level1">
 <h1>Initial results</h1>
 <p>The hypothesis regarding number of offers was not supported at the greater than 1 year level. Further subdivision into 2 year plus or other breakdowns might show a different result. Combination resembled fixed-price, but did not do as well with 5 or more offers.</p>
-<pre class="r"><code>FixedPriceGin[[1]]$levels$Dur</code></pre>
+<pre class="r"><code>    FixedPriceGin[[1]]$levels$Dur</code></pre>
 <pre><code>## [1] &quot;[0 months,~2 months)&quot;  &quot;[~2 months,~7 months)&quot; &quot;[~7 months-~1 year]&quot;  
 ## [4] &quot;(~1 year,~2 years]&quot;    &quot;(~2 years+]&quot;</code></pre>
-<pre class="r"><code>LongDurFind&lt;- setEvidence(FixedPriceGin, 
-                          nodes=c(&quot;Dur&quot;),
-                          states=c(&quot;(~2 years+]&quot;)
-                          )
-
-getEvidence(LongDurFind)</code></pre>
+<pre class="r"><code>    LongDurFind&lt;- setEvidence(FixedPriceGin, 
+                              nodes=c(&quot;Dur&quot;),
+                              states=c(&quot;(~2 years+]&quot;)
+                              )
+    
+    getEvidence(LongDurFind)</code></pre>
 <pre><code>## Finding: 
 ## Dur: (~2 years+]
 ## Pr(Finding)= 0.006950983</code></pre>
-<pre class="r"><code>LongDurLongDF&lt;-FixedPriceComparisonTable(subset(ModelSummary,Dur==&quot;(~2 years+]&quot;),
-                                &quot;Long Dur&quot;)</code></pre>
-<pre><code>## debugging in: FixedPriceComparisonTable(subset(ModelSummary, Dur == &quot;(~2 years+]&quot;), 
-##     &quot;Long Dur&quot;)
-## debug: {
-##     TermDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##         &quot;Term&quot;)
-##     TermDF &lt;- ddply(TermDF, .(FxCb, Control, iVariable), transform, 
-##         p = Freq/sum(Freq))
-##     colnames(TermDF)[colnames(TermDF) == &quot;Term&quot;] &lt;- &quot;dVariable&quot;
-##     TermDF &lt;- subset(TermDF, dVariable == &quot;Terminated&quot;)
-##     TermDF$Average &lt;- NA
-##     expNChgDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;NChg&quot;)
-##     expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   0&quot;] &lt;- 0
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   1&quot;] &lt;- 1 * expNChgDF$p[expNChgDF$NChg == 
-##         &quot;   1&quot;]
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   2&quot;] &lt;- 2 * expNChgDF$p[expNChgDF$NChg == 
-##         &quot;   2&quot;]
-##     expNChgDF$Average[expNChgDF$NChg == &quot;[   3,1040]&quot;] &lt;- 3 * 
-##         expNChgDF$p[expNChgDF$NChg == &quot;[   3,1040]&quot;]
-##     expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expNChgDF$dVariable &lt;- &quot;Average Number of Change Orders&quot;
-##     expCRaiDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;CRai&quot;)
-##     expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[-0.001, 0.001)&quot;] &lt;- 0
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;] &lt;- -0.001 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;]
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;] &lt;- 0.001 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;]
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;] &lt;- 0.15 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;]
-##     expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expCRaiDF$dVariable &lt;- &quot;Ceiling Raising Change Orders %&quot;
-##     varTable &lt;- subset(varTable, Comp == &quot;Comp.&quot;)
-##     expOffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;Offr&quot;)
-##     expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expOffrDF$Average[expOffrDF$Offr == &quot;1&quot;] &lt;- 1 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;1&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;2&quot;] &lt;- 2 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;2&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;3-4&quot;] &lt;- 3.5 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;3-4&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;5+&quot;] &lt;- 5 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;5+&quot;]
-##     expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expOffrDF$dVariable &lt;- &quot;Average Number of Offers for Competed Contracts&quot;
-##     OffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##         &quot;Offr&quot;)
-##     OffrDF &lt;- ddply(OffrDF, .(FxCb, Control, iVariable), transform, 
-##         p = Freq/sum(Freq))
-##     colnames(OffrDF)[colnames(OffrDF) == &quot;Offr&quot;] &lt;- &quot;dVariable&quot;
-##     OffrDF &lt;- subset(OffrDF, dVariable == &quot;1&quot;)
-##     OffrDF$dVariable &lt;- &quot;% Single Offer Competition&quot;
-##     OffrDF$Average &lt;- NA
-##     ResultsDF &lt;- rbind(TermDF, expOffrDF, OffrDF, expNChgDF, 
-##         expCRaiDF)
-##     if (!is.na(HypothesisLabel)) 
-##         ResultsDF$Hypothesis &lt;- HypothesisLabel
-##     ResultsDF
-## }
-## debug: TermDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Term&quot;)
-## debug: TermDF &lt;- ddply(TermDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: colnames(TermDF)[colnames(TermDF) == &quot;Term&quot;] &lt;- &quot;dVariable&quot;
-## debug: TermDF &lt;- subset(TermDF, dVariable == &quot;Terminated&quot;)
-## debug: TermDF$Average &lt;- NA
-## debug: expNChgDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;NChg&quot;)
-## debug: expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   0&quot;] &lt;- 0
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   1&quot;] &lt;- 1 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;   1&quot;]
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   2&quot;] &lt;- 2 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;   2&quot;]
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;[   3,1040]&quot;] &lt;- 3 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;[   3,1040]&quot;]
-## debug: expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expNChgDF$dVariable &lt;- &quot;Average Number of Change Orders&quot;
-## debug: expCRaiDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;CRai&quot;)
-## debug: expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[-0.001, 0.001)&quot;] &lt;- 0
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;] &lt;- -0.001 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;]
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;] &lt;- 0.001 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;]
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;] &lt;- 0.15 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;]
-## debug: expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expCRaiDF$dVariable &lt;- &quot;Ceiling Raising Change Orders %&quot;
-## debug: varTable &lt;- subset(varTable, Comp == &quot;Comp.&quot;)
-## debug: expOffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Offr&quot;)
-## debug: expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;1&quot;] &lt;- 1 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;1&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;2&quot;] &lt;- 2 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;2&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;3-4&quot;] &lt;- 3.5 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;3-4&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;5+&quot;] &lt;- 5 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;5+&quot;]
-## debug: expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expOffrDF$dVariable &lt;- &quot;Average Number of Offers for Competed Contracts&quot;
-## debug: OffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Offr&quot;)
-## debug: OffrDF &lt;- ddply(OffrDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: colnames(OffrDF)[colnames(OffrDF) == &quot;Offr&quot;] &lt;- &quot;dVariable&quot;
-## debug: OffrDF &lt;- subset(OffrDF, dVariable == &quot;1&quot;)
-## debug: OffrDF$dVariable &lt;- &quot;% Single Offer Competition&quot;
-## debug: OffrDF$Average &lt;- NA
-## debug: ResultsDF &lt;- rbind(TermDF, expOffrDF, OffrDF, expNChgDF, expCRaiDF)
-## debug: if (!is.na(HypothesisLabel)) ResultsDF$Hypothesis &lt;- HypothesisLabel
-## debug: ResultsDF$Hypothesis &lt;- HypothesisLabel
-## debug: ResultsDF
-## exiting from: FixedPriceComparisonTable(subset(ModelSummary, Dur == &quot;(~2 years+]&quot;), 
-##     &quot;Long Dur&quot;)</code></pre>
-<pre class="r"><code>LongDurLongDF$Hypothesis&lt;-factor(LongDurLongDF$Hypothesis,levels=c(&quot;Long Dur.&quot;,&quot;Population&quot;),ordered=TRUE)
-
-#Remove redundant tests
-LongDurLongDF&lt;-subset(LongDurLongDF,
-                  !Control %in% c(unique(LongDurLongDF$Hypothesis),&quot;Not Long Dur.&quot;))
-
-
-#Single Offer Competition
-ggplot(subset(LongDurLongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())</code></pre>
+<pre class="r"><code>    LongDurLongDF&lt;-FixedPriceComparisonTable(subset(ModelSummary,Dur==&quot;(~2 years+]&quot;),
+                                    &quot;Long Dur&quot;)
+    
+    
+    
+    
+    LongDurLongDF$Hypothesis&lt;-factor(LongDurLongDF$Hypothesis,levels=c(&quot;Long Dur.&quot;,&quot;Population&quot;),ordered=TRUE)
+    
+    #Remove redundant tests
+    LongDurLongDF&lt;-subset(LongDurLongDF,
+                      !Control %in% c(unique(LongDurLongDF$Hypothesis),&quot;2+ Year Dur.&quot;,&quot;&lt;2 Year Dur.&quot;))
+    
+    
+    #Single Offer Competition
+    PointRowWrapper(NULL,#VAR.main.label,
+                    &quot;Long Duration Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;% of Contracts Receiving Single Offer Competition&quot;,          #VAR.data.label,
+                    &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(LongDurLongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
+                              &quot;Control&quot;,
+                              &quot;p&quot;,
+                              &quot;FxCb&quot;,
+                              &quot;Significance&quot;,
+                              &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-1.png" />
 </div>
-<pre class="r"><code>#Average Number of Offers
-ggplot(subset(LongDurLongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())</code></pre>
+<pre class="r"><code>    #Average Number of Offers
+    PointRowWrapper(NULL,#VAR.main.label,
+                    &quot;Long Duration Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;Approximate Average Number of Offers&quot;,          #VAR.data.label,
+                    &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(LongDurLongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                              &quot;Control&quot;,
+                              &quot;Average&quot;,
+                              &quot;FxCb&quot;,
+                              &quot;Significance&quot;,
+                              &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-2.png" />
 </div>
-<pre class="r"><code>#Average Number of Changes
-ggplot(subset(LongDurLongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))</code></pre>
+<pre class="r"><code>    #Average Number of Changes
+    PointRowWrapper(NULL,#VAR.main.label,
+                    &quot;Long Duration Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
+                    &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(LongDurLongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                              &quot;Control&quot;,
+                              &quot;Average&quot;,
+                              &quot;FxCb&quot;,
+                              &quot;Significance&quot;,
+                              &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-3.png" />
 </div>
-<pre class="r"><code>#Ceiling Raising Change Orders %
-ggplot(subset(LongDurLongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))</code></pre>
+<pre class="r"><code>    #Ceiling Raising Change Orders %
+    PointRowWrapper(NULL,#VAR.main.label,
+                    &quot;Long Duration Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;Approximate Average Ceiling Raising Change Order %&quot;,          #VAR.data.label,
+                    &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(LongDurLongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                              &quot;Control&quot;,
+                              &quot;Average&quot;,
+                              &quot;FxCb&quot;,
+                              &quot;Significance&quot;,
+                              &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-4.png" />
 </div>
-<pre class="r"><code>#Terminations
-ggplot(subset(LongDurLongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())</code></pre>
+<pre class="r"><code>    #Terminations
+    PointRowWrapper(NULL,#VAR.main.label,
+                    &quot;Long Duration Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;% of Terminated Contracts&quot;,          #VAR.data.label,
+                    &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(LongDurLongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                              &quot;Control&quot;,
+                              &quot;p&quot;,
+                              &quot;FxCb&quot;,
+                              &quot;Significance&quot;,
+                              &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-5.png" />
 </div>
-<pre class="r"><code>rm(LongDurFind)</code></pre>
-<pre class="r"><code>LongDurWideDF&lt;-FixedPriceCast(rbind(LongDurLongDF,PopulationLongDF))
-
-
-LongDurWideDF$Hypothesis&lt;-factor(LongDurWideDF$Hypothesis,levels=c(&quot;Long Dur.&quot;,&quot;Population&quot;),ordered=TRUE)
+<pre class="r"><code>    rm(LongDurFind)</code></pre>
+<pre class="r"><code>LongDurWideDF&lt;-FixedPriceCast(rbind(LongDurLongDF,PopulationLongDF))</code></pre>
+<pre><code>## Warning: attributes are not identical across measure variables; they will
+## be dropped</code></pre>
+<pre class="r"><code>LongDurWideDF$Hypothesis&lt;-factor(LongDurWideDF$Hypothesis,levels=c(&quot;Long Dur.&quot;,&quot;Population&quot;),ordered=TRUE)
 
 #Remove redundant tests
 LongDurWideDF&lt;-subset(LongDurWideDF,
@@ -1804,16 +1581,16 @@ ggplot(subset(LongDurWideDF,dVariable==&quot;% Single Offer Competition&quot;),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-1.png" />
 </div>
@@ -1823,16 +1600,16 @@ ggplot(subset(LongDurWideDF,dVariable==&quot;Average Number of Offers for Compet
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-2.png" />
 </div>
@@ -1842,16 +1619,16 @@ ggplot(subset(LongDurWideDF,dVariable==&quot;Average Number of Change Orders&quo
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-3.png" />
 </div>
@@ -1861,16 +1638,16 @@ ggplot(subset(LongDurWideDF,dVariable==&quot;Ceiling Raising Change Orders %&quo
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-4.png" />
 </div>
@@ -1880,16 +1657,16 @@ ggplot(subset(LongDurWideDF,dVariable==&quot;Terminated&quot;),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-5.png" />
 </div>
@@ -1930,183 +1707,74 @@ getEvidence(CompFind)</code></pre>
 ## Comp: Comp.
 ## Pr(Finding)= 0.8009173</code></pre>
 <pre class="r"><code>CompLongDF&lt;-FixedPriceComparisonTable(subset(ModelSummary,Comp==&quot;Comp.&quot;),
-                                      &quot;Comp.&quot;)</code></pre>
-<pre><code>## debugging in: FixedPriceComparisonTable(subset(ModelSummary, Comp == &quot;Comp.&quot;), 
-##     &quot;Comp.&quot;)
-## debug: {
-##     TermDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##         &quot;Term&quot;)
-##     TermDF &lt;- ddply(TermDF, .(FxCb, Control, iVariable), transform, 
-##         p = Freq/sum(Freq))
-##     colnames(TermDF)[colnames(TermDF) == &quot;Term&quot;] &lt;- &quot;dVariable&quot;
-##     TermDF &lt;- subset(TermDF, dVariable == &quot;Terminated&quot;)
-##     TermDF$Average &lt;- NA
-##     expNChgDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;NChg&quot;)
-##     expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   0&quot;] &lt;- 0
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   1&quot;] &lt;- 1 * expNChgDF$p[expNChgDF$NChg == 
-##         &quot;   1&quot;]
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   2&quot;] &lt;- 2 * expNChgDF$p[expNChgDF$NChg == 
-##         &quot;   2&quot;]
-##     expNChgDF$Average[expNChgDF$NChg == &quot;[   3,1040]&quot;] &lt;- 3 * 
-##         expNChgDF$p[expNChgDF$NChg == &quot;[   3,1040]&quot;]
-##     expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expNChgDF$dVariable &lt;- &quot;Average Number of Change Orders&quot;
-##     expCRaiDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;CRai&quot;)
-##     expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[-0.001, 0.001)&quot;] &lt;- 0
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;] &lt;- -0.001 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;]
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;] &lt;- 0.001 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;]
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;] &lt;- 0.15 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;]
-##     expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expCRaiDF$dVariable &lt;- &quot;Ceiling Raising Change Orders %&quot;
-##     varTable &lt;- subset(varTable, Comp == &quot;Comp.&quot;)
-##     expOffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;Offr&quot;)
-##     expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expOffrDF$Average[expOffrDF$Offr == &quot;1&quot;] &lt;- 1 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;1&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;2&quot;] &lt;- 2 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;2&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;3-4&quot;] &lt;- 3.5 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;3-4&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;5+&quot;] &lt;- 5 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;5+&quot;]
-##     expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expOffrDF$dVariable &lt;- &quot;Average Number of Offers for Competed Contracts&quot;
-##     OffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##         &quot;Offr&quot;)
-##     OffrDF &lt;- ddply(OffrDF, .(FxCb, Control, iVariable), transform, 
-##         p = Freq/sum(Freq))
-##     colnames(OffrDF)[colnames(OffrDF) == &quot;Offr&quot;] &lt;- &quot;dVariable&quot;
-##     OffrDF &lt;- subset(OffrDF, dVariable == &quot;1&quot;)
-##     OffrDF$dVariable &lt;- &quot;% Single Offer Competition&quot;
-##     OffrDF$Average &lt;- NA
-##     ResultsDF &lt;- rbind(TermDF, expOffrDF, OffrDF, expNChgDF, 
-##         expCRaiDF)
-##     if (!is.na(HypothesisLabel)) 
-##         ResultsDF$Hypothesis &lt;- HypothesisLabel
-##     ResultsDF
-## }
-## debug: TermDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Term&quot;)
-## debug: TermDF &lt;- ddply(TermDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: colnames(TermDF)[colnames(TermDF) == &quot;Term&quot;] &lt;- &quot;dVariable&quot;
-## debug: TermDF &lt;- subset(TermDF, dVariable == &quot;Terminated&quot;)
-## debug: TermDF$Average &lt;- NA
-## debug: expNChgDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;NChg&quot;)
-## debug: expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   0&quot;] &lt;- 0
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   1&quot;] &lt;- 1 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;   1&quot;]
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   2&quot;] &lt;- 2 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;   2&quot;]
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;[   3,1040]&quot;] &lt;- 3 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;[   3,1040]&quot;]
-## debug: expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expNChgDF$dVariable &lt;- &quot;Average Number of Change Orders&quot;
-## debug: expCRaiDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;CRai&quot;)
-## debug: expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[-0.001, 0.001)&quot;] &lt;- 0
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;] &lt;- -0.001 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;]
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;] &lt;- 0.001 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;]
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;] &lt;- 0.15 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;]
-## debug: expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expCRaiDF$dVariable &lt;- &quot;Ceiling Raising Change Orders %&quot;
-## debug: varTable &lt;- subset(varTable, Comp == &quot;Comp.&quot;)
-## debug: expOffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Offr&quot;)
-## debug: expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;1&quot;] &lt;- 1 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;1&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;2&quot;] &lt;- 2 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;2&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;3-4&quot;] &lt;- 3.5 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;3-4&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;5+&quot;] &lt;- 5 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;5+&quot;]
-## debug: expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expOffrDF$dVariable &lt;- &quot;Average Number of Offers for Competed Contracts&quot;
-## debug: OffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Offr&quot;)
-## debug: OffrDF &lt;- ddply(OffrDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: colnames(OffrDF)[colnames(OffrDF) == &quot;Offr&quot;] &lt;- &quot;dVariable&quot;
-## debug: OffrDF &lt;- subset(OffrDF, dVariable == &quot;1&quot;)
-## debug: OffrDF$dVariable &lt;- &quot;% Single Offer Competition&quot;
-## debug: OffrDF$Average &lt;- NA
-## debug: ResultsDF &lt;- rbind(TermDF, expOffrDF, OffrDF, expNChgDF, expCRaiDF)
-## debug: if (!is.na(HypothesisLabel)) ResultsDF$Hypothesis &lt;- HypothesisLabel
-## debug: ResultsDF$Hypothesis &lt;- HypothesisLabel
-## debug: ResultsDF
-## exiting from: FixedPriceComparisonTable(subset(ModelSummary, Comp == &quot;Comp.&quot;), 
-##     &quot;Comp.&quot;)</code></pre>
-<pre class="r"><code>#Remove redundant tests
+                                      &quot;Comp.&quot;)
+
+
+
+
+#Remove redundant tests
 CompLongDF&lt;-subset(CompLongDF,
                !Control %in% c(unique(CompLongDF$Hypothesis),&quot;Not Comp.&quot;))
 #Remove the  iVariables not covered in hypothesis
 CompLongDF&lt;-subset(CompLongDF,
                !dVariable %in% c(&quot;1&quot;,&quot;Average Number of Offers&quot;))
 
-
-
-#Average Number of Changes
-ggplot(subset(CompLongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))</code></pre>
+    
+    
+    #Average Number of Changes
+    PointRowWrapper(NULL,#VAR.main.label,
+                    &quot;Competed Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
+                    &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(CompLongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                              &quot;Control&quot;,
+                              &quot;Average&quot;,
+                              &quot;FxCb&quot;,
+                              &quot;Significance&quot;,
+                              &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H4CompAbsolute-1.png" />
 </div>
-<pre class="r"><code>#Ceiling Raising Change Orders %
-ggplot(subset(CompLongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))</code></pre>
+<pre class="r"><code>    #Ceiling Raising Change Orders %
+    PointRowWrapper(NULL,#VAR.main.label,
+                    &quot;Competed Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;Approximate Average Ceiling Raising Change Order %&quot;,          #VAR.data.label,
+                    &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(CompLongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                              &quot;Control&quot;,
+                              &quot;Average&quot;,
+                              &quot;FxCb&quot;,
+                              &quot;Significance&quot;,
+                              &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H4CompAbsolute-2.png" />
 </div>
-<pre class="r"><code>#Terminations
-ggplot(subset(CompLongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())</code></pre>
+<pre class="r"><code>    #Terminations
+    PointRowWrapper(NULL,#VAR.main.label,
+                    &quot;Competed Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;% of Terminated Contracts&quot;,          #VAR.data.label,
+                    &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(CompLongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                              &quot;Control&quot;,
+                              &quot;p&quot;,
+                              &quot;FxCb&quot;,
+                              &quot;Significance&quot;,
+                              &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H4CompAbsolute-3.png" />
 </div>
 <pre class="r"><code>rm(CompFind)</code></pre>
 <pre class="r"><code>CompWideDF&lt;-FixedPriceCast(rbind(CompLongDF,
-                                    PopulationLongDF))
-
-
-
-CompWideDF$Hypothesis&lt;-factor(CompWideDF$Hypothesis,levels=c(&quot;Comp.&quot;,&quot;Population&quot;),ordered=TRUE)
+                                    PopulationLongDF))</code></pre>
+<pre><code>## Warning: attributes are not identical across measure variables; they will
+## be dropped</code></pre>
+<pre class="r"><code>CompWideDF$Hypothesis&lt;-factor(CompWideDF$Hypothesis,levels=c(&quot;Comp.&quot;,&quot;Population&quot;),ordered=TRUE)
 
 #Remove redundant tests
 CompWideDF&lt;-subset(CompWideDF,
@@ -2141,8 +1809,6 @@ ggplot(subset(CompWideDF,dVariable==&quot;Terminated&quot;),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H4Comp-3.png" />
 </div>
@@ -2186,197 +1852,102 @@ getEvidence(SoftwareFind)</code></pre>
 ## Soft: Possible Software Eng.
 ## Pr(Finding)= 0.003934603</code></pre>
 <pre class="r"><code>SoftwareLongDF&lt;-FixedPriceComparisonTable(subset(ModelSummary,Soft==&quot;Possible Software Eng.&quot;),
-                                      &quot;Possible \nSoftware Eng.&quot;)</code></pre>
-<pre><code>## debugging in: FixedPriceComparisonTable(subset(ModelSummary, Soft == &quot;Possible Software Eng.&quot;), 
-##     &quot;Possible \nSoftware Eng.&quot;)
-## debug: {
-##     TermDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##         &quot;Term&quot;)
-##     TermDF &lt;- ddply(TermDF, .(FxCb, Control, iVariable), transform, 
-##         p = Freq/sum(Freq))
-##     colnames(TermDF)[colnames(TermDF) == &quot;Term&quot;] &lt;- &quot;dVariable&quot;
-##     TermDF &lt;- subset(TermDF, dVariable == &quot;Terminated&quot;)
-##     TermDF$Average &lt;- NA
-##     expNChgDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;NChg&quot;)
-##     expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   0&quot;] &lt;- 0
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   1&quot;] &lt;- 1 * expNChgDF$p[expNChgDF$NChg == 
-##         &quot;   1&quot;]
-##     expNChgDF$Average[expNChgDF$NChg == &quot;   2&quot;] &lt;- 2 * expNChgDF$p[expNChgDF$NChg == 
-##         &quot;   2&quot;]
-##     expNChgDF$Average[expNChgDF$NChg == &quot;[   3,1040]&quot;] &lt;- 3 * 
-##         expNChgDF$p[expNChgDF$NChg == &quot;[   3,1040]&quot;]
-##     expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expNChgDF$dVariable &lt;- &quot;Average Number of Change Orders&quot;
-##     expCRaiDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;CRai&quot;)
-##     expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[-0.001, 0.001)&quot;] &lt;- 0
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;] &lt;- -0.001 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;]
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;] &lt;- 0.001 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;]
-##     expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;] &lt;- 0.15 * 
-##         expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;]
-##     expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expCRaiDF$dVariable &lt;- &quot;Ceiling Raising Change Orders %&quot;
-##     varTable &lt;- subset(varTable, Comp == &quot;Comp.&quot;)
-##     expOffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, 
-##         &quot;Ceil&quot;, &quot;Offr&quot;)
-##     expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), 
-##         transform, p = Freq/sum(Freq))
-##     expOffrDF$Average[expOffrDF$Offr == &quot;1&quot;] &lt;- 1 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;1&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;2&quot;] &lt;- 2 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;2&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;3-4&quot;] &lt;- 3.5 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;3-4&quot;]
-##     expOffrDF$Average[expOffrDF$Offr == &quot;5+&quot;] &lt;- 5 * expOffrDF$p[expOffrDF$Offr == 
-##         &quot;5+&quot;]
-##     expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), 
-##         summarise, Average = sum(Average), p = sum(p), Freq = sum(Freq))
-##     expOffrDF$dVariable &lt;- &quot;Average Number of Offers for Competed Contracts&quot;
-##     OffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##         &quot;Offr&quot;)
-##     OffrDF &lt;- ddply(OffrDF, .(FxCb, Control, iVariable), transform, 
-##         p = Freq/sum(Freq))
-##     colnames(OffrDF)[colnames(OffrDF) == &quot;Offr&quot;] &lt;- &quot;dVariable&quot;
-##     OffrDF &lt;- subset(OffrDF, dVariable == &quot;1&quot;)
-##     OffrDF$dVariable &lt;- &quot;% Single Offer Competition&quot;
-##     OffrDF$Average &lt;- NA
-##     ResultsDF &lt;- rbind(TermDF, expOffrDF, OffrDF, expNChgDF, 
-##         expCRaiDF)
-##     if (!is.na(HypothesisLabel)) 
-##         ResultsDF$Hypothesis &lt;- HypothesisLabel
-##     ResultsDF
-## }
-## debug: TermDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Term&quot;)
-## debug: TermDF &lt;- ddply(TermDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: colnames(TermDF)[colnames(TermDF) == &quot;Term&quot;] &lt;- &quot;dVariable&quot;
-## debug: TermDF &lt;- subset(TermDF, dVariable == &quot;Terminated&quot;)
-## debug: TermDF$Average &lt;- NA
-## debug: expNChgDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;NChg&quot;)
-## debug: expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   0&quot;] &lt;- 0
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   1&quot;] &lt;- 1 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;   1&quot;]
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;   2&quot;] &lt;- 2 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;   2&quot;]
-## debug: expNChgDF$Average[expNChgDF$NChg == &quot;[   3,1040]&quot;] &lt;- 3 * expNChgDF$p[expNChgDF$NChg == 
-##     &quot;[   3,1040]&quot;]
-## debug: expNChgDF &lt;- ddply(expNChgDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expNChgDF$dVariable &lt;- &quot;Average Number of Change Orders&quot;
-## debug: expCRaiDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;CRai&quot;)
-## debug: expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[-0.001, 0.001)&quot;] &lt;- 0
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;] &lt;- -0.001 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[  -Inf,-0.001)&quot;]
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;] &lt;- 0.001 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.001, 0.150)&quot;]
-## debug: expCRaiDF$Average[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;] &lt;- 0.15 * 
-##     expCRaiDF$p[expCRaiDF$CRai == &quot;[ 0.150,   Inf]&quot;]
-## debug: expCRaiDF &lt;- ddply(expCRaiDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expCRaiDF$dVariable &lt;- &quot;Ceiling Raising Change Orders %&quot;
-## debug: varTable &lt;- subset(varTable, Comp == &quot;Comp.&quot;)
-## debug: expOffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Offr&quot;)
-## debug: expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;1&quot;] &lt;- 1 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;1&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;2&quot;] &lt;- 2 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;2&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;3-4&quot;] &lt;- 3.5 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;3-4&quot;]
-## debug: expOffrDF$Average[expOffrDF$Offr == &quot;5+&quot;] &lt;- 5 * expOffrDF$p[expOffrDF$Offr == 
-##     &quot;5+&quot;]
-## debug: expOffrDF &lt;- ddply(expOffrDF, .(FxCb, Control, iVariable), summarise, 
-##     Average = sum(Average), p = sum(p), Freq = sum(Freq))
-## debug: expOffrDF$dVariable &lt;- &quot;Average Number of Offers for Competed Contracts&quot;
-## debug: OffrDF &lt;- QueryControlVariablesTable(varTable, &quot;FxCb&quot;, &quot;Ceil&quot;, 
-##     &quot;Offr&quot;)
-## debug: OffrDF &lt;- ddply(OffrDF, .(FxCb, Control, iVariable), transform, 
-##     p = Freq/sum(Freq))
-## debug: colnames(OffrDF)[colnames(OffrDF) == &quot;Offr&quot;] &lt;- &quot;dVariable&quot;
-## debug: OffrDF &lt;- subset(OffrDF, dVariable == &quot;1&quot;)
-## debug: OffrDF$dVariable &lt;- &quot;% Single Offer Competition&quot;
-## debug: OffrDF$Average &lt;- NA
-## debug: ResultsDF &lt;- rbind(TermDF, expOffrDF, OffrDF, expNChgDF, expCRaiDF)
-## debug: if (!is.na(HypothesisLabel)) ResultsDF$Hypothesis &lt;- HypothesisLabel
-## debug: ResultsDF$Hypothesis &lt;- HypothesisLabel
-## debug: ResultsDF
-## exiting from: FixedPriceComparisonTable(subset(ModelSummary, Soft == &quot;Possible Software Eng.&quot;), 
-##     &quot;Possible \nSoftware Eng.&quot;)</code></pre>
-<pre class="r"><code>SoftwareLongDF$Hypothesis&lt;-factor(SoftwareLongDF$Hypothesis,levels=c(&quot;Comp.&quot;,&quot;Possible Software Eng.&quot;),ordered=TRUE)
+                                      &quot;Possible \nSoftware Eng.&quot;)
+
+
+
+
+SoftwareLongDF$Hypothesis&lt;-factor(SoftwareLongDF$Hypothesis,levels=c(&quot;Comp.&quot;,&quot;Possible Software Eng.&quot;),ordered=TRUE)
 
 #Remove redundant tests
 SoftwareLongDF&lt;-subset(SoftwareLongDF,
                    !Control %in% unique(SoftwareLongDF$Hypothesis))
 
-
 #Single Offer Competition
-ggplot(subset(SoftwareLongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Software Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;% of Contracts Receiving Single Offer Competition&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareLongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;p&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-1.png" />
 </div>
 <pre class="r"><code>#Average Number of Offers
-ggplot(subset(SoftwareLongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Software Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Number of Offers&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareLongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;Average&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-2.png" />
 </div>
 <pre class="r"><code>#Average Number of Changes
-ggplot(subset(SoftwareLongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Software Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareLongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;Average&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-3.png" />
 </div>
 <pre class="r"><code>#Ceiling Raising Change Orders %
-ggplot(subset(SoftwareLongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Software Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Ceiling Raising Change Order %&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareLongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;Average&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-4.png" />
 </div>
 <pre class="r"><code>#Terminations
-ggplot(subset(SoftwareLongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Software Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;% of Terminated Contracts&quot;,          #VAR.data.label,
+                &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
+                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareLongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+                          &quot;Control&quot;,
+                          &quot;p&quot;,
+                          &quot;FxCb&quot;,
+                          &quot;Significance&quot;,
+                          &quot;iVariable&quot;)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-5.png" />
 </div>
 <pre class="r"><code>rm(SoftwareFind)</code></pre>
-<pre class="r"><code>SoftwareWideDF&lt;-FixedPriceCast(rbind(SoftwareLongDF,PopulationLongDF))
-
-
-SoftwareWideDF$Hypothesis&lt;-factor(SoftwareWideDF$Hypothesis,levels=c(&quot;Possible \nSoftware Eng.&quot;,&quot;Population&quot;),ordered=TRUE)
+<pre class="r"><code>SoftwareWideDF&lt;-FixedPriceCast(rbind(SoftwareLongDF,PopulationLongDF))</code></pre>
+<pre><code>## Warning: attributes are not identical across measure variables; they will
+## be dropped</code></pre>
+<pre class="r"><code>SoftwareWideDF$Hypothesis&lt;-factor(SoftwareWideDF$Hypothesis,levels=c(&quot;Possible \nSoftware Eng.&quot;,&quot;Population&quot;),ordered=TRUE)
 
 #Remove redundant tests
 SoftwareWideDF&lt;-subset(SoftwareWideDF,
@@ -2389,16 +1960,16 @@ ggplot(subset(SoftwareWideDF,dVariable==&quot;% Single Offer Competition&quot;),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 6 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-1.png" />
 </div>
@@ -2408,15 +1979,15 @@ ggplot(subset(SoftwareWideDF,dVariable==&quot;Average Number of Offers for Compe
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-2.png" />
@@ -2427,15 +1998,15 @@ ggplot(subset(SoftwareWideDF,dVariable==&quot;Average Number of Change Orders&qu
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
 <pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
 <pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
 ## values (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-3.png" />
@@ -2446,15 +2017,15 @@ ggplot(subset(SoftwareWideDF,dVariable==&quot;Ceiling Raising Change Orders %&qu
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
+## values (geom_point).</code></pre>
 <pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
 <pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
 ## values (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-4.png" />
@@ -2465,16 +2036,16 @@ ggplot(subset(SoftwareWideDF,dVariable==&quot;Terminated&quot;),
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+## (geom_point).</code></pre>
 <pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
 ## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 12 rows containing missing
-## values (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-5.png" />
 </div>

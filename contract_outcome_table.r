@@ -17,7 +17,7 @@ StandardizeTableQuery<-function(varTable,
                                 studyVariableCol,
                                 iVariableCol,
                                 dVariableCol,
-                                resultLabel=NA
+                                resultLabel="Overall"
 ){
     
     #All contracts by ceiling
@@ -39,13 +39,13 @@ StandardizeTableQuery<-function(varTable,
                          Count=sum(Count))
         
         colnames(ResultsDF)[colnames(ResultsDF)==iVariableCol]<-"iVariable"
-        if(!is.na(resultLabel)){
-            #         ResultsDF$iVariable<-factor(ResultsDF$iVariable,levels=levels(ResultsDF$iVariable),
-            #                                     labels=paste(resultLabel,levels(ResultsDF$iVariable)))
-            ResultsDF$Control<-resultLabel
-        }
-        else     ResultsDF$Control<-"Overall"
+        ResultsDF$Control<-resultLabel
+        
     }
+    
+    ResultsDF<-ChiSquaredFixedPriceCostBased(ResultsDF,dVariableCol,resultLabel)    
+    
+    
     ResultsDF
 }    
     
@@ -115,6 +115,89 @@ StandardizeTableQuery<-function(varTable,
 # }
 
 
+ChiSquaredFixedPriceCostBased<-function(ResultsDF,dVariableCol,ControlCol){
+    ResultsDF<-AddZerosForMissingFreqs(ResultsDF,dVariableCol)
+    
+    
+    for(i in levels(ResultsDF$iVariable)){
+        Fx<-subset(ResultsDF,iVariable==i&Control==ControlCol&FxCb=="Fixed-Price")
+        Fx<-Fx[order(Fx[,dVariableCol]),]
+        Cb<-subset(ResultsDF,iVariable==i&Control==ControlCol&FxCb=="Cost-Based")
+        Cb<-Cb[order(Cb[,dVariableCol]),]
+        RelevantList<-ResultsDF$iVariable==i&ResultsDF$Control==ControlCol&
+            ResultsDF$FxCb %in% c("Fixed-Price","Cost-Based")
+        if(nrow(Fx)>0 & nrow(Cb)>0){
+            #Chi-squared is less reliable if the expected value of any cell
+            #is less than 5.
+            if(min(sum(Cb$Count)*Fx$Count/sum(Fx$Count))<5){
+                test<-chisq.test(Cb$Count,p=Fx$Count/sum(Fx$Count),simulate.p.value=TRUE)
+            } else{
+                test<-chisq.test(Cb$Count,p=Fx$Count/sum(Fx$Count),simulate.p.value=FALSE)
+            }
+            ResultsDF[RelevantList,"statistic"]<-test$statistic
+            ResultsDF[RelevantList,"parameter"]<-test$parameter
+            ResultsDF[RelevantList,"p.value"]<-test$p.value
+            ResultsDF[RelevantList,"method"]<-test$method
+        }
+        else if(any(RelevantList)){
+            ResultsDF[RelevantList,"statistic"]<-NA
+            ResultsDF[RelevantList,"parameter"]<-NA
+            ResultsDF[RelevantList,"p.value"]<-NA
+            ResultsDF[RelevantList,"method"]<-"No comparison due to missing data"
+        }
+    }
+    ResultsDF
+}
+
+ChiSquaredPopulationComparison<-function(ResultsDF,dVariableCol,ControlCol,
+                                         HypothesisCol,HypothesisValue){
+    ResultsDF<-AddZerosForMissingFreqs(ResultsDF,dVariableCol)
+    
+    for(d in levels(ResultsDF[dVariableCol,])){
+        for(c in levels(ResultsDF[ControlCol,])){       
+            for(i in levels(ResultsDF$iVariable)){
+                Pop<-ResultsDF[[ResultsDF$iVariable==i&
+                                   ResultsDF[,ControlCol]==c&
+                                   ResultsDF[,dVariableCol]==d&
+                                   ResultsDF[,HypothesisCol]=="Population",]]
+                
+                Hyp<-ResultsDF[[ResultsDF$iVariable==i&
+                                   ResultsDF[,ControlCol]==c&
+                                   ResultsDF[,dVariableCol]==d&
+                                   ResultsDF[,HypothesisCol]=="HypothesisValue",]]
+                
+                RelevantList<-ResultsDF$iVariable==i&
+                    ResultsDF[,ControlCol]==c&
+                    ResultsDF[,dVariableCol]==d
+                if(nrow(Pop)>0 & nrow(Hyp)>0){
+                    #Use a Chi-Squared test when there is no average i.e. for Terminations and Single Offer
+                    if(is.na(Hyp$Average)){
+                        #Chi-squared is less reliable if the expected value of any cell
+                        #is less than 5.
+                        HypCount<-c(Hyp$Fixed-Price_Count,
+                                    ((1/Hyp$Fixed-Price_p)-1)*Hyp$Fixed-Price_Count
+                        if(min(sum(Hyp$Count)*Pop$Count/sum(Pop$Count))<5){
+                            test<-chisq.test(Hyp$Count,p=Pop$Count/sum(Pop$Count),simulate.p.value=TRUE)
+                        } else{
+                            test<-chisq.test(Hyp$Count,p=Pop$Count/sum(Pop$Count),simulate.p.value=FALSE)
+                        }
+                        ResultsDF[RelevantList,"statistic"]<-test$statistic
+                        ResultsDF[RelevantList,"parameter"]<-test$parameter
+                        ResultsDF[RelevantList,"p.value"]<-test$p.value
+                        ResultsDF[RelevantList,"method"]<-test$method
+                    }
+                }
+                else if(any(RelevantList)){
+                    ResultsDF[RelevantList,"statistic"]<-NA
+                    ResultsDF[RelevantList,"parameter"]<-NA
+                    ResultsDF[RelevantList,"p.value"]<-NA
+                    ResultsDF[RelevantList,"method"]<-"No comparison due to missing data"
+                }
+            }
+        }
+    }
+    ResultsDF
+}
 
 
 QueryControlVariablesTable<-function(varTable,
@@ -122,9 +205,11 @@ QueryControlVariablesTable<-function(varTable,
                                 iVariableCol,
                                 dVariableCol
 ){
+    
+    
+    
     ResultsDF<-StandardizeTableQuery(varTable,studyVariableCol,iVariableCol,dVariableCol)
-    
-    
+
     
     
     #Aircraft contracts by ceiling
@@ -133,6 +218,9 @@ QueryControlVariablesTable<-function(varTable,
                     What=="Aircraft and Drones"),
         studyVariableCol,iVariableCol,dVariableCol,resultLabel="Aircraft")
     )
+
+     
+    
     
     ResultsDF<-rbind(ResultsDF,StandardizeTableQuery(
         subset(varTable, What %in% levels(varTable$What)[
@@ -209,35 +297,6 @@ QueryControlVariablesTable<-function(varTable,
                               )),
                               ordered=TRUE
     )
-    ResultsDF<-AddZerosForMissingFreqs(ResultsDF,dVariableCol)
-    
-    
-
-    
-    ResultsDF$iVariable<-revalue(ResultsDF$iVariable, c("[15k,100k)"="[0,100k)","[0,15k)"="[0,100k)"))
-    
-    
-    
-    #Order the ceilings
-    ResultsDF$iVariable<-factor(ResultsDF$iVariable,
-                                levels=c("[75m+]",
-                                         "[10m,75m)",
-                                         "[1m,10m)",
-                                         "[100k,1m)",
-                                         "[0,100k)"
-                                         
-                                         
-                                ),
-                                labels=c("[75m+]",
-                                         "[10m,75m)",
-                                         "[1m,10m)",
-                                         "[100k,1m)",
-                                         "[0,100k)"
-                                         ),
-                                ordered=TRUE
-    )
-    
-    ResultsDF<-ddply(ResultsDF,c("FxCb","Control","iVariable",dVariableCol),summarise,Freq=sum(Freq))
     
     
     ResultsDF
@@ -252,8 +311,9 @@ AddZerosForMissingFreqs<-function(resultsDF,dVariableCol){
     
     #Add rows with zeros for combinations that do not exist in the model, e.g. terminated cost plus $75+
     #but that do have corresponding contracts in other categoreis.
-    zeroDF<-ddply(resultsDF,.(FxCb,Control,iVariable),summarise,Freq=0)
+    zeroDF<-ddply(resultsDF,.(FxCb,Control,iVariable),summarise,Freq=0,Count=0)
     #     blankDF<-resultsDF[0,]
+    if( nrow(zeroDF)>0){
     for(i in levels(resultsDF[,dVariableCol])){
         newrows<-zeroDF
         newrows[,dVariableCol]<-i
@@ -261,7 +321,8 @@ AddZerosForMissingFreqs<-function(resultsDF,dVariableCol){
                          newrows)
     }
     #Merge those zero lines into existing rows. This means most of them go away.
-    resultsDF<-ddply(resultsDF,c("FxCb","Control","iVariable",dVariableCol),summarise,Freq=sum(Freq))
+    resultsDF<-ddply(resultsDF,c("FxCb","Control","iVariable",dVariableCol),summarise,Freq=sum(Freq),Count=sum(Count))
+    }
     resultsDF
 }
 
@@ -289,14 +350,17 @@ FixedPriceComparisonTable<-function(varTable,HypothesisLabel=NA){
 
     
     
-    expNChgDF<-ddply(expNChgDF,.(FxCb,Control,iVariable),transform,p=Freq/sum(Freq))
+    expNChgDF<-ddply(expNChgDF,.(FxCb,Control,iVariable,statistic,parameter,p.value,method),transform,p=Freq/sum(Freq))
     expNChgDF$Average[expNChgDF$NChg=="   0"]<-0
     expNChgDF$Average[expNChgDF$NChg=="   1"]<-1*expNChgDF$p[expNChgDF$NChg=="   1"]
     expNChgDF$Average[expNChgDF$NChg=="   2"]<-2*expNChgDF$p[expNChgDF$NChg=="   2"]
     expNChgDF$Average[expNChgDF$NChg=="[   3,1040]"]<-3*expNChgDF$p[expNChgDF$NChg=="[   3,1040]"]
-    expNChgDF<-ddply(expNChgDF,.(FxCb,Control,iVariable),summarise,Average=sum(Average),p=sum(p),Freq=sum(Freq))
+    expNChgDF<-ddply(expNChgDF,.(FxCb,Control,iVariable,statistic,parameter,p.value,method),summarise,Average=sum(Average),p=sum(p),
+                     Freq=sum(Freq),
+                     Count=sum(Count))
     expNChgDF$dVariable<-"Average Number of Change Orders"
     
+#     debug(QueryControlVariablesTable)
     expCRaiDF<-QueryControlVariablesTable(varTable,
                                      "FxCb",
                                      "Ceil",
@@ -304,12 +368,15 @@ FixedPriceComparisonTable<-function(varTable,HypothesisLabel=NA){
     )
     
     
-    expCRaiDF<-ddply(expCRaiDF,.(FxCb,Control,iVariable),transform,p=Freq/sum(Freq))
+    expCRaiDF<-ddply(expCRaiDF,.(FxCb,Control,iVariable,statistic,parameter,p.value,method),transform,p=Freq/sum(Freq))
     expCRaiDF$Average[expCRaiDF$CRai=="[-0.001, 0.001)"]<-0
     expCRaiDF$Average[expCRaiDF$CRai=="[  -Inf,-0.001)"]<- -0.001*expCRaiDF$p[expCRaiDF$CRai=="[  -Inf,-0.001)"]
     expCRaiDF$Average[expCRaiDF$CRai=="[ 0.001, 0.150)"]<-0.001*expCRaiDF$p[expCRaiDF$CRai=="[ 0.001, 0.150)"]
     expCRaiDF$Average[expCRaiDF$CRai=="[ 0.150,   Inf]"]<-0.15*expCRaiDF$p[expCRaiDF$CRai=="[ 0.150,   Inf]"]
-    expCRaiDF<-ddply(expCRaiDF,.(FxCb,Control,iVariable),summarise,Average=sum(Average),p=sum(p),Freq=sum(Freq))
+    expCRaiDF<-ddply(expCRaiDF,.(FxCb,Control,iVariable,statistic,parameter,p.value,method),summarise,Average=sum(Average)
+                     ,p=sum(p),
+                     Freq=sum(Freq)
+                     ,Count=sum(Count))
     expCRaiDF$dVariable<-"Ceiling Raising Change Orders %"
     
     
@@ -323,12 +390,15 @@ FixedPriceComparisonTable<-function(varTable,HypothesisLabel=NA){
                                      "Offr"
     )
     
-    expOffrDF<-ddply(expOffrDF,.(FxCb,Control,iVariable),transform,p=Freq/sum(Freq))
+    expOffrDF<-ddply(expOffrDF,.(FxCb,Control,iVariable,statistic,parameter,p.value,method),transform,p=Freq/sum(Freq))
     expOffrDF$Average[expOffrDF$Offr=="1"]<-1*expOffrDF$p[expOffrDF$Offr=="1"]
     expOffrDF$Average[expOffrDF$Offr=="2"]<-2*expOffrDF$p[expOffrDF$Offr=="2"]
     expOffrDF$Average[expOffrDF$Offr=="3-4"]<-3.5*expOffrDF$p[expOffrDF$Offr=="3-4"]
     expOffrDF$Average[expOffrDF$Offr=="5+"]<-5*expOffrDF$p[expOffrDF$Offr=="5+"]
-    expOffrDF<-ddply(expOffrDF,.(FxCb,Control,iVariable),summarise,Average=sum(Average),p=sum(p),Freq=sum(Freq))
+    expOffrDF<-ddply(expOffrDF,.(FxCb,Control,iVariable,statistic,parameter,p.value,method),summarise,Average=sum(Average),
+                     p=sum(p),
+                     Freq=sum(Freq),
+                     Count=sum(Count))
     expOffrDF$dVariable<-"Average Number of Offers for Competed Contracts"
     
     
@@ -340,7 +410,7 @@ FixedPriceComparisonTable<-function(varTable,HypothesisLabel=NA){
     )
     
     
-    OffrDF<-ddply(OffrDF,.(FxCb,Control,iVariable),transform,p=Freq/sum(Freq))
+    OffrDF<-ddply(OffrDF,.(FxCb,Control,iVariable,statistic,parameter,p.value,method),transform,p=Freq/sum(Freq))
     colnames(OffrDF)[colnames(OffrDF)=="Offr"]<-"dVariable"
     OffrDF<-subset(OffrDF,dVariable=="1")
     OffrDF$dVariable<-"% Single Offer Competition"
@@ -351,120 +421,21 @@ FixedPriceComparisonTable<-function(varTable,HypothesisLabel=NA){
     if(!is.na(HypothesisLabel)) ResultsDF$Hypothesis<-HypothesisLabel
     
     
-    
+ResultsDF$Significance<-cut2(ResultsDF$p.value,c(0.01,0.05))
+
+ResultsDF$Significance<-addNA(ResultsDF$Significance,ifany=TRUE)
+ResultsDF$Significance<-factor(ResultsDF$Significance,
+                               exclude=NULL,
+                               levels=c(levels(ResultsDF$Significance)),
+                               labels=c("<0.01",
+                                        "<0.05",
+                                        "Not Significant\n(>0.05)",
+                                        "Sample Too Small\nfor Chi-Squared"
+                               )
+)    
+
+
     ResultsDF
     
 }
-
-
-
-FixedPriceHypothesisTable<-function(varTable,HypothesisLabel=NA){
-    
-    TermDF<-QueryControlVariablesTable(varTable,
-                                  "FxCb",
-                                  "Ceil",
-                                  "Term"
-    )
-    
-    
-    TermDF<-ddply(TermDF,.(FxCb,Control,iVariable),transform,p=Freq/sum(Freq))
-    TermDF<-dcast(TermDF,Term + Control + iVariable ~ FxCb, sum, value.var="p")
-    TermDF$FixedCostMargin<-TermDF[,"Fixed-Price"]/TermDF[,"Cost-Based"]
-    TermDF$FixedCombMargin<-TermDF[,"Fixed-Price"]/TermDF[,"Combination or Other"]
-    colnames(TermDF)[colnames(TermDF)=="Term"]<-"dVariable"
-    TermDF<-subset(TermDF,dVariable=="Terminated")
-    
-    
-    
-    
-    
-    
-    
-    expNChgDF<-QueryControlVariablesTable(varTable,
-                                     "FxCb",
-                                     "Ceil",
-                                     "NChg"
-    )
-    
-    expNChgDF<-ddply(expNChgDF,.(FxCb,Control,iVariable),transform,p=Freq/sum(Freq))
-    expNChgDF$expNChg[expNChgDF$NChg=="   0"]<-0
-    expNChgDF$expNChg[expNChgDF$NChg=="   1"]<-1*expNChgDF$p[expNChgDF$NChg=="   1"]
-    expNChgDF$expNChg[expNChgDF$NChg=="   2"]<-2*expNChgDF$p[expNChgDF$NChg=="   2"]
-    expNChgDF$expNChg[expNChgDF$NChg=="[   3,1040]"]<-3*expNChgDF$p[expNChgDF$NChg=="[   3,1040]"]
-    expNChgDF<-ddply(expNChgDF,.(FxCb,Control,iVariable),summarise,expNChg=sum(expNChg))
-    expNChgDF<-dcast(expNChgDF,  iVariable + Control ~ FxCb  , sum, value.var="expNChg")
-    expNChgDF$dVariable<-"Average Number of Change Orders"
-    expNChgDF$FixedCostMargin<-expNChgDF[,"Fixed-Price"]/expNChgDF[,"Cost-Based"]
-    expNChgDF$FixedCombMargin<-expNChgDF[,"Fixed-Price"]/expNChgDF[,"Combination or Other"]
-    
-    
-    expCRaiDF<-QueryControlVariablesTable(varTable,
-                                     "FxCb",
-                                     "Ceil",
-                                     "CRai"
-    )
-    
-    
-    expCRaiDF<-ddply(expCRaiDF,.(FxCb,Control,iVariable),transform,p=Freq/sum(Freq))
-    expCRaiDF$expCRai[expCRaiDF$CRai=="[-0.001, 0.001)"]<-0
-    expCRaiDF$expCRai[expCRaiDF$CRai=="[  -Inf,-0.001)"]<- -0.001*expCRaiDF$p[expCRaiDF$CRai=="[  -Inf,-0.001)"]
-    expCRaiDF$expCRai[expCRaiDF$CRai=="[ 0.001, 0.120)"]<-0.001*expCRaiDF$p[expCRaiDF$CRai=="[ 0.001, 0.120)"]
-    expCRaiDF$expCRai[expCRaiDF$CRai=="[ 0.120,   Inf]"]<-0.12*expCRaiDF$p[expCRaiDF$CRai=="[ 0.120,   Inf]"]
-    expCRaiDF<-ddply(expCRaiDF,.(FxCb,Control,iVariable),summarise,expCRai=sum(expCRai))
-    expCRaiDF<-dcast(expCRaiDF, iVariable + Control~ FxCb, sum, value.var="expCRai")
-    expCRaiDF$dVariable<-"Ceiling Raising Change Orders %"
-    expCRaiDF$FixedCostMargin<-expCRaiDF[,"Fixed-Price"]/expCRaiDF[,"Cost-Based"]
-    expCRaiDF$FixedCombMargin<-expCRaiDF[,"Fixed-Price"]/expCRaiDF[,"Combination or Other"]
-    
-    
-    
-    #Limit just to competed contracts
-    varTable<-subset(varTable, Comp=="Comp.")
-    
-    
-    expOffrDF<-QueryControlVariablesTable(varTable,
-                                     "FxCb",
-                                     "Ceil",
-                                     "Offr"
-    )
-    
-    expOffrDF<-ddply(expOffrDF,.(FxCb,Control,iVariable),transform,p=Freq/sum(Freq))
-    expOffrDF$expOffr[expOffrDF$Offr=="1"]<-1*expOffrDF$p[expOffrDF$Offr=="1"]
-    expOffrDF$expOffr[expOffrDF$Offr=="2"]<-2*expOffrDF$p[expOffrDF$Offr=="2"]
-    expOffrDF$expOffr[expOffrDF$Offr=="3-4"]<-3.5*expOffrDF$p[expOffrDF$Offr=="3-4"]
-    expOffrDF$expOffr[expOffrDF$Offr=="5+"]<-5*expOffrDF$p[expOffrDF$Offr=="5+"]
-    expOffrDF<-ddply(expOffrDF,.(FxCb,Control,iVariable),summarise,expOffr=sum(expOffr))
-    expOffrDF<-dcast(expOffrDF,  iVariable + Control ~ FxCb  , sum, value.var="expOffr")
-    expOffrDF$dVariable<-"Average Number of Offers for Competed Contracts"
-    expOffrDF$FixedCostMargin<-expOffrDF[,"Fixed-Price"]/expOffrDF[,"Cost-Based"]
-    expOffrDF$FixedCombMargin<-expOffrDF[,"Fixed-Price"]/expOffrDF[,"Combination or Other"]
-    
-    
-    
-    OffrDF<-QueryControlVariablesTable(varTable,
-                                  "FxCb",
-                                  "Ceil",
-                                  "Offr"
-    )
-    
-    
-    colnames(OffrDF)[colnames(OffrDF)=="Ceil"]<-"iVariable"
-    OffrDF<-ddply(OffrDF,.(FxCb,Control,iVariable),transform,p=Freq/sum(Freq))
-    OffrDF<-dcast(OffrDF,Offr + Control + iVariable ~ FxCb, sum, value.var="p")
-    OffrDF$FixedCostMargin<-OffrDF[,"Fixed-Price"]/OffrDF[,"Cost-Based"]
-    OffrDF$FixedCombMargin<-OffrDF[,"Fixed-Price"]/OffrDF[,"Combination or Other"]
-    colnames(OffrDF)[colnames(OffrDF)=="Offr"]<-"dVariable"
-    OffrDF<-subset(OffrDF,dVariable=="1")
-    expNChgDF$dVariable<-"% Single Offer Competition"
-    
-    ResultsDF<-rbind(TermDF,expOffrDF,OffrDF,expNChgDF,expCRaiDF)
-    
-    
-    if(!is.na(HypothesisLabel)) ResultsDF$Hypothesis<-HypothesisLabel
-    
-
-    
-    ResultsDF
-    
-}
-
+c

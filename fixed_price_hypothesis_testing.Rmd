@@ -31,6 +31,7 @@ setwd("K:\\Development\\Fixed-price")
 Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 # Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
 source(paste(Path,"lookups.r",sep=""))
+source(paste(Path,"helper.r",sep=""))
 
 source("contract_outcome_gRain.r")
 source("contract_outcome_table.r")
@@ -80,6 +81,30 @@ ContractModel$Who<-droplevels(ContractModel$Who)
 ContractModel$What<-droplevels(ContractModel$What)
 ContractModel$Comp<-droplevels(ContractModel$Comp)
 
+
+ContractModel$Ceil<-revalue(ContractModel$Ceil, c("[15k,100k)"="[0,100k)","[0,15k)"="[0,100k)"))
+    
+    
+    
+    #Order the ceilings
+    ContractModel$Ceil<-factor(ContractModel$Ceil,
+                                levels=c("[75m+]",
+                                         "[10m,75m)",
+                                         "[1m,10m)",
+                                         "[100k,1m)",
+                                         "[0,100k)"
+                                         
+                                         
+                                ),
+                                labels=c("[75m+]",
+                                         "[10m,75m)",
+                                         "[1m,10m)",
+                                         "[100k,1m)",
+                                         "[0,100k)"
+                                ),
+                                ordered=TRUE
+    )
+    
 
 ModelSummary<-ddply(ContractModel,
                     .(FxCb,Comp,Link,MDAP,Who,What,Intl,PSR,Ceil,Dur,Offr,Veh,Term,Soft,UCA,CRai,NChg),
@@ -206,46 +231,84 @@ summary(FixedPriceGin)
 PopulationLongDF<-FixedPriceComparisonTable(ModelSummary,"Population")
 
 
+Coloration<-NULL
+
+
 #Single Offer Competition
-ggplot(subset(PopulationLongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+PointRowWrapper(NULL,#VAR.main.label,
+                "All Contracts (Overall and Controls)",          #VAR.row.label,
+                "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationLongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
+                          "Control",
+                          "p",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
 
 
 #Average Number of Offers
-ggplot(subset(PopulationLongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())
+PointRowWrapper(NULL,#VAR.main.label,
+                "All Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Number of Offers",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationLongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
+
+
+
 
 #Average Number of Changes
-ggplot(subset(PopulationLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+PointRowWrapper(NULL,#VAR.main.label,
+                "All Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Number of Change Orders",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(PopulationLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+PointRowWrapper(NULL,#VAR.main.label,
+                "All Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Ceiling Raising Change Order %",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
+
 
 #Terminations
-ggplot(subset(PopulationLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
-
-
-
-rm(RnDfind)
+PointRowWrapper(NULL,#VAR.main.label,
+                "All Contracts (Overall and Controls)",          #VAR.row.label,
+                "% of Terminated Contracts",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "p",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
 
 
 ``` 
@@ -314,6 +377,83 @@ write.csv(PopulationWideDF,paste("Output\\",
                           ,".csv",
                           sep=""))
 
+
+
+#Single Offer Competition
+PointRowWrapper(NULL,#VAR.main.label,
+                "All Contracts (Overall and Controls)",          #VAR.row.label,
+                "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationWideDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
+                          "Control",
+                          "p",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
+
+
+#Average Number of Offers
+PointRowWrapper(NULL,#VAR.main.label,
+                "All Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Number of Offers",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
+
+
+
+
+#Average Number of Changes
+PointRowWrapper(NULL,#VAR.main.label,
+                "All Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Number of Change Orders",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationWideDF,dVariable=="Average Number of Change Orders"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
+
+
+#Ceiling Raising Change Orders %
+PointRowWrapper(NULL,#VAR.main.label,
+                "All Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Ceiling Raising Change Order %",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationWideDF,dVariable=="Ceiling Raising Change Orders %"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
+
+
+#Terminations
+PointRowWrapper(NULL,#VAR.main.label,
+                "All Contracts (Overall and Controls)",          #VAR.row.label,
+                "% of Terminated Contracts",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationWideDF,dVariable=="Terminated"),
+                          "Control",
+                          "p",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
 
 
 ``` 
@@ -897,50 +1037,93 @@ RnDfind<- setEvidence(FixedPriceGin,
                       states=c("R&D")
                       )
 
-getEvidence(RnDfind)
 
-debug(FixedPriceComparisonTable)
+
+getEvidence(RnDfind)
+# debug(ChiSquaredFixedPriceCostBased)
+# debug(FixedPriceComparisonTable)
 RnDlongDF<-FixedPriceComparisonTable(subset(ModelSummary,PSR=="R&D"),
                                 "R&D")
 
 
+Coloration<-NULL
+
+
 #Single Offer Competition
-ggplot(subset(RnDlongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+PointRowWrapper(NULL,#VAR.main.label,
+                "R&D Contracts (Overall and Controls)",          #VAR.row.label,
+                "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDlongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
+                          "Control",
+                          "p",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
 
 
 #Average Number of Offers
-ggplot(subset(RnDlongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())
+PointRowWrapper(NULL,#VAR.main.label,
+                "R&D Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Number of Offers",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDlongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
+
+
+
 
 #Average Number of Changes
-ggplot(subset(RnDlongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+PointRowWrapper(NULL,#VAR.main.label,
+                "R&D Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Number of Change Orders",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDlongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(RnDlongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+PointRowWrapper(NULL,#VAR.main.label,
+                "R&D Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Ceiling Raising Change Order %",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDlongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
+
 
 #Terminations
-ggplot(subset(RnDlongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
-
+PointRowWrapper(NULL,#VAR.main.label,
+                "R&D Contracts (Overall and Controls)",          #VAR.row.label,
+                "% of Terminated Contracts",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDlongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "p",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
 
 
 rm(RnDfind)
@@ -950,7 +1133,7 @@ rm(RnDfind)
 
 
 ```{r H1LargeR&D}
-
+# debug(FixedPriceCast)
 RnDwideDF<-FixedPriceCast(rbind(RnDlongDF,PopulationLongDF))
 
 
@@ -1052,41 +1235,80 @@ MDAPlongDF<-subset(MDAPlongDF,
 MDAPlongDF$Hypothesis<-factor(MDAPlongDF$Hypothesis,levels=c("MDAP","Population"),ordered=TRUE)
 
 #Single Offer Competition
-ggplot(subset(MDAPlongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+PointRowWrapper(NULL,#VAR.main.label,
+                "MDAP Contracts (Overall and Controls)",          #VAR.row.label,
+                "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPlongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
+                          "Control",
+                          "p",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
 
 
 #Average Number of Offers
-ggplot(subset(MDAPlongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())
+PointRowWrapper(NULL,#VAR.main.label,
+                "MDAP Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Number of Offers",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPlongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
+
+
+
 
 #Average Number of Changes
-ggplot(subset(MDAPlongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+PointRowWrapper(NULL,#VAR.main.label,
+                "MDAP Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Number of Change Orders",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPlongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(MDAPlongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+PointRowWrapper(NULL,#VAR.main.label,
+                "MDAP Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Ceiling Raising Change Order %",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPlongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
+
 
 #Terminations
-ggplot(subset(MDAPlongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+PointRowWrapper(NULL,#VAR.main.label,
+                "MDAP Contracts (Overall and Controls)",          #VAR.row.label,
+                "% of Terminated Contracts",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPlongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "p",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
 
 
 ```                      
@@ -1176,68 +1398,108 @@ The hypothesis regarding number of offers was not supported at the greater than 
 
 ```{r H3LongDurAbsolute}
 
-FixedPriceGin[[1]]$levels$Dur
-
-LongDurFind<- setEvidence(FixedPriceGin, 
-                          nodes=c("Dur"),
-                          states=c("(~2 years+]")
-                          )
-
-getEvidence(LongDurFind)
-
-LongDurLongDF<-FixedPriceComparisonTable(subset(ModelSummary,Dur=="(~2 years+]"),
-                                "Long Dur")
-
-
-
-
-LongDurLongDF$Hypothesis<-factor(LongDurLongDF$Hypothesis,levels=c("Long Dur.","Population"),ordered=TRUE)
-
-#Remove redundant tests
-LongDurLongDF<-subset(LongDurLongDF,
-                  !Control %in% c(unique(LongDurLongDF$Hypothesis),"Not Long Dur."))
-
-
-#Single Offer Competition
-ggplot(subset(LongDurLongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
-
-
-#Average Number of Offers
-ggplot(subset(LongDurLongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())
-
-#Average Number of Changes
-ggplot(subset(LongDurLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
-
-
-#Ceiling Raising Change Orders %
-ggplot(subset(LongDurLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
-
-#Terminations
-ggplot(subset(LongDurLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
-
-
-
-rm(LongDurFind)
+    FixedPriceGin[[1]]$levels$Dur
+    
+    LongDurFind<- setEvidence(FixedPriceGin, 
+                              nodes=c("Dur"),
+                              states=c("(~2 years+]")
+                              )
+    
+    getEvidence(LongDurFind)
+    
+    
+    LongDurLongDF<-FixedPriceComparisonTable(subset(ModelSummary,Dur=="(~2 years+]"),
+                                    "Long Dur")
+    
+    
+    
+    
+    LongDurLongDF$Hypothesis<-factor(LongDurLongDF$Hypothesis,levels=c("Long Dur.","Population"),ordered=TRUE)
+    
+    #Remove redundant tests
+    LongDurLongDF<-subset(LongDurLongDF,
+                      !Control %in% c(unique(LongDurLongDF$Hypothesis),"2+ Year Dur.","<2 Year Dur."))
+    
+    
+    #Single Offer Competition
+    PointRowWrapper(NULL,#VAR.main.label,
+                    "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
+                    "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
+                    "Contract Pricing",          #VAR.color.legend.label,
+                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(LongDurLongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
+                              "Control",
+                              "p",
+                              "FxCb",
+                              "Significance",
+                              "iVariable")
+    
+    
+    #Average Number of Offers
+    PointRowWrapper(NULL,#VAR.main.label,
+                    "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
+                    "Approximate Average Number of Offers",          #VAR.data.label,
+                    "Contract Pricing",          #VAR.color.legend.label,
+                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(LongDurLongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
+                              "Control",
+                              "Average",
+                              "FxCb",
+                              "Significance",
+                              "iVariable")
+    
+    
+    
+    
+    #Average Number of Changes
+    PointRowWrapper(NULL,#VAR.main.label,
+                    "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
+                    "Approximate Average Number of Change Orders",          #VAR.data.label,
+                    "Contract Pricing",          #VAR.color.legend.label,
+                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(LongDurLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+                              "Control",
+                              "Average",
+                              "FxCb",
+                              "Significance",
+                              "iVariable")
+    
+    
+    #Ceiling Raising Change Orders %
+    PointRowWrapper(NULL,#VAR.main.label,
+                    "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
+                    "Approximate Average Ceiling Raising Change Order %",          #VAR.data.label,
+                    "Contract Pricing",          #VAR.color.legend.label,
+                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(LongDurLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+                              "Control",
+                              "Average",
+                              "FxCb",
+                              "Significance",
+                              "iVariable")
+    
+    
+    #Terminations
+    PointRowWrapper(NULL,#VAR.main.label,
+                    "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
+                    "% of Terminated Contracts",          #VAR.data.label,
+                    "Contract Pricing",          #VAR.color.legend.label,
+                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(LongDurLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+                              "Control",
+                              "p",
+                              "FxCb",
+                              "Significance",
+                              "iVariable")
+    
+    
+    
+    rm(LongDurFind)
 
 ``` 
 
@@ -1351,29 +1613,52 @@ CompLongDF<-subset(CompLongDF,
 
 
 
-#Average Number of Changes
-ggplot(subset(CompLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
-
-
-#Ceiling Raising Change Orders %
-ggplot(subset(CompLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
-
-#Terminations
-ggplot(subset(CompLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
-
-
+    
+    
+    #Average Number of Changes
+    PointRowWrapper(NULL,#VAR.main.label,
+                    "Competed Contracts (Overall and Controls)",          #VAR.row.label,
+                    "Approximate Average Number of Change Orders",          #VAR.data.label,
+                    "Contract Pricing",          #VAR.color.legend.label,
+                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(CompLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+                              "Control",
+                              "Average",
+                              "FxCb",
+                              "Significance",
+                              "iVariable")
+    
+    
+    #Ceiling Raising Change Orders %
+    PointRowWrapper(NULL,#VAR.main.label,
+                    "Competed Contracts (Overall and Controls)",          #VAR.row.label,
+                    "Approximate Average Ceiling Raising Change Order %",          #VAR.data.label,
+                    "Contract Pricing",          #VAR.color.legend.label,
+                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(CompLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+                              "Control",
+                              "Average",
+                              "FxCb",
+                              "Significance",
+                              "iVariable")
+    
+    
+    #Terminations
+    PointRowWrapper(NULL,#VAR.main.label,
+                    "Competed Contracts (Overall and Controls)",          #VAR.row.label,
+                    "% of Terminated Contracts",          #VAR.data.label,
+                    "Contract Pricing",          #VAR.color.legend.label,
+                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    Coloration,#VAR.Coloration
+        subset(CompLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+                              "Control",
+                              "p",
+                              "FxCb",
+                              "Significance",
+                              "iVariable")
+    
 
 rm(CompFind)
 
@@ -1480,44 +1765,81 @@ SoftwareLongDF$Hypothesis<-factor(SoftwareLongDF$Hypothesis,levels=c("Comp.","Po
 SoftwareLongDF<-subset(SoftwareLongDF,
                    !Control %in% unique(SoftwareLongDF$Hypothesis))
 
-
 #Single Offer Competition
-ggplot(subset(SoftwareLongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
+PointRowWrapper(NULL,#VAR.main.label,
+                "Software Contracts (Overall and Controls)",          #VAR.row.label,
+                "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareLongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
+                          "Control",
+                          "p",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
 
 
 #Average Number of Offers
-ggplot(subset(SoftwareLongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_continuous(labels = percent_format())
+PointRowWrapper(NULL,#VAR.main.label,
+                "Software Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Number of Offers",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareLongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
+
+
+
 
 #Average Number of Changes
-ggplot(subset(SoftwareLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+PointRowWrapper(NULL,#VAR.main.label,
+                "Software Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Number of Change Orders",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(SoftwareLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))
+PointRowWrapper(NULL,#VAR.main.label,
+                "Software Contracts (Overall and Controls)",          #VAR.row.label,
+                "Approximate Average Ceiling Raising Change Order %",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "Average",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
+
 
 #Terminations
-ggplot(subset(SoftwareLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
-       aes(x=Control,color=FxCb,shape=FxCb,y=p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())
-
+PointRowWrapper(NULL,#VAR.main.label,
+                "Software Contracts (Overall and Controls)",          #VAR.row.label,
+                "% of Terminated Contracts",          #VAR.data.label,
+                "Contract Pricing",          #VAR.color.legend.label,
+                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+                          "Control",
+                          "p",
+                          "FxCb",
+                          "Significance",
+                          "iVariable")
 
 rm(SoftwareFind)
 
