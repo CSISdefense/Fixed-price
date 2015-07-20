@@ -1564,44 +1564,82 @@ LongDurWideDF<-subset(LongDurWideDF,
 
 
 #Single Offer Competition
-ggplot(subset(LongDurWideDF,dVariable=="% Single Offer Competition"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+PointRowWrapper(NULL,#VAR.main.label,
+                "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Single Offer Competition Rate",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(LongDurWideDF,dVariable=="% Single Offer Competition"),
+                          "Control",
+                          "FixedCostMargin_p",
+                          "Hypothesis",
+                          "Cost.Based_Significance",
+                          "iVariable")+geom_hline(aes(yintercept=0))  
+
 
 
 #Average Number of Offers
-ggplot(subset(LongDurWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+PointRowWrapper(NULL,#VAR.main.label,
+                "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Approximate Average Number of Offers",   #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(LongDurWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+                          "Control",
+                          "FixedCostMargin_Average",
+                          "Hypothesis",
+                          "Cost.Based_Significance",
+                          "iVariable")
+
+
+
+
 
 #Average Number of Changes
-ggplot(subset(LongDurWideDF,dVariable=="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+PointRowWrapper(NULL,#VAR.main.label,
+                "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Approximate Average Number of Change Orders",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(LongDurWideDF,dVariable=="Average Number of Change Orders"),
+                          "Control",
+                          "FixedCostMargin_Average",
+                          "Hypothesis",
+                          "Cost.Based_Significance",
+                          "iVariable")
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(LongDurWideDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
-
+PointRowWrapper(NULL,#VAR.main.label,
+                "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Approximate Average Ceiling Raising Change Orders",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(LongDurWideDF,dVariable=="Ceiling Raising Change Orders %"),
+                          "Control",
+                          "FixedCostMargin_Average",
+                          "Hypothesis",
+                          "Cost.Based_Significance",
+                          "iVariable")
 
 
 #Terminations
-ggplot(subset(LongDurWideDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
-
+PointRowWrapper(NULL,#VAR.main.label,
+                "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Terminated Contracts Rate",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(LongDurWideDF,dVariable=="Terminated"),
+                          "Control",
+                          "FixedCostMargin_p",
+                          "Hypothesis",
+                          "Cost.Based_Significance",
+                          "iVariable")
 
 write.csv(LongDurWideDF,paste("Output\\",
                           paste("LongDur"
@@ -1732,29 +1770,48 @@ CompWideDF<-subset(CompWideDF,
 
 
 #Average Number of Changes
-ggplot(subset(CompWideDF,dVariable=="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+PointRowWrapper(NULL,#VAR.main.label,
+                "Competition Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Approximate Average Number of Change Orders",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(CompWideDF,dVariable=="Average Number of Change Orders"),
+                          "Control",
+                          "FixedCostMargin_Average",
+                          "Hypothesis",
+                          "Cost.Based_Significance",
+                          "iVariable")
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(CompWideDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
-
+PointRowWrapper(NULL,#VAR.main.label,
+                "Competition Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Approximate Average Ceiling Raising Change Orders",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(CompWideDF,dVariable=="Ceiling Raising Change Orders %"),
+                          "Control",
+                          "FixedCostMargin_Average",
+                          "Hypothesis",
+                          "Cost.Based_Significance",
+                          "iVariable")
 
 
 #Terminations
-ggplot(subset(CompWideDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
-
+PointRowWrapper(NULL,#VAR.main.label,
+                "Competition Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Terminated Contracts Rate",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(CompWideDF,dVariable=="Terminated"),
+                          "Control",
+                          "FixedCostMargin_p",
+                          "Hypothesis",
+                          "Cost.Based_Significance",
+                          "iVariable")
 
 write.csv(CompWideDF,paste("Output\\",
                           paste("Comp"
@@ -1906,47 +1963,83 @@ SoftwareWideDF$Hypothesis<-factor(SoftwareWideDF$Hypothesis,levels=c("Possible \
 SoftwareWideDF<-subset(SoftwareWideDF,
                    !Control %in% unique(SoftwareWideDF$Hypothesis))
 
-
 #Single Offer Competition
-ggplot(subset(SoftwareWideDF,dVariable=="% Single Offer Competition"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+PointRowWrapper(NULL,#VAR.main.label,
+                "Software Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Single Offer Competition Rate",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareWideDF,dVariable=="% Single Offer Competition"),
+                          "Control",
+                          "FixedCostMargin_p",
+                          "Hypothesis",
+                          "Cost.Based_Significance",
+                          "iVariable")+geom_hline(aes(yintercept=0))  
+
 
 
 #Average Number of Offers
-ggplot(subset(SoftwareWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+PointRowWrapper(NULL,#VAR.main.label,
+                "Software Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Approximate Average Number of Offers",   #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+                          "Control",
+                          "FixedCostMargin_Average",
+                          "Hypothesis",
+                          "Cost.Based_Significance",
+                          "iVariable")
+
+
+
+
 
 #Average Number of Changes
-ggplot(subset(SoftwareWideDF,dVariable=="Average Number of Change Orders"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+PointRowWrapper(NULL,#VAR.main.label,
+                "Software Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Approximate Average Number of Change Orders",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareWideDF,dVariable=="Average Number of Change Orders"),
+                          "Control",
+                          "FixedCostMargin_Average",
+                          "Hypothesis",
+                          "Cost.Based_Significance",
+                          "iVariable")
 
 
 #Ceiling Raising Change Orders %
-ggplot(subset(SoftwareWideDF,dVariable=="Ceiling Raising Change Orders %"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
-
+PointRowWrapper(NULL,#VAR.main.label,
+                "Software Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Approximate Average Ceiling Raising Change Orders",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareWideDF,dVariable=="Ceiling Raising Change Orders %"),
+                          "Control",
+                          "FixedCostMargin_Average",
+                          "Hypothesis",
+                          "Cost.Based_Significance",
+                          "iVariable")
 
 
 #Terminations
-ggplot(subset(SoftwareWideDF,dVariable=="Terminated"),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
-
-
+PointRowWrapper(NULL,#VAR.main.label,
+                "Software Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Terminated Contracts Rate",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareWideDF,dVariable=="Terminated"),
+                          "Control",
+                          "FixedCostMargin_p",
+                          "Hypothesis",
+                          "Cost.Based_Significance",
+                          "iVariable")
 
 
 write.csv(SoftwareWideDF,paste("Output\\",
