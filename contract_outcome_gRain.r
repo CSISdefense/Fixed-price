@@ -573,7 +573,7 @@ ResultsDF[,"Combination or Other_Average"]<-FactorToNumber(ResultsDF[,"Combinati
         ResultsDF[,"Cost-Based_Average"]
     ResultsDF$FixedCombMargin_Average<-(ResultsDF[,"Fixed-Price_Average"]-ResultsDF[,"Combination or Other_Average"])/
         ResultsDF[,"Combination or Other_Average"]
-    
+    names(ResultsDF)<-gsub("-", ".", names(ResultsDF))
     
     ResultsDF
     

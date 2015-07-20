@@ -175,9 +175,9 @@ ChiSquaredPopulationComparison<-function(ResultsDF,dVariableCol,ControlCol,
                         #Chi-squared is less reliable if the expected value of any cell
                         #is less than 5.
                         HypCount<-c(Hyp$Fixed-Price_Count,
-                                    ((1/Hyp$Fixed-Price_p)-1)*Hyp$Fixed-Price_Count
-                        if(min(sum(Hyp$Count)*Pop$Count/sum(Pop$Count))<5){
-                            test<-chisq.test(Hyp$Count,p=Pop$Count/sum(Pop$Count),simulate.p.value=TRUE)
+                                    ((1/Hyp$Fixed-Price_p)-1)*Hyp$Fixed-Price_Count)
+                        if(min(sum(HypCount)*Pop$Count/sum(Pop$Count))<5){
+                            test<-chisq.test(HypCount,p=Pop$Count/sum(Pop$Count),simulate.p.value=TRUE)
                         } else{
                             test<-chisq.test(Hyp$Count,p=Pop$Count/sum(Pop$Count),simulate.p.value=FALSE)
                         }
