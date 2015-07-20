@@ -239,7 +239,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts (Overall and Controls)",          #VAR.row.label,
                 "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(PopulationLongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
                           "Control",
@@ -254,7 +254,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts (Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Offers",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(PopulationLongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
                           "Control",
@@ -271,7 +271,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts (Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Change Orders",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(PopulationLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
                           "Control",
@@ -286,7 +286,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts (Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Ceiling Raising Change Order %",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(PopulationLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
                           "Control",
@@ -301,7 +301,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts (Overall and Controls)",          #VAR.row.label,
                 "% of Terminated Contracts",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(PopulationLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
                           "Control",
@@ -333,6 +333,22 @@ ggplot(subset(PopulationWideDF,dVariable=="% Single Offer Competition"),
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
 
+#Single Offer Competition
+PointRowWrapper(NULL,#VAR.main.label,
+                "All Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Single Offer Competition Rate",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationWideDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
+                          "Control",
+                          "FixedCostMargin_p",
+                          "Hypothesis",
+                          "Cost-Based_Significance",
+                          "iVariable")+geom_hline(aes(yintercept=0))  
+
+
+
 #Average Number of Offers
 ggplot(subset(PopulationWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
@@ -340,12 +356,30 @@ ggplot(subset(PopulationWideDF,dVariable=="Average Number of Offers for Competed
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 
+
+#Average Number of Offers
+PointRowWrapper(NULL,#VAR.main.label,
+                "All Contracts (Overall and Controls)",          #VAR.row.label,
+                "% Difference Between Fixed Price and Cost-Based Approximate Average Number of Offers",   #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+                          "Control",
+                          "Average",
+                          "FixedCostMargin_Average",
+                          "Cost-Based_Significance",
+                          "iVariable")
+
+
+
 #Average Number of Changes
 ggplot(subset(PopulationWideDF,dVariable=="Average Number of Change Orders"),
        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
        )+
     geom_point()+
     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
+
 
 
 #Ceiling Raising Change Orders %
@@ -379,34 +413,6 @@ write.csv(PopulationWideDF,paste("Output\\",
 
 
 
-#Single Offer Competition
-PointRowWrapper(NULL,#VAR.main.label,
-                "All Contracts (Overall and Controls)",          #VAR.row.label,
-                "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
-                Coloration,#VAR.Coloration
-    subset(PopulationWideDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
-                          "Control",
-                          "p",
-                          "FxCb",
-                          "Significance",
-                          "iVariable")
-
-
-#Average Number of Offers
-PointRowWrapper(NULL,#VAR.main.label,
-                "All Contracts (Overall and Controls)",          #VAR.row.label,
-                "Approximate Average Number of Offers",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
-                Coloration,#VAR.Coloration
-    subset(PopulationWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
-                          "Control",
-                          "Average",
-                          "FxCb",
-                          "Significance",
-                          "iVariable")
 
 
 
@@ -414,45 +420,45 @@ PointRowWrapper(NULL,#VAR.main.label,
 #Average Number of Changes
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts (Overall and Controls)",          #VAR.row.label,
-                "Approximate Average Number of Change Orders",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "% Difference Between Fixed Price and Cost-Based Approximate Average Number of Change Orders",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(PopulationWideDF,dVariable=="Average Number of Change Orders"),
                           "Control",
                           "Average",
                           "FxCb",
-                          "Significance",
+                          "Cost-Based_Significance",
                           "iVariable")
 
 
 #Ceiling Raising Change Orders %
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts (Overall and Controls)",          #VAR.row.label,
-                "Approximate Average Ceiling Raising Change Order %",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "% Difference Between Fixed Price and Cost-Based Approximate Average Ceiling Raising Change Orders",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(PopulationWideDF,dVariable=="Ceiling Raising Change Orders %"),
                           "Control",
                           "Average",
-                          "FxCb",
-                          "Significance",
+                          "Hypothesis",
+                          "Cost-Based_Significance",
                           "iVariable")
 
 
 #Terminations
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts (Overall and Controls)",          #VAR.row.label,
-                "% of Terminated Contracts",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "% Difference Between Fixed Price and Cost-Based Terminated Contracts Rate",          #VAR.data.label,
+                "Contract Sample",          #VAR.color.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(PopulationWideDF,dVariable=="Terminated"),
                           "Control",
                           "p",
-                          "FxCb",
-                          "Significance",
+                          "Hypothesis",
+                          "Cost-Based_Significance",
                           "iVariable")
 
 
@@ -1054,7 +1060,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts (Overall and Controls)",          #VAR.row.label,
                 "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(RnDlongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
                           "Control",
@@ -1069,7 +1075,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts (Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Offers",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(RnDlongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
                           "Control",
@@ -1086,7 +1092,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts (Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Change Orders",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(RnDlongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
                           "Control",
@@ -1101,7 +1107,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts (Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Ceiling Raising Change Order %",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(RnDlongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
                           "Control",
@@ -1116,7 +1122,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts (Overall and Controls)",          #VAR.row.label,
                 "% of Terminated Contracts",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(RnDlongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
                           "Control",
@@ -1239,7 +1245,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts (Overall and Controls)",          #VAR.row.label,
                 "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(MDAPlongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
                           "Control",
@@ -1254,7 +1260,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts (Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Offers",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(MDAPlongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
                           "Control",
@@ -1271,7 +1277,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts (Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Change Orders",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(MDAPlongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
                           "Control",
@@ -1286,7 +1292,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts (Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Ceiling Raising Change Order %",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(MDAPlongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
                           "Control",
@@ -1301,7 +1307,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts (Overall and Controls)",          #VAR.row.label,
                 "% of Terminated Contracts",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(MDAPlongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
                           "Control",
@@ -1426,7 +1432,7 @@ The hypothesis regarding number of offers was not supported at the greater than 
                     "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
                     "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
                     "Contract Pricing",          #VAR.color.legend.label,
-                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
         subset(LongDurLongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
                               "Control",
@@ -1441,7 +1447,7 @@ The hypothesis regarding number of offers was not supported at the greater than 
                     "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
                     "Approximate Average Number of Offers",          #VAR.data.label,
                     "Contract Pricing",          #VAR.color.legend.label,
-                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
         subset(LongDurLongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
                               "Control",
@@ -1458,7 +1464,7 @@ The hypothesis regarding number of offers was not supported at the greater than 
                     "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
                     "Approximate Average Number of Change Orders",          #VAR.data.label,
                     "Contract Pricing",          #VAR.color.legend.label,
-                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
         subset(LongDurLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
                               "Control",
@@ -1473,7 +1479,7 @@ The hypothesis regarding number of offers was not supported at the greater than 
                     "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
                     "Approximate Average Ceiling Raising Change Order %",          #VAR.data.label,
                     "Contract Pricing",          #VAR.color.legend.label,
-                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
         subset(LongDurLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
                               "Control",
@@ -1488,7 +1494,7 @@ The hypothesis regarding number of offers was not supported at the greater than 
                     "Long Duration Contracts (Overall and Controls)",          #VAR.row.label,
                     "% of Terminated Contracts",          #VAR.data.label,
                     "Contract Pricing",          #VAR.color.legend.label,
-                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
         subset(LongDurLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
                               "Control",
@@ -1620,7 +1626,7 @@ CompLongDF<-subset(CompLongDF,
                     "Competed Contracts (Overall and Controls)",          #VAR.row.label,
                     "Approximate Average Number of Change Orders",          #VAR.data.label,
                     "Contract Pricing",          #VAR.color.legend.label,
-                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
         subset(CompLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
                               "Control",
@@ -1635,7 +1641,7 @@ CompLongDF<-subset(CompLongDF,
                     "Competed Contracts (Overall and Controls)",          #VAR.row.label,
                     "Approximate Average Ceiling Raising Change Order %",          #VAR.data.label,
                     "Contract Pricing",          #VAR.color.legend.label,
-                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
         subset(CompLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
                               "Control",
@@ -1650,7 +1656,7 @@ CompLongDF<-subset(CompLongDF,
                     "Competed Contracts (Overall and Controls)",          #VAR.row.label,
                     "% of Terminated Contracts",          #VAR.data.label,
                     "Contract Pricing",          #VAR.color.legend.label,
-                    "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                    "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
         subset(CompLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
                               "Control",
@@ -1770,7 +1776,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts (Overall and Controls)",          #VAR.row.label,
                 "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(SoftwareLongDF,dVariable=="% Single Offer Competition" & FxCb!="Combination or Other"),
                           "Control",
@@ -1785,7 +1791,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts (Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Offers",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(SoftwareLongDF,dVariable=="Average Number of Offers for Competed Contracts"  & FxCb!="Combination or Other"),
                           "Control",
@@ -1802,7 +1808,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts (Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Change Orders",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(SoftwareLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
                           "Control",
@@ -1817,7 +1823,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts (Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Ceiling Raising Change Order %",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(SoftwareLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
                           "Control",
@@ -1832,7 +1838,7 @@ PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts (Overall and Controls)",          #VAR.row.label,
                 "% of Terminated Contracts",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
-                "Signicance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
+                "Significance of Difference between\nFixed Price and Cost-Based",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(SoftwareLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
                           "Control",
