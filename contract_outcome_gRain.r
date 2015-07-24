@@ -536,11 +536,11 @@ FixedPriceCast<-function(ResultsDF){
 #                      , sum    +statistic+ parameter+p.value+method
                      , value.var="value"
     )
-    ResultsDF<-ResultsDF[!names(ResultsDF) %in% c("Fixed-Price_statistic",
+    ResultsDF<-ResultsDF[,!names(ResultsDF) %in% c("Fixed-Price_statistic",
                                "Fixed-Price_parameter",
                                "Fixed-Price_p.value",
                                "Fixed-Price_method",
-                               "Fixed-Price_Significance"),]
+                               "Fixed-Price_Significance")]
 ResultsDF[,"Fixed-Price_Freq"]<-FactorToNumber(ResultsDF[,"Fixed-Price_Freq"])
 ResultsDF[,"Fixed-Price_Count"]<-FactorToNumber(ResultsDF[,"Fixed-Price_Count"])
 ResultsDF[,"Fixed-Price_p"]<-FactorToNumber(ResultsDF[,"Fixed-Price_p"])
@@ -564,17 +564,18 @@ ResultsDF[,"Combination or Other_Count"]<-FactorToNumber(ResultsDF[,"Combination
 ResultsDF[,"Combination or Other_p"]<-FactorToNumber(ResultsDF[,"Combination or Other_p"])
 ResultsDF[,"Combination or Other_Average"]<-FactorToNumber(ResultsDF[,"Combination or Other_Average"])
 
-    ResultsDF$FixedCostMargin_p<-(ResultsDF[,"Fixed-Price_p"]-ResultsDF[,"Cost-Based_p"])/
+    ResultsDF$pFixedCostMargin<-(ResultsDF[,"Fixed-Price_p"]-ResultsDF[,"Cost-Based_p"])/
         ResultsDF[,"Cost-Based_p"]
-    ResultsDF$FixedCombMargin_p<-(ResultsDF[,"Fixed-Price_p"]-ResultsDF[,"Combination or Other_p"])/
+    ResultsDF$pFixedCombMargin<-(ResultsDF[,"Fixed-Price_p"]-ResultsDF[,"Combination or Other_p"])/
         ResultsDF[,"Combination or Other_p"]
     
-    ResultsDF$FixedCostMargin_Average<-(ResultsDF[,"Fixed-Price_Average"]-ResultsDF[,"Cost-Based_Average"])/
+    ResultsDF$avgFixedCostMargin<-(ResultsDF[,"Fixed-Price_Average"]-ResultsDF[,"Cost-Based_Average"])/
         ResultsDF[,"Cost-Based_Average"]
-    ResultsDF$FixedCombMargin_Average<-(ResultsDF[,"Fixed-Price_Average"]-ResultsDF[,"Combination or Other_Average"])/
+    ResultsDF$avgFixedCombMargin<-(ResultsDF[,"Fixed-Price_Average"]-ResultsDF[,"Combination or Other_Average"])/
         ResultsDF[,"Combination or Other_Average"]
     names(ResultsDF)<-gsub("-", ".", names(ResultsDF))
     
+
     ResultsDF
     
 }

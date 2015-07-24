@@ -429,8 +429,8 @@ ResultsDF$Significance<-factor(ResultsDF$Significance,
                                levels=c(levels(ResultsDF$Significance)),
                                labels=c("<0.01",
                                         "<0.05",
-                                        "Not Significant\n(>0.05)",
-                                        "Sample Too Small\nfor Chi-Squared"
+                                        "Not Signif.\n(>0.05)",
+                                        "Sample Too\nSmall to Test"
                                )
 )    
 

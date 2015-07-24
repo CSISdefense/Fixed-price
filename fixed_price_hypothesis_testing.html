@@ -330,15 +330,15 @@ PopulationLongDF&lt;-FixedPriceComparisonTable(ModelSummary,&quot;Population&quo
 
 Coloration&lt;-NULL
 
-
+# debug(PointRowWrapper)
 #Single Offer Competition
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;All Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                 &quot;% of Contracts Receiving Single Offer Competition&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
-    subset(PopulationLongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
+    subset(PopulationLongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; Control!=&quot;Comp.&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
                           &quot;p&quot;,
                           &quot;FxCb&quot;,
@@ -349,12 +349,12 @@ PointRowWrapper(NULL,#VAR.main.label,
 </div>
 <pre class="r"><code>#Average Number of Offers
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;All Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                 &quot;Approximate Average Number of Offers&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
-    subset(PopulationLongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+    subset(PopulationLongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot; &amp; Control!=&quot;Comp.&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
                           &quot;Average&quot;,
                           &quot;FxCb&quot;,
@@ -365,10 +365,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 </div>
 <pre class="r"><code>#Average Number of Changes
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;All Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                 &quot;Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(PopulationLongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
@@ -381,26 +381,27 @@ PointRowWrapper(NULL,#VAR.main.label,
 </div>
 <pre class="r"><code>#Ceiling Raising Change Orders %
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
-                &quot;Approximate Average Ceiling Raising Change Order %&quot;,          #VAR.data.label,
+                &quot;All Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Ceiling-Breach Percentage&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
-    subset(PopulationLongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+    subset(PopulationLongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
                           &quot;Average&quot;,
                           &quot;FxCb&quot;,
                           &quot;Significance&quot;,
-                          &quot;iVariable&quot;)</code></pre>
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/PopulationAbsolute-4.png" />
 </div>
 <pre class="r"><code>#Terminations
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
-                &quot;% of Terminated Contracts&quot;,          #VAR.data.label,
+                &quot;All Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Contract Termination Rate&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(PopulationLongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
@@ -420,55 +421,93 @@ PopulationWideDF&lt;-subset(PopulationWideDF,
 # PopulationWideDF$Hypothesis&lt;-factor(PopulationWideDF$Hypothesis,levels=c(&quot;R&amp;D&quot;,&quot;Population&quot;),ordered=TRUE)
 
 #Single Offer Competition
-ggplot(subset(PopulationWideDF,dVariable==&quot;% Single Offer Competition&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;All Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Single Offer Competition Rate&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationWideDF,dVariable==&quot;% Single Offer Competition&quot;),
+                          &quot;Control&quot;,
+                          &quot;pFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;)+geom_hline(aes(yintercept=0))  </code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/PopulationDivision-1.png" />
 </div>
 <pre class="r"><code>#Average Number of Offers
-ggplot(subset(PopulationWideDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;All Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Number of Offers&quot;,   #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationWideDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)+geom_hline(aes(yintercept=0))</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/PopulationDivision-2.png" />
 </div>
 <pre class="r"><code>#Average Number of Changes
-ggplot(subset(PopulationWideDF,dVariable==&quot;Average Number of Change Orders&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;All Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationWideDF,dVariable==&quot;Average Number of Change Orders&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)+geom_hline(aes(yintercept=0))</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/PopulationDivision-3.png" />
 </div>
 <pre class="r"><code>#Ceiling Raising Change Orders %
-ggplot(subset(PopulationWideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format(),limits=c(-1,6))+geom_hline(aes(yintercept=0))</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;All Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Ceiling Breach Percentage&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationWideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)+geom_hline(aes(yintercept=0))</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/PopulationDivision-4.png" />
 </div>
-<pre class="r"><code>#Note scale excludes UCA.    
-
-
-
-#Terminations
-ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
+<pre class="r"><code>#Terminations
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;All Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Termination Rate&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
+                          &quot;Control&quot;,
+                          &quot;pFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    high=10
+    )+geom_hline(aes(yintercept=0))</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/PopulationDivision-5.png" />
 </div>
-<pre class="r"><code>write.csv(PopulationWideDF,paste(&quot;Output\\&quot;,
+<pre class="r"><code>PopulationOutliersDF&lt;-ListOutliers(PopulationWideDF,&quot;pFixedCostMargin&quot;,NA,10)
+
+write.csv(PopulationWideDF,paste(&quot;Output\\&quot;,
                           paste(&quot;Population&quot;
                                 ,&quot;Fixed_Price&quot;
                                 ,&quot;Hypothesis_Testing&quot;
@@ -520,7 +559,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Single Offer Competition
 # ggplot(subset(SizeDF,dVariable==&quot;% Single Offer Competition&quot;),
-#        aes(x=Control,y=FixedCostMargin_Average)
+#        aes(x=Control,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -528,14 +567,14 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Average Number of Offers
 # ggplot(subset(SizeDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
-#        aes(x=Control,y=FixedCostMargin_Average)
+#        aes(x=Control,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 # 
 # #Average Number of Changes
 # ggplot(subset(SizeDF,dVariable==&quot;Average Number of Change Orders&quot;),
-#        aes(x=Control,y=FixedCostMargin_Average)
+#        aes(x=Control,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -543,7 +582,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Ceiling Raising Change Orders %
 # ggplot(subset(SizeDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
-#        aes(x=Control,y=FixedCostMargin_Average)
+#        aes(x=Control,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -552,7 +591,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Terminations
 # ggplot(subset(SizeDF,dVariable==&quot;Terminated&quot;),
-#        aes(x=Control,y=FixedCostMargin_p)
+#        aes(x=Control,y=pFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -609,7 +648,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Single Offer Competition
 # ggplot(subset(AircraftDF,dVariable==&quot;% Single Offer Competition&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=pFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -617,14 +656,14 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Average Number of Offers
 # ggplot(subset(AircraftDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 # 
 # #Average Number of Changes
 # ggplot(subset(AircraftDF,dVariable==&quot;Average Number of Change Orders&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -632,7 +671,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Ceiling Raising Change Orders %
 # ggplot(subset(AircraftDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -641,7 +680,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Terminations
 # ggplot(subset(AircraftDF,dVariable==&quot;Terminated&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=pFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -718,7 +757,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Single Offer Competition
 # ggplot(subset(UCAdf,dVariable==&quot;% Single Offer Competition&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=pFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -726,14 +765,14 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Average Number of Offers
 # ggplot(subset(UCAdf,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 # 
 # #Average Number of Changes
 # ggplot(subset(UCAdf,dVariable==&quot;Average Number of Change Orders&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -741,7 +780,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Ceiling Raising Change Orders %
 # ggplot(subset(UCAdf,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -750,7 +789,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Terminations
 # ggplot(subset(UCAdf,dVariable==&quot;Terminated&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=pFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -802,7 +841,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Single Offer Competition
 # ggplot(subset(VehicleDF,dVariable==&quot;% Single Offer Competition&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=pFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -810,14 +849,14 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Average Number of Offers
 # ggplot(subset(VehicleDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 # 
 # #Average Number of Changes
 # ggplot(subset(VehicleDF,dVariable==&quot;Average Number of Change Orders&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -825,7 +864,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Ceiling Raising Change Orders %
 # ggplot(subset(VehicleDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -834,7 +873,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Terminations
 # ggplot(subset(VehicleDF,dVariable==&quot;Terminated&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=pFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -885,7 +924,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Single Offer Competition
 # ggplot(subset(LongDurWideDF,dVariable==&quot;% Single Offer Competition&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=pFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -893,14 +932,14 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Average Number of Offers
 # ggplot(subset(LongDurWideDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 # 
 # #Average Number of Changes
 # ggplot(subset(LongDurWideDF,dVariable==&quot;Average Number of Change Orders&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -908,7 +947,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Ceiling Raising Change Orders %
 # ggplot(subset(LongDurWideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -917,7 +956,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Terminations
 # ggplot(subset(LongDurWideDF,dVariable==&quot;Terminated&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=pFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -971,7 +1010,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Single Offer Competition
 # ggplot(subset(CompDF,dVariable==&quot;% Single Offer Competition&quot;),
-#        aes(x=Control,y=FixedCostMargin_p)
+#        aes(x=Control,y=pFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -979,14 +1018,14 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Average Number of Offers
 # ggplot(subset(CompDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
-#        aes(x=Control,y=FixedCostMargin_Average)
+#        aes(x=Control,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 # 
 # #Average Number of Changes
 # ggplot(subset(CompDF,dVariable==&quot;Average Number of Change Orders&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -994,7 +1033,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Ceiling Raising Change Orders %
 # ggplot(subset(CompDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -1003,7 +1042,7 @@ ggplot(subset(PopulationWideDF,dVariable==&quot;Terminated&quot;),
 # 
 # #Terminations
 # ggplot(subset(CompDF,dVariable==&quot;Terminated&quot;),
-#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
+#        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=pFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
@@ -1056,12 +1095,12 @@ Coloration&lt;-NULL
 
 #Single Offer Competition
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;R&amp;D Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                 &quot;% of Contracts Receiving Single Offer Competition&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
-    subset(RnDlongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
+    subset(RnDlongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; Control!=&quot;Comp.&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
                           &quot;p&quot;,
                           &quot;FxCb&quot;,
@@ -1072,12 +1111,12 @@ PointRowWrapper(NULL,#VAR.main.label,
 </div>
 <pre class="r"><code>#Average Number of Offers
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;R&amp;D Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                 &quot;Approximate Average Number of Offers&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
-    subset(RnDlongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+    subset(RnDlongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot; &amp; Control!=&quot;Comp.&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
                           &quot;Average&quot;,
                           &quot;FxCb&quot;,
@@ -1088,10 +1127,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 </div>
 <pre class="r"><code>#Average Number of Changes
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;R&amp;D Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                 &quot;Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(RnDlongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
@@ -1104,26 +1143,27 @@ PointRowWrapper(NULL,#VAR.main.label,
 </div>
 <pre class="r"><code>#Ceiling Raising Change Orders %
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
-                &quot;Approximate Average Ceiling Raising Change Order %&quot;,          #VAR.data.label,
+                &quot;R&amp;D Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Ceiling-Breach Percentage&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(RnDlongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
                           &quot;Average&quot;,
                           &quot;FxCb&quot;,
                           &quot;Significance&quot;,
-                          &quot;iVariable&quot;)</code></pre>
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;Dabsolute-4.png" />
 </div>
 <pre class="r"><code>#Terminations
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;R&amp;D Contracts (Overall and Controls)&quot;,          #VAR.row.label,
-                &quot;% of Terminated Contracts&quot;,          #VAR.data.label,
+                &quot;R&amp;D Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Contract Termination Rate&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(RnDlongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
@@ -1145,55 +1185,103 @@ RnDwideDF&lt;-subset(RnDwideDF,
 RnDwideDF$Hypothesis&lt;-factor(RnDwideDF$Hypothesis,levels=c(&quot;R&amp;D&quot;,&quot;Population&quot;),ordered=TRUE)
 
 #Single Offer Competition
-ggplot(subset(RnDwideDF,dVariable==&quot;% Single Offer Competition&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Single Offer Competition Rate&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDwideDF,dVariable==&quot;% Single Offer Competition&quot;),
+                          &quot;Control&quot;,
+                          &quot;pFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;)+geom_hline(aes(yintercept=0))+geom_hline(aes(yintercept=0))  </code></pre>
 <pre><code>## Warning in loop_apply(n, do.ply): Removed 4 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;D-1.png" />
 </div>
 <pre class="r"><code>#Average Number of Offers
-ggplot(subset(RnDwideDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Number of Offers&quot;,   #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDwideDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)+geom_hline(aes(yintercept=0))</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 3 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;D-2.png" />
 </div>
 <pre class="r"><code>#Average Number of Changes
-ggplot(subset(RnDwideDF,dVariable==&quot;Average Number of Change Orders&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDwideDF,dVariable==&quot;Average Number of Change Orders&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)+geom_hline(aes(yintercept=0))</code></pre>
 <pre><code>## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;D-3.png" />
 </div>
 <pre class="r"><code>#Ceiling Raising Change Orders %
-ggplot(subset(RnDwideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Ceiling Breach Percentage&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDwideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    low=-10,
+    high=10,
+    Percentage=TRUE
+    )+geom_hline(aes(yintercept=0))</code></pre>
 <pre><code>## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;D-4.png" />
 </div>
-<pre class="r"><code>#Terminations
-ggplot(subset(RnDwideDF,dVariable==&quot;Terminated&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
+<pre class="r"><code>RnDoutliersDF&lt;-ListOutliers(RnDwideDF,&quot;avgFixedCostMargin&quot;,-10,10)
+
+
+#Terminations
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;R&amp;D Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Termination Rate&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(RnDwideDF,dVariable==&quot;Terminated&quot;),
+                          &quot;Control&quot;,
+                          &quot;pFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    high=10
+    )+geom_hline(aes(yintercept=0))</code></pre>
 <pre><code>## Warning in loop_apply(n, do.ply): Removed 4 rows containing missing values
 ## (geom_point).</code></pre>
 <pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
@@ -1203,7 +1291,11 @@ ggplot(subset(RnDwideDF,dVariable==&quot;Terminated&quot;),
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H1LargeR&amp;D-5.png" />
 </div>
-<pre class="r"><code>write.csv(RnDwideDF,paste(&quot;Output\\&quot;,
+<pre class="r"><code>RnDoutliersDF&lt;-rbind(RnDoutliersDF,ListOutliers(RnDwideDF,&quot;pFixedCostMargin&quot;,NA,10))
+
+
+
+write.csv(RnDwideDF,paste(&quot;Output\\&quot;,
                           paste(&quot;RnD&quot;
                                 ,&quot;Fixed_Price&quot;
                                 ,&quot;Hypothesis_Testing&quot;
@@ -1238,7 +1330,7 @@ ggplot(subset(RnDwideDF,dVariable==&quot;Terminated&quot;),
                        states=c( &quot;Labeled MDAP&quot; ))
 
 MDAPlongDF&lt;-FixedPriceComparisonTable(subset(ModelSummary,MDAP==&quot;Labeled MDAP&quot;),
-                                &quot;Labeled MDAP&quot;)
+                                &quot;MDAP&quot;)
 
 
 
@@ -1249,12 +1341,12 @@ MDAPlongDF$Hypothesis&lt;-factor(MDAPlongDF$Hypothesis,levels=c(&quot;MDAP&quot;
 
 #Single Offer Competition
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;MDAP Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;MDAP Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                 &quot;% of Contracts Receiving Single Offer Competition&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
-    subset(MDAPlongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
+    subset(MDAPlongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; Control!=&quot;Comp.&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
                           &quot;p&quot;,
                           &quot;FxCb&quot;,
@@ -1265,12 +1357,12 @@ PointRowWrapper(NULL,#VAR.main.label,
 </div>
 <pre class="r"><code>#Average Number of Offers
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;MDAP Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;MDAP Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                 &quot;Approximate Average Number of Offers&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
-    subset(MDAPlongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+    subset(MDAPlongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot; &amp; Control!=&quot;Comp.&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
                           &quot;Average&quot;,
                           &quot;FxCb&quot;,
@@ -1281,10 +1373,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 </div>
 <pre class="r"><code>#Average Number of Changes
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;MDAP Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;MDAP Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                 &quot;Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(MDAPlongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
@@ -1297,26 +1389,27 @@ PointRowWrapper(NULL,#VAR.main.label,
 </div>
 <pre class="r"><code>#Ceiling Raising Change Orders %
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;MDAP Contracts (Overall and Controls)&quot;,          #VAR.row.label,
-                &quot;Approximate Average Ceiling Raising Change Order %&quot;,          #VAR.data.label,
+                &quot;MDAP Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Ceiling-Breach Percentage&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
-    subset(MDAPlongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+    subset(MDAPlongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;   &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
                           &quot;Average&quot;,
                           &quot;FxCb&quot;,
                           &quot;Significance&quot;,
-                          &quot;iVariable&quot;)</code></pre>
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-4.png" />
 </div>
 <pre class="r"><code>#Terminations
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;MDAP Contracts (Overall and Controls)&quot;,          #VAR.row.label,
-                &quot;% of Terminated Contracts&quot;,          #VAR.data.label,
+                &quot;MDAP Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Contract Termination Rate&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(MDAPlongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
@@ -1338,101 +1431,110 @@ MDAPwideDF&lt;-subset(MDAPwideDF,
 
 
 #Single Offer Competition
-ggplot(subset(MDAPwideDF,dVariable==&quot;% Single Offer Competition&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;MDAP Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Single Offer Competition Rate&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPwideDF,dVariable==&quot;% Single Offer Competition&quot;),
+                          &quot;Control&quot;,
+                          &quot;pFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;)+geom_hline(aes(yintercept=0))  </code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-1.png" />
 </div>
 <pre class="r"><code>#Average Number of Offers
-ggplot(subset(MDAPwideDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;MDAP Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Number of Offers&quot;,   #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPwideDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)+geom_hline(aes(yintercept=0))</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-2.png" />
 </div>
 <pre class="r"><code>#Average Number of Changes
-ggplot(subset(MDAPwideDF,dVariable==&quot;Average Number of Change Orders&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;MDAP Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPwideDF,dVariable==&quot;Average Number of Change Orders&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)+geom_hline(aes(yintercept=0))</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-3.png" />
 </div>
 <pre class="r"><code>#Ceiling Raising Change Orders %
-ggplot(subset(MDAPwideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;MDAP Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Ceiling Breach Percentage&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPwideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+#     low=-10,
+    high=10,
+    Percentage=TRUE
+    )+geom_hline(aes(yintercept=0))</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-4.png" />
 </div>
-<pre class="r"><code>#Terminations
-ggplot(subset(MDAPwideDF,dVariable==&quot;Terminated&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
+<pre class="r"><code>MDAPoutliersDF&lt;-ListOutliers(MDAPwideDF,&quot;avgFixedCostMargin&quot;,NA,10)
+
+
+#Terminations
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;MDAP Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Termination Rate&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(MDAPwideDF,dVariable==&quot;Terminated&quot;),
+                          &quot;Control&quot;,
+                          &quot;pFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+#     low=-10,
+    high=10
+    )+geom_hline(aes(yintercept=0))</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H2MDAP-5.png" />
 </div>
-<pre class="r"><code>write.csv(MDAPwideDF,paste(&quot;Output\\&quot;,
+<pre class="r"><code>MDAPoutliersDF&lt;-rbind(MDAPoutliersDF,ListOutliers(MDAPwideDF,&quot;pFixedCostMargin&quot;,NA,10))
+
+write.csv(MDAPwideDF,paste(&quot;Output\\&quot;,
                           paste(&quot;MDAP&quot;
                                 ,&quot;Fixed_Price&quot;
                                 ,&quot;Hypothesis_Testing&quot;
@@ -1472,12 +1574,12 @@ ggplot(subset(MDAPwideDF,dVariable==&quot;Terminated&quot;),
 ## Dur: (~2 years+]
 ## Pr(Finding)= 0.006950983</code></pre>
 <pre class="r"><code>    LongDurLongDF&lt;-FixedPriceComparisonTable(subset(ModelSummary,Dur==&quot;(~2 years+]&quot;),
-                                    &quot;Long Dur&quot;)
+                                    &quot;2+ Year Dur.&quot;)
     
     
     
     
-    LongDurLongDF$Hypothesis&lt;-factor(LongDurLongDF$Hypothesis,levels=c(&quot;Long Dur.&quot;,&quot;Population&quot;),ordered=TRUE)
+    LongDurLongDF$Hypothesis&lt;-factor(LongDurLongDF$Hypothesis,levels=c(&quot;2+ Year Dur.&quot;,&quot;Population&quot;),ordered=TRUE)
     
     #Remove redundant tests
     LongDurLongDF&lt;-subset(LongDurLongDF,
@@ -1486,12 +1588,12 @@ ggplot(subset(MDAPwideDF,dVariable==&quot;Terminated&quot;),
     
     #Single Offer Competition
     PointRowWrapper(NULL,#VAR.main.label,
-                    &quot;Long Duration Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;Long Duration Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                     &quot;% of Contracts Receiving Single Offer Competition&quot;,          #VAR.data.label,
                     &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
-        subset(LongDurLongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
+        subset(LongDurLongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; Control!=&quot;Comp.&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
                               &quot;Control&quot;,
                               &quot;p&quot;,
                               &quot;FxCb&quot;,
@@ -1502,12 +1604,12 @@ ggplot(subset(MDAPwideDF,dVariable==&quot;Terminated&quot;),
 </div>
 <pre class="r"><code>    #Average Number of Offers
     PointRowWrapper(NULL,#VAR.main.label,
-                    &quot;Long Duration Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;Long Duration Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                     &quot;Approximate Average Number of Offers&quot;,          #VAR.data.label,
                     &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
-        subset(LongDurLongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+        subset(LongDurLongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot; &amp; Control!=&quot;Comp.&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
                               &quot;Control&quot;,
                               &quot;Average&quot;,
                               &quot;FxCb&quot;,
@@ -1518,10 +1620,10 @@ ggplot(subset(MDAPwideDF,dVariable==&quot;Terminated&quot;),
 </div>
 <pre class="r"><code>    #Average Number of Changes
     PointRowWrapper(NULL,#VAR.main.label,
-                    &quot;Long Duration Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;Long Duration Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                     &quot;Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
                     &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
         subset(LongDurLongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                               &quot;Control&quot;,
@@ -1534,26 +1636,27 @@ ggplot(subset(MDAPwideDF,dVariable==&quot;Terminated&quot;),
 </div>
 <pre class="r"><code>    #Ceiling Raising Change Orders %
     PointRowWrapper(NULL,#VAR.main.label,
-                    &quot;Long Duration Contracts (Overall and Controls)&quot;,          #VAR.row.label,
-                    &quot;Approximate Average Ceiling Raising Change Order %&quot;,          #VAR.data.label,
+                    &quot;Long Duration Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;Approximate Average Ceiling-Breach Percentage&quot;,          #VAR.data.label,
                     &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
         subset(LongDurLongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                               &quot;Control&quot;,
                               &quot;Average&quot;,
                               &quot;FxCb&quot;,
                               &quot;Significance&quot;,
-                              &quot;iVariable&quot;)</code></pre>
+                              &quot;iVariable&quot;,
+    Percentage=TRUE)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-4.png" />
 </div>
 <pre class="r"><code>    #Terminations
     PointRowWrapper(NULL,#VAR.main.label,
-                    &quot;Long Duration Contracts (Overall and Controls)&quot;,          #VAR.row.label,
-                    &quot;% of Terminated Contracts&quot;,          #VAR.data.label,
+                    &quot;Long Duration Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;Contract Termination Rate&quot;,          #VAR.data.label,
                     &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
         subset(LongDurLongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                               &quot;Control&quot;,
@@ -1568,104 +1671,110 @@ ggplot(subset(MDAPwideDF,dVariable==&quot;Terminated&quot;),
 <pre class="r"><code>LongDurWideDF&lt;-FixedPriceCast(rbind(LongDurLongDF,PopulationLongDF))</code></pre>
 <pre><code>## Warning: attributes are not identical across measure variables; they will
 ## be dropped</code></pre>
-<pre class="r"><code>LongDurWideDF$Hypothesis&lt;-factor(LongDurWideDF$Hypothesis,levels=c(&quot;Long Dur.&quot;,&quot;Population&quot;),ordered=TRUE)
+<pre class="r"><code>LongDurWideDF$Hypothesis&lt;-factor(LongDurWideDF$Hypothesis,levels=c(&quot;2+ Year Dur.&quot;,&quot;Population&quot;),ordered=TRUE)
 
 #Remove redundant tests
 LongDurWideDF&lt;-subset(LongDurWideDF,
-                  !Control %in% c(unique(LongDurWideDF$Hypothesis),&quot;Not Long Dur.&quot;))
+                  !Control %in% c(unique(LongDurWideDF$Hypothesis),&quot;2+ Year Dur.&quot;))
 
 
 #Single Offer Competition
-ggplot(subset(LongDurWideDF,dVariable==&quot;% Single Offer Competition&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Long Duration Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Single Offer Competition Rate&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(LongDurWideDF,dVariable==&quot;% Single Offer Competition&quot;),
+                          &quot;Control&quot;,
+                          &quot;pFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;)+geom_hline(aes(yintercept=0))  </code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-1.png" />
 </div>
 <pre class="r"><code>#Average Number of Offers
-ggplot(subset(LongDurWideDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Long Duration Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Number of Offers&quot;,   #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(LongDurWideDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)+geom_hline(aes(yintercept=0))</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-2.png" />
 </div>
 <pre class="r"><code>#Average Number of Changes
-ggplot(subset(LongDurWideDF,dVariable==&quot;Average Number of Change Orders&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Long Duration Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(LongDurWideDF,dVariable==&quot;Average Number of Change Orders&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)+geom_hline(aes(yintercept=0))</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-3.png" />
 </div>
 <pre class="r"><code>#Ceiling Raising Change Orders %
-ggplot(subset(LongDurWideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Long Duration Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Ceiling Breach Percentage&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(LongDurWideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+#     low=-10,
+    high=10,
+    Percentage=TRUE
+    )+geom_hline(aes(yintercept=0))</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-4.png" />
 </div>
-<pre class="r"><code>#Terminations
-ggplot(subset(LongDurWideDF,dVariable==&quot;Terminated&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+<pre class="r"><code>LongDurOutliersDF&lt;-ListOutliers(LongDurWideDF,&quot;avgFixedCostMargin&quot;,NA,10)
+
+
+#Terminations
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Long Duration Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Termination Rate&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(LongDurWideDF,dVariable==&quot;Terminated&quot;),
+                          &quot;Control&quot;,
+                          &quot;pFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;)+geom_hline(aes(yintercept=0))</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
-## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H3LongDur-5.png" />
@@ -1723,10 +1832,10 @@ CompLongDF&lt;-subset(CompLongDF,
     
     #Average Number of Changes
     PointRowWrapper(NULL,#VAR.main.label,
-                    &quot;Competed Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;Competed Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                     &quot;Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
                     &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
         subset(CompLongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                               &quot;Control&quot;,
@@ -1739,26 +1848,27 @@ CompLongDF&lt;-subset(CompLongDF,
 </div>
 <pre class="r"><code>    #Ceiling Raising Change Orders %
     PointRowWrapper(NULL,#VAR.main.label,
-                    &quot;Competed Contracts (Overall and Controls)&quot;,          #VAR.row.label,
-                    &quot;Approximate Average Ceiling Raising Change Order %&quot;,          #VAR.data.label,
+                    &quot;Competed Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;Approximate Average Ceiling-Breach Percentage&quot;,          #VAR.data.label,
                     &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
-        subset(CompLongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+        subset(CompLongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;   &amp; FxCb!=&quot;Combination or Other&quot;),
                               &quot;Control&quot;,
                               &quot;Average&quot;,
                               &quot;FxCb&quot;,
                               &quot;Significance&quot;,
-                              &quot;iVariable&quot;)</code></pre>
+                              &quot;iVariable&quot;,
+    Percentage=TRUE)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H4CompAbsolute-2.png" />
 </div>
 <pre class="r"><code>    #Terminations
     PointRowWrapper(NULL,#VAR.main.label,
-                    &quot;Competed Contracts (Overall and Controls)&quot;,          #VAR.row.label,
-                    &quot;% of Terminated Contracts&quot;,          #VAR.data.label,
+                    &quot;Competed Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                    &quot;Contract Termination Rate&quot;,          #VAR.data.label,
                     &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                    &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                    &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
         subset(CompLongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                               &quot;Control&quot;,
@@ -1786,33 +1896,69 @@ CompWideDF&lt;-subset(CompWideDF,
 
 
 #Average Number of Changes
-ggplot(subset(CompWideDF,dVariable==&quot;Average Number of Change Orders&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Competed Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(CompWideDF,dVariable==&quot;Average Number of Change Orders&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)+geom_hline(aes(yintercept=0))</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H4Comp-1.png" />
 </div>
 <pre class="r"><code>#Ceiling Raising Change Orders %
-ggplot(subset(CompWideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
+# debug(PointRowWrapper)
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Competed Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Ceiling Breach Percentage&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(CompWideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    low=-10,
+    high=10,
+    Percentage=TRUE
+    )+geom_hline(aes(yintercept=0))</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H4Comp-2.png" />
 </div>
-<pre class="r"><code>#Terminations
-ggplot(subset(CompWideDF,dVariable==&quot;Terminated&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
+<pre class="r"><code>CompOutliersDF&lt;-ListOutliers(CompWideDF,&quot;avgFixedCostMargin&quot;,-10,10)
+
+#Terminations
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Competed Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Termination Rate&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(CompWideDF,dVariable==&quot;Terminated&quot;),
+                          &quot;Control&quot;,
+                          &quot;pFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+#     low=-10,
+    high=10
+    )+geom_hline(aes(yintercept=0))</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H4Comp-3.png" />
 </div>
-<pre class="r"><code>write.csv(CompWideDF,paste(&quot;Output\\&quot;,
+<pre class="r"><code>CompOutliersDF&lt;-rbind(CompOutliersDF,ListOutliers(CompWideDF,&quot;pFixedCostMargin&quot;,NA,10))
+
+write.csv(CompWideDF,paste(&quot;Output\\&quot;,
                           paste(&quot;Comp&quot;
                                 ,&quot;Fixed_Price&quot;
                                 ,&quot;Hypothesis_Testing&quot;
@@ -1852,7 +1998,7 @@ getEvidence(SoftwareFind)</code></pre>
 ## Soft: Possible Software Eng.
 ## Pr(Finding)= 0.003934603</code></pre>
 <pre class="r"><code>SoftwareLongDF&lt;-FixedPriceComparisonTable(subset(ModelSummary,Soft==&quot;Possible Software Eng.&quot;),
-                                      &quot;Possible \nSoftware Eng.&quot;)
+                                      &quot;Possible Software Eng.&quot;)
 
 
 
@@ -1865,12 +2011,12 @@ SoftwareLongDF&lt;-subset(SoftwareLongDF,
 
 #Single Offer Competition
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;Software Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Software Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                 &quot;% of Contracts Receiving Single Offer Competition&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
-    subset(SoftwareLongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
+    subset(SoftwareLongDF,dVariable==&quot;% Single Offer Competition&quot; &amp; Control!=&quot;Comp.&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
                           &quot;p&quot;,
                           &quot;FxCb&quot;,
@@ -1881,12 +2027,12 @@ PointRowWrapper(NULL,#VAR.main.label,
 </div>
 <pre class="r"><code>#Average Number of Offers
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;Software Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Software Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                 &quot;Approximate Average Number of Offers&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
-    subset(SoftwareLongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
+    subset(SoftwareLongDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot; &amp; Control!=&quot;Comp.&quot; &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
                           &quot;Average&quot;,
                           &quot;FxCb&quot;,
@@ -1897,10 +2043,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 </div>
 <pre class="r"><code>#Average Number of Changes
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;Software Contracts (Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Software Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
                 &quot;Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(SoftwareLongDF,dVariable==&quot;Average Number of Change Orders&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
@@ -1913,26 +2059,27 @@ PointRowWrapper(NULL,#VAR.main.label,
 </div>
 <pre class="r"><code>#Ceiling Raising Change Orders %
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;Software Contracts (Overall and Controls)&quot;,          #VAR.row.label,
-                &quot;Approximate Average Ceiling Raising Change Order %&quot;,          #VAR.data.label,
+                &quot;Software Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Approximate Average Ceiling-Breach Percentage&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(SoftwareLongDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
                           &quot;Average&quot;,
                           &quot;FxCb&quot;,
                           &quot;Significance&quot;,
-                          &quot;iVariable&quot;)</code></pre>
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-4.png" />
 </div>
 <pre class="r"><code>#Terminations
 PointRowWrapper(NULL,#VAR.main.label,
-                &quot;Software Contracts (Overall and Controls)&quot;,          #VAR.row.label,
-                &quot;% of Terminated Contracts&quot;,          #VAR.data.label,
+                &quot;Software Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Contract Termination Rate&quot;,          #VAR.data.label,
                 &quot;Contract Pricing&quot;,          #VAR.color.legend.label,
-                &quot;Signicance of Difference between\nFixed Price and Cost-Based&quot;,         #VAR.size.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
     subset(SoftwareLongDF,dVariable==&quot;Terminated&quot;  &amp; FxCb!=&quot;Combination or Other&quot;),
                           &quot;Control&quot;,
@@ -1947,109 +2094,164 @@ PointRowWrapper(NULL,#VAR.main.label,
 <pre class="r"><code>SoftwareWideDF&lt;-FixedPriceCast(rbind(SoftwareLongDF,PopulationLongDF))</code></pre>
 <pre><code>## Warning: attributes are not identical across measure variables; they will
 ## be dropped</code></pre>
-<pre class="r"><code>SoftwareWideDF$Hypothesis&lt;-factor(SoftwareWideDF$Hypothesis,levels=c(&quot;Possible \nSoftware Eng.&quot;,&quot;Population&quot;),ordered=TRUE)
+<pre class="r"><code>SoftwareWideDF$Hypothesis&lt;-factor(SoftwareWideDF$Hypothesis,levels=c(&quot;Possible Software Eng.&quot;,&quot;Population&quot;),ordered=TRUE)
 
 #Remove redundant tests
 SoftwareWideDF&lt;-subset(SoftwareWideDF,
                    !Control %in% unique(SoftwareWideDF$Hypothesis))
 
-
 #Single Offer Competition
-ggplot(subset(SoftwareWideDF,dVariable==&quot;% Single Offer Competition&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 6 rows containing missing values
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Software Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Single Offer Competition Rate&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareWideDF,dVariable==&quot;% Single Offer Competition&quot;),
+                          &quot;Control&quot;,
+                          &quot;pFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;)+geom_hline(aes(yintercept=0))  </code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 3 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 7 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-1.png" />
 </div>
 <pre class="r"><code>#Average Number of Offers
-ggplot(subset(SoftwareWideDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Software Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Number of Offers&quot;,   #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareWideDF,dVariable==&quot;Average Number of Offers for Competed Contracts&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    Percentage=TRUE)  +geom_hline(aes(yintercept=0))</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-2.png" />
 </div>
 <pre class="r"><code>#Average Number of Changes
-ggplot(subset(SoftwareWideDF,dVariable==&quot;Average Number of Change Orders&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Software Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Number of Change Orders&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareWideDF,dVariable==&quot;Average Number of Change Orders&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+#     low=-10,
+    high=10,
+    Percentage=TRUE
+    )+geom_hline(aes(yintercept=0))</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 3 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-3.png" />
 </div>
-<pre class="r"><code>#Ceiling Raising Change Orders %
-ggplot(subset(SoftwareWideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_Average)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+<pre class="r"><code>SoftwareOutliersDF&lt;-rbind(ListOutliers(SoftwareWideDF,&quot;pFixedCostMargin&quot;,NA,10))
+
+
+#Ceiling Raising Change Orders %
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Software Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Approximate Average Ceiling Breach Percentage&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareWideDF,dVariable==&quot;Ceiling Raising Change Orders %&quot;),
+                          &quot;Control&quot;,
+                          &quot;avgFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+    low=-10,
+    high=10,
+    Percentage=TRUE
+    )+geom_hline(aes(yintercept=0))</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 4 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 11 rows containing missing
-## values (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
+## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-4.png" />
 </div>
-<pre class="r"><code>#Terminations
-ggplot(subset(SoftwareWideDF,dVariable==&quot;Terminated&quot;),
-       aes(x=Control,color=Hypothesis,shape=Hypothesis,y=FixedCostMargin_p)
-       )+
-    geom_point()+
-    facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position=&quot;bottom&quot;,axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  </code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+<pre class="r"><code>SoftwareOutliersDF&lt;-rbind(SoftwareOutliersDF,ListOutliers(SoftwareOutliersDF,&quot;avgFixedCostMargin&quot;,-10,10))
+
+
+#Terminations
+PointRowWrapper(NULL,#VAR.main.label,
+                &quot;Software Contracts\n(Overall and Controls)&quot;,          #VAR.row.label,
+                &quot;Fixed-to-Cost Ratio for Termination Rate&quot;,          #VAR.data.label,
+                &quot;Contract Sample&quot;,          #VAR.color.legend.label,
+                &quot;Significance of Fixed-Price\nvs. Cost-Based Difference&quot;,         #VAR.size.legend.label,
+                Coloration,#VAR.Coloration
+    subset(SoftwareWideDF,dVariable==&quot;Terminated&quot;),
+                          &quot;Control&quot;,
+                          &quot;pFixedCostMargin&quot;,
+                          &quot;Hypothesis&quot;,
+                          &quot;Cost.Based_Significance&quot;,
+                          &quot;iVariable&quot;,
+#     low=-10,
+    high=10
+    )+geom_hline(aes(yintercept=0))</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 3 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 4 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 8 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 3 rows containing missing values
 ## (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 10 rows containing missing
-## values (geom_point).</code></pre>
-<pre><code>## Warning in loop_apply(n, do.ply): Removed 9 rows containing missing values
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_point).</code></pre>
+<pre><code>## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).</code></pre>
 <div class="figure">
 <img src="fixed_price_hypothesis_testing_files/figure-html/H5Software-5.png" />
 </div>
-<pre class="r"><code>write.csv(SoftwareWideDF,paste(&quot;Output\\&quot;,
+<pre class="r"><code>SoftwareOutliersDF&lt;-rbind(SoftwareOutliersDF,ListOutliers(SoftwareWideDF,&quot;pFixedCostMargin&quot;,NA,10))
+
+
+write.csv(SoftwareWideDF,paste(&quot;Output\\&quot;,
                           paste(&quot;Software&quot;
                                 ,&quot;Fixed_Price&quot;
                                 ,&quot;Hypothesis_Testing&quot;
