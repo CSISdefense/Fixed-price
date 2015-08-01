@@ -7,6 +7,24 @@ Tuesday, January 13, 2015
 ## Loading required package: ggplot2
 ## Loading required package: stringr
 ## Loading required package: plyr
+## Loading required package: Hmisc
+## Loading required package: grid
+## Loading required package: lattice
+## Loading required package: survival
+## Loading required package: Formula
+## 
+## Attaching package: 'Hmisc'
+## 
+## The following objects are masked from 'package:plyr':
+## 
+##     is.discrete, summarize
+## 
+## The following objects are masked from 'package:base':
+## 
+##     format.pval, round.POSIXt, trunc.POSIXt, units
+## 
+## Loading required package: scales
+## Loading required package: reshape2
 ```
 
 Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the [exploration on R&D](RnD_1to5_exploration.md), we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..
@@ -23,18 +41,64 @@ ContractSample  <- read.csv(
     stringsAsFactors = TRUE
     )
 
+CompleteModelAndDetail  <- read.csv(
+    paste("data\\defense_contract_CSIScontractID_detail.csv", sep = ""),
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+
+
+
+
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SubCustomer.sum"]<-"Who"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="UnmodifiedIsSomeCompetition"]<-"Comp"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="PlatformPortfolio.sum"]<-"What"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsIDV"]<-"IDV"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="FixedOrCost"]<-"FxCb"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="AnyInternational"]<-"Intl"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleArea"]<-"PSR"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qLowCeiling"]<-"LowCeil"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qHighCeiling"]<-"Ceil"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qLinked"]<-"Link"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qDuration"]<-"Dur"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SingleOffer"]<-"One"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qOffers"]<-"Offr"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsTerminated"]<-"Term"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SoftwareEng"]<-"Soft"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleVehicle"]<-"Veh"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="LabeledMDAP"]<-"MDAP"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qNChg"]<-"NChg"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qCRais"]<-"CRai"
+#These will probably be moved into apply_lookups at some point
+
+#ContractWeighted <- apply_lookups(Path,ContractWeighted)
+    CompleteModelAndDetail$Ceil<-factor(CompleteModelAndDetail$Ceil,
+                                levels=c("[75m+]",
+                                         "[10m,75m)",
+                                         "[1m,10m)", 
+                                         "[100k,1m)",
+                                         "[15k,100k)",
+                                         "[0,15k)"
+                                ),
+                                ordered=TRUE
+    )
+
+
 #These will probably be moved into apply_lookups at some point
 ContractSample$pIsSomeCompetition <- ContractSample$ObligatedAmountIsSomeCompetition/ContractSample$ObligatedAmount
 ContractSample$pIsSomeCompetition[is.na(ContractSample$ObligatedAmountIsSomeCompetition)] <- 0
 ContractSample$MinOfEffectiveDate <- strptime(ContractSample$MinOfEffectiveDate, "%Y-%m-%d")
+# debug(apply_lookups)
 ContractSample<-apply_lookups(Path,ContractSample)
 ```
 
 ```
+## Joining by: ContractingOfficeID, MajorCommandID
 ## Joining by: Contracting.Agency.ID
 ## Joining by: SubCustomer, Customer
-## Joining by: MajorCommandID
 ## Joining by: systemequipmentcode
+## Joining by: Fiscal.Year
 ```
 
 ```
@@ -59,7 +123,7 @@ The latter is prefered for certain types of indefinite delivery vehicles and the
 ###IsSomeCompetition
 Is Some Competition is a binary variable, true if competitive procedures were used, false if they were not. Unlabeled cases are classified as NAs.
 
-* UnmodifiedIsSomeCompetition is the classification given by the first record for the contract (33.49% missing data).
+* Comp is the classification given by the first record for the contract (0.00% missing data).
 * IsSomeCompetition is a classification for the entirity of the contract  (3.78% missing data).
   1. A contract which is sometimes classified as competed and never classified as uncompeted is categorized as competed. 
   2. A contract which is sometimes classified as uncompeted and never classified as competed is categorized as uncompeted.
@@ -73,7 +137,7 @@ Reassuringly, as is shown below, even when IsSomeCompetition is has a mixed or u
 ```r
 summary(subset(ContractSample,select=c(statutoryexceptiontofairopportunity,
                                 extentcompeted,
-                                 UnmodifiedIsSomeCompetition,
+#                                  Comp,
                                 IsSomeCompetition,
                                 pIsSomeCompetition
                                 ))
@@ -89,21 +153,13 @@ summary(subset(ContractSample,select=c(statutoryexceptiontofairopportunity,
 ##  URG    :   41                       F      :  97  
 ##  (Other):   21                       (Other): 110  
 ##  NA's   :12492                       NA's   : 263  
-##  UnmodifiedIsSomeCompetition            IsSomeCompetition
-##  Comp.    :7146              Comp.               :9886   
-##  No Comp. :2830              No Comp.            :4547   
-##  Unlabeled:5024              Mixed or \nUnlabeled: 567   
-##                                                          
-##                                                          
-##                                                          
-##                                                          
-##  pIsSomeCompetition
-##  Min.   :-0.2883   
-##  1st Qu.: 0.0000   
-##  Median : 1.0000   
-##  Mean   : 0.6644   
-##  3rd Qu.: 1.0000   
-##  Max.   : 2.8078   
+##             IsSomeCompetition pIsSomeCompetition
+##  Comp.               :9886    Min.   :-0.2883   
+##  No Comp.            :4547    1st Qu.: 0.0000   
+##  Mixed or \nUnlabeled: 567    Median : 1.0000   
+##                               Mean   : 0.6644   
+##                               3rd Qu.: 1.0000   
+##                               Max.   : 2.8078   
 ## 
 ```
 
@@ -111,12 +167,53 @@ summary(subset(ContractSample,select=c(statutoryexceptiontofairopportunity,
 ggplot(
     data = subset(ContractSample,IsSomeCompetition=="Mixed or \nUnlabeled"),
     aes_string(x = "pIsSomeCompetition"),
-    main = "Distribution by percent of dollars with some competition for mixed and unlabeled contracts."
-    ) +
+    
+    ) + scale_y_continuous(labels=percent)+
     geom_bar(binwidth=0.05)
 ```
 
-![](Contract_Competition_files/figure-html/overallvars-1.png) 
+![](Contract_Competition_files/figure-html/CompetitionVariableExploration-1.png) 
+
+##Variables describing competition
+The next set of variables are relevant when competition is present, as measured by IsSomeCompetition
+
+```r
+competed.sample<-subset(ContractSample,IsSomeCompetition=="Comp.")
+
+quantile(ContractSample$NumberOfOffersReceived,c(0.25,0.5,0.75),na.rm=TRUE)
+```
+
+```
+## 25% 50% 75% 
+##   1   2   4
+```
+
+```r
+ecdf(ContractSample$NumberOfOffersReceived)(c(1,2,3,4,5))
+```
+
+```
+## [1] 0.4456537 0.6045120 0.6982846 0.7611359 0.8146893
+```
+
+```r
+ecdf(ContractSample$NumberOfOffersReceived)(c(1,2,3,5))
+```
+
+```
+## [1] 0.4456537 0.6045120 0.6982846 0.8146893
+```
+There are two variables of concern: The Number of Offers received and whether or not a contract experienced full and open competition. 
+
+###Number of Offers Received
+This variable is particularly important, as single-offer competition (IsSomeCompetition=1 and NumberOfOfferesReceived=1)  is a dependent variable in two ongoing CSIS studies.
+
+* UnmodifiedNumberOfOffersReceived reports the Number of Offers received according to the first reported transaction under a contract (31.44% missing data, far too high, there must be a SQL mistake).
+* NumberOfOffersReceived reports the Number of Offers received for the entire contract. Ignoring missing values, CSIS will checks if only a single whole number is reported. If so, that is the value reported. Otherwise the value is NA. (5.95% missing data).
+
+The distribution of the number of offers received. For the chart below, we've cut out the instances where more than one hundred offers were received. Notably if the competition and no competition categries are combined, the distribution is fully exponential. That is still largely true for competed entries, although it the number receiving single offer competition is lower than the number receiving competition with multiple offers.
+
+
 
 ```r
 # 
@@ -138,27 +235,8 @@ ggplot(
 #     ,"StartDate"
 #     ,"EndDate"
 #     )
-```
-
-##Variables describing competition
-The next set of variables are relevant when competition is present, as measured by IsSomeCompetition
-
-```r
-competed.sample<-subset(ContractSample,IsSomeCompetition=="Comp.")
-```
-There are two variables of concern: The Number of Offers received and whether or not a contract experienced full and open competition. 
-
-###Number of Offers Received
-This variable is particularly important, as single-offer competition (IsSomeCompetition=1 and NumberOfOfferesReceived=1)  is a dependent variable in two ongoing CSIS studies.
-
-* UnmodifiedNumberOfOffersReceived reports the Number of Offers received according to the first reported transaction under a contract (31.44% missing data, far too high, there must be a SQL mistake).
-* NumberOfOffersReceived reports the Number of Offers received for the entire contract. Ignoring missing values, CSIS will checks if only a single whole number is reported. If so, that is the value reported. Otherwise the value is NA. (5.95% missing data).
-
-The distribution of the number of offers received. For the chart below, we've cut out the instances where more than one hundred offers were received. Notably if the competition and no competition categries are combined, the distribution is fully exponential. That is still largely true for competed entries, although it the number receiving single offer competition is lower than the number receiving competition with multiple offers.
 
 
-
-```r
 ggplot(
     data = subset(ContractSample,UnmodifiedNumberOfOffersReceived<100),
     aes_string(x = "UnmodifiedNumberOfOffersReceived"),
@@ -350,16 +428,245 @@ summary(subset(uncompeted.sample,select=c(
 ```
 
 
+![](Contract_Competition_files/figure-html/remaining-1.png) ![](Contract_Competition_files/figure-html/remaining-2.png) ![](Contract_Competition_files/figure-html/remaining-3.png) ![](Contract_Competition_files/figure-html/remaining-4.png) 
+
+
+![](Contract_Competition_files/figure-html/CompPSR-1.png) ![](Contract_Competition_files/figure-html/CompPSR-2.png) ![](Contract_Competition_files/figure-html/CompPSR-3.png) ![](Contract_Competition_files/figure-html/CompPSR-4.png) ![](Contract_Competition_files/figure-html/CompPSR-5.png) ![](Contract_Competition_files/figure-html/CompPSR-6.png) 
+
 
 ```
-## 25% 50% 75% 
-##   1   2   4
+## Warning in loop_apply(n, do.ply): Removed 5 rows containing non-finite
+## values (stat_boxplot).
 ```
 
 ```
-## [1] 0.4456537 0.6045120 0.6982846 0.7611359 0.8146893
+## Warning in loop_apply(n, do.ply): Removed 69 rows containing non-finite
+## values (stat_boxplot).
 ```
 
 ```
-## [1] 0.4456537 0.6045120 0.6982846 0.8146893
+## Warning in loop_apply(n, do.ply): Removed 612 rows containing non-finite
+## values (stat_boxplot).
 ```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 2838 rows containing non-finite
+## values (stat_boxplot).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 14131 rows containing non-finite
+## values (stat_boxplot).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 47244 rows containing non-finite
+## values (stat_boxplot).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 5 rows containing missing values
+## (stat_summary).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 69 rows containing missing
+## values (stat_summary).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 612 rows containing missing
+## values (stat_summary).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 2838 rows containing missing
+## values (stat_summary).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 14131 rows containing missing
+## values (stat_summary).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 47244 rows containing missing
+## values (stat_summary).
+```
+
+![](Contract_Competition_files/figure-html/CompVehicle-1.png) ![](Contract_Competition_files/figure-html/CompVehicle-2.png) 
+
+
+```r
+Durbox<-BoxplotWrapper(
+    "VAR.name",
+    "VAR.proper.name",
+    "VAR.X.label",
+    "Number of Offers Received" ,
+    Coloration,
+    subset(CompleteModelAndDetail,!is.na(Dur)&!is.na(Ceil)),
+    "Dur",
+    "UnmodifiedNumberOfOffersReceived",
+"Ceil"
+)
+CeiDurbox<-BoxplotWrapper(
+    "VAR.name",
+    "VAR.proper.name",
+    "VAR.X.label",
+    "Number of Offers Received" ,
+    Coloration,
+    subset(CompleteModelAndDetail,!is.na(Dur)&!is.na(Ceil)),
+"Ceil" ,   
+    "UnmodifiedNumberOfOffersReceived",
+"Dur"
+)
+
+Durbox
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 4 rows containing non-finite
+## values (stat_boxplot).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 57 rows containing non-finite
+## values (stat_boxplot).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 581 rows containing non-finite
+## values (stat_boxplot).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 2795 rows containing non-finite
+## values (stat_boxplot).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 14154 rows containing non-finite
+## values (stat_boxplot).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 47246 rows containing non-finite
+## values (stat_boxplot).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 4 rows containing missing values
+## (stat_summary).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 57 rows containing missing
+## values (stat_summary).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 581 rows containing missing
+## values (stat_summary).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 2795 rows containing missing
+## values (stat_summary).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 14154 rows containing missing
+## values (stat_summary).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 47246 rows containing missing
+## values (stat_summary).
+```
+
+![](Contract_Competition_files/figure-html/CompDur-1.png) 
+
+
+```r
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Veh)&!is.na(Ceil)),
+    aes_string(x = "FxCb",fill="FxCb"),
+    main = "Distribution by duration and ceiling"
+    ) +
+    geom_bar()+facet_grid(Veh~Ceil,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+```
+
+![](Contract_Competition_files/figure-html/CompFixedPrice-1.png) 
+
+```r
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Veh)&!is.na(Ceil)),
+    aes_string(x = "Veh",fill="Veh"),
+    main = "Distribution by duration and ceiling"
+    ) +
+    geom_bar()+facet_grid(FxCb~Ceil,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+```
+
+![](Contract_Competition_files/figure-html/CompFixedPrice-2.png) 
+
+```r
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Dur)&!is.na(PSR)),
+    aes_string(x = "FxCb",fill="FxCb"),
+    main = "Distribution by duration and ceiling"
+    ) +
+    geom_bar()+facet_grid(Dur~PSR,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+```
+
+![](Contract_Competition_files/figure-html/CompFixedPrice-3.png) 
+
+```r
+FoCbox<-BoxplotWrapper(
+    "VAR.name",
+    "VAR.proper.name",
+    "VAR.X.label",
+    "Number of Offers Received" ,
+    Coloration,
+    subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Ceil)),
+    "Ceil",
+    "UnmodifiedNumberOfOffersReceived",
+"FxCb"
+)
+
+FoCbox
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 611 rows containing non-finite
+## values (stat_boxplot).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 410 rows containing non-finite
+## values (stat_boxplot).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 63865 rows containing non-finite
+## values (stat_boxplot).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 611 rows containing missing
+## values (stat_summary).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 410 rows containing missing
+## values (stat_summary).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 63865 rows containing missing
+## values (stat_summary).
+```
+
+![](Contract_Competition_files/figure-html/CompFixedPrice-4.png) 

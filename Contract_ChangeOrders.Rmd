@@ -20,7 +20,7 @@ if (!require("ggplot2")) {
 }
 
 require(scales)
-
+require(Hmisc)
 #install.packages("ggplot2")
 #library("ggplot2")
 
@@ -84,25 +84,54 @@ CompleteModelAndDetail  <- read.csv(
 
 
 
-CompleteModelAndDetail$Ceil<-factor(CompleteModelAndDetail$Ceil,
-                                        levels=c("[0.00e+00,1.50e+04)"
-                                                 ,"[1.50e+04,1.00e+05)"
-                                                 ,"[1.00e+05,1.00e+06)"
-                                                 ,"[1.00e+06,3.00e+07)"
-                                                 ,"[3.00e+07,3.36e+12]"
-                                                 ),
-                                        labels=c("[0,15k)"
-                                                 ,"[15k,100k)"
-                                                 ,"[100k,1m)"
-                                                 ,"[1m,30m)"
-                                                 ,"[30m+]"
-                                                 ),
-                                        ordered=TRUE)
-
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SubCustomer.sum"]<-"Who"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="UnmodifiedIsSomeCompetition"]<-"Comp"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="PlatformPortfolio.sum"]<-"What"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsIDV"]<-"IDV"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="FixedOrCost"]<-"FxCb"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="AnyInternational"]<-"Intl"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleArea"]<-"PSR"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qLowCeiling"]<-"LowCeil"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qHighCeiling"]<-"Ceil"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qLinked"]<-"Link"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qDuration"]<-"Dur"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SingleOffer"]<-"One"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qOffers"]<-"Offr"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsTerminated"]<-"Term"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SoftwareEng"]<-"Soft"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleVehicle"]<-"Veh"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="LabeledMDAP"]<-"MDAP"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qNChg"]<-"NChg"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qCRais"]<-"CRai"
 
 #These will probably be moved into apply_lookups at some point
 #ContractWeighted <- apply_lookups(Path,ContractWeighted)
+    CompleteModelAndDetail$Ceil<-factor(CompleteModelAndDetail$Ceil,
+                                levels=c("[75m+]",
+                                         "[10m,75m)",
+                                         "[1m,10m)", 
+                                         "[100k,1m)",
+                                         "[15k,100k)",
+                                         "[0,15k)"
+                                ),
+                                ordered=TRUE
+    )
+ 
+# levels(CompleteModelAndDetail$CRai)
 
+    CompleteModelAndDetail$CRai<-factor(CompleteModelAndDetail$CRai,
+                                levels=c("[  -Inf,-0.001)",
+                                         "[-0.001, 0.001)",
+                                         "[ 0.001, 0.150)", 
+                                         "[ 0.150,   Inf]"
+                                ),
+                                labels=c("[< -0.1%)",
+                                         "[-0.1%,0.1%)",
+                                         "[0.1%,15%)", 
+                                         "[15%+]"
+                                ),
+                                ordered=TRUE
+    )
 
 ```
 
@@ -110,7 +139,7 @@ CompleteModelAndDetail$Ceil<-factor(CompleteModelAndDetail$Ceil,
 **A histogram of the data** showing the distribution of the number of change orders each year from 2007.
 
 
-```{r NumberOfChangeOrders, echo = TRUE, fig.width=4.5,fig.height=6}
+```{r ChangeOrders, echo = TRUE, fig.width=4.5,fig.height=6}
 
 library("ggplot2")
 
@@ -201,7 +230,7 @@ ecdf(subset(CompleteModelAndDetail$pChangeOrderUnmodifiedBaseAndAll,CompleteMode
 ecdf(subset(CompleteModelAndDetail$pChangeOrderObligated,CompleteModelAndDetail$SumOfisChangeOrder>0))(
     c(-0.001,0,0.001,0.05,0.075,0.1,0.11,0.12,0.15))
 
-pChangeOrderUnmodifiedBaseAndAll
+
 
 
 CompleteModelAndDetail$qCRais <- cut2(
@@ -211,10 +240,10 @@ CompleteModelAndDetail$qCRais <- cut2(
                                               0.15)
     )
 #                                               min(subset(
-#                                                   CompleteContracts$pChangeOrderObligated,
-#                                                   CompleteContracts$pChangeOrderObligated>0)),
+#                                                   CompleteModelAndDetail$pChangeOrderObligated,
+#                                                   CompleteModelAndDetail$pChangeOrderObligated>0)),
 
-summary(subset(CompleteModelAndDetail$qCRais,CompleteContracts$SumOfisChangeOrder>0    ))
+summary(subset(CompleteModelAndDetail$qCRais,CompleteModelAndDetail$SumOfisChangeOrder>0    ))
 ```
 
 
@@ -236,50 +265,8 @@ The % Growth in Base and All Options Value Amount form Change Orders is calculat
 
 **A histogram of the data** showing the distribution of the initial amount of the specific change order 
 
-```{r CostCeilingRaisingChangeOrders, echo = TRUE, fig.width=4.5,fig.height=6}
 
-
-
-ggplot(
-  data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
-  aes_string(x = "pChangeOrderUnmodifiedBaseAndAll"),
-  ) + geom_bar(bin=0.01) + 
-    facet_grid( Ceil ~ .,
-                scales = "free_y",
-                space = "free_y") +   
-    scale_y_continuous("Number of Contracts with Change Orders")+
-    scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)",
-                       limits=c(-1.25,1.25), labels=percent)
-
-
-names(CompleteModelAndDetail)
-
-ggplot(
-  data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
-  aes_string(x = "pChangeOrderUnmodifiedBaseAndAll")
-  )+ geom_bar()+
-#     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)")
-    scale_y_continuous("Number of Contracts with Change Orders")+
-        facet_grid( . ~ Ceil ) +
-    scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)",
-                       limits=c(-1.25,1.25), labels=percent)
-
-
-
-ggplot(
-  data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
-  aes_string(x = "pChangeOrderUnmodifiedBaseAndAll",weight="pContract")
-  )+ geom_bar()+
-#     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)")
-    scale_y_continuous("Percent of Contracts with Change Orders", labels=percent)+
-        facet_grid( . ~ Ceil ) +
-    scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)",
-                       limits=c(-0.5,1), labels=percent)
-
-
-
-
-
+```{r CeilBreachSummary}
 ggplot(
   data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
   aes_string(x = "Ceil",weight="pContract")
@@ -305,5 +292,51 @@ ggplot(
 
 ```
 
+```{r CeilingBreachDetailed, echo = TRUE, fig.width=6.5,fig.height=6}
+
+
+ggplot(
+  data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
+  aes_string(x = "pChangeOrderUnmodifiedBaseAndAll"),
+  ) + geom_bar(binwidth=0.01) + 
+    facet_grid( Ceil ~ .,
+                scales = "free_y",
+                space = "free_y") +   
+    scale_y_continuous("Number of Contracts with Change Orders")+
+    scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)",
+                       limits=c(-1.25,1.25), labels=percent)+theme(axis.text.x=element_text(angle=90))
+
+ggplot(
+  data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
+  aes_string(x = "pChangeOrderUnmodifiedBaseAndAll")
+  )+ geom_bar()+
+#     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)")
+    scale_y_continuous("Number of Contracts with Change Orders")+
+        facet_grid( . ~ Ceil ) +
+    scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)", limits=c(-1.25,1.25), labels=percent)+theme(axis.title.x=element_text(angle=90))
+
+
+BreachSummary<-ddply(CompleteModelAndDetail,.(Ceil,pChangeOrderUnmodifiedBaseAndAll,SumOfisChangeOrder,CRai),
+                     summarise,
+                     pContract=sum(pContract))
+
+
+ggplot(
+  data = subset(BreachSummary,SumOfisChangeOrder>0),
+  aes_string(x = "pChangeOrderUnmodifiedBaseAndAll",weight="pContract",fill="CRai")#
+  )+ geom_bar(binwidth=0.05)+
+#     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)")
+    scale_y_continuous("Percent of Contracts", labels=percent)+
+        facet_grid( . ~ Ceil )+scale_x_continuous("Extent of Ceiling Breach in 5% Increments",limits=c(-0.5,1), labels=percent)+theme(axis.text.x=element_text(angle=90),legend.position="bottom")+scale_fill_discrete(name="Extent of Ceiling Breach")
+
+
+tapply(CompleteModelAndDetail$CRai, CompleteModelAndDetail$Ceil, summary)
+
+ddply(subset(CompleteModelAndDetail,SumOfisChangeOrder>0),.(Ceil,CRai),
+                     summarise,
+                     pContract=sum(pContract))
+
+
+```
 
 

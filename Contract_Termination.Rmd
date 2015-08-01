@@ -14,8 +14,8 @@ Dod Fixed-Price Study: Is Terminated exploration
 ##install.packages("ggplot2")
 
 ##library("ggplot2")
-
-setwd("K:\\Development\\Fixed-price")
+# 
+# setwd("K:\\Development\\Fixed-price")
 
 Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 source(paste(Path,"lookups.r",sep=""))
@@ -72,30 +72,44 @@ CompleteModelAndDetail  <- read.csv(
     stringsAsFactors = TRUE
     )
 
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SubCustomer.sum"]<-"Who"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="UnmodifiedIsSomeCompetition"]<-"Comp"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="PlatformPortfolio.sum"]<-"What"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsIDV"]<-"IDV"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="FixedOrCost"]<-"FxCb"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="AnyInternational"]<-"Intl"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleArea"]<-"PSR"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qLowCeiling"]<-"LowCeil"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qHighCeiling"]<-"Ceil"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qLinked"]<-"Link"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qDuration"]<-"Dur"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SingleOffer"]<-"One"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qOffers"]<-"Offr"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsTerminated"]<-"Term"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SoftwareEng"]<-"Soft"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleVehicle"]<-"Veh"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="LabeledMDAP"]<-"MDAP"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qNChg"]<-"NChg"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qCRais"]<-"CRai"
 
-CompleteModelAndDetail$Ceil<-factor(CompleteModelAndDetail$Ceil,
-                                        levels=c("[0.00e+00,1.50e+04)"
-                                                 ,"[1.50e+04,1.00e+05)"
-                                                 ,"[1.00e+05,1.00e+06)"
-                                                 ,"[1.00e+06,3.00e+07)"
-                                                 ,"[3.00e+07,3.36e+12]"
-                                                 ),
-                                        labels=c("[0,15k)"
-                                                 ,"[15k,100k)"
-                                                 ,"[100k,1m)"
-                                                 ,"[1m,30m)"
-                                                 ,"[30m+]"
-                                                 ),
-                                        ordered=TRUE)
+    CompleteModelAndDetail$Ceil<-factor(CompleteModelAndDetail$Ceil,
+                                levels=c("[75m+]",
+                                         "[10m,75m)",
+                                         "[1m,10m)", 
+                                         "[100k,1m)",
+                                         "[15k,100k)",
+                                         "[0,15k)"
+                                ),
+                                ordered=TRUE
+    )
 
-#These will probably be moved into apply_lookups at some point
 #ContractWeighted <- apply_lookups(Path,ContractWeighted)
 
 ```
 
 **A Histogram of the IsTerminated data** showing the distribution of whether or not a contract was terminated each year from 2007.  
 
-```{r ShowGraphs, echo = TRUE, fig.width=4.5,fig.height=6}
+```{r ContractTerminationGraphs, echo = TRUE, fig.width=4.5,fig.height=6}
 
 require("ggplot2")
 require(scales)
@@ -126,7 +140,7 @@ ggplot(
   data = subset(CompleteModelAndDetail,Term=="Terminated"),
   aes_string(x = "Ceil")
   )+ geom_bar()+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+scale_y_continuous("Number of Partially or Completely \nTerminated Contracts")
+    scale_x_discrete("Original Ceiling (Base and All Options Value)")+scale_y_continuous("Number of Partially or Completely \nTerminated Contracts")
 
 
 
@@ -147,23 +161,23 @@ ggplot(
   data = subset(CompleteModelAndDetail,Term=="Terminated"),
   aes_string(x = "Ceil",weight="Action.Obligation")
   )+ geom_bar()+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+scale_y_continuous("Total Obligated Value of Partially or Completely Terminated Contracts")
+    scale_x_discrete("Original Ceiling (Base and All Options Value)")+scale_y_continuous("Total Obligated Value of Partially or Completely Terminated Contracts")
 
 
 ggplot(
   data = subset(CompleteModelAndDetail,Term=="Terminated"),
   aes_string(x = "Ceil",weight="pContract")
 #   main="Percentage of Contracts going to Partially or Completely Terminated Contracts\nBy Initial Contract Ceiling"
-  )+ geom_bar()+ scale_y_continuous("Percent of Contracts by Cost Ceiling Category", labels=percent)+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")
+  )+ geom_bar()+ scale_y_continuous("Percent of Contracts Partially or Completely Terminated\nby Original Ceiling Category", labels=percent)+
+    scale_x_discrete("Original Ceiling (Base and All Options Value)")
 
 
 ggplot(
   data = subset(CompleteModelAndDetail,Term=="Terminated"),
   aes_string(x = "Ceil",weight="pObligation"),
   main="Percentage of Contract Obligations going to Partially or Completely Terminated Contracts\nBy Initial Contract Ceiling"
-  )+ geom_bar()+ scale_y_continuous("Percent of Obligations in Cost Ceiling Category", labels=percent)+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")
+  )+ geom_bar()+ scale_y_continuous("Percent of Obligations to Terminated Contracts in Original Ceiling Category", labels=percent)+
+    scale_x_discrete("Original Ceiling (Base and All Options Value)")
 
 
 # 

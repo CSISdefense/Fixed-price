@@ -59,10 +59,47 @@ CompleteModelAndDetail  <- read.csv(
     )
 
 
+
+
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SubCustomer.sum"]<-"Who"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="UnmodifiedIsSomeCompetition"]<-"Comp"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="PlatformPortfolio.sum"]<-"What"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsIDV"]<-"IDV"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="FixedOrCost"]<-"FxCb"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="AnyInternational"]<-"Intl"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleArea"]<-"PSR"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qLowCeiling"]<-"LowCeil"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qHighCeiling"]<-"Ceil"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qLinked"]<-"Link"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qDuration"]<-"Dur"
+# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SingleOffer"]<-"One"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qOffers"]<-"Offr"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsTerminated"]<-"Term"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SoftwareEng"]<-"Soft"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleVehicle"]<-"Veh"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="LabeledMDAP"]<-"MDAP"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qNChg"]<-"NChg"
+colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qCRais"]<-"CRai"
+#These will probably be moved into apply_lookups at some point
+
+#ContractWeighted <- apply_lookups(Path,ContractWeighted)
+    CompleteModelAndDetail$Ceil<-factor(CompleteModelAndDetail$Ceil,
+                                levels=c("[75m+]",
+                                         "[10m,75m)",
+                                         "[1m,10m)", 
+                                         "[100k,1m)",
+                                         "[15k,100k)",
+                                         "[0,15k)"
+                                ),
+                                ordered=TRUE
+    )
+
+
 #These will probably be moved into apply_lookups at some point
 ContractSample$pIsSomeCompetition <- ContractSample$ObligatedAmountIsSomeCompetition/ContractSample$ObligatedAmount
 ContractSample$pIsSomeCompetition[is.na(ContractSample$ObligatedAmountIsSomeCompetition)] <- 0
 ContractSample$MinOfEffectiveDate <- strptime(ContractSample$MinOfEffectiveDate, "%Y-%m-%d")
+# debug(apply_lookups)
 ContractSample<-apply_lookups(Path,ContractSample)
 ```
 FPDS classifies competition using two variables: "Extent Competed" and "Statutory Exception To Fair Opportunity"
@@ -72,7 +109,7 @@ The latter is prefered for certain types of indefinite delivery vehicles and the
 ###IsSomeCompetition
 Is Some Competition is a binary variable, true if competitive procedures were used, false if they were not. Unlabeled cases are classified as NAs.
 
-* Comp is the classification given by the first record for the contract (`r sprintf("%1.2f%%",nrow(subset(ContractSample,Comp=="Unlabeled")) /nrow(ContractSample)*100)` missing data).
+* Comp is the classification given by the first record for the contract (`r sprintf("%1.2f%%",nrow(subset(ContractSample,IsSomeCompetition=="Unlabeled")) /nrow(ContractSample)*100)` missing data).
 * IsSomeCompetition is a classification for the entirity of the contract  (`r sprintf("%1.2f%%",nrow(subset(ContractSample,IsSomeCompetition=="Mixed or \nUnlabeled")) /nrow(ContractSample)*100)` missing data).
   1. A contract which is sometimes classified as competed and never classified as uncompeted is categorized as competed. 
   2. A contract which is sometimes classified as uncompeted and never classified as competed is categorized as uncompeted.
@@ -82,10 +119,10 @@ Is Some Competition is a binary variable, true if competitive procedures were us
 
 Reassuringly, as is shown below, even when IsSomeCompetition is has a mixed or unlabeled value, the most frequently occuring values are those that are almost never classified as competed or consistently classified as competed.
 
-```{r overallvars, echo = TRUE}
+```{r CompetitionVariableExploration, echo = TRUE}
 summary(subset(ContractSample,select=c(statutoryexceptiontofairopportunity,
                                 extentcompeted,
-                                 Comp,
+#                                  Comp,
                                 IsSomeCompetition,
                                 pIsSomeCompetition
                                 ))
@@ -96,7 +133,7 @@ ggplot(
     data = subset(ContractSample,IsSomeCompetition=="Mixed or \nUnlabeled"),
     aes_string(x = "pIsSomeCompetition"),
     
-    ) + scale_y_continuous(labels=percent)
+    ) + scale_y_continuous(labels=percent)+
     geom_bar(binwidth=0.05)
 
 
@@ -107,6 +144,12 @@ ggplot(
 The next set of variables are relevant when competition is present, as measured by IsSomeCompetition
 ```{r competitiosetup, echo = TRUE}
 competed.sample<-subset(ContractSample,IsSomeCompetition=="Comp.")
+
+quantile(ContractSample$NumberOfOffersReceived,c(0.25,0.5,0.75),na.rm=TRUE)
+ecdf(ContractSample$NumberOfOffersReceived)(c(1,2,3,4,5))
+ecdf(ContractSample$NumberOfOffersReceived)(c(1,2,3,5))
+
+
 ```
 There are two variables of concern: The Number of Offers received and whether or not a contract experienced full and open competition. 
 
@@ -281,22 +324,6 @@ summary(subset(uncompeted.sample,select=c(
 
 
 ```{r remaining, echo = FALSE}
-#Graphs I made earlier that I'm not presently using.
-CompleteModelAndDetail$Ceil<-factor(CompleteModelAndDetail$Ceil,
-                                        levels=c("[0.00e+00,1.50e+04)"
-                                                 ,"[1.50e+04,1.00e+05)"
-                                                 ,"[1.00e+05,1.00e+06)"
-                                                 ,"[1.00e+06,3.00e+07)"
-                                                 ,"[3.00e+07,3.36e+12]"
-                                                 ),
-                                        labels=c("[0,15k)"
-                                                 ,"[15k,100k)"
-                                                 ,"[100k,1m)"
-                                                 ,"[1m,30m)"
-                                                 ,"[30m+]"
-                                                 ),
-                                        ordered=TRUE)
-
 
 
 ggplot(
@@ -306,6 +333,7 @@ ggplot(
     ) +
     geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,100))+facet_grid(Ceil~.,scales="free_y")+
     theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
 
 
 ggplot(
@@ -320,37 +348,41 @@ ggplot(
 
 
 ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(Ceil)&!is.na(SimpleArea)&Comp=="Comp."),
+    data = subset(CompleteModelAndDetail,!is.na(Ceil)&!is.na(PSR)&Comp=="Comp."),
     aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
     main = "Distribution by is full and open"
     ) +
-    geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,50))+facet_grid(Ceil~SimpleArea,scales="free_y")+
+    geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,50))+facet_grid(Ceil~PSR,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(PSR)&Comp=="Comp."),
+    aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
+    main = "Distribution by is full and open"
+    ) +
+    geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,50))+facet_grid(FxCb~PSR,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+
+```
+
+
+```{r CompPSR, echo = FALSE}
+
+
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&PSR=="R&D"&Comp=="Comp."),
+    aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
+    main = "Distribution by is full and open"
+    ) +
+    geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,50))+facet_grid(FxCb~PSR,scales="free_y")+
     theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
 
 
 
 ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(SimpleArea)&Comp=="Comp."),
-    aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
-    main = "Distribution by is full and open"
-    ) +
-    geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,50))+facet_grid(FxCb~SimpleArea,scales="free_y")+
-    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
-
-
-
-ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(FxCb)&SimpleArea=="R&D"&Comp=="Comp."),
-    aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
-    main = "Distribution by is full and open"
-    ) +
-    geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,50))+facet_grid(FxCb~SimpleArea,scales="free_y")+
-    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
-
-
-
-ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(FxCb)&SimpleArea=="R&D"&Comp=="Comp."),
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&PSR=="R&D"&Comp=="Comp."),
     aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
     main = "Distribution by is full and open"
     ) +
@@ -359,12 +391,13 @@ ggplot(
 
 
 ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(IDV)&SimpleArea=="Products"&Comp=="Comp."),
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(IDV)&PSR=="Products"&Comp=="Comp."),
     aes_string(x = "UnmodifiedNumberOfOffersReceived",fill="Offr"),
     main = "Distribution by is full and open"
     ) +
     geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,50))+facet_grid(IDV~FxCb,scales="free_y")+
     theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
 
 #Move this to fixed price
 ggplot(
@@ -375,7 +408,6 @@ ggplot(
     geom_bar()+facet_grid(Ceil~PSR,scales="free_y")+
     theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
 
-
 ggplot(
     data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Comp)&!is.na(PSR)),
     aes_string(x = "FxCb",fill="FxCb"),
@@ -383,7 +415,6 @@ ggplot(
     ) +
     geom_bar()+facet_grid(Comp~PSR,scales="free_y")+
     theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
-
 
 ggplot(
     data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(IDV)&!is.na(PSR)),
@@ -393,107 +424,60 @@ ggplot(
     geom_bar()+facet_grid(IDV~PSR,scales="free_y")+
     theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
 
-ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(IDV)&!is.na(Ceil)),
-    aes_string(x = "FxCb",fill="FxCb"),
-    main = "Distribution by duration and ceiling"
-    ) +
-    geom_bar()+facet_grid(IDV~Ceil,scales="free_y")+
-    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+```
 
-ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(IDV)&!is.na(Ceil)),
-    aes_string(x = "IDV",fill="IDV"),
-    main = "Distribution by duration and ceiling"
-    ) +
-    geom_bar()+facet_grid(FxCb~Ceil,scales="free_y")+
-    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+```{r CompVehicle, echo = FALSE}
 
+CompleteModelAndDetail$Veh[CompleteModelAndDetail$Veh=="MULTIPLE AWARD"]<-"Other IDV"
+CompleteModelAndDetail$Veh<-factor(CompleteModelAndDetail$Veh,
+                                   levels=c("SINGLE AWARD",
+                                            "MULTIPLE AWARD" ,
+                                            "Other IDV"  ,
+                                            "Def/Pur"    ),
+                                   labels=c("Single Award IDV" ,
+                                            "MULTIPLE AWARD" ,
+                                            "Other IDV",
+                                            "Definitive Con,/Pur. Order"      ))
 
-
-ggplot(
-    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Dur)&!is.na(PSR)),
-    aes_string(x = "FxCb",fill="FxCb"),
-    main = "Distribution by duration and ceiling"
-    ) +
-    geom_bar()+facet_grid(Dur~PSR,scales="free_y")+
-    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
-
-Dur
-
-
-
-IDVBox<-BoxplotWrapper(
-    "Box plot of number of offers received by ceiling and IDV",
-    "Box plot of number of offers received by ceiling and IDV",
-    "Initial contract ceiling",
+VehBox<-BoxplotWrapper(
+    "Box plot of number of offers received by Ceiling and Contract Vehicle",
+    "",
+    "Original Ceiling",
     "Number of Offers Received" ,
     Coloration,
-    subset(CompleteModelAndDetail,!is.na(IDV)&!is.na(Ceil)),
-"IDV",    
+    subset(CompleteModelAndDetail,!is.na(Veh)&!is.na(Ceil)),
+"Veh",    
     "UnmodifiedNumberOfOffersReceived",
 )
-IDVBox<-IDVBox+coord_cartesian(ylim=c(0,30))+
-    facet_wrap(~Ceil,ncol=5)+
-    theme(axis.text.x=element_text(angle=0))#size=axis.text.size,
+VehBox<-VehBox+coord_cartesian(ylim=c(0,20))+
+    facet_wrap(~Ceil,ncol=6)+
+    theme(axis.text.x=element_text(angle=90))#size=axis.text.size,
 
 mean(subset(CompleteModelAndDetail,
-            IDV=="IDV"&Ceil=="[30m+]")$UnmodifiedNumberOfOffersReceived,,na.rm=TRUE)
-FoCbox<-BoxplotWrapper(
-    "VAR.name",
-    "VAR.proper.name",
-    "VAR.X.label",
-    "Number of Offers Received" ,
-    Coloration,
-    subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Ceil)),
-    "Ceil",
-    "UnmodifiedNumberOfOffersReceived",
-"FxCb"
-)
-Durbox<-BoxplotWrapper(
-    "VAR.name",
-    "VAR.proper.name",
-    "VAR.X.label",
-    "Number of Offers Received" ,
-    Coloration,
-    subset(CompleteModelAndDetail,!is.na(Dur)&!is.na(Ceil)),
-    "Dur",
-    "UnmodifiedNumberOfOffersReceived",
-"Ceil"
-)
-CeiDurbox<-BoxplotWrapper(
-    "VAR.name",
-    "VAR.proper.name",
-    "VAR.X.label",
-    "Number of Offers Received" ,
-    Coloration,
-    subset(CompleteModelAndDetail,!is.na(Dur)&!is.na(Ceil)),
-"Ceil" ,   
-    "UnmodifiedNumberOfOffersReceived",
-"Dur"
-)
+            Veh=="Other IDV"&Ceil=="[75m+]")$UnmodifiedNumberOfOffersReceived,,na.rm=TRUE)
+
+summary(subset(CompleteModelAndDetail,
+            Veh=="Other IDV"&Ceil=="[75m+]")$UnmodifiedNumberOfOffersReceived,,na.rm=TRUE)
 
 
+VehBox
 
-
-Box
 OffersByCeil<-HistogramOrDensityWrapper(
     "VAR.name"
-    ,"VAR.proper.name"
-    ,"NUmber of Offers Received"
-    ,"Frequency"
+    ,""
+    ,"Number of Offers Received"
+    ,"Number of Contracts\n(Variable Scale)"
     ,Coloration
-    ,subset(CompleteModelAndDetail,!is.na(Ceil)&Comp=="Comp.")
+    ,subset(CompleteModelAndDetail,!is.na(Ceil)&Comp=="Comp." & !is.na(Veh))
     ,"histogram"
     ,"UnmodifiedNumberOfOffersReceived"
+    ,"Offr"
+    ,"Veh"
     ,"Ceil"
     
-)
-OffersByCeil+geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,100))+facet_grid(Ceil~.)
-
-
-OffersByCeil+geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,100))+facet_grid(Ceil~.)
-
+)+theme(strip.text.y=element_text(angle=0))
+# OffersByCeil+geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,100))+facet_grid(Ceil~.)
+OffersByCeil
 # +     facet_grid( IsFullAndOpen ~ .,
 #               scales = "free_y",
 #               space = "free_y") + scale_y_continuous(expand = c(0,50)) 
@@ -523,8 +507,77 @@ OffersByCeil+geom_bar(binwidth=1)+scale_x_continuous(limits=c(0,100))+facet_grid
 # 
 # nrow(ContractSample[is.na(ContractSample$UnmodifiedNumberOfOffersReceived),])
 
-quantile(ContractSample$NumberOfOffersReceived,c(0.25,0.5,0.75),na.rm=TRUE)
-ecdf(ContractSample$NumberOfOffersReceived)(c(1,2,3,4,5))
-ecdf(ContractSample$NumberOfOffersReceived)(c(1,2,3,5))
+
+```
+
+```{r CompDur}
+Durbox<-BoxplotWrapper(
+    "VAR.name",
+    "VAR.proper.name",
+    "VAR.X.label",
+    "Number of Offers Received" ,
+    Coloration,
+    subset(CompleteModelAndDetail,!is.na(Dur)&!is.na(Ceil)),
+    "Dur",
+    "UnmodifiedNumberOfOffersReceived",
+"Ceil"
+)
+CeiDurbox<-BoxplotWrapper(
+    "VAR.name",
+    "VAR.proper.name",
+    "VAR.X.label",
+    "Number of Offers Received" ,
+    Coloration,
+    subset(CompleteModelAndDetail,!is.na(Dur)&!is.na(Ceil)),
+"Ceil" ,   
+    "UnmodifiedNumberOfOffersReceived",
+"Dur"
+)
+
+Durbox
+
+```
+
+```{r CompFixedPrice}
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Veh)&!is.na(Ceil)),
+    aes_string(x = "FxCb",fill="FxCb"),
+    main = "Distribution by duration and ceiling"
+    ) +
+    geom_bar()+facet_grid(Veh~Ceil,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Veh)&!is.na(Ceil)),
+    aes_string(x = "Veh",fill="Veh"),
+    main = "Distribution by duration and ceiling"
+    ) +
+    geom_bar()+facet_grid(FxCb~Ceil,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+
+
+ggplot(
+    data = subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Dur)&!is.na(PSR)),
+    aes_string(x = "FxCb",fill="FxCb"),
+    main = "Distribution by duration and ceiling"
+    ) +
+    geom_bar()+facet_grid(Dur~PSR,scales="free_y")+
+    theme(strip.text.y=element_text(angle=0))#size=axis.text.size,
+
+FoCbox<-BoxplotWrapper(
+    "VAR.name",
+    "VAR.proper.name",
+    "VAR.X.label",
+    "Number of Offers Received" ,
+    Coloration,
+    subset(CompleteModelAndDetail,!is.na(FxCb)&!is.na(Ceil)),
+    "Ceil",
+    "UnmodifiedNumberOfOffersReceived",
+"FxCb"
+)
+
+FoCbox
 
 ```

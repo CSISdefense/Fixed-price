@@ -310,7 +310,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 #Ceiling Raising Change Orders %
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,
-                "Approximate Average Ceiling-Breach Percentage",          #VAR.data.label,
+                "Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
                 "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
@@ -419,7 +419,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 #Ceiling Raising Change Orders %
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,
-                "Fixed-to-Cost Ratio for Approximate Average Ceiling Breach Percentage",          #VAR.data.label,
+                "Fixed-to-Cost Ratio for Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
                 "Contract Sample",          #VAR.color.legend.label,
                 "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
@@ -429,12 +429,15 @@ PointRowWrapper(NULL,#VAR.main.label,
                           "Hypothesis",
                           "Cost.Based_Significance",
                           "iVariable",
+    high=10,
     Percentage=TRUE)+geom_hline(aes(yintercept=0))
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/PopulationDivision-4.png) 
 
 ```r
+PopulationOutliersDF<-ListOutliers(PopulationWideDF,"avgFixedCostMargin",NA,10)
+
 #Terminations
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,
@@ -455,7 +458,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 ![](fixed_price_hypothesis_testing_files/figure-html/PopulationDivision-5.png) 
 
 ```r
-PopulationOutliersDF<-ListOutliers(PopulationWideDF,"pFixedCostMargin",NA,10)
+PopulationOutliersDF<-rbind(PopulationOutliersDF,ListOutliers(PopulationWideDF,"pFixedCostMargin",NA,10))
 
 write.csv(PopulationWideDF,paste("Output\\",
                           paste("Population"
@@ -1130,7 +1133,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 #Ceiling Raising Change Orders %
 PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts\n(Overall and Controls)",          #VAR.row.label,
-                "Approximate Average Ceiling-Breach Percentage",          #VAR.data.label,
+                "Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
                 "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
@@ -1259,7 +1262,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 #Ceiling Raising Change Orders %
 PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts\n(Overall and Controls)",          #VAR.row.label,
-                "Fixed-to-Cost Ratio for Approximate Average Ceiling Breach Percentage",          #VAR.data.label,
+                "Fixed-to-Cost Ratio for Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
                 "Contract Sample",          #VAR.color.legend.label,
                 "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
@@ -1432,7 +1435,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 #Ceiling Raising Change Orders %
 PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts\n(Overall and Controls)",          #VAR.row.label,
-                "Approximate Average Ceiling-Breach Percentage",          #VAR.data.label,
+                "Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
                 "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
@@ -1558,7 +1561,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 #Ceiling Raising Change Orders %
 PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts\n(Overall and Controls)",          #VAR.row.label,
-                "Fixed-to-Cost Ratio for Approximate Average Ceiling Breach Percentage",          #VAR.data.label,
+                "Fixed-to-Cost Ratio for Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
                 "Contract Sample",          #VAR.color.legend.label,
                 "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
@@ -1737,7 +1740,7 @@ The hypothesis regarding number of offers was not supported at the greater than 
     #Ceiling Raising Change Orders %
     PointRowWrapper(NULL,#VAR.main.label,
                     "Long Duration Contracts\n(Overall and Controls)",          #VAR.row.label,
-                    "Approximate Average Ceiling-Breach Percentage",          #VAR.data.label,
+                    "Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
                     "Contract Pricing",          #VAR.color.legend.label,
                     "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
@@ -1866,7 +1869,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 #Ceiling Raising Change Orders %
 PointRowWrapper(NULL,#VAR.main.label,
                 "Long Duration Contracts\n(Overall and Controls)",          #VAR.row.label,
-                "Fixed-to-Cost Ratio for Approximate Average Ceiling Breach Percentage",          #VAR.data.label,
+                "Fixed-to-Cost Ratio for Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
                 "Contract Sample",          #VAR.color.legend.label,
                 "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
@@ -2009,7 +2012,7 @@ CompLongDF<-subset(CompLongDF,
     #Ceiling Raising Change Orders %
     PointRowWrapper(NULL,#VAR.main.label,
                     "Competed Contracts\n(Overall and Controls)",          #VAR.row.label,
-                    "Approximate Average Ceiling-Breach Percentage",          #VAR.data.label,
+                    "Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
                     "Contract Pricing",          #VAR.color.legend.label,
                     "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
                     Coloration,#VAR.Coloration
@@ -2093,7 +2096,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 # debug(PointRowWrapper)
 PointRowWrapper(NULL,#VAR.main.label,
                 "Competed Contracts\n(Overall and Controls)",          #VAR.row.label,
-                "Fixed-to-Cost Ratio for Approximate Average Ceiling Breach Percentage",          #VAR.data.label,
+                "Fixed-to-Cost Ratio for Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
                 "Contract Sample",          #VAR.color.legend.label,
                 "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
@@ -2264,7 +2267,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 #Ceiling Raising Change Orders %
 PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts\n(Overall and Controls)",          #VAR.row.label,
-                "Approximate Average Ceiling-Breach Percentage",          #VAR.data.label,
+                "Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
                 "Contract Pricing",          #VAR.color.legend.label,
                 "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration
@@ -2459,7 +2462,7 @@ SoftwareOutliersDF<-rbind(ListOutliers(SoftwareWideDF,"pFixedCostMargin",NA,10))
 #Ceiling Raising Change Orders %
 PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts\n(Overall and Controls)",          #VAR.row.label,
-                "Fixed-to-Cost Ratio for Approximate Average Ceiling Breach Percentage",          #VAR.data.label,
+                "Fixed-to-Cost Ratio for Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
                 "Contract Sample",          #VAR.color.legend.label,
                 "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
                 Coloration,#VAR.Coloration

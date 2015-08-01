@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+<title></title>
+
+<script src="fixed_price_model_trimmed_files/jquery-1.11.0/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="fixed_price_model_trimmed_files/bootstrap-3.3.1/css/bootstrap.min.css" rel="stylesheet" />
+<script src="fixed_price_model_trimmed_files/bootstrap-3.3.1/js/bootstrap.min.js"></script>
+<script src="fixed_price_model_trimmed_files/bootstrap-3.3.1/shim/html5shiv.min.js"></script>
+<script src="fixed_price_model_trimmed_files/bootstrap-3.3.1/shim/respond.min.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<link rel="stylesheet"
+      href="fixed_price_model_trimmed_files/highlight/default.css"
+      type="text/css" />
+<script src="fixed_price_model_trimmed_files/highlight/highlight.js"></script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img { 
+  max-width:100%; 
+  height: auto; 
+}
+</style>
+<div class="container-fluid main-container">
+
+
+
+
+<pre><code>## Loading required package: ggplot2
+## Loading required package: stringr
+## Loading required package: graph
+## Loading required package: plyr
+## 
+## Attaching package: &#39;plyr&#39;
+## 
+## The following object is masked from &#39;package:graph&#39;:
+## 
+##     join
+## 
+## Loading required package: Hmisc
+## Loading required package: grid
+## Loading required package: lattice
+## Loading required package: survival
+## Loading required package: Formula
+## 
+## Attaching package: &#39;Hmisc&#39;
+## 
+## The following objects are masked from &#39;package:plyr&#39;:
+## 
+##     is.discrete, summarize
+## 
+## The following objects are masked from &#39;package:base&#39;:
+## 
+##     format.pval, round.POSIXt, trunc.POSIXt, units
+## 
+## Loading required package: Matrix
+## Loading required package: gRain
+## Loading required package: gRbase
+## Loading required package: bnlearn
+## 
+## Attaching package: &#39;bnlearn&#39;
+## 
+## The following objects are masked from &#39;package:gRbase&#39;:
+## 
+##     children, parents
+## 
+## Loading required package: Rgraphviz</code></pre>
+<p>Contracts are classified using a mix of numerical and categorical variables. While the changes in numerical variables are easy to grasp and summarize, a contract may have one line item that is competed and another that is not. As is detailed in the <a href="RnD_1to5_exploration.md">exploration on R&amp;D</a>, we are only considering information available prior to contract start. The percentage of contract obligations that were competed is a valuable benchmark, but is highly influenced by factors that occured after contract start..</p>
+<div id="studying-contract-vehicle-within-the-sample." class="section level2">
+<h2>Studying contract vehicle within the sample.</h2>
+<p>Describe contract vehicle here.</p>
+<pre class="r"><code># setwd(&quot;K:\\Development\\Fixed-price\\&quot;)
+filename&lt;-&quot;data\\defense_contract_CSIScontractID_model.csv&quot;
+zipfile&lt;-unz(&quot;Data\\defense_contract_CSIScontractID_model.zip&quot;,
+        &quot;defense_contract_CSIScontractID_model.csv&quot;)
+
+
+ContractModel  &lt;- read.csv(
+    zipfile,
+    header = TRUE, sep = &quot;,&quot;, dec = &quot;.&quot;, strip.white = TRUE, 
+    na.strings = c(&quot;NULL&quot;,&quot;NA&quot;,&quot;&quot;),
+    stringsAsFactors = TRUE
+    )
+ContractModel&lt;-subset(ContractModel,select=-c(IDV,LowCeil))
+
+
+# 
+# nrow(ContractModel)
+# nrow(subset(ContractModel,complete.cases(ContractModel)))
+# summary(subset(ContractModel,complete.cases(ContractModel)))
+#   .(FxCb,Comp,Link,MDAP,Who,What,Intl,PSR,Ceil,Dur,Offr,Veh,Term,Soft,UCA,CRai,NChg),# 
+
+
+names(ContractModel)</code></pre>
+<pre><code>##  [1] &quot;FxCb&quot; &quot;Comp&quot; &quot;Link&quot; &quot;MDAP&quot; &quot;Who&quot;  &quot;What&quot; &quot;Intl&quot; &quot;PSR&quot;  &quot;Ceil&quot; &quot;Dur&quot; 
+## [11] &quot;Offr&quot; &quot;Veh&quot;  &quot;Term&quot; &quot;Soft&quot; &quot;UCA&quot;  &quot;CRai&quot; &quot;NChg&quot;</code></pre>
+<pre class="r"><code>dropped&lt;-subset(ContractModel,!complete.cases(ContractModel)|
+                    Intl==&quot;Unlabeled&quot;|
+                    PSR ==&quot;Mixed or Unlabeled&quot; |
+                    Who==&quot;Uncategorized&quot; |
+                    What ==&quot;Unlabeled&quot;)
+
+ContractModel&lt;-subset(ContractModel,complete.cases(ContractModel)&amp;
+                          Intl!=&quot;Unlabeled&quot;&amp;
+                          PSR !=&quot;Mixed or Unlabeled&quot;&amp;
+                          Who!=&quot;Uncategorized&quot; &amp; 
+                          What!=&quot;Unlabeled&quot;)
+
+ContractModel$Intl&lt;-droplevels(ContractModel$Intl)
+ContractModel$PSR&lt;-droplevels(ContractModel$PSR)
+ContractModel$Who&lt;-droplevels(ContractModel$Who)
+ContractModel$What&lt;-droplevels(ContractModel$What)
+ContractModel$Comp&lt;-droplevels(ContractModel$Comp)
+
+nrow(ContractModel)</code></pre>
+<pre><code>## [1] 5890302</code></pre>
+<p>The last stage before Bayesian learning is setting the whitelists and blacklists. The whitelist contains vectors that must existing in the graph while the blacklist contains forbidden vectors. There was some iteration in the development of the white and blacklist, as nonsensical connections were removed and the blacklist was made systematic.</p>
+<p>I’ve listed them below based on the origin piece of evidence. 1. Veh (Vehicle) * Whitelist to Comp (Competition) as many forms of Vehs don’t qualify for full and open. * Blacklist to PSR (SimpleArea) because what you are buying is picked before how you are buying it. 2. FxCb (FixedOrCost) * Whitelist to One (SingleOffer) as this is the key study question. * Blacklist to PSR (SimpleArea) and Intl (AnyInternational) because figuring out what and where come first. * Blacklist to Ceil (qCeiling) and Dur (qDuration), because project scope should come before project pricing, although this may not be entirely true when the vendors make proposals. 3. Comp (Competition)<br />* Whitelist to One (SingleOffer). We’ll see how strong this connection ends up being, but it’s really straightforward. * Blacklist to PSR (SimpleArea), Intl (AnyInternational), and FxCb (FixedOrCost), as I think those details are set before deciding competition procedures. 4. Intl (AnyInternational) No restrictions or requirements. 5. PSR (SimpleArea) * Blacklist to Intl (AnyInternational) As I think the place of performance in the U.S. or abroad (but not the vendor location) is sometimes decided at least as early as the product or service. 6. Ceil (qCeiling) * Blacklist to PSR (SimpleArea) Intl (AnyInternational) because what and where come before scope. 7. Dur (qDuration) * Blacklist to PSR (SimpleArea) Intl (AnyInternational) because what and where come before scope. 8. One (SingleOffer) * Blacklist to everything not covered by an existing whitelist. While the vendors responses may influence some factors at the margin, this is the dependent variable for this part of the study.</p>
+<pre class="r"><code>#White list, connections that must occur
+ContractWL&lt;-data.frame(from=&quot;Comp&quot;,to=&quot;Offr&quot;)
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Comp&quot;,to=&quot;Offr&quot;))
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;PSR&quot;,to=&quot;FxCb&quot;))
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;PSR&quot;,to=&quot;Link&quot;))
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;FxCb&quot;,to=&quot;Offr&quot;))
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;What&quot;,to=&quot;Link&quot;))
+
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Who&quot;,to=&quot;What&quot;))
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Veh&quot;,to=&quot;Ceil&quot;))
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Ceil&quot;,to=&quot;FxCb&quot;))
+
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;PSR&quot;,to=&quot;Soft&quot;))
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;UCA&quot;,to=&quot;Veh&quot;))
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;MDAP&quot;,to=&quot;Link&quot;))
+#Adding links to offers
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;UCA&quot;,to=&quot;Offr&quot;)) #Less appealing
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;MDAP&quot;,to=&quot;Offr&quot;)) #Fewer eligible vendors
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Soft&quot;,to=&quot;Offr&quot;)) #Fewer eligible vendors
+
+
+#Adding links to Terminations
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Dur&quot;,to=&quot;Term&quot;)) #Longer greater risk of cancellation
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;FxCb&quot;,to=&quot;Term&quot;)) #Harder to adapt to changes
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Ceil&quot;,to=&quot;Term&quot;)) #Bigger, termination more necessary
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;CRai&quot;,to=&quot;Term&quot;)) #Overruns increase risk of termination
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Intl&quot;,to=&quot;Term&quot;)) #Outside factors can drive international cancellation
+
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Soft&quot;,to=&quot;Term&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;UCA&quot;,to=&quot;Term&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;What&quot;,to=&quot;Term&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Veh&quot;,to=&quot;Term&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;PSR&quot;,to=&quot;Term&quot;)) #Covering all hypotheses and controls
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;MDAP&quot;,to=&quot;Term&quot;)) #Major cancellations can cascade
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Comp&quot;,to=&quot;Term&quot;)) #Covering all hypotheses and controls
+
+#Adding links to Number of Change Orders
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Dur&quot;,to=&quot;NChg&quot;)) #Longer greater risk of cancellation
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;FxCb&quot;,to=&quot;NChg&quot;)) #Less flexible contract type
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Intl&quot;,to=&quot;NChg&quot;)) #Outside factors can drive international cancellation
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;UCA&quot;,to=&quot;NChg&quot;)) #Greater uncertainty with UCAs
+
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Ceil&quot;,to=&quot;NChg&quot;))  #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Soft&quot;,to=&quot;NChg&quot;)) #Covering all hypotheses and controls
+
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;What&quot;,to=&quot;NChg&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Veh&quot;,to=&quot;NChg&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;PSR&quot;,to=&quot;NChg&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;MDAP&quot;,to=&quot;NChg&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Comp&quot;,to=&quot;NChg&quot;)) #Covering all hypotheses and controls
+
+
+#Adding links to Number of Ceiling Raising Change orders
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Comp&quot;,to=&quot;CRai&quot;)) #Risk of low balling 
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Offr&quot;,to=&quot;CRai&quot;)) #Risk of monopolistic practices if one offer
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Ceil&quot;,to=&quot;CRai&quot;)) #Large contracts likely smaller % change
+
+
+
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Dur&quot;,to=&quot;CRai&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Soft&quot;,to=&quot;CRai&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;UCA&quot;,to=&quot;CRai&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;What&quot;,to=&quot;CRai&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Veh&quot;,to=&quot;CRai&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;PSR&quot;,to=&quot;CRai&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;MDAP&quot;,to=&quot;CRai&quot;)) #Covering all hypotheses and controls
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Comp&quot;,to=&quot;CRai&quot;)) #Covering all hypotheses and controls
+
+
+bnWhitelist &lt;- empty.graph(nodes = names(ContractModel))
+arcs(bnWhitelist)&lt;-ContractWL
+graphviz.plot(bnWhitelist,main=&quot;Whitelisted Arcs Rd. 1&quot;)</code></pre>
+<p><img src="fixed_price_model_trimmed_files/figure-html/BayesianLearningSetup-1.png" /></p>
+<pre class="r"><code>#Black list, connections that are prohibited
+ContractBL&lt;-data.frame(from=c(&quot;Offr&quot;),to= c(&quot;Veh&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Offr&quot;,to=&quot;Who&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Offr&quot;,to=&quot;What&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Offr&quot;,to=&quot;PSR&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Offr&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Offr&quot;,to=&quot;FxCb&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Offr&quot;,to=&quot;Ceil&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Offr&quot;,to=&quot;Dur&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Offr&quot;,to=&quot;Link&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Offr&quot;,to=&quot;UCA&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Offr&quot;,to=&quot;Soft&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Offr&quot;,to=&quot;MDAP&quot;))
+# ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Who&quot;,to=&quot;Offr&quot;))
+
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Link&quot;,to=&quot;Who&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Link&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Link&quot;,to=&quot;Veh&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Link&quot;,to=&quot;UCA&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Link&quot;,to=&quot;Soft&quot;))
+
+
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;Who&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;What&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;Ceil&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;Dur&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;Link&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;Comp&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;UCA&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;Soft&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;FxCb&quot;,to=&quot;MDAP&quot;))
+
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Ceil&quot;,to=&quot;Who&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Ceil&quot;,to=&quot;What&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Ceil&quot;,to=&quot;PSR&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Ceil&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Ceil&quot;,to=&quot;Link&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Ceil&quot;,to=&quot;UCA&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Ceil&quot;,to=&quot;Soft&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Ceil&quot;,to=&quot;MDAP&quot;))
+
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Dur&quot;,to=&quot;Who&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Dur&quot;,to=&quot;What&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Dur&quot;,to=&quot;PSR&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Dur&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Dur&quot;,to=&quot;Link&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Dur&quot;,to=&quot;UCA&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Dur&quot;,to=&quot;Soft&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Dur&quot;,to=&quot;MDAP&quot;))
+
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Comp&quot;,to=&quot;Who&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Comp&quot;,to=&quot;What&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Comp&quot;,to=&quot;PSR&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Comp&quot;,to=&quot;Link&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Comp&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Comp&quot;,to=&quot;Soft&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Comp&quot;,to=&quot;MDAP&quot;))
+
+
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;PSR&quot;,to=&quot;Who&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;PSR&quot;,to=&quot;What&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;PSR&quot;,to=&quot;Intl&quot;))
+
+
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Soft&quot;,to=&quot;Who&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Soft&quot;,to=&quot;What&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Soft&quot;,to=&quot;Intl&quot;))
+
+
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;MDAP&quot;,to=&quot;Who&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;MDAP&quot;,to=&quot;What&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;MDAP&quot;,to=&quot;Intl&quot;))
+
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;UCA&quot;,to=&quot;Who&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;UCA&quot;,to=&quot;What&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;UCA&quot;,to=&quot;Intl&quot;))
+
+
+
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Veh&quot;,to=&quot;Who&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Veh&quot;,to=&quot;What&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Veh&quot;,to=&quot;PSR&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Veh&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Veh&quot;,to=&quot;Comp&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Veh&quot;,to=&quot;Link&quot;))
+
+# ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Comp&quot;,to=&quot;Ceil&quot;))
+# ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Comp&quot;,to=&quot;Dur&quot;))
+
+
+
+
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Who&quot;,to=&quot;Comp&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Who&quot;,to=&quot;Offr&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Who&quot;,to=&quot;Veh&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Who&quot;,to=&quot;FxCb&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Who&quot;,to=&quot;Ceil&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Who&quot;,to=&quot;Dur&quot;))
+
+
+
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;NChg&quot;,to=&quot;Veh&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;NChg&quot;,to=&quot;Who&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;NChg&quot;,to=&quot;What&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;NChg&quot;,to=&quot;PSR&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;NChg&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;NChg&quot;,to=&quot;FxCb&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;NChg&quot;,to=&quot;Ceil&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;NChg&quot;,to=&quot;Dur&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;NChg&quot;,to=&quot;Link&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;NChg&quot;,to=&quot;Offr&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;NChg&quot;,to=&quot;UCA&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;NChg&quot;,to=&quot;Soft&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;NChg&quot;,to=&quot;MDAP&quot;))
+
+
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;CRai&quot;,to=&quot;Veh&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;CRai&quot;,to=&quot;Who&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;CRai&quot;,to=&quot;What&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;CRai&quot;,to=&quot;PSR&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;CRai&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;CRai&quot;,to=&quot;FxCb&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;CRai&quot;,to=&quot;Ceil&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;CRai&quot;,to=&quot;Dur&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;CRai&quot;,to=&quot;Link&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;CRai&quot;,to=&quot;Offr&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;CRai&quot;,to=&quot;NChg&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;CRai&quot;,to=&quot;UCA&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;CRai&quot;,to=&quot;Soft&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;CRai&quot;,to=&quot;MDAP&quot;))
+
+
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;Veh&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;Who&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;What&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;PSR&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;Intl&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;FxCb&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;Ceil&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;Dur&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;Link&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;Offr&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;NChg&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;CRai&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;UCA&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;Soft&quot;))
+ContractBL&lt;-rbind(ContractBL,data.frame(from=&quot;Term&quot;,to=&quot;MDAP&quot;))
+
+
+AllArcsBL&lt;-paste(ContractBL$to,ContractBL$from,sep=&quot;~&quot;)
+ReversedArcsBL&lt;-paste(ContractBL$from,ContractBL$to,sep=&quot;~&quot;)
+DoubleArcsBL&lt;-AllArcsBL[AllArcsBL %in% ReversedArcsBL]
+SingleArcsBL&lt;-ReversedArcsBL[!ReversedArcsBL %in% AllArcsBL]
+PurpleBL&lt;-c(rep(&quot;purple&quot;,length(DoubleArcsBL)))
+names(PurpleBL)&lt;-DoubleArcsBL
+RedBL&lt;-c(rep(&quot;red&quot;,length(SingleArcsBL)))
+names(RedBL)&lt;-SingleArcsBL
+ColorsBL&lt;-c(PurpleBL,RedBL)
+
+
+df &lt;- data.frame(from=ContractBL$from, to=ContractBL$to, weight=rep(1,nrow(ContractBL)))
+gBL &lt;- graphBAM( data.frame(from=ContractBL$from, to=ContractBL$to, weight=rep(1,nrow(ContractBL))),
+                edgemode = &quot;directed&quot;)
+# adjacencyMatrix(gBL)
+# plot(gBL,main=&quot;Fixed Price Bayesian Network Blacklist&quot;)
+# AllArcs&lt;-edgeNames(gBL)
+# ReversedArcs&lt;-paste(sub(pattern = &quot;[a-zA-Z0-9]*~&quot;, replacement=&quot;&quot;, x = AllArcs),
+# sub(pattern = &quot;~[a-zA-Z0-9]*&quot;, replacement=&quot;&quot;, x = AllArcs),
+# sep=&quot;~&quot;)
+# DoubleArcs&lt;-AllArcs[AllArcs %in% ReversedArcs]
+
+
+eAttrs&lt;-list()
+eAttrs$color&lt;-ColorsBL[names(ColorsBL) %in% edgeNames(gBL)]
+
+ nNodes &lt;- length(nodes(gBL))
+ nA &lt;- list()
+# &gt; nA$fixedSize&lt;-rep(FALSE, nNodes)
+ nA$height &lt;- nA$width &lt;- rep(&quot;3.5&quot;, nNodes)
+# &gt; nA$label &lt;- rep(&quot;z&quot;, nNodes)
+# &gt; nA$color &lt;- rep(&quot;green&quot;, nNodes)
+# &gt; nA$fillcolor &lt;- rep(&quot;orange&quot;, nNodes)
+# &gt; nA$shape &lt;- rep(&quot;circle&quot;, nNodes)
+# &gt; nA$fontcolor &lt;- rep(&quot;blue&quot;, nNodes)
+nA$fontsize &lt;- rep(18, nNodes)
+nA &lt;- lapply(nA, function(x) { names(x) &lt;- nodes(gBL); x})
+
+plot(gBL,
+     main=&quot;Competition Bayesian Network Blacklist\nOne-way Blocks in Red, Two-way Blocks in Purple&quot;,
+     edgeAttrs=eAttrs,
+     nodeAttrs=nA,
+     &quot;dot&quot;)</code></pre>
+<p><img src="fixed_price_model_trimmed_files/figure-html/BayesianLearningSetup-2.png" /></p>
+<p>After the team developed the initial list and a small number of elements accidentally left off were corrected for, the next step was to do a preliminary run through with Bayesian learning.</p>
+<p>Noteably this initial run through produced two warnings of challenging relationships Veh to Dur and Veh to FxCb. After consulting within the team, the choice was made to add whitelisted relationships that went against those automatically produced.</p>
+<p>Veh (IsVeh) new white lists: * Whitelist to FxCb (FixedOrCost) because the pricing mechanism of most Vehs are set. Thus, once the choice of which Veh to use is made, the pricing mechanism would be set automatically. Furthermore, Fixed-price is often the mechanism because the Veh allows for multiple instances of a single contract reducing the need for the flexabilit Cost-Based contracts offer. * Whitelist to Dur (Duration) because the use of the Veh mechanism typically means multiple shorter contractors under one Veh rather than a single longer contract.</p>
+<p>With those two connections in hand, all three Bayesian Learning algorith were applied.</p>
+<pre class="r"><code>#White list, connections that must occur
+iamb_dug&lt;-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=TRUE, alpha=0.001)</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure Comp -&gt; Veh &lt;- Dur is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure PSR -&gt; Veh &lt;- Dur is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure Dur -&gt; Veh &lt;- UCA is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.</code></pre>
+<pre class="r"><code>undirected.arcs(iamb_dug)</code></pre>
+<pre><code>##      from   to    
+## [1,] &quot;Who&quot;  &quot;Intl&quot;
+## [2,] &quot;Intl&quot; &quot;Who&quot;</code></pre>
+<pre class="r"><code>attrs&lt;-list(node=list(fontsize=27))
+graphviz.plot(iamb_dug,main=&quot;First Test&quot;)</code></pre>
+<p><img src="fixed_price_model_trimmed_files/figure-html/FirstTest-1.png" /></p>
+<pre class="r"><code># uiamb_dug&lt;-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE, alpha=0.001)
+# graphviz.plot(uiamb_dug,main=&quot;First Test&quot;)
+# #Comparing the optimized and unoptimized Incremental Association results
+# all.equal(iamb_dug,uiamb_dug)
+# 
+# interiamb_dug&lt;-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL, alpha=0.001)
+# graphviz.plot(interiamb_dug,main=&quot;First Test&quot;)
+# uinteriamb_dug&lt;-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE, alpha=0.001)</code></pre>
+<p>The first round produces multiple warnings because the networks produced produce two-way arcs, which are not allowed. These are resolved through additional white list settings.</p>
+<pre class="r"><code>#White list, connections that must occur
+
+#Resolving cases where one or both arcs are oriented in opposite directions.
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Veh&quot;,to=&quot;FxCb&quot;))
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Veh&quot;,to=&quot;Dur&quot;))
+# ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Ceil&quot;,to=&quot;Dur&quot;))
+ContractWL&lt;-rbind(ContractWL,data.frame(from=&quot;Who&quot;,to=&quot;Intl&quot;))
+ContractWL&lt;-rbind(ContractWL,data.frame(to=&quot;Intl&quot;,from=&quot;What&quot;))
+
+gWL &lt;- graphBAM( data.frame(from=ContractWL$from, to=ContractWL$to, weight=rep(1,nrow(ContractWL))),
+                edgemode = &quot;directed&quot;)
+
+plot(gWL,
+#      main=&quot;Competition Bayesian Network Blacklist\nOne-way Blocks in Red, Two-way Blocks in Purple&quot;,
+#      edgeAttrs=eAttrs,
+#      nodeAttrs=nA,
+     &quot;dot&quot;)</code></pre>
+<p><img src="fixed_price_model_trimmed_files/figure-html/WhiteListAfterFirstTest-1.png" /></p>
+<pre class="r"><code>iamb_dug&lt;-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=TRUE, alpha=0.001)</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure What -&gt; Dur &lt;- Ceil is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.</code></pre>
+<pre class="r"><code>graphviz.plot(iamb_dug,main=&quot;First Test&quot;)</code></pre>
+<p><img src="fixed_price_model_trimmed_files/figure-html/SecondTest-1.png" /></p>
+<pre class="r"><code>uiamb_dug&lt;-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE, alpha=0.001)
+graphviz.plot(uiamb_dug,main=&quot;First Test&quot;)</code></pre>
+<p><img src="fixed_price_model_trimmed_files/figure-html/SecondTest-2.png" /></p>
+<pre class="r"><code># #Comparing the optimized and unoptimized Incremental Association results
+# all.equal(iamb_dug,uiamb_dug)
+# 
+interiamb_dug&lt;-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL, alpha=0.001)</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure FxCb -&gt; Veh &lt;- Comp is not
+## applicable, because one or both arcs introduce cycles in the graph.</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure FxCb -&gt; Veh &lt;- MDAP is not
+## applicable, because one or both arcs introduce cycles in the graph.</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure FxCb -&gt; Veh &lt;- UCA is not
+## applicable, because one or both arcs introduce cycles in the graph.</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure FxCb -&gt; Veh &lt;- Intl is not
+## applicable, because one or both arcs introduce cycles in the graph.</code></pre>
+<pre class="r"><code>graphviz.plot(interiamb_dug,main=&quot;First Test&quot;)</code></pre>
+<p><img src="fixed_price_model_trimmed_files/figure-html/SecondTest-3.png" /></p>
+<pre class="r"><code>uinteriamb_dug&lt;-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE, alpha=0.001)</code></pre>
+<pre class="r"><code># 
+# 
+highlightWL &lt;- list(arcs = ContractWL, col = &quot;blue&quot;)
+# 
+# highlightLists2 &lt;- list(arcs = data.frame(from=c(as.character(ContractWL$from),
+#                                                  as.character(ContractBL$to)),
+#                                           to=c(as.character(ContractWL$to),
+#                                                as.character(ContractBL$from))),
+#                         col = &quot;blue&quot;)
+# 
+# 
+# 
+# 
+iamb_dug&lt;-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=TRUE, alpha=0.001)</code></pre>
+<pre><code>## Warning in FUN(newX[, i], ...): vstructure What -&gt; Dur &lt;- Ceil is not
+## applicable, because one or both arcs are oriented in the opposite
+## direction.</code></pre>
+<pre class="r"><code>uiamb_dug&lt;-iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE, alpha=0.001)
+# #Comparing the optimized and unoptimized Incremental Association results
+# all.equal(iamb_dug,uiamb_dug)
+# 
+# interiamb_dug&lt;-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL, alpha=0.001)
+# uinteriamb_dug&lt;-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE, alpha=0.001)
+# #They also dont match with interleaved.
+# all.equal(interiamb_dug,uinteriamb_dug)
+# all.equal(uiamb_dug,uinteriamb_dug)
+# 
+# mmpc_dug&lt;-mmpc(ContractModel)
+# ummpc_dug&lt;-mmpc(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE)
+# #They also dont match with interleaved.
+# all.equal(mmpc_dug,ummpc_dug)
+# 
+# gs_dug&lt;-gs(ContractModel,blacklist=ContractBL,whitelist=ContractWL,alpha=0.001)
+# 
+# #But the two methods do not producing matching results
+# all.equal(iamb_dug,interiamb_dug)
+# all.equal(uiamb_dug,uinteriamb_dug)
+# all.equal(uiamb_dug,mmpc_dug)
+# 
+# 
+# uinteriamb_dug05&lt;-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.05)
+# 
+# hc_dug&lt;- hc(ContractModel, score = &quot;aic&quot;,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE)
+# graphviz.plot(hc_dug,main=&quot;Hill Climbing Whitelist highlighted&quot;,highlight=highlightWL2)
+# graphviz.plot(hc_dug,main=&quot;Hill Climbing Whitelist Interleaved highlighted  &quot;,highlight=list(arcs=arcs(uinteriamb_dug)))
+# graphviz.plot(uinteriamb_dug,main=&quot;Unoptimized Interleaved Hillclimbing highlighted&quot;,highlight=list(arcs=arcs(hc_dug)))
+# 
+# 
+# graphviz.plot(uiamb_dug,main=&quot;Unoptimized Incremental Association &quot;,highlight=highlightWL2)
+# graphviz.plot(uinteriamb_dug,main=&quot;Unoptimized Interleaved Incremental Association &quot;,highlight=highlightWL2)
+# graphviz.plot(mmpc_dug,main=&quot;MMPC &quot;,highlight=highlightWL2)
+# 
+# # graphviz.plot(uiamb_dug,main=&quot;Unoptimized Incremental Association &quot;,highlight=arcs(uinteriamb_dug))
+# 
+# graphviz.plot(gs_dug,main=&quot;Grow-Shrink 2nd run&quot;,highlight=highlightWL2)
+# 
+# #Comparing the optimized and unoptimized Interleaved Incremental Association results
+# 
+# uinteriamb_dug00001&lt;-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.000001)
+# all.equal(uinteriamb_dug,uinteriamb_dug00001)
+# 
+# 
+# modelstring(uinteriamb_dug00001)
+# modelstring(uinteriamb_dug)
+modelstring(interiamb_dug)</code></pre>
+<pre><code>## [1] &quot;[Comp][Who][UCA][What|Who][MDAP|What][Intl|Who:What][PSR|Who:What:Intl][Link|MDAP:Who:What:PSR][Veh|Comp:MDAP:What:Intl:PSR:UCA][Soft|PSR][Ceil|Veh][FxCb|What:PSR:Ceil:Veh][Dur|What:Intl:PSR:Ceil:Veh][Offr|FxCb:Comp:MDAP:Intl:Veh:Soft:UCA][NChg|FxCb:Intl:Dur:UCA][CRai|Comp:Ceil:Offr:NChg][Term|FxCb:MDAP:Intl:Ceil:Dur:CRai]&quot;</code></pre>
+<pre class="r"><code># modelstring(uiamb_dug)
+# modelstring(iamb_dug)
+# modelstring(hc_dug)
+# modelstring(gs_dug)
+# 
+# # [1] &quot;[Who][What|Who][Intl|Who:What][PSR|Who:What:Intl][FxCb|PSR][Comp|What:Intl:PSR][Link|Who:What:Intl:PSR][Veh|Comp:What:Intl:PSR][Ceil|Veh:What:Intl:PSR][Dur|Veh:Comp:Link:What:Intl:PSR:Ceil][Offr|Veh:FxCb:Comp:Link:What:Intl:Ceil]&quot;
+# # &gt; modelstring(uinteriamb_dug00001)
+# # [1] &quot;[Who][What|Who][Intl|Who:What][PSR|Who:What:Intl][FxCb|PSR][Comp|What:Intl:PSR][Link|Who:What:Intl:PSR][Veh|Comp:What:Intl:PSR][Ceil|Veh:What:Intl:PSR][Dur|Veh:Comp:Link:What:Intl:PSR:Ceil][Offr|Veh:FxCb:Comp:Link:What:Intl:Ceil]&quot;
+# # &gt; modelstring(uinteriamb_dug)
+# # [1] &quot;[Who][What|Who][Intl|Who:What][PSR|Who:What:Intl][FxCb|PSR][Comp|What:Intl:PSR][Link|Who:What:Intl:PSR][Veh|Comp:What:Intl:PSR][Ceil|Veh:What:Intl:PSR][Dur|Veh:Comp:Link:What:Intl:PSR:Ceil][Offr|Veh:FxCb:Comp:Link:What:Intl:Ceil]&quot;
+# # &gt; modelstring(interiamb_dug)
+# # [1] &quot;[Who][What|Who][Intl|Who:What][PSR|Who:What:Intl][FxCb|PSR][Comp|What:Intl:PSR][Link|Who:What:Intl:PSR][Veh|Comp:What:Intl:PSR][Ceil|Veh:What:Intl:PSR][Dur|Veh:Comp:Link:What:Intl:PSR:Ceil][Offr|Veh:FxCb:Comp:Link:What:Intl:Ceil:Dur]&quot;
+# # &gt; modelstring(uiamb_dug)
+# # [1] &quot;[Who][What|Who][Intl|Who:What][PSR|Who:What:Intl][Link|Who:What:Intl:PSR][Comp|Link:What:Intl:PSR][Veh|Comp:What:PSR][Ceil|Veh:What:Intl:PSR][FxCb|PSR:Ceil][Dur|Veh:Comp:Link:What:Intl:PSR:Ceil][Offr|Veh:FxCb:Comp:What:Intl]&quot;
+# # &gt; modelstring(iamb_dug)
+# # [1] &quot;[Who][What|Who][Intl|Who:What][PSR|Who:What:Intl][Link|Who:What:Intl:PSR][Comp|Link:What:Intl:PSR][Veh|Comp:What:PSR][Ceil|Veh:What:Intl:PSR][FxCb|PSR:Ceil][Dur|Veh:Comp:Link:What:Intl:PSR:Ceil][Offr|Veh:FxCb:Comp:What:Intl:Dur]&quot;
+# # &gt; modelstring(hc_dug)
+# # [1] &quot;[Who][Intl|Who][What|Who:Intl][PSR|Who:What:Intl][Link|Who:What:Intl:PSR][Comp|Link:What:Intl:PSR][Dur|Comp:Link:What:Intl:PSR][Veh|Comp:What:Intl:PSR:Dur][Ceil|Veh:Comp:Link:What:Intl:PSR:Dur][FxCb|Veh:Comp:Link:What:PSR:Ceil:Dur][Offr|Veh:FxCb:Comp:What:Intl:PSR:Ceil:Dur]&quot;
+# # graphviz.plot(uinteriamb_dug,main=&quot;Unoptimized Interleaved Incremental 001 Association 00001 highlighted&quot;,highlight=list(arcs=arcs(uinteriamb_dug00001)))
+# # graphviz.plot(uinteriamb_dug,main=&quot;Unoptimized Interleaved Incremental Association Optimized highlighted&quot;,highlight=list(arcs=arcs(interiamb_dug)))
+# # graphviz.plot(interiamb_dug,main=&quot;optimized Interleaved Incremental Association UnOptimized highlighted&quot;,highlight=list(arcs=arcs(uinteriamb_dug)))
+# 
+# graphviz.plot(uinteriamb_dug,main=&quot;Unoptimized Interleaved Incremental Association IAMB highlighted&quot;,highlight=list(arcs=arcs(uiamb_dug)))
+# 
+# graphviz.plot(iamb_dug,main=&quot;Unoptimized Incremental Association Unoptimized IAMB highlighted&quot;,highlight=list(arcs=arcs(uiamb_dug)))
+# graphviz.plot(uiamb_dug,main=&quot;optimized Incremental Association IAMB highlighted&quot;,highlight=list(arcs=arcs(iamb_dug)))</code></pre>
+<p>To the study teams dismay, the bayesian learning results were not consistent across different methods. The unoptimized versions of the learning algorithms do better at catching statistical oddities at the cost of requiring more comparisons. After analyzing the unoptimized and optimized versions, the team chose to adopt one arc that appeared in the both unoptimized versions, namely duration to offers. Seperate analysis shown in the Contract_Competition found that longer contracts did have fewer offers even after controlling for contract ceiling.</p>
+<p>Similarly, the grow shrink algorithm included a link from Ceil to FxCb. Analysis shown in Contract_Pricing holds up that connection, even after controlling for PSR. This does not appear to be true of duration or competition. There may well be a link between Vehicle and Fixed-price, but there’s enough complexity in the causality in that relationship that the team chose not to force it.</p>
+<ul>
+<li>Whitelist Ceil (Ceil) to FxCb because higher ceiling contracts are more likely to be cost-based or combination.</li>
+</ul>
+<p>Dur (Duration) to Number of Offers received (Offr) was considered, but this ended up resulting in the Ceil to Dur being lost. Of the two, Ceil has the more straightforward relationship, so it was kept.</p>
+<p>The other alternative within the package, a min-max parents and childrens approach,</p>
+<pre class="r"><code>uinteriamb3_dug00001&lt;-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.01)
+ 
+# all.equal(uinteriamb3_dug00001,iamb_dug)
+
+# uinteriamb3_dug&lt;-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.001)
+# 
+# uinteriamb3_dug05&lt;-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.05)
+# 
+# all.equal(uinteriamb_dug,uinteriamb3_dug00001)
+# 
+graphviz.plot(uinteriamb3_dug00001,main=&quot;&quot;,highlight=highlightWL)</code></pre>
+<p><img src="fixed_price_model_trimmed_files/figure-html/BayesianExecutionRd3-1.png" /></p>
+<pre class="r"><code># graphviz.plot(uinteriamb_dug00001,main=&quot;Unoptimized Interleaved Incremental Association either list highlighted&quot;,highlight=highlightLists3)
+# graphviz.plot(uinteriamb_dug00001,main=&quot;Unoptimized Interleaved Incremental Association IAMB highlighted&quot;,highlight=list(arcs=arcs(uiamb_dug)))
+# # graphviz.plot(uiamb_dug,main=&quot;Unoptimized Interleaved Incremental Association &quot;,highlight=list(arcs=arcs(uinteriamb_dug)))
+# graphviz.plot(uinteriamb_dug,main=&quot;Unoptimized Interleaved Incremental Association IAMB highlighted&quot;,highlight=list(arcs=arcs(uinteriamb3_dug00001)))
+# graphviz.plot(uinteriamb3_dug00001,main=&quot;Unoptimized Interleaved Incremental Association IAMB highlighted&quot;,highlight=list(arcs=arcs(uinteriamb_dug)))
+# graphviz.plot(uinteriamb3_dug,main=&quot;Unoptimized Interleaved Incremental Association IAMB highlighted&quot;,highlight=list(arcs=arcs(uinteriamb_dug)))
+
+
+# uinteriamb3_dug00001&lt;-set.arc(uinteriamb3_dug00001,&quot;Ceil&quot;,&quot;Offr&quot;)
+# uinteriamb3_dug00001&lt;-drop.arc(uinteriamb3_dug00001,&quot;Dur&quot;,&quot;Offr&quot;)
+
+# graphviz.plot(uinteriamb3_dug00001,main=&quot;Initial Number of Offers Bayesian Network&quot;,highlight=highlightWL3)</code></pre>
+<pre class="r"><code>FixedPriceNetwork&lt;-uinteriamb3_dug00001
+modelstring(FixedPriceNetwork)</code></pre>
+<pre><code>## [1] &quot;[Comp][Who][UCA][What|Who][MDAP|What][Intl|Who:What][PSR|Who:What][Link|MDAP:Who:What:PSR][Veh|What:PSR:UCA][Soft|PSR][Ceil|Link:PSR:Veh][Dur|What:PSR:Veh][FxCb|What:PSR:Ceil][Offr|FxCb:Comp:MDAP:Intl:Veh:Soft:UCA][NChg|FxCb:Intl:Dur:UCA][CRai|Comp:Ceil:Offr:NChg][Term|FxCb:MDAP:Intl:Ceil:Dur:CRai]&quot;</code></pre>
+<pre class="r"><code># plot(FixedPriceNetwork,&quot;dot&quot;)
+# CompetitionFitted&lt;-bn.fit(x=FixedNetwork,data=ContractModel,method=&quot;bayes&quot;)
+# summary(ContractModel)
+# cpquery(CompetitionFitted, 
+#         event =  (Offr==&quot;1&quot;),
+#         evidence = (FxCb==&quot;Fixed-Price&quot;) &amp; (Comp==&quot;Comp.&quot;))
+# cpquery(CompetitionFitted, 
+#         event =  (Offr==&quot;1&quot;),
+#         evidence = (FxCb==&quot;Cost-Based&quot;) &amp; (Comp==&quot;Comp.&quot;))
+# cpquery(CompetitionFitted, 
+#         event =  (Offr==&quot;1&quot;),
+#         evidence = (FxCb==&quot;Cost-Based&quot;) &amp; (Comp==&quot;Comp.&quot;) &amp; (Ceil==&quot;[0,15k)&quot;))
+# cpquery(CompetitionFitted, 
+#         event =  (Offr==&quot;1&quot;),
+#         evidence = (FxCb==&quot;Cost-Based&quot;) &amp; (Comp==&quot;Comp.&quot;) &amp; (Ceil==&quot;[15k,100k)&quot;))
+# cpquery(CompetitionFitted, o
+#         event =  (Offr==&quot;1&quot;),
+#         evidence = (FxCb==&quot;Cost-Based&quot;) &amp; (Comp==&quot;Comp.&quot;) &amp; (Ceil==&quot;[100k,1m)&quot;))
+# cpquery(CompetitionFitted, 
+#         event =  (Offr==&quot;1&quot;),
+#         evidence = (FxCb==&quot;Cost-Based&quot;) &amp; (Comp==&quot;Comp.&quot;) &amp; (Ceil==&quot;[1m,30m)&quot;))
+# cpquery(CompetitionFitted, 
+#         event =  (Offr==&quot;1&quot;),
+#         evidence = (FxCb==&quot;Cost-Based&quot;) &amp; (Comp==&quot;Comp.&quot;) &amp; (Ceil==&quot;[30m+]&quot;))
+# 
+# y&lt;-paste(&quot;Ceil==&#39;&quot;,levels(ContractModel$Ceil),&quot;&#39;&quot;,sep=&quot;&quot;)
+# 
+# sapply(levels(ContractModel$Ceil),function(x) eval(sprintf(&#39;cpquery(CompetitionFitted, 
+#         event =  (Offr==&quot;1&quot;),
+#         evidence = (FxCb==&quot;Cost-Based&quot;) &amp; (Comp==&quot;Comp.&quot;) &amp; (Ceil==&quot;%s&quot;)&#39;,x)))
+# 
+# sapply(levels(ContractModel$Ceil),FixedPriceTest)
+
+# FixedPriceTest(&quot;[30m+]&quot;)
+# 
+# FixedPriceTest&lt;-function(x){
+#     cpquery(CompetitionFitted, 
+#         event =  (Offr==&quot;1&quot;),
+#         evidence = (FxCb==&quot;Cost-Based&quot;) &amp; (Comp==&quot;Comp.&quot;) &amp; (Ceil==x)
+#         )
+# }
+# 
+# eval(&quot;cpquery(CompetitionFitted, \n        event =  (Offr==\&quot;1\&quot;),\n        evidence = (FxCb==\&quot;Cost-Based\&quot;) &amp; (Comp==\&quot;Comp.\&quot;) &amp; (Ceil==\&quot;[30m+]\&quot;)&quot;)
+# levels(ContractModel$Ceil)
+# 
+# sapply(levels(ContractModel$Ceil),function(x) paste(x,&quot;&quot;)) 
+# 
+# sapply(c(1,2,3),function(x)   cpquery(CompetitionFitted, 
+#         event =  (Offr==&quot;1&quot;),
+#         evidence = (FxCb==&quot;Cost-Based&quot;) &amp; (Comp==&quot;Comp.&quot;))) (Ceil==x) &amp;  (Ceil==x)) #&amp; (Ceil==x)
+# 
+
+require(gRain)
+# cad.cpt &lt;- extractCPT(ContractModel, as.graphNEL(FixedNetwork), smooth = 0.001)
+# FixedPriceGin &lt;- grain(compileCPT(cad.cpt))
+
+FixedPriceGin &lt;- grain(as.graphNEL(FixedPriceNetwork), data=ContractModel, smooth = 0.0000000001)</code></pre>
+<pre><code>## extractCPT - data.frame</code></pre>
+<pre class="r"><code>summary(FixedPriceGin)</code></pre>
+<pre><code>## Independence network: Compiled: FALSE Propagated: FALSE 
+##  Nodes : Named chr [1:17] &quot;FxCb&quot; &quot;Comp&quot; &quot;Link&quot; &quot;MDAP&quot; &quot;Who&quot; &quot;What&quot; ...
+##  - attr(*, &quot;names&quot;)= chr [1:17] &quot;FxCb&quot; &quot;Comp&quot; &quot;Link&quot; &quot;MDAP&quot; ...</code></pre>
+<pre class="r"><code>save(FixedPriceGin,file=&quot;Output//FixedPriceGin.RData&quot;)</code></pre>
+<pre class="r"><code>names(ContractModel)</code></pre>
+<pre><code>##  [1] &quot;FxCb&quot; &quot;Comp&quot; &quot;Link&quot; &quot;MDAP&quot; &quot;Who&quot;  &quot;What&quot; &quot;Intl&quot; &quot;PSR&quot;  &quot;Ceil&quot; &quot;Dur&quot; 
+## [11] &quot;Offr&quot; &quot;Veh&quot;  &quot;Term&quot; &quot;Soft&quot; &quot;UCA&quot;  &quot;CRai&quot; &quot;NChg&quot;</code></pre>
+<pre class="r"><code>reduced&lt;-subset(ContractModel,select=-c(Soft,MDAP))
+droplist&lt;-c(&quot;Soft&quot;,&quot;MDAP&quot;,&quot;IDV&quot;,&quot;UCA&quot;)
+reducedWhitelist&lt;-subset(ContractWL,(!from %in% droplist) &amp; (!to %in% droplist)  )
+reducedBlacklist&lt;-subset(ContractBL,(!from %in% droplist) &amp; (!to %in% droplist)  )
+
+reduceduinteriamb3_dug&lt;-inter.iamb(reduced,blacklist=reducedBlacklist,whitelist=reducedWhitelist,optimized=FALSE)
+modelstring(reduceduinteriamb3_dug)</code></pre>
+<pre><code>## [1] &quot;[Who][UCA][What|Who][Comp|What][Intl|Who:What][PSR|Who:What:Intl][Link|Who:What:PSR][Veh|What:Intl:PSR][Ceil|What:Veh][Dur|Link:What:PSR:Veh][FxCb|PSR:Ceil][Offr|FxCb:Comp:Intl:PSR:Veh][NChg|FxCb:Intl:Dur][CRai|Comp:Ceil:Offr:NChg][Term|FxCb:Intl:Ceil:Dur:CRai]&quot;</code></pre>
+<pre class="r"><code>undirected.arcs(reduceduinteriamb3_dug)</code></pre>
+<pre><code>##      from to</code></pre>
+<pre class="r"><code>ReducedFixedPriceGin &lt;- grain(as.graphNEL(reduceduinteriamb3_dug), data=ContractModel, smooth = 0.00000001)</code></pre>
+<pre><code>## extractCPT - data.frame</code></pre>
+<pre class="r"><code>save(ReducedFixedPriceGin,file=&quot;Output//ReducedFixedPriceGin.RData&quot;)
+# is.pdag(reduceduinteriamb3_dug)
+
+querygrain(FixedPriceGin,
+           nodes=c(&quot;Offr&quot;),
+           type=&quot;marginal&quot;)</code></pre>
+<pre><code>## $Offr
+## Offr
+##         1         2       3-4        5+ 
+## 0.3498315 0.1690471 0.1963135 0.2848079</code></pre>
+<pre class="r"><code>querygrain(ReducedFixedPriceGin,
+           nodes=c(&quot;Offr&quot;),
+           type=&quot;marginal&quot;)</code></pre>
+<pre><code>## $Offr
+## Offr
+##         1         2       3-4        5+ 
+## 0.3484158 0.1665437 0.1993442 0.2856963</code></pre>
+<pre class="r"><code>prop&lt;-table(subset(ContractModel,  select = Offr))
+prop/sum(prop)</code></pre>
+<pre><code>## 
+##         1         2       3-4        5+ 
+## 0.3454558 0.1718240 0.1974038 0.2853164</code></pre>
+<pre class="r"><code>querygrain(FixedPriceGin,
+           nodes=c(&quot;NChg&quot;),
+           type=&quot;marginal&quot;)</code></pre>
+<pre><code>## $NChg
+## NChg
+##           0           1           2 [   3,1040] 
+## 0.968145329 0.023930891 0.004671374 0.003252407</code></pre>
+<pre class="r"><code>querygrain(ReducedFixedPriceGin,
+           nodes=c(&quot;NChg&quot;),
+           type=&quot;marginal&quot;)</code></pre>
+<pre><code>## $NChg
+## NChg
+##           0           1           2 [   3,1040] 
+## 0.968249846 0.023893866 0.004635636 0.003220652</code></pre>
+<pre class="r"><code>prop&lt;-table(subset(ContractModel,  select = NChg))
+prop/sum(prop)</code></pre>
+<pre><code>## 
+##           0           1           2 [   3,1040] 
+## 0.968456286 0.023725439 0.004620816 0.003197459</code></pre>
+<pre class="r"><code>querygrain(FixedPriceGin,
+           nodes=c(&quot;CRai&quot;),
+           type=&quot;marginal&quot;)</code></pre>
+<pre><code>## $CRai
+## CRai
+## [-0.001, 0.001) [  -Inf,-0.001) [ 0.001, 0.150) [ 0.150,   Inf] 
+##     0.975509535     0.010504863     0.005935334     0.008050268</code></pre>
+<pre class="r"><code>querygrain(ReducedFixedPriceGin,
+           nodes=c(&quot;CRai&quot;),
+           type=&quot;marginal&quot;)</code></pre>
+<pre><code>## $CRai
+## CRai
+## [-0.001, 0.001) [  -Inf,-0.001) [ 0.001, 0.150) [ 0.150,   Inf] 
+##     0.975504431     0.010534673     0.005835991     0.008124905</code></pre>
+<pre class="r"><code>prop&lt;-table(subset(ContractModel,  select = CRai))
+prop/sum(prop)</code></pre>
+<pre><code>## 
+## [-0.001, 0.001) [  -Inf,-0.001) [ 0.001, 0.150) [ 0.150,   Inf] 
+##     0.977029191     0.009278811     0.006891667     0.006800330</code></pre>
+<pre class="r"><code># 
+# StandardizeTableChiSquared(ContractModel,
+#                            FixedPriceGin, 
+#                            &quot;Term&quot;
+#                            )
+# 
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            ReducedFixedPriceGin, 
+#                            &quot;Term&quot;
+#                            )
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            ReducedFixedPriceGin, 
+#                            &quot;Term&quot;
+#                            )
+# 
+# 
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            FixedPriceGin, 
+#                            &quot;CRai&quot;
+#                            )
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            FixedPriceGin, 
+#                            &quot;NChg&quot;
+#                            )
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            ReducedFixedPriceGin, 
+#                            &quot;CRai&quot;
+#                            )
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            ReducedFixedPriceGin, 
+#                            &quot;NChg&quot;
+#                            )
+# 
+
+querygrain(FixedPriceGin,
+           nodes=c(&quot;Term&quot;),
+           type=&quot;marginal&quot;)</code></pre>
+<pre><code>## $Term
+## Term
+##   Terminated Unterminated 
+##   0.00833413   0.99166587</code></pre>
+<pre class="r"><code>querygrain(ReducedFixedPriceGin,
+           nodes=c(&quot;Term&quot;),
+           type=&quot;marginal&quot;)</code></pre>
+<pre><code>## $Term
+## Term
+##   Terminated Unterminated 
+##  0.008296815  0.991703185</code></pre>
+<pre class="r"><code>prop&lt;-table(subset(ContractModel,  select = Term))
+prop/sum(prop)</code></pre>
+<pre><code>## 
+##   Terminated Unterminated 
+##  0.008199919  0.991800081</code></pre>
+</div>
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+$(document).ready(function () {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+});
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

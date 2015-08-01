@@ -56,10 +56,8 @@ ContractModel<-subset(ContractModel,select=-c(IDV,LowCeil))
 # summary(subset(ContractModel,complete.cases(ContractModel)))
 #   .(FxCb,Comp,Link,MDAP,Who,What,Intl,PSR,Ceil,Dur,Offr,Veh,Term,Soft,UCA,CRai,NChg),# 
 
-ContractModel$Count<-1
+
 names(ContractModel)
-
-
 
 dropped<-subset(ContractModel,!complete.cases(ContractModel)|
                     Intl=="Unlabeled"|
@@ -78,7 +76,6 @@ ContractModel$PSR<-droplevels(ContractModel$PSR)
 ContractModel$Who<-droplevels(ContractModel$Who)
 ContractModel$What<-droplevels(ContractModel$What)
 ContractModel$Comp<-droplevels(ContractModel$Comp)
-
 
 nrow(ContractModel)
 ```
@@ -106,7 +103,7 @@ I've listed them below based on the origin piece of evidence.
 8. One (SingleOffer) 
 * Blacklist to everything not covered by an existing whitelist. While the vendors responses may influence some factors at the margin, this is the dependent variable for this part of the study.
 
-```{r BayesianLearningSetup, echo = TRUE}
+```{r BayesianLearningSetup, echo = TRUE, fig.width=6.5,fig.height=4.5}
 
 #White list, connections that must occur
 ContractWL<-data.frame(from="Comp",to="Offr")
@@ -332,58 +329,49 @@ ContractBL<-rbind(ContractBL,data.frame(from="Term",to="Soft"))
 ContractBL<-rbind(ContractBL,data.frame(from="Term",to="MDAP"))
 
 
-df <- data.frame(from=ContractBL$from, to=ContractBL$to, weight=rep(1,nrow(ContractBL)))
-g1 <- graphBAM( data.frame(from=ContractBL$from, to=ContractBL$to, weight=rep(1,nrow(ContractBL))),
-                edgemode = "directed")
-adjacencyMatrix(g1)
-plot(g1,main="Fixed Price Bayesian Network Blacklist")
-edgeNames(g1)
-eAttrs<-list()
-eAttrs$color<-c("Ceil~Intl"="red",
-                "Ceil~Link"="red",
-                "Ceil~PSR"="red",
-                "Ceil~What"="red",
-                "Ceil~Who"="purple",
-                "Comp~Intl"="red",
-                "Comp~Link"="red",
-                "Comp~PSR"="red",
-                "Comp~What"="red",
-                "Comp~Who"="purple",
-                "Dur~Intl"="red",
-                "Dur~Link"="red",
-                "Dur~PSR"="red",
-                "Dur~What"="red",
-                "Dur~Who"="purple",
-                "FxCb~Ceil"="red",
-                "FxCb~Comp"="red",
-                "FxCb~Dur"="red",
-                "FxCb~Intl"="red",
-                "FxCb~Link"="red",
-                "FxCb~What"="red",
-                "FxCb~Who"="purple",
-                "Veh~Intl"="red",
-                "Veh~Link"="purple",
-                "Veh~PSR"="red",
-                "Veh~What"="red",
-                "Veh~Who"="purple",
-                "Link~Intl"="red",
-                "Link~Who"="red",
-                "Offr~Ceil"="red",
-                "Offr~Dur"="red",
-                "Offr~FxCb"="red",
-                "Offr~Veh"="red",
-                "Offr~Intl"="red",
-                "Offr~Link"="red",
-                "Offr~PSR"="red",
-                "Offr~What"="red",
-                "Offr~Who"="purple",
-                "PSR~Intl"="red",
-                "PSR~What"="red",
-                "PSR~Who"="red"  )
+AllArcsBL<-paste(ContractBL$to,ContractBL$from,sep="~")
+ReversedArcsBL<-paste(ContractBL$from,ContractBL$to,sep="~")
+DoubleArcsBL<-AllArcsBL[AllArcsBL %in% ReversedArcsBL]
+SingleArcsBL<-ReversedArcsBL[!ReversedArcsBL %in% AllArcsBL]
+PurpleBL<-c(rep("purple",length(DoubleArcsBL)))
+names(PurpleBL)<-DoubleArcsBL
+RedBL<-c(rep("red",length(SingleArcsBL)))
+names(RedBL)<-SingleArcsBL
+ColorsBL<-c(PurpleBL,RedBL)
 
-plot(g1,
+
+df <- data.frame(from=ContractBL$from, to=ContractBL$to, weight=rep(1,nrow(ContractBL)))
+gBL <- graphBAM( data.frame(from=ContractBL$from, to=ContractBL$to, weight=rep(1,nrow(ContractBL))),
+                edgemode = "directed")
+# adjacencyMatrix(gBL)
+# plot(gBL,main="Fixed Price Bayesian Network Blacklist")
+# AllArcs<-edgeNames(gBL)
+# ReversedArcs<-paste(sub(pattern = "[a-zA-Z0-9]*~", replacement="", x = AllArcs),
+# sub(pattern = "~[a-zA-Z0-9]*", replacement="", x = AllArcs),
+# sep="~")
+# DoubleArcs<-AllArcs[AllArcs %in% ReversedArcs]
+
+
+eAttrs<-list()
+eAttrs$color<-ColorsBL[names(ColorsBL) %in% edgeNames(gBL)]
+
+ nNodes <- length(nodes(gBL))
+ nA <- list()
+# > nA$fixedSize<-rep(FALSE, nNodes)
+ nA$height <- nA$width <- rep("3.5", nNodes)
+# > nA$label <- rep("z", nNodes)
+# > nA$color <- rep("green", nNodes)
+# > nA$fillcolor <- rep("orange", nNodes)
+# > nA$shape <- rep("circle", nNodes)
+# > nA$fontcolor <- rep("blue", nNodes)
+nA$fontsize <- rep(18, nNodes)
+nA <- lapply(nA, function(x) { names(x) <- nodes(gBL); x})
+
+plot(gBL,
      main="Competition Bayesian Network Blacklist\nOne-way Blocks in Red, Two-way Blocks in Purple",
-     edgeAttrs=eAttrs)
+     edgeAttrs=eAttrs,
+     nodeAttrs=nA,
+     "dot")
 
 
 ```
@@ -420,7 +408,7 @@ graphviz.plot(iamb_dug,main="First Test")
 
 The first round produces multiple warnings because the networks produced produce two-way arcs, which are not allowed. These are resolved through additional white list settings. 
 
-```{r WhiteListAfterFirstTest}
+```{r WhiteListAfterFirstTest, fig.width=6.5,fig.height=4}
 #White list, connections that must occur
 
 #Resolving cases where one or both arcs are oriented in opposite directions.
@@ -429,6 +417,16 @@ ContractWL<-rbind(ContractWL,data.frame(from="Veh",to="Dur"))
 # ContractWL<-rbind(ContractWL,data.frame(from="Ceil",to="Dur"))
 ContractWL<-rbind(ContractWL,data.frame(from="Who",to="Intl"))
 ContractWL<-rbind(ContractWL,data.frame(to="Intl",from="What"))
+
+gWL <- graphBAM( data.frame(from=ContractWL$from, to=ContractWL$to, weight=rep(1,nrow(ContractWL))),
+                edgemode = "directed")
+
+plot(gWL,
+#      main="Competition Bayesian Network Blacklist\nOne-way Blocks in Red, Two-way Blocks in Purple",
+#      edgeAttrs=eAttrs,
+#      nodeAttrs=nA,
+     "dot")
+
 ``` 
 
 
@@ -450,7 +448,7 @@ uinteriamb_dug<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=Contract
 ```{r RoundTwo}
 # 
 # 
-# highlightWL2 <- list(arcs = ContractWL, col = "blue")
+highlightWL <- list(arcs = ContractWL, col = "blue")
 # 
 # highlightLists2 <- list(arcs = data.frame(from=c(as.character(ContractWL$from),
 #                                                  as.character(ContractBL$to)),
@@ -552,7 +550,7 @@ Dur (Duration) to Number of Offers received (Offr) was considered, but this ende
 The other alternative within the package, a min-max parents and childrens approach, 
 
 
-```{r BayesianExecutionRd3, echo = TRUE}
+```{r BayesianExecutionRd3, echo = TRUE, fig.width=6.5,fig.height=4}
 
 uinteriamb3_dug00001<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=ContractWL,optimized=FALSE,alpha=0.01)
  
@@ -564,7 +562,7 @@ uinteriamb3_dug00001<-inter.iamb(ContractModel,blacklist=ContractBL,whitelist=Co
 # 
 # all.equal(uinteriamb_dug,uinteriamb3_dug00001)
 # 
-graphviz.plot(uinteriamb3_dug00001,main="Unoptimized Interleaved Incremental Association Whitelist highlighted")#,highlight#=highlightWL3)
+graphviz.plot(uinteriamb3_dug00001,main="",highlight=highlightWL)
 # graphviz.plot(uinteriamb_dug00001,main="Unoptimized Interleaved Incremental Association either list highlighted",highlight=highlightLists3)
 # graphviz.plot(uinteriamb_dug00001,main="Unoptimized Interleaved Incremental Association IAMB highlighted",highlight=list(arcs=arcs(uiamb_dug)))
 # # graphviz.plot(uiamb_dug,main="Unoptimized Interleaved Incremental Association ",highlight=list(arcs=arcs(uinteriamb_dug)))
@@ -602,7 +600,7 @@ modelstring(FixedPriceNetwork)
 # cpquery(CompetitionFitted, 
 #         event =  (Offr=="1"),
 #         evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[15k,100k)"))
-# cpquery(CompetitionFitted, 
+# cpquery(CompetitionFitted, o
 #         event =  (Offr=="1"),
 #         evidence = (FxCb=="Cost-Based") & (Comp=="Comp.") & (Ceil=="[100k,1m)"))
 # cpquery(CompetitionFitted, 
@@ -643,7 +641,7 @@ require(gRain)
 # cad.cpt <- extractCPT(ContractModel, as.graphNEL(FixedNetwork), smooth = 0.001)
 # FixedPriceGin <- grain(compileCPT(cad.cpt))
 
-FixedPriceGin <- grain(as.graphNEL(FixedPriceNetwork), data=ContractModel, smooth = 0.000000001)
+FixedPriceGin <- grain(as.graphNEL(FixedPriceNetwork), data=ContractModel, smooth = 0.0000000001)
 summary(FixedPriceGin)
 save(FixedPriceGin,file="Output//FixedPriceGin.RData")
 ```
@@ -662,7 +660,7 @@ modelstring(reduceduinteriamb3_dug)
 undirected.arcs(reduceduinteriamb3_dug)
 ReducedFixedPriceGin <- grain(as.graphNEL(reduceduinteriamb3_dug), data=ContractModel, smooth = 0.00000001)
 save(ReducedFixedPriceGin,file="Output//ReducedFixedPriceGin.RData")
-is.pdag(reduceduinteriamb3_dug)
+# is.pdag(reduceduinteriamb3_dug)
 
 querygrain(FixedPriceGin,
            nodes=c("Offr"),
@@ -701,45 +699,45 @@ querygrain(ReducedFixedPriceGin,
 prop<-table(subset(ContractModel,  select = CRai))
 prop/sum(prop)
 
-
-StandardizeTableChiSquared(ContractModel,
-                           FixedPriceGin, 
-                           "Term"
-                           )
-
-
-StandardizeTableChiSquared(ContractModel,
-                           ReducedFixedPriceGin, 
-                           "Term"
-                           )
-
-StandardizeTableChiSquared(ContractModel,
-                           ReducedFixedPriceGin, 
-                           "Term"
-                           )
-
-
-
-StandardizeTableChiSquared(ContractModel,
-                           FixedPriceGin, 
-                           "CRai"
-                           )
-
-StandardizeTableChiSquared(ContractModel,
-                           FixedPriceGin, 
-                           "NChg"
-                           )
-
-StandardizeTableChiSquared(ContractModel,
-                           ReducedFixedPriceGin, 
-                           "CRai"
-                           )
-
-StandardizeTableChiSquared(ContractModel,
-                           ReducedFixedPriceGin, 
-                           "NChg"
-                           )
-
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            FixedPriceGin, 
+#                            "Term"
+#                            )
+# 
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            ReducedFixedPriceGin, 
+#                            "Term"
+#                            )
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            ReducedFixedPriceGin, 
+#                            "Term"
+#                            )
+# 
+# 
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            FixedPriceGin, 
+#                            "CRai"
+#                            )
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            FixedPriceGin, 
+#                            "NChg"
+#                            )
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            ReducedFixedPriceGin, 
+#                            "CRai"
+#                            )
+# 
+# StandardizeTableChiSquared(ContractModel,
+#                            ReducedFixedPriceGin, 
+#                            "NChg"
+#                            )
+# 
 
 querygrain(FixedPriceGin,
            nodes=c("Term"),
@@ -754,4 +752,3 @@ prop/sum(prop)
 
 
 ```
-
