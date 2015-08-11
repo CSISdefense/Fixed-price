@@ -1074,7 +1074,7 @@ write.csv(PopulationWideDF,paste(&quot;Output\\&quot;,
 <h2>Results</h2>
 <p>The hypothesis is supported with regard to number of offers. Larger fixed-price contracts are more likely to experience single offer competition and are less likely to experience competition with three or more offers. Combination tracks more closely with fixed-price than cost-plus.</p>
 <pre class="r"><code>FixedPriceGin[[1]]$levels$Ceil</code></pre>
-<pre><code>## [1] &quot;[0,15k)&quot;    &quot;[15k,100k)&quot; &quot;[100k,1m)&quot;  &quot;[1m,10m)&quot;   &quot;[10m,75m)&quot; 
+<pre><code>## [1] &quot;[0,15k)&quot;    &quot;[100k,1m)&quot;  &quot;[10m,75m)&quot;  &quot;[15k,100k)&quot; &quot;[1m,10m)&quot;  
 ## [6] &quot;[75m+]&quot;</code></pre>
 <pre class="r"><code>RnDfind&lt;- setEvidence(FixedPriceGin, 
                       nodes=c(&quot;PSR&quot;),
@@ -1565,8 +1565,8 @@ write.csv(MDAPwideDF,paste(&quot;Output\\&quot;,
 <h1>Initial results</h1>
 <p>The hypothesis regarding number of offers was not supported at the greater than 1 year level. Further subdivision into 2 year plus or other breakdowns might show a different result. Combination resembled fixed-price, but did not do as well with 5 or more offers.</p>
 <pre class="r"><code>    FixedPriceGin[[1]]$levels$Dur</code></pre>
-<pre><code>## [1] &quot;[0 months,~2 months)&quot;  &quot;[~2 months,~7 months)&quot; &quot;[~7 months-~1 year]&quot;  
-## [4] &quot;(~1 year,~2 years]&quot;    &quot;(~2 years+]&quot;</code></pre>
+<pre><code>## [1] &quot;(~1 year,~2 years]&quot;    &quot;(~2 years+]&quot;           &quot;[~2 months,~7 months)&quot;
+## [4] &quot;[~7 months-~1 year]&quot;   &quot;[0 months,~2 months)&quot;</code></pre>
 <pre class="r"><code>    LongDurFind&lt;- setEvidence(FixedPriceGin, 
                               nodes=c(&quot;Dur&quot;),
                               states=c(&quot;(~2 years+]&quot;)

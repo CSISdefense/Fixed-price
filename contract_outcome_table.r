@@ -434,6 +434,24 @@ ResultsDF$Significance<-factor(ResultsDF$Significance,
                                )
 )    
 
+ResultsDF$iVariable<-factor(ResultsDF$iVariable,
+                            levels=c("[75m+]",
+                                     "[10m,75m)",
+                                     "[1m,10m)", 
+                                     "[100k,1m)",
+                                     "[0,100k)"
+                            ),
+                            labels=c("75m+",
+                                     "10m - <75m",
+                                     "1m - <10m", 
+                                     "100k - <1m",
+                                     "0 - <100k"                                     
+                            ),
+                            ordered=TRUE
+                            
+)
+
+
 
     ResultsDF
     

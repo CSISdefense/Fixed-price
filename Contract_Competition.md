@@ -81,9 +81,16 @@ colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qCRais"]<-"C
                                          "[15k,100k)",
                                          "[0,15k)"
                                 ),
+                                labels=c("75m+",
+                                         "10m - <75m",
+                                         "1m - <10m", 
+                                         "100k - <1m",
+                                         "15k - <100k",
+                                         "0 - <15k"
+                                ),
                                 ordered=TRUE
+                                
     )
-
 
 #These will probably be moved into apply_lookups at some point
 ContractSample$pIsSomeCompetition <- ContractSample$ObligatedAmountIsSomeCompetition/ContractSample$ObligatedAmount
@@ -435,6 +442,15 @@ summary(subset(uncompeted.sample,select=c(
 
 
 ```
+## [1] 136.6631
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+##     1.0     4.0   253.0   136.7   253.0   253.0       5
+```
+
+```
 ## Warning in loop_apply(n, do.ply): Removed 5 rows containing non-finite
 ## values (stat_boxplot).
 ```
@@ -494,7 +510,99 @@ summary(subset(uncompeted.sample,select=c(
 ## values (stat_summary).
 ```
 
-![](Contract_Competition_files/figure-html/CompVehicle-1.png) ![](Contract_Competition_files/figure-html/CompVehicle-2.png) 
+![](Contract_Competition_files/figure-html/CompVehicle-1.png) 
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
+## (geom_segment).
+```
+
+![](Contract_Competition_files/figure-html/CompVehicle-2.png) 
 
 
 ```r

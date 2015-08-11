@@ -1045,7 +1045,7 @@ FixedPriceGin[[1]]$levels$Ceil
 ```
 
 ```
-## [1] "[0,15k)"    "[15k,100k)" "[100k,1m)"  "[1m,10m)"   "[10m,75m)" 
+## [1] "[0,15k)"    "[100k,1m)"  "[10m,75m)"  "[15k,100k)" "[1m,10m)"  
 ## [6] "[75m+]"
 ```
 
@@ -1650,8 +1650,8 @@ The hypothesis regarding number of offers was not supported at the greater than 
 ```
 
 ```
-## [1] "[0 months,~2 months)"  "[~2 months,~7 months)" "[~7 months-~1 year]"  
-## [4] "(~1 year,~2 years]"    "(~2 years+]"
+## [1] "(~1 year,~2 years]"    "(~2 years+]"           "[~2 months,~7 months)"
+## [4] "[~7 months-~1 year]"   "[0 months,~2 months)"
 ```
 
 ```r

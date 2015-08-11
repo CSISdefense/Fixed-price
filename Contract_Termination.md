@@ -100,7 +100,15 @@ colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qCRais"]<-"C
                                          "[15k,100k)",
                                          "[0,15k)"
                                 ),
+                                labels=c("75m+",
+                                         "10m - <75m",
+                                         "1m - <10m", 
+                                         "100k - <1m",
+                                         "15k - <100k",
+                                         "0 - <15k"
+                                ),
                                 ordered=TRUE
+                                
     )
 
 #ContractWeighted <- apply_lookups(Path,ContractWeighted)
@@ -154,7 +162,7 @@ ggplot(
   data = subset(CompleteModelAndDetail,Term=="Terminated"),
   aes_string(x = "Ceil")
   )+ geom_bar()+
-    scale_x_discrete("Original Ceiling (Base and All Options Value)")+scale_y_continuous("Number of Partially or Completely \nTerminated Contracts")
+    scale_x_discrete("Original Ceiling (Base and All Options Value)")+scale_y_continuous("Number of Partially or Completely \nTerminated Contracts",labels = comma)+theme(axis.text.x=element_text(angle=90,size=12))
 ```
 
 ![](Contract_Termination_files/figure-html/ContractTerminationGraphs-3.png) 
@@ -186,13 +194,13 @@ head(CompleteModelAndDetail)
 ## 4                          <NA>      Navy Electronics and Communications
 ## 5                           571 Other DoD Electronics and Communications
 ## 6                          <NA> Other DoD            Aircraft and Drones
-##                Intl      PSR LowCeil   Ceil                   Dur
-## 1 Any International Products  [30m+] [75m+]   [~7 months-~1 year]
-## 2         Just U.S. Products  [30m+] [75m+]    (~1 year,~2 years]
-## 3         Just U.S. Services  [30m+] [75m+]  [0 months,~2 months)
-## 4         Just U.S. Services  [30m+] [75m+]   [~7 months-~1 year]
-## 5         Just U.S. Products  [30m+] [75m+] [~2 months,~7 months)
-## 6         Just U.S. Products  [30m+] [75m+]  [0 months,~2 months)
+##                Intl      PSR LowCeil Ceil                   Dur
+## 1 Any International Products  [30m+] 75m+   [~7 months-~1 year]
+## 2         Just U.S. Products  [30m+] 75m+    (~1 year,~2 years]
+## 3         Just U.S. Services  [30m+] 75m+  [0 months,~2 months)
+## 4         Just U.S. Services  [30m+] 75m+   [~7 months-~1 year]
+## 5         Just U.S. Products  [30m+] 75m+ [~2 months,~7 months)
+## 6         Just U.S. Products  [30m+] 75m+  [0 months,~2 months)
 ##   SingleOffer Offr IsIDV.1                   Soft     UCA            CRai
 ## 1       Multi  3-4     IDV      Not Software Eng. Not UCA [-0.001, 0.001)
 ## 2      Single    1     IDV      Not Software Eng. Not UCA [-0.001, 0.001)
@@ -233,9 +241,9 @@ head(CompleteModelAndDetail)
 ```r
 ggplot(
   data = subset(CompleteModelAndDetail,Term=="Terminated"),
-  aes_string(x = "Ceil",weight="Action.Obligation")
+  aes(x = Ceil,weight=Action.Obligation/1000000000)
   )+ geom_bar()+
-    scale_x_discrete("Original Ceiling (Base and All Options Value)")+scale_y_continuous("Total Obligated Value of Partially or Completely Terminated Contracts")
+    scale_x_discrete("Original Ceiling (Base and All Options Value)")+scale_y_continuous("Total Obligations Going to Partially or Completely\nTerminated Contracts ($ Billions)",labels = comma)+theme(axis.text.x=element_text(angle=90,size=12))
 ```
 
 ![](Contract_Termination_files/figure-html/ContractTerminationGraphs-4.png) 
@@ -246,7 +254,7 @@ ggplot(
   aes_string(x = "Ceil",weight="pContract")
 #   main="Percentage of Contracts going to Partially or Completely Terminated Contracts\nBy Initial Contract Ceiling"
   )+ geom_bar()+ scale_y_continuous("Percent of Contracts Partially or Completely Terminated\nby Original Ceiling Category", labels=percent)+
-    scale_x_discrete("Original Ceiling (Base and All Options Value)")
+    scale_x_discrete("Original Ceiling (Base and All Options Value)")+theme(axis.text.x=element_text(angle=90,size=12))
 ```
 
 ![](Contract_Termination_files/figure-html/ContractTerminationGraphs-5.png) 
@@ -257,7 +265,7 @@ ggplot(
   aes_string(x = "Ceil",weight="pObligation"),
   main="Percentage of Contract Obligations going to Partially or Completely Terminated Contracts\nBy Initial Contract Ceiling"
   )+ geom_bar()+ scale_y_continuous("Percent of Obligations to Terminated Contracts in Original Ceiling Category", labels=percent)+
-    scale_x_discrete("Original Ceiling (Base and All Options Value)")
+    scale_x_discrete("Original Ceiling (Base and All Options Value)")+theme(axis.text.x=element_text(angle=90,size=12))
 ```
 
 ![](Contract_Termination_files/figure-html/ContractTerminationGraphs-6.png) 
@@ -303,13 +311,13 @@ head(CompleteModelAndDetail)
 ## 4                          <NA>      Navy Electronics and Communications
 ## 5                           571 Other DoD Electronics and Communications
 ## 6                          <NA> Other DoD            Aircraft and Drones
-##                Intl      PSR LowCeil   Ceil                   Dur
-## 1 Any International Products  [30m+] [75m+]   [~7 months-~1 year]
-## 2         Just U.S. Products  [30m+] [75m+]    (~1 year,~2 years]
-## 3         Just U.S. Services  [30m+] [75m+]  [0 months,~2 months)
-## 4         Just U.S. Services  [30m+] [75m+]   [~7 months-~1 year]
-## 5         Just U.S. Products  [30m+] [75m+] [~2 months,~7 months)
-## 6         Just U.S. Products  [30m+] [75m+]  [0 months,~2 months)
+##                Intl      PSR LowCeil Ceil                   Dur
+## 1 Any International Products  [30m+] 75m+   [~7 months-~1 year]
+## 2         Just U.S. Products  [30m+] 75m+    (~1 year,~2 years]
+## 3         Just U.S. Services  [30m+] 75m+  [0 months,~2 months)
+## 4         Just U.S. Services  [30m+] 75m+   [~7 months-~1 year]
+## 5         Just U.S. Products  [30m+] 75m+ [~2 months,~7 months)
+## 6         Just U.S. Products  [30m+] 75m+  [0 months,~2 months)
 ##   SingleOffer Offr IsIDV.1                   Soft     UCA            CRai
 ## 1       Multi  3-4     IDV      Not Software Eng. Not UCA [-0.001, 0.001)
 ## 2      Single    1     IDV      Not Software Eng. Not UCA [-0.001, 0.001)

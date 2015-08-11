@@ -508,15 +508,23 @@ FixedPriceComparison<-function(varGin,HypothesisLabel=NA){
     if(!is.na(HypothesisLabel)) ResultsDF$Hypothesis<-HypothesisLabel
     
     #Order the ceilings
-    ResultsDF$iVariable<-factor(ResultsDF$iVariable,
+    ResultsDF$iVariable<-factor(CompleteModelAndDetail$Ceil,
                                 levels=c("[75m+]",
-                                         "[1m,10m)", 
                                          "[10m,75m)",
+                                         "[1m,10m)", 
                                          "[100k,1m)",
                                          "[15k,100k)",
                                          "[0,15k)"
                                 ),
+                                labels=c("75m+",
+                                         "10m - <75m",
+                                         "1m - <10m", 
+                                         "100k - <1m",
+                                         "15k - <100k",
+                                         "0 - <15k"
+                                ),
                                 ordered=TRUE
+                                
     )
     
     
@@ -688,7 +696,7 @@ FixedPriceHypothesisTester<-function(varGin,HypothesisLabel=NA){
     if(!is.na(HypothesisLabel)) ResultsDF$Hypothesis<-HypothesisLabel
     
     #Order the ceilings
-    ResultsDF$iVariable<-factor(ResultsDF$iVariable,
+    ResultsDF$iVariable<-factor(CompleteModelAndDetail$Ceil,
                                 levels=c("[75m+]",
                                          "[10m,75m)",
                                          "[1m,10m)", 
@@ -696,7 +704,15 @@ FixedPriceHypothesisTester<-function(varGin,HypothesisLabel=NA){
                                          "[15k,100k)",
                                          "[0,15k)"
                                 ),
+                                labels=c("75m+",
+                                         "10m - <75m",
+                                         "1m - <10m", 
+                                         "100k - <1m",
+                                         "15k - <100k",
+                                         "0 - <15k"
+                                ),
                                 ordered=TRUE
+                                
     )
     
     

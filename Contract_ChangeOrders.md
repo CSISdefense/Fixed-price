@@ -151,8 +151,17 @@ colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qCRais"]<-"C
                                          "[15k,100k)",
                                          "[0,15k)"
                                 ),
+                                labels=c("75m+",
+                                         "10m - <75m",
+                                         "1m - <10m", 
+                                         "100k - <1m",
+                                         "15k - <100k",
+                                         "0 - <15k"
+                                ),
                                 ordered=TRUE
+                                
     )
+
  
 # levels(CompleteModelAndDetail$CRai)
 
@@ -162,10 +171,10 @@ colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qCRais"]<-"C
                                          "[ 0.001, 0.150)", 
                                          "[ 0.150,   Inf]"
                                 ),
-                                labels=c("[< -0.1%)",
-                                         "[-0.1%,0.1%)",
-                                         "[0.1%,15%)", 
-                                         "[15%+]"
+                                labels=c("< -0.1%",
+                                         "-0.1% - <0.1%",
+                                         "0.1% - <15%", 
+                                         "15%+"
                                 ),
                                 ordered=TRUE
     )
@@ -220,7 +229,7 @@ ggplot(
   data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
   aes_string(x = "Ceil")
   )+ geom_bar()+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+scale_y_continuous("Number of Contracts with Change Orders")
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+scale_y_continuous("Number of Contracts with Change Orders")+theme(axis.text.x=element_text(angle=90))
 ```
 
 ![](Contract_ChangeOrders_files/figure-html/ChangeOrders-3.png) 
@@ -231,7 +240,7 @@ ggplot(
   aes_string(x = "Ceil",weight="pContract")
 #   main="Percentage of Contracts going to Partially or Completely Terminated Contracts\nBy Initial Contract Ceiling"
   )+ geom_bar()+ scale_y_continuous("Percent of Contracts with Change Orders", labels=percent)+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+theme(axis.text.x=element_text(angle=90))
 ```
 
 ![](Contract_ChangeOrders_files/figure-html/ChangeOrders-4.png) 
@@ -242,7 +251,7 @@ ggplot(
   aes_string(x = "Ceil",weight="pObligation"),
   main="Percentage of Contract Obligations going to Contracts with Change Orders\nBy Initial Contract Ceiling"
   )+ geom_bar()+ scale_y_continuous("Percent of Obligations in Cost Ceiling Category", labels=percent)+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+theme(axis.text.x=element_text(angle=90))
 ```
 
 ![](Contract_ChangeOrders_files/figure-html/ChangeOrders-5.png) 
@@ -252,7 +261,7 @@ ggplot(
   data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
   aes_string(x = "Ceil",weight="Action.Obligation")
   )+ geom_bar()+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+scale_y_continuous("Total Obligated Value of Contracts with Change Orders")
+    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+scale_y_continuous("Total Obligated Value of Contracts with Change Orders")+theme(axis.text.x=element_text(angle=90))
 ```
 
 ![](Contract_ChangeOrders_files/figure-html/ChangeOrders-6.png) 
@@ -262,8 +271,8 @@ levels(CompleteModelAndDetail$Ceil)
 ```
 
 ```
-## [1] "[75m+]"     "[10m,75m)"  "[1m,10m)"   "[100k,1m)"  "[15k,100k)"
-## [6] "[0,15k)"
+## [1] "75m+"        "10m - <75m"  "1m - <10m"   "100k - <1m"  "15k - <100k"
+## [6] "0 - <15k"
 ```
 
 ```r
@@ -282,7 +291,7 @@ quantile(subset(CompleteModelAndDetail$SumOfisChangeOrder,
 
 ```
 ## 90% 95% 99% 
-##   0   1   4
+##   0   0   1
 ```
 
 ```r
@@ -292,7 +301,7 @@ quantile(subset(CompleteModelAndDetail$SumOfisChangeOrder,CompleteModelAndDetail
 
 ```
 ## 25% 50% 75% 90% 
-##   1   1   2   3
+##   1   1   1   3
 ```
 
 ```r
@@ -426,7 +435,7 @@ ggplot(
                 space = "free_y") +   
     scale_y_continuous("Number of Contracts with Change Orders")+
     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)",
-                       limits=c(-1.25,1.25), labels=percent)+theme(axis.text.x=element_text(angle=90))
+                       limits=c(-1.25,1.25), labels=percent)+theme(axis.text.x=element_text(angle=90,size=1))
 ```
 
 ```
@@ -501,29 +510,64 @@ tapply(CompleteModelAndDetail$CRai, CompleteModelAndDetail$Ceil, summary)
 ```
 
 ```
-## $`[75m+]`
-##    [< -0.1%) [-0.1%,0.1%)   [0.1%,15%)       [15%+] 
-##          115         2238          301           96 
+## $`75m+`
+##       < -0.1% -0.1% - <0.1%   0.1% - <15%          15%+ 
+##           115          2238           301            96 
 ## 
-## $`[10m,75m)`
-##    [< -0.1%) [-0.1%,0.1%)   [0.1%,15%)       [15%+] 
-##          591        11242         1661          464 
+## $`10m - <75m`
+##       < -0.1% -0.1% - <0.1%   0.1% - <15%          15%+ 
+##           591         11242          1661           464 
 ## 
-## $`[1m,10m)`
-##    [< -0.1%) [-0.1%,0.1%)   [0.1%,15%)       [15%+] 
-##         3162        93784         6430         2939 
+## $`1m - <10m`
+##       < -0.1% -0.1% - <0.1%   0.1% - <15%          15%+ 
+##          3162         93784          6430          2939 
 ## 
-## $`[100k,1m)`
-##    [< -0.1%) [-0.1%,0.1%)   [0.1%,15%)       [15%+] 
-##         9854       557508        12019         8788 
+## $`100k - <1m`
+##       < -0.1% -0.1% - <0.1%   0.1% - <15%          15%+ 
+##          9854        557508         12019          8788 
 ## 
-## $`[15k,100k)`
-##    [< -0.1%) [-0.1%,0.1%)   [0.1%,15%)       [15%+] 
-##        20400      1784039        11297        13160 
+## $`15k - <100k`
+##       < -0.1% -0.1% - <0.1%   0.1% - <15%          15%+ 
+##         20400       1784039         11297         13160 
 ## 
-## $`[0,15k)`
-##    [< -0.1%) [-0.1%,0.1%)   [0.1%,15%)       [15%+]         NA's 
-##        21857      3396587         9779        15772          203
+## $`0 - <15k`
+##       < -0.1% -0.1% - <0.1%   0.1% - <15%          15%+          NA's 
+##         21857       3396587          9779         15772           203
+```
+
+```r
+ddply(subset(CompleteModelAndDetail,SumOfisChangeOrder>0),.(Ceil,CRai),
+                     summarise,
+                     pContract=sum(pContract))
+```
+
+```
+##           Ceil          CRai    pContract
+## 1         75m+       < -0.1% 0.0418181818
+## 2         75m+ -0.1% - <0.1% 0.0898181818
+## 3         75m+   0.1% - <15% 0.1094545455
+## 4         75m+          15%+ 0.0349090909
+## 5   10m - <75m       < -0.1% 0.0423413096
+## 6   10m - <75m -0.1% - <0.1% 0.0904857429
+## 7   10m - <75m   0.1% - <15% 0.1189998567
+## 8   10m - <75m          15%+ 0.0332425849
+## 9    1m - <10m       < -0.1% 0.0297418050
+## 10   1m - <10m -0.1% - <0.1% 0.0570568593
+## 11   1m - <10m   0.1% - <15% 0.0604806471
+## 12   1m - <10m          15%+ 0.0276442647
+## 13  100k - <1m       < -0.1% 0.0167536881
+## 14  100k - <1m -0.1% - <0.1% 0.0277760304
+## 15  100k - <1m   0.1% - <15% 0.0204346030
+## 16  100k - <1m          15%+ 0.0149412839
+## 17 15k - <100k       < -0.1% 0.0111542701
+## 18 15k - <100k -0.1% - <0.1% 0.0091257239
+## 19 15k - <100k   0.1% - <15% 0.0061769505
+## 20 15k - <100k          15%+ 0.0071955978
+## 21    0 - <15k       < -0.1% 0.0063460347
+## 22    0 - <15k -0.1% - <0.1% 0.0032260050
+## 23    0 - <15k   0.1% - <15% 0.0028392677
+## 24    0 - <15k          15%+ 0.0045792954
+## 25    0 - <15k          <NA> 0.0000589397
 ```
 
 

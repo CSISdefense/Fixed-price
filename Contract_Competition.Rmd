@@ -8,6 +8,16 @@ output:
 ---
 
 ```{r hiddensetup, echo = FALSE}
+legend.text.size<-5
+axis.text.size<-5
+strip.text.size<-5
+legend.text.size<-5
+
+table.text.size<-5.75
+title.text.size<-6
+geom.text.size<-1.5
+
+
 require(ggplot2)
 require(stringr)
 require(plyr)
@@ -91,9 +101,16 @@ colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qCRais"]<-"C
                                          "[15k,100k)",
                                          "[0,15k)"
                                 ),
+                                labels=c("75m+",
+                                         "10m - <75m",
+                                         "1m - <10m", 
+                                         "100k - <1m",
+                                         "15k - <100k",
+                                         "0 - <15k"
+                                ),
                                 ordered=TRUE
+                                
     )
-
 
 #These will probably be moved into apply_lookups at some point
 ContractSample$pIsSomeCompetition <- ContractSample$ObligatedAmountIsSomeCompetition/ContractSample$ObligatedAmount
@@ -454,10 +471,10 @@ VehBox<-VehBox+coord_cartesian(ylim=c(0,20))+
     theme(axis.text.x=element_text(angle=90))#size=axis.text.size,
 
 mean(subset(CompleteModelAndDetail,
-            Veh=="Other IDV"&Ceil=="[75m+]")$UnmodifiedNumberOfOffersReceived,,na.rm=TRUE)
+            Veh=="Other IDV"&Ceil=="75m+")$UnmodifiedNumberOfOffersReceived,,na.rm=TRUE)
 
 summary(subset(CompleteModelAndDetail,
-            Veh=="Other IDV"&Ceil=="[75m+]")$UnmodifiedNumberOfOffersReceived,,na.rm=TRUE)
+            Veh=="Other IDV"&Ceil=="75m+")$UnmodifiedNumberOfOffersReceived,,na.rm=TRUE)
 
 
 VehBox
