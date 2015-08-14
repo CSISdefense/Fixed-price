@@ -250,22 +250,26 @@ summary(FixedPriceGin)
 PopulationLongDF<-FixedPriceComparisonTable(ModelSummary,"Population")
 
 
-Coloration<-NULL
 
-# debug(PointRowWrapper)
+
+
 #Single Offer Competition
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(PopulationLongDF,dVariable=="% Single Offer Competition" & Control!="Comp." & FxCb!="Combination or Other"),
+    subset(PopulationLongDF,!is.na(Significance)&dVariable=="% Single Offer Competition" & Control!="Comp." & FxCb!="Combination or Other"),
                           "Control",
                           "p",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/PopulationAbsolute-1.png) 
@@ -275,15 +279,19 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Offers",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(PopulationLongDF,dVariable=="Average Number of Offers for Competed Contracts" & Control!="Comp." & FxCb!="Combination or Other"),
+    subset(PopulationLongDF,!is.na(Significance)&dVariable=="Average Number of Offers for Competed Contracts" & Control!="Comp." & FxCb!="Combination or Other"),
                           "Control",
                           "Average",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/PopulationAbsolute-2.png) 
@@ -293,15 +301,19 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Change Orders",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(PopulationLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+    subset(PopulationLongDF,!is.na(Significance)&dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
                           "Control",
                           "Average",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/PopulationAbsolute-3.png) 
@@ -311,16 +323,20 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(PopulationLongDF,dVariable=="Ceiling Raising Change Orders %" & FxCb!="Combination or Other"),
+    subset(PopulationLongDF,!is.na(Significance)&dVariable=="Ceiling Raising Change Orders %" & FxCb!="Combination or Other"),
                           "Control",
                           "Average",
                           "FxCb",
                           "Significance",
                           "iVariable",
     Percentage=TRUE)
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/PopulationAbsolute-4.png) 
@@ -330,15 +346,19 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Contract Termination Rate",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(PopulationLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+    subset(PopulationLongDF,!is.na(Significance)&dVariable=="Terminated"  & FxCb!="Combination or Other"),
                           "Control",
                           "p",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/PopulationAbsolute-5.png) 
@@ -364,15 +384,19 @@ PopulationWideDF<-subset(PopulationWideDF,
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Single Offer Competition Rate",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(PopulationWideDF,dVariable=="% Single Offer Competition"),
+    subset(PopulationWideDF,!is.na(Cost.Based_Significance)&dVariable=="% Single Offer Competition"),
                           "Control",
                           "pFixedCostMargin",
                           "Hypothesis",
                           "Cost.Based_Significance",
                           "iVariable")+geom_hline(aes(yintercept=0))  
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/PopulationDivision-1.png) 
@@ -382,16 +406,20 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Number of Offers",   #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(PopulationWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+    subset(PopulationWideDF,!is.na(Cost.Based_Significance)&dVariable=="Average Number of Offers for Competed Contracts"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
                           "Cost.Based_Significance",
                           "iVariable",
     Percentage=TRUE)+geom_hline(aes(yintercept=0))
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/PopulationDivision-2.png) 
@@ -401,16 +429,20 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Number of Change Orders",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(PopulationWideDF,dVariable=="Average Number of Change Orders"),
+    subset(PopulationWideDF,!is.na(Cost.Based_Significance)&dVariable=="Average Number of Change Orders"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
                           "Cost.Based_Significance",
                           "iVariable",
     Percentage=TRUE)+geom_hline(aes(yintercept=0))
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/PopulationDivision-3.png) 
@@ -420,10 +452,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(PopulationWideDF,dVariable=="Ceiling Raising Change Orders %"),
+    subset(PopulationWideDF,!is.na(Cost.Based_Significance)&dVariable=="Ceiling Raising Change Orders %"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
@@ -431,6 +463,10 @@ PointRowWrapper(NULL,#VAR.main.label,
                           "iVariable",
     high=10,
     Percentage=TRUE)+geom_hline(aes(yintercept=0))
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/PopulationDivision-4.png) 
@@ -442,10 +478,10 @@ PopulationOutliersDF<-ListOutliers(PopulationWideDF,"avgFixedCostMargin",NA,10)
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Termination Rate",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(PopulationWideDF,dVariable=="Terminated"),
+    subset(PopulationWideDF,!is.na(Cost.Based_Significance)&dVariable=="Terminated"),
                           "Control",
                           "pFixedCostMargin",
                           "Hypothesis",
@@ -453,6 +489,10 @@ PointRowWrapper(NULL,#VAR.main.label,
                           "iVariable",
     high=10
     )+geom_hline(aes(yintercept=0))
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/PopulationDivision-5.png) 
@@ -884,7 +924,7 @@ The analysis indicates validates this past finding, IDVs are marketedly more lik
 # 
 # 
 # #Single Offer Competition
-# ggplot(subset(LongDurWideDF,dVariable=="% Single Offer Competition"),
+# ggplot(subset(LongDurWideDF,!is.na(Cost.Based_Significance)&dVariable=="% Single Offer Competition"),
 #        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=pFixedCostMargin)
 #        )+
 #     geom_point()+
@@ -892,14 +932,14 @@ The analysis indicates validates this past finding, IDVs are marketedly more lik
 # 
 # 
 # #Average Number of Offers
-# ggplot(subset(LongDurWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+# ggplot(subset(LongDurWideDF,!is.na(Cost.Based_Significance)&dVariable=="Average Number of Offers for Competed Contracts"),
 #        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
 #     facet_grid(dVariable~iVariable)+ coord_flip()+theme(legend.position="bottom",axis.text.x = element_text(angle = 90, hjust = 1))+ scale_y_continuous(labels = percent_format())+geom_hline(aes(yintercept=0))  
 # 
 # #Average Number of Changes
-# ggplot(subset(LongDurWideDF,dVariable=="Average Number of Change Orders"),
+# ggplot(subset(LongDurWideDF,!is.na(Cost.Based_Significance)&dVariable=="Average Number of Change Orders"),
 #        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
@@ -907,7 +947,7 @@ The analysis indicates validates this past finding, IDVs are marketedly more lik
 # 
 # 
 # #Ceiling Raising Change Orders %
-# ggplot(subset(LongDurWideDF,dVariable=="Ceiling Raising Change Orders %"),
+# ggplot(subset(LongDurWideDF,!is.na(Cost.Based_Significance)&dVariable=="Ceiling Raising Change Orders %"),
 #        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=avgFixedCostMargin)
 #        )+
 #     geom_point()+
@@ -916,7 +956,7 @@ The analysis indicates validates this past finding, IDVs are marketedly more lik
 # 
 # 
 # #Terminations
-# ggplot(subset(LongDurWideDF,dVariable=="Terminated"),
+# ggplot(subset(LongDurWideDF,!is.na(Cost.Based_Significance)&dVariable=="Terminated"),
 #        aes(x=Control,color=Hypothesis,shape=Hypothesis,y=pFixedCostMargin)
 #        )+
 #     geom_point()+
@@ -1073,22 +1113,26 @@ RnDlongDF<-FixedPriceComparisonTable(subset(ModelSummary,PSR=="R&D"),
                                 "R&D")
 
 
-Coloration<-NULL
 
 
+# debug(PointRowWrapper)
 #Single Offer Competition
 PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(RnDlongDF,dVariable=="% Single Offer Competition" & Control!="Comp." & FxCb!="Combination or Other"),
+    subset(RnDlongDF,!is.na(Significance)&dVariable=="% Single Offer Competition" & Control!="Comp." & FxCb!="Combination or Other"),
                           "Control",
                           "p",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&Dabsolute-1.png) 
@@ -1098,15 +1142,19 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Offers",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(RnDlongDF,dVariable=="Average Number of Offers for Competed Contracts" & Control!="Comp." & FxCb!="Combination or Other"),
+    subset(RnDlongDF,!is.na(Significance)&dVariable=="Average Number of Offers for Competed Contracts" & Control!="Comp." & FxCb!="Combination or Other"),
                           "Control",
                           "Average",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&Dabsolute-2.png) 
@@ -1116,15 +1164,19 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Change Orders",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(RnDlongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+    subset(RnDlongDF,!is.na(Significance)&dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
                           "Control",
                           "Average",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&Dabsolute-3.png) 
@@ -1134,16 +1186,20 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(RnDlongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+    subset(RnDlongDF,!is.na(Significance)&dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
                           "Control",
                           "Average",
                           "FxCb",
                           "Significance",
                           "iVariable",
     Percentage=TRUE)
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&Dabsolute-4.png) 
@@ -1153,15 +1209,19 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Contract Termination Rate",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(RnDlongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+    subset(RnDlongDF,!is.na(Significance)&dVariable=="Terminated"  & FxCb!="Combination or Other"),
                           "Control",
                           "p",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H1LargeR&Dabsolute-5.png) 
@@ -1192,10 +1252,10 @@ RnDwideDF$Hypothesis<-factor(RnDwideDF$Hypothesis,levels=c("R&D","Population"),o
 PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Single Offer Competition Rate",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(RnDwideDF,dVariable=="% Single Offer Competition"),
+    subset(RnDwideDF,!is.na(Cost.Based_Significance)&dVariable=="% Single Offer Competition"),
                           "Control",
                           "pFixedCostMargin",
                           "Hypothesis",
@@ -1204,7 +1264,11 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 4 rows containing missing values
+## Joining by: variable
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
 ## (geom_point).
 ```
 
@@ -1215,10 +1279,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Number of Offers",   #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(RnDwideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+    subset(RnDwideDF,!is.na(Cost.Based_Significance)&dVariable=="Average Number of Offers for Competed Contracts"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
@@ -1228,7 +1292,11 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 3 rows containing missing values
+## Joining by: variable
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).
 ```
 
@@ -1239,16 +1307,20 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Number of Change Orders",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(RnDwideDF,dVariable=="Average Number of Change Orders"),
+    subset(RnDwideDF,!is.na(Cost.Based_Significance)&dVariable=="Average Number of Change Orders"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
                           "Cost.Based_Significance",
                           "iVariable",
     Percentage=TRUE)+geom_hline(aes(yintercept=0))
+```
+
+```
+## Joining by: variable
 ```
 
 ```
@@ -1263,10 +1335,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(RnDwideDF,dVariable=="Ceiling Raising Change Orders %"),
+    subset(RnDwideDF,!is.na(Cost.Based_Significance)&dVariable=="Ceiling Raising Change Orders %"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
@@ -1276,6 +1348,10 @@ PointRowWrapper(NULL,#VAR.main.label,
     high=10,
     Percentage=TRUE
     )+geom_hline(aes(yintercept=0))
+```
+
+```
+## Joining by: variable
 ```
 
 ```
@@ -1298,10 +1374,10 @@ RnDoutliersDF<-ListOutliers(RnDwideDF,"avgFixedCostMargin",-10,10)
 PointRowWrapper(NULL,#VAR.main.label,
                 "R&D Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Termination Rate",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(RnDwideDF,dVariable=="Terminated"),
+    subset(RnDwideDF,!is.na(Cost.Based_Significance)&dVariable=="Terminated"),
                           "Control",
                           "pFixedCostMargin",
                           "Hypothesis",
@@ -1309,6 +1385,10 @@ PointRowWrapper(NULL,#VAR.main.label,
                           "iVariable",
     high=10
     )+geom_hline(aes(yintercept=0))
+```
+
+```
+## Joining by: variable
 ```
 
 ```
@@ -1382,15 +1462,19 @@ MDAPlongDF$Hypothesis<-factor(MDAPlongDF$Hypothesis,levels=c("MDAP","Population"
 PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(MDAPlongDF,dVariable=="% Single Offer Competition" & Control!="Comp." & FxCb!="Combination or Other"),
+    subset(MDAPlongDF,!is.na(Significance)&dVariable=="% Single Offer Competition" & Control!="Comp." & FxCb!="Combination or Other"),
                           "Control",
                           "p",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-1.png) 
@@ -1400,15 +1484,19 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Offers",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(MDAPlongDF,dVariable=="Average Number of Offers for Competed Contracts" & Control!="Comp." & FxCb!="Combination or Other"),
+    subset(MDAPlongDF,!is.na(Significance)&dVariable=="Average Number of Offers for Competed Contracts" & Control!="Comp." & FxCb!="Combination or Other"),
                           "Control",
                           "Average",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-2.png) 
@@ -1418,15 +1506,19 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Change Orders",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(MDAPlongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+    subset(MDAPlongDF,!is.na(Significance)&dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
                           "Control",
                           "Average",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-3.png) 
@@ -1436,16 +1528,20 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(MDAPlongDF,dVariable=="Ceiling Raising Change Orders %"   & FxCb!="Combination or Other"),
+    subset(MDAPlongDF,!is.na(Significance)&dVariable=="Ceiling Raising Change Orders %"   & FxCb!="Combination or Other"),
                           "Control",
                           "Average",
                           "FxCb",
                           "Significance",
                           "iVariable",
     Percentage=TRUE)
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-4.png) 
@@ -1455,15 +1551,19 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Contract Termination Rate",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(MDAPlongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+    subset(MDAPlongDF,!is.na(Significance)&dVariable=="Terminated"  & FxCb!="Combination or Other"),
                           "Control",
                           "p",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAPabsolute-5.png) 
@@ -1491,10 +1591,10 @@ MDAPwideDF<-subset(MDAPwideDF,
 PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Single Offer Competition Rate",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(MDAPwideDF,dVariable=="% Single Offer Competition"),
+    subset(MDAPwideDF,!is.na(Cost.Based_Significance)&dVariable=="% Single Offer Competition"),
                           "Control",
                           "pFixedCostMargin",
                           "Hypothesis",
@@ -1503,8 +1603,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
-## (geom_point).
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-1.png) 
@@ -1514,10 +1613,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Number of Offers",   #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(MDAPwideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+    subset(MDAPwideDF,!is.na(Cost.Based_Significance)&dVariable=="Average Number of Offers for Competed Contracts"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
@@ -1527,8 +1626,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
-## (geom_point).
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-2.png) 
@@ -1538,10 +1636,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Number of Change Orders",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(MDAPwideDF,dVariable=="Average Number of Change Orders"),
+    subset(MDAPwideDF,!is.na(Cost.Based_Significance)&dVariable=="Average Number of Change Orders"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
@@ -1551,8 +1649,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-3.png) 
@@ -1562,10 +1659,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(MDAPwideDF,dVariable=="Ceiling Raising Change Orders %"),
+    subset(MDAPwideDF,!is.na(Cost.Based_Significance)&dVariable=="Ceiling Raising Change Orders %"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
@@ -1578,8 +1675,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H2MDAP-4.png) 
@@ -1592,10 +1688,10 @@ MDAPoutliersDF<-ListOutliers(MDAPwideDF,"avgFixedCostMargin",NA,10)
 PointRowWrapper(NULL,#VAR.main.label,
                 "MDAP Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Termination Rate",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(MDAPwideDF,dVariable=="Terminated"),
+    subset(MDAPwideDF,!is.na(Cost.Based_Significance)&dVariable=="Terminated"),
                           "Control",
                           "pFixedCostMargin",
                           "Hypothesis",
@@ -1607,7 +1703,11 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
+## Joining by: variable
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
 ## (geom_point).
 ```
 
@@ -1687,15 +1787,19 @@ The hypothesis regarding number of offers was not supported at the greater than 
     PointRowWrapper(NULL,#VAR.main.label,
                     "Long Duration Contracts\n(Overall and Controls)",          #VAR.row.label,
                     "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
-                    "Contract Pricing",          #VAR.color.legend.label,
-                    "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                    "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                    
                     Coloration,#VAR.Coloration
-        subset(LongDurLongDF,dVariable=="% Single Offer Competition" & Control!="Comp." & FxCb!="Combination or Other"),
+        subset(LongDurLongDF,!is.na(Significance)&dVariable=="% Single Offer Competition" & Control!="Comp." & FxCb!="Combination or Other"),
                               "Control",
                               "p",
                               "FxCb",
                               "Significance",
                               "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-1.png) 
@@ -1705,15 +1809,19 @@ The hypothesis regarding number of offers was not supported at the greater than 
     PointRowWrapper(NULL,#VAR.main.label,
                     "Long Duration Contracts\n(Overall and Controls)",          #VAR.row.label,
                     "Approximate Average Number of Offers",          #VAR.data.label,
-                    "Contract Pricing",          #VAR.color.legend.label,
-                    "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                    "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                    
                     Coloration,#VAR.Coloration
-        subset(LongDurLongDF,dVariable=="Average Number of Offers for Competed Contracts" & Control!="Comp." & FxCb!="Combination or Other"),
+        subset(LongDurLongDF,!is.na(Significance)&dVariable=="Average Number of Offers for Competed Contracts" & Control!="Comp." & FxCb!="Combination or Other"),
                               "Control",
                               "Average",
                               "FxCb",
                               "Significance",
                               "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-2.png) 
@@ -1723,15 +1831,19 @@ The hypothesis regarding number of offers was not supported at the greater than 
     PointRowWrapper(NULL,#VAR.main.label,
                     "Long Duration Contracts\n(Overall and Controls)",          #VAR.row.label,
                     "Approximate Average Number of Change Orders",          #VAR.data.label,
-                    "Contract Pricing",          #VAR.color.legend.label,
-                    "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                    "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                    
                     Coloration,#VAR.Coloration
-        subset(LongDurLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+        subset(LongDurLongDF,!is.na(Significance)&dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
                               "Control",
                               "Average",
                               "FxCb",
                               "Significance",
                               "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-3.png) 
@@ -1741,16 +1853,20 @@ The hypothesis regarding number of offers was not supported at the greater than 
     PointRowWrapper(NULL,#VAR.main.label,
                     "Long Duration Contracts\n(Overall and Controls)",          #VAR.row.label,
                     "Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
-                    "Contract Pricing",          #VAR.color.legend.label,
-                    "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                    "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                    
                     Coloration,#VAR.Coloration
-        subset(LongDurLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+        subset(LongDurLongDF,!is.na(Significance)&dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
                               "Control",
                               "Average",
                               "FxCb",
                               "Significance",
                               "iVariable",
     Percentage=TRUE)
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-4.png) 
@@ -1760,15 +1876,19 @@ The hypothesis regarding number of offers was not supported at the greater than 
     PointRowWrapper(NULL,#VAR.main.label,
                     "Long Duration Contracts\n(Overall and Controls)",          #VAR.row.label,
                     "Contract Termination Rate",          #VAR.data.label,
-                    "Contract Pricing",          #VAR.color.legend.label,
-                    "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                    "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                    
                     Coloration,#VAR.Coloration
-        subset(LongDurLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+        subset(LongDurLongDF,!is.na(Significance)&dVariable=="Terminated"  & FxCb!="Combination or Other"),
                               "Control",
                               "p",
                               "FxCb",
                               "Significance",
                               "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDurAbsolute-5.png) 
@@ -1799,10 +1919,10 @@ LongDurWideDF<-subset(LongDurWideDF,
 PointRowWrapper(NULL,#VAR.main.label,
                 "Long Duration Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Single Offer Competition Rate",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(LongDurWideDF,dVariable=="% Single Offer Competition"),
+    subset(LongDurWideDF,!is.na(Cost.Based_Significance)&dVariable=="% Single Offer Competition"),
                           "Control",
                           "pFixedCostMargin",
                           "Hypothesis",
@@ -1811,8 +1931,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-1.png) 
@@ -1822,10 +1941,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "Long Duration Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Number of Offers",   #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(LongDurWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+    subset(LongDurWideDF,!is.na(Cost.Based_Significance)&dVariable=="Average Number of Offers for Competed Contracts"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
@@ -1835,8 +1954,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-2.png) 
@@ -1846,10 +1964,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "Long Duration Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Number of Change Orders",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(LongDurWideDF,dVariable=="Average Number of Change Orders"),
+    subset(LongDurWideDF,!is.na(Cost.Based_Significance)&dVariable=="Average Number of Change Orders"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
@@ -1859,8 +1977,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-3.png) 
@@ -1870,10 +1987,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "Long Duration Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(LongDurWideDF,dVariable=="Ceiling Raising Change Orders %"),
+    subset(LongDurWideDF,!is.na(Cost.Based_Significance)&dVariable=="Ceiling Raising Change Orders %"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
@@ -1886,8 +2003,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H3LongDur-4.png) 
@@ -1900,10 +2016,10 @@ LongDurOutliersDF<-ListOutliers(LongDurWideDF,"avgFixedCostMargin",NA,10)
 PointRowWrapper(NULL,#VAR.main.label,
                 "Long Duration Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Termination Rate",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(LongDurWideDF,dVariable=="Terminated"),
+    subset(LongDurWideDF,!is.na(Cost.Based_Significance)&dVariable=="Terminated"),
                           "Control",
                           "pFixedCostMargin",
                           "Hypothesis",
@@ -1912,8 +2028,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).
+## Joining by: variable
 ```
 
 ```
@@ -1995,15 +2110,19 @@ CompLongDF<-subset(CompLongDF,
     PointRowWrapper(NULL,#VAR.main.label,
                     "Competed Contracts\n(Overall and Controls)",          #VAR.row.label,
                     "Approximate Average Number of Change Orders",          #VAR.data.label,
-                    "Contract Pricing",          #VAR.color.legend.label,
-                    "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                    "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                    
                     Coloration,#VAR.Coloration
-        subset(CompLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+        subset(CompLongDF,!is.na(Significance)&dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
                               "Control",
                               "Average",
                               "FxCb",
                               "Significance",
                               "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H4CompAbsolute-1.png) 
@@ -2013,16 +2132,20 @@ CompLongDF<-subset(CompLongDF,
     PointRowWrapper(NULL,#VAR.main.label,
                     "Competed Contracts\n(Overall and Controls)",          #VAR.row.label,
                     "Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
-                    "Contract Pricing",          #VAR.color.legend.label,
-                    "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                    "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                    
                     Coloration,#VAR.Coloration
-        subset(CompLongDF,dVariable=="Ceiling Raising Change Orders %"   & FxCb!="Combination or Other"),
+        subset(CompLongDF,!is.na(Significance)&dVariable=="Ceiling Raising Change Orders %"   & FxCb!="Combination or Other"),
                               "Control",
                               "Average",
                               "FxCb",
                               "Significance",
                               "iVariable",
     Percentage=TRUE)
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H4CompAbsolute-2.png) 
@@ -2032,15 +2155,19 @@ CompLongDF<-subset(CompLongDF,
     PointRowWrapper(NULL,#VAR.main.label,
                     "Competed Contracts\n(Overall and Controls)",          #VAR.row.label,
                     "Contract Termination Rate",          #VAR.data.label,
-                    "Contract Pricing",          #VAR.color.legend.label,
-                    "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                    "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                    
                     Coloration,#VAR.Coloration
-        subset(CompLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+        subset(CompLongDF,!is.na(Significance)&dVariable=="Terminated"  & FxCb!="Combination or Other"),
                               "Control",
                               "p",
                               "FxCb",
                               "Significance",
                               "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H4CompAbsolute-3.png) 
@@ -2077,16 +2204,20 @@ CompWideDF<-subset(CompWideDF,
 PointRowWrapper(NULL,#VAR.main.label,
                 "Competed Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Number of Change Orders",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(CompWideDF,dVariable=="Average Number of Change Orders"),
+    subset(CompWideDF,!is.na(Cost.Based_Significance)&dVariable=="Average Number of Change Orders"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
                           "Cost.Based_Significance",
                           "iVariable",
     Percentage=TRUE)+geom_hline(aes(yintercept=0))
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H4Comp-1.png) 
@@ -2097,10 +2228,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "Competed Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(CompWideDF,dVariable=="Ceiling Raising Change Orders %"),
+    subset(CompWideDF,!is.na(Cost.Based_Significance)&dVariable=="Ceiling Raising Change Orders %"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
@@ -2112,6 +2243,10 @@ PointRowWrapper(NULL,#VAR.main.label,
     )+geom_hline(aes(yintercept=0))
 ```
 
+```
+## Joining by: variable
+```
+
 ![](fixed_price_hypothesis_testing_files/figure-html/H4Comp-2.png) 
 
 ```r
@@ -2121,10 +2256,10 @@ CompOutliersDF<-ListOutliers(CompWideDF,"avgFixedCostMargin",-10,10)
 PointRowWrapper(NULL,#VAR.main.label,
                 "Competed Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Termination Rate",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(CompWideDF,dVariable=="Terminated"),
+    subset(CompWideDF,!is.na(Cost.Based_Significance)&dVariable=="Terminated"),
                           "Control",
                           "pFixedCostMargin",
                           "Hypothesis",
@@ -2133,6 +2268,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 #     low=-10,
     high=10
     )+geom_hline(aes(yintercept=0))
+```
+
+```
+## Joining by: variable
 ```
 
 ```
@@ -2199,12 +2338,12 @@ getEvidence(SoftwareFind)
 
 ```r
 SoftwareLongDF<-FixedPriceComparisonTable(subset(ModelSummary,Soft=="Possible Software Eng."),
-                                      "Possible Software Eng.")
+                                      "Software Dev.")
 
 
 
 
-SoftwareLongDF$Hypothesis<-factor(SoftwareLongDF$Hypothesis,levels=c("Comp.","Possible Software Eng."),ordered=TRUE)
+SoftwareLongDF$Hypothesis<-factor(SoftwareLongDF$Hypothesis,levels=c("Comp.","Software Dev."),ordered=TRUE)
 
 #Remove redundant tests
 SoftwareLongDF<-subset(SoftwareLongDF,
@@ -2214,15 +2353,19 @@ SoftwareLongDF<-subset(SoftwareLongDF,
 PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "% of Contracts Receiving Single Offer Competition",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(SoftwareLongDF,dVariable=="% Single Offer Competition" & Control!="Comp." & FxCb!="Combination or Other"),
+    subset(SoftwareLongDF,!is.na(Significance)&dVariable=="% Single Offer Competition" & Control!="Comp." & FxCb!="Combination or Other"),
                           "Control",
                           "p",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-1.png) 
@@ -2232,15 +2375,19 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Offers",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(SoftwareLongDF,dVariable=="Average Number of Offers for Competed Contracts" & Control!="Comp." & FxCb!="Combination or Other"),
+    subset(SoftwareLongDF,!is.na(Significance)&dVariable=="Average Number of Offers for Competed Contracts" & Control!="Comp." & FxCb!="Combination or Other"),
                           "Control",
                           "Average",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-2.png) 
@@ -2250,15 +2397,19 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Number of Change Orders",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(SoftwareLongDF,dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
+    subset(SoftwareLongDF,!is.na(Significance)&dVariable=="Average Number of Change Orders"  & FxCb!="Combination or Other"),
                           "Control",
                           "Average",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-3.png) 
@@ -2268,16 +2419,20 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(SoftwareLongDF,dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
+    subset(SoftwareLongDF,!is.na(Significance)&dVariable=="Ceiling Raising Change Orders %"  & FxCb!="Combination or Other"),
                           "Control",
                           "Average",
                           "FxCb",
                           "Significance",
                           "iVariable",
     Percentage=TRUE)
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-4.png) 
@@ -2287,15 +2442,19 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Contract Termination Rate",          #VAR.data.label,
-                "Contract Pricing",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Pricing and Significance of Fixed-Price vs. Cost-Based Difference", #VAR.legend.label
+                
                 Coloration,#VAR.Coloration
-    subset(SoftwareLongDF,dVariable=="Terminated"  & FxCb!="Combination or Other"),
+    subset(SoftwareLongDF,!is.na(Significance)&dVariable=="Terminated"  & FxCb!="Combination or Other"),
                           "Control",
                           "p",
                           "FxCb",
                           "Significance",
                           "iVariable")
+```
+
+```
+## Joining by: variable
 ```
 
 ![](fixed_price_hypothesis_testing_files/figure-html/H5SoftwareAbsolute-5.png) 
@@ -2316,7 +2475,7 @@ SoftwareWideDF<-FixedPriceCast(rbind(SoftwareLongDF,PopulationLongDF))
 ```
 
 ```r
-SoftwareWideDF$Hypothesis<-factor(SoftwareWideDF$Hypothesis,levels=c("Possible Software Eng.","Population"),ordered=TRUE)
+SoftwareWideDF$Hypothesis<-factor(SoftwareWideDF$Hypothesis,levels=c("Software Dev.","Population"),ordered=TRUE)
 
 #Remove redundant tests
 SoftwareWideDF<-subset(SoftwareWideDF,
@@ -2326,10 +2485,10 @@ SoftwareWideDF<-subset(SoftwareWideDF,
 PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Single Offer Competition Rate",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(SoftwareWideDF,dVariable=="% Single Offer Competition"),
+    subset(SoftwareWideDF,!is.na(Cost.Based_Significance)&dVariable=="% Single Offer Competition"),
                           "Control",
                           "pFixedCostMargin",
                           "Hypothesis",
@@ -2338,18 +2497,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 3 rows containing missing values
-## (geom_point).
-```
-
-```
-## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).
-```
-
-```
-## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
-## (geom_point).
+## Joining by: variable
 ```
 
 ```
@@ -2369,10 +2517,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Number of Offers",   #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(SoftwareWideDF,dVariable=="Average Number of Offers for Competed Contracts"),
+    subset(SoftwareWideDF,!is.na(Cost.Based_Significance)&dVariable=="Average Number of Offers for Competed Contracts"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
@@ -2382,23 +2530,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
-## (geom_point).
-```
-
-```
-## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).
-```
-
-```
-## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
-## (geom_point).
-```
-
-```
-## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).
+## Joining by: variable
 ```
 
 ```
@@ -2413,10 +2545,10 @@ PointRowWrapper(NULL,#VAR.main.label,
 PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Number of Change Orders",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(SoftwareWideDF,dVariable=="Average Number of Change Orders"),
+    subset(SoftwareWideDF,!is.na(Cost.Based_Significance)&dVariable=="Average Number of Change Orders"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
@@ -2429,18 +2561,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 3 rows containing missing values
-## (geom_point).
-```
-
-```
-## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).
-```
-
-```
-## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).
+## Joining by: variable
 ```
 
 ```
@@ -2463,10 +2584,10 @@ SoftwareOutliersDF<-rbind(ListOutliers(SoftwareWideDF,"pFixedCostMargin",NA,10))
 PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Approximate Average Extent of Ceiling Breaches",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(SoftwareWideDF,dVariable=="Ceiling Raising Change Orders %"),
+    subset(SoftwareWideDF,!is.na(Cost.Based_Significance)&dVariable=="Ceiling Raising Change Orders %"),
                           "Control",
                           "avgFixedCostMargin",
                           "Hypothesis",
@@ -2479,13 +2600,7 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 4 rows containing missing values
-## (geom_point).
-```
-
-```
-## Warning in loop_apply(n, do.ply): Removed 1 rows containing missing values
-## (geom_point).
+## Joining by: variable
 ```
 
 ```
@@ -2513,10 +2628,10 @@ SoftwareOutliersDF<-rbind(SoftwareOutliersDF,ListOutliers(SoftwareOutliersDF,"av
 PointRowWrapper(NULL,#VAR.main.label,
                 "Software Contracts\n(Overall and Controls)",          #VAR.row.label,
                 "Fixed-to-Cost Ratio for Termination Rate",          #VAR.data.label,
-                "Contract Sample",          #VAR.color.legend.label,
-                "Significance of Fixed-Price\nvs. Cost-Based Difference",         #VAR.size.legend.label,
+                "Contract Sample and Significance of Fixed-Price vs. Cost-Based Difference",
+                
                 Coloration,#VAR.Coloration
-    subset(SoftwareWideDF,dVariable=="Terminated"),
+    subset(SoftwareWideDF,!is.na(Cost.Based_Significance)&dVariable=="Terminated"),
                           "Control",
                           "pFixedCostMargin",
                           "Hypothesis",
@@ -2528,17 +2643,16 @@ PointRowWrapper(NULL,#VAR.main.label,
 ```
 
 ```
+## Joining by: variable
+```
+
+```
 ## Warning in loop_apply(n, do.ply): Removed 3 rows containing missing values
 ## (geom_point).
 ```
 
 ```
-## Warning in loop_apply(n, do.ply): Removed 4 rows containing missing values
-## (geom_point).
-```
-
-```
-## Warning in loop_apply(n, do.ply): Removed 3 rows containing missing values
+## Warning in loop_apply(n, do.ply): Removed 2 rows containing missing values
 ## (geom_point).
 ```
 

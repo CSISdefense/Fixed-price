@@ -4,7 +4,7 @@ Small to Test",1.69770582221421e-07,1,0.0351648351648351,NA,1,"Chi-squared test 
 	 (based on 2000 replicates)",0.0625,NA,"Not Signif.
 (>0.05)",8.48852911107105e-07,5,0.0520833333333333,NA,-0.166666666666667,-0.661458333333334,NA,NA
 "2","No Comp.","Terminated","2+ Year Dur.","10m - <75m",3.39541164442842e-07,2,NA,NA,NA,NA,0.0327868852459016,NA,"Sample Too
-Small to Test",8.48852911107105e-07,5,0.211652930402931,NA,0.793103448275862,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",8.48852911107105e-07,5,0.211652930402931,NA,0.814592703648176,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0.0390625,NA,"Not Signif.
 (>0.05)",2.54655873332131e-06,15,0.0319148936170213,NA,-0.182978723404255,-0.0265957446808491,NA,NA
 "3","No Comp.","Terminated","2+ Year Dur.","1m - <10m",5.09311746664263e-07,3,NA,NA,NA,NA,0.03125,NA,"Sample Too
@@ -15,7 +15,7 @@ Small to Test",6.79082328885684e-07,4,4.32157786188098,"1",0.0376320122046192,"C
 Small to Test",5.09311746664263e-07,3,1.34352320385828,"1",0.246413598535336,"Chi-squared test for given probabilities",0.0146341463414634,NA,"Not Signif.
 (>0.05)",3.92170044931482e-05,231,0.0279864308214199,NA,0.912406106130362,0.567240125999511,NA,NA
 "6","No Comp.","Terminated","Population","75m+",6.79082328885684e-07,4,NA,NA,NA,NA,0.105263157894737,NA,"Sample Too
-Small to Test",1.01862349332853e-06,6,2.15649307989997,NA,0.145927036481759,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",1.01862349332853e-06,6,2.15649307989997,NA,0.15792103948026,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0.0530973451327434,NA,"Not Signif.
 (>0.05)",2.37678815109989e-06,14,0.0296610169491525,NA,-0.441384180790962,-0.718220338983052,NA,NA
 "7","No Comp.","Terminated","Population","10m - <75m",1.86747640443563e-06,11,NA,NA,NA,NA,0.0365448504983389,NA,"Sample Too
@@ -28,7 +28,7 @@ Small to Test",8.48852911107105e-06,50,140.349496518576,"1",2.23248006661888e-32
 "10","No Comp.","Terminated","Population","0 - <100k",3.05587047998558e-06,18,NA,NA,NA,NA,0.00203527815468114,NA,"Sample Too
 Small to Test",1.34118759954923e-05,79,159.652714983243,"1",1.34749272519364e-36,"Chi-squared test for given probabilities",0.00258397932816537,NA,"<0.01",0.00155866371537487,9181,0.00964750510957342,NA,2.73358447740492,3.74014084383707,NA,NA
 "11","No Comp.","Average Number of Change Orders","2+ Year Dur.","75m+",2.20701756887847e-06,13,NA,NA,NA,NA,1,1.53846153846154,"Sample Too
-Small to Test",2.71632931554273e-06,16,0.819298245614035,NA,0.817591204397801,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",2.71632931554273e-06,16,0.819298245614035,NA,0.843578210894553,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,1.0625,"Not Signif.
 (>0.05)",1.62979758932564e-05,96,1,0.854166666666667,0,0,-0.196078431372549,-0.444791666666667
 "12","No Comp.","Average Number of Change Orders","2+ Year Dur.","10m - <75m",1.03560055155067e-05,61,NA,NA,NA,NA,1,0.754098360655738,"Sample Too
@@ -38,10 +38,10 @@ Small to Test",2.17306345243419e-05,128,1.66843041389552,"3",0.643975092046533,"
 Small to Test",8.87900145018031e-05,523,6.45165264650597,"3",0.0915888291866205,"Chi-squared test for given probabilities",1,0.227533460803059,"Not Signif.
 (>0.05)",0.000287591366283087,1694,1,0.257378984651712,0,0,0.131169823301223,-0.332205877660424
 "14","No Comp.","Average Number of Change Orders","2+ Year Dur.","100k - <1m",1.22234819199423e-05,72,NA,NA,NA,NA,1,0.25,"Sample Too
-Small to Test",8.25085029596106e-05,486,21.8372229027275,NA,0.00249875062468766,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",8.25085029596106e-05,486,21.8372229027275,NA,0.000999500249875062,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.185185185185185,"<0.01",0.000599459925823837,3531,1,0.114698385726423,0,0,-0.380628717077315,-0.541206457094308
 "15","No Comp.","Average Number of Change Orders","2+ Year Dur.","0 - <100k",9.50715260439957e-06,56,NA,NA,NA,NA,1,0.0178571428571429,"Sample Too
-Small to Test",3.48029693553913e-05,205,1.37336679285439,NA,0.690154922538731,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",3.48029693553913e-05,205,1.37336679285439,NA,0.727636181909045,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0926829268292683,"Not Signif.
 (>0.05)",0.00140128638565561,8254,1,0.0895323479525079,0,0,-0.0339930878808359,4.01381148534043
 "16","No Comp.","Average Number of Change Orders","Population","75m+",6.45128212441399e-06,38,NA,NA,NA,NA,1,1.28947368421053,"Sample Too
@@ -55,11 +55,11 @@ Small to Test",0.00276216737274252,16270,82.1528159840598,"3",1.05971011611522e-
 "20","No Comp.","Average Number of Change Orders","Population","0 - <100k",0.00150145102916625,8844,NA,NA,NA,NA,1,0.027363184079602,"Sample Too
 Small to Test",0.0051903960102555,30573,85.7307924896711,"3",1.80835389073784e-18,"Chi-squared test for given probabilities",1,0.0335917312661499,"<0.01",0.161561325718104,951645,1,0.0369286866426031,0,0,0.0993385946682605,0.349575639120585
 "21","No Comp.","Ceiling Raising Change Orders %","2+ Year Dur.","75m+",2.20701756887847e-06,13,NA,NA,NA,NA,1,0.0118461538461538,"Sample Too
-Small to Test",2.71632931554273e-06,16,2.01176470588235,NA,0.555222388805597,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",2.71632931554273e-06,16,2.01176470588235,NA,0.55472263868066,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0095,"Not Signif.
 (>0.05)",1.62979758932564e-05,96,1,0.0063125,0,0,-0.335526315789474,-0.467126623376621
 "22","No Comp.","Ceiling Raising Change Orders %","2+ Year Dur.","10m - <75m",1.03560055155067e-05,61,NA,NA,NA,NA,1,0.0147868852459016,"Sample Too
-Small to Test",2.17306345243419e-05,128,1.05527677281638,NA,0.787606196901549,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",2.17306345243419e-05,128,1.05527677281638,NA,0.79960019990005,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0035546875,"Not Signif.
 (>0.05)",7.97921736440678e-05,470,1,0.00320851063829787,0,0,-0.0973860182370827,-0.783016464594046
 "23","No Comp.","Ceiling Raising Change Orders %","2+ Year Dur.","1m - <10m",1.62979758932564e-05,96,NA,NA,NA,NA,1,0.00471875,"Sample Too
@@ -68,10 +68,10 @@ Small to Test",8.87900145018031e-05,523,6.97487832879567,"3",0.0727028106367182,
 "24","No Comp.","Ceiling Raising Change Orders %","2+ Year Dur.","100k - <1m",1.22234819199423e-05,72,NA,NA,NA,NA,1,0.00629166666666667,"Sample Too
 Small to Test",8.25085029596106e-05,486,50.3324993444398,"3",6.78712554280418e-11,"Chi-squared test for given probabilities",1,0.00709876543209876,"<0.01",0.000599459925823837,3531,1,0.0019368450863778,0,0,-0.727157474788518,-0.692157072363794
 "25","No Comp.","Ceiling Raising Change Orders %","2+ Year Dur.","0 - <100k",9.50715260439957e-06,56,NA,NA,NA,NA,1,0.00267857142857143,"Sample Too
-Small to Test",3.48029693553913e-05,205,9.93434063244724,NA,0.0339830084957521,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",3.48029693553913e-05,205,9.93434063244724,NA,0.0349825087456272,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.00364878048780488,"<0.05",0.00140128638565561,8254,1,0.00135510055730555,0,0,-0.628615488973747,-0.494095791939262
 "26","No Comp.","Ceiling Raising Change Orders %","Population","75m+",6.45128212441399e-06,38,NA,NA,NA,NA,1,0.00818421052631579,"Sample Too
-Small to Test",1.91840757910206e-05,113,17.9693394118173,NA,0.00199900049975012,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",1.91840757910206e-05,113,17.9693394118173,NA,0.00249875062468766,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0106725663716814,"<0.01",8.01317148085107e-05,472,1,0.0028728813559322,0,0,-0.730816257694578,-0.648972696059731
 "27","No Comp.","Ceiling Raising Change Orders %","Population","10m - <75m",5.11009452486477e-05,301,NA,NA,NA,NA,1,0.0120132890365449,"Sample Too
 Small to Test",0.000122744130946087,723,29.0226710777796,"3",2.21499825294567e-06,"Chi-squared test for given probabilities",1,0.0066625172890733,"<0.01",0.00045396653686008,2674,1,0.00299551234106208,0,0,-0.550393310652297,-0.750650106565353
@@ -82,7 +82,7 @@ Small to Test",0.00276216737274252,16270,276.133979723936,"3",1.45322369072513e-
 "30","No Comp.","Ceiling Raising Change Orders %","Population","0 - <100k",0.00150145102916625,8844,NA,NA,NA,NA,1,0.00147342831298055,"Sample Too
 Small to Test",0.0051903960102555,30573,132.901115898893,"3",1.28181524707933e-28,"Chi-squared test for given probabilities",1,0.00118333169790338,"<0.01",0.161561325718104,951645,1,0.00124640596020575,0,0,0.0533022671615446,-0.154077637014836
 "31","Comp.","Terminated","2+ Year Dur.","75m+",3.39541164442842e-07,2,NA,NA,NA,NA,0.1,NA,"Sample Too
-Small to Test",1.69770582221421e-07,1,3.41686152953759,NA,0.071464267866067,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",1.69770582221421e-07,1,3.41686152953759,NA,0.0869565217391304,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0.027027027027027,NA,"Not Signif.
 (>0.05)",3.56518222664984e-06,21,0.128834355828221,NA,3.76687116564418,0.28834355828221,NA,NA
 "32","Comp.","Terminated","2+ Year Dur.","10m - <75m",1.69770582221421e-07,1,NA,NA,NA,NA,0.0138888888888889,NA,"Sample Too
@@ -147,7 +147,7 @@ Small to Test",0.00227102107837595,13377,3552.97058282853,"3",0,"Chi-squared tes
 "60","Comp.","% Single Offer Competition","Population","0 - <100k",0.000276386507856473,1628,NA,NA,NA,NA,0.0606964432182537,NA,"Sample Too
 Small to Test",0.00160365291966354,9446,54212.1860513748,"3",0,"Chi-squared test for given probabilities",0.102943580466221,NA,"<0.01",0.129638514290099,763610,0.187344362200899,NA,0.81987416167609,2.0865789207325,NA,NA
 "61","Comp.","Average Number of Change Orders","2+ Year Dur.","75m+",3.39541164442842e-06,20,NA,NA,NA,NA,1,1.5,"Sample Too
-Small to Test",6.28151154219257e-06,37,4.61370600983277,NA,0.214392803598201,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",6.28151154219257e-06,37,4.61370600983277,NA,0.19640179910045,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.864864864864865,"Not Signif.
 (>0.05)",2.76726049020916e-05,163,1,1.31288343558282,0,0,0.518021472392635,-0.12474437627812
 "62","Comp.","Average Number of Change Orders","2+ Year Dur.","10m - <75m",1.22234819199423e-05,72,NA,NA,NA,NA,1,0.861111111111111,"Sample Too
@@ -157,7 +157,7 @@ Small to Test",0.000318829153411829,1878,170.568177677354,"3",9.59409536922162e-
 "64","Comp.","Average Number of Change Orders","2+ Year Dur.","100k - <1m",2.92005401420844e-05,172,NA,NA,NA,NA,1,0.313953488372093,"Sample Too
 Small to Test",0.000465171395286693,2740,44.7070556326701,"3",1.06787836712758e-09,"Chi-squared test for given probabilities",1,0.12043795620438,"<0.01",0.000932040496395601,5490,1,0.189981785063752,0,0,0.577424518408117,-0.394872832759901
 "65","Comp.","Average Number of Change Orders","2+ Year Dur.","0 - <100k",7.80944678218536e-06,46,NA,NA,NA,NA,1,0.478260869565217,"Sample Too
-Small to Test",3.31052635331771e-05,195,9.3518844026775,NA,0.0359820089955022,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",3.31052635331771e-05,195,9.3518844026775,NA,0.0364817591204398,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.138461538461538,"<0.05",0.00177630960178273,10463,1,0.0750262830928032,0,0,-0.45814351099642,-0.843126862624139
 "66","Comp.","Average Number of Change Orders","Population","75m+",1.46002700710422e-05,86,NA,NA,NA,NA,1,0.988372093023256,"Sample Too
 Small to Test",0.000120367342794987,709,317.105253083769,"3",1.97412260050032e-68,"Chi-squared test for given probabilities",1,0.19605077574048,"<0.01",0.000193368693150198,1139,1,0.865671641791045,0,0,3.41554815848813,-0.12414398595259
@@ -170,7 +170,7 @@ Small to Test",0.00728859063593004,42932,156.207063771271,"3",1.20673389586145e-
 "70","Comp.","Average Number of Change Orders","Population","0 - <100k",0.00455358655634295,26822,NA,NA,NA,NA,1,0.0256133025128626,"Sample Too
 Small to Test",0.0155779788540554,91759,158.337298276658,"3",4.18737192315428e-34,"Chi-squared test for given probabilities",1,0.0290652688019704,"<0.01",0.691979800017045,4075970,1,0.0250252087233223,0,0,-0.138999577336584,-0.022960482711863
 "71","Comp.","Ceiling Raising Change Orders %","2+ Year Dur.","75m+",3.39541164442842e-06,20,NA,NA,NA,NA,1,0,"Sample Too
-Small to Test",6.28151154219257e-06,37,6.40056481516878,NA,0.095952023988006,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",6.28151154219257e-06,37,6.40056481516878,NA,0.0979510244877561,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0121621621621622,"Not Signif.
 (>0.05)",2.76726049020916e-05,163,1,0.00754601226993865,0,0,-0.379550102249491,Inf
 "72","Comp.","Ceiling Raising Change Orders %","2+ Year Dur.","10m - <75m",1.22234819199423e-05,72,NA,NA,NA,NA,1,0.0105138888888889,"Sample Too
@@ -180,7 +180,7 @@ Small to Test",0.000318829153411828,1878,168.158414073003,"3",3.17851088351865e-
 "74","Comp.","Ceiling Raising Change Orders %","2+ Year Dur.","100k - <1m",2.92005401420844e-05,172,NA,NA,NA,NA,1,0.00693604651162791,"Sample Too
 Small to Test",0.000465171395286693,2740,142.81674233366,"3",9.33421225478116e-31,"Chi-squared test for given probabilities",1,0.00240802919708029,"<0.01",0.000932040496395601,5490,1,0.00356029143897996,0,0,0.478508418127478,-0.486697294631557
 "75","Comp.","Ceiling Raising Change Orders %","2+ Year Dur.","0 - <100k",7.80944678218536e-06,46,NA,NA,NA,NA,1,0.0228478260869565,"Sample Too
-Small to Test",3.31052635331771e-05,195,23.5445211566716,NA,0.000499750124937531,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",3.31052635331771e-05,195,23.5445211566716,NA,0.00249875062468766,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.00690769230769231,"<0.01",0.00177630960178273,10463,1,0.00157583866959763,0,0,-0.771871907519274,-0.931028945003339
 "76","Comp.","Ceiling Raising Change Orders %","Population","75m+",1.46002700710422e-05,86,NA,NA,NA,NA,1,0.00358139534883721,"Sample Too
 Small to Test",0.000120367342794987,709,222.193831362476,"3",6.73705621927043e-48,"Chi-squared test for given probabilities",1,0.0012820874471086,"<0.01",0.000193368693150198,1139,1,0.00868393327480246,0,0,5.77327688870733,1.4247346156916
@@ -204,7 +204,7 @@ Small to Test",3.05587047998558e-06,18,29.92211669941,"1",4.49753267415757e-08,"
 "84","Def./Pur.","Terminated","2+ Year Dur.","100k - <1m",1.69770582221421e-07,1,NA,NA,NA,NA,0.00943396226415094,NA,"Sample Too
 Small to Test",2.03724698665705e-06,12,83.1064047906833,"1",7.77533550412206e-20,"Chi-squared test for given probabilities",0.00632911392405063,NA,"<0.01",2.35981109287775e-05,139,0.0533999231655782,NA,7.43718786016136,4.66039185555129,NA,NA
 "85","Def./Pur.","Terminated","2+ Year Dur.","0 - <100k",3.39541164442842e-07,2,NA,NA,NA,NA,0.0540540540540541,NA,"Sample Too
-Small to Test",1.01862349332853e-06,6,1.19035352704414,NA,0.288355822088956,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",1.01862349332853e-06,6,1.19035352704414,NA,0.285857071464268,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0.0845070422535211,NA,"Not Signif.
 (>0.05)",4.77055336042193e-05,281,0.0549902152641879,NA,-0.34928245270711,0.0173189823874754,NA,NA
 "86","Def./Pur.","Terminated","Population","75m+",1.01862349332853e-06,6,NA,NA,NA,NA,0.15,NA,"Sample Too
@@ -220,7 +220,7 @@ Small to Test",8.1489879466282e-06,48,64.9238342762676,"1",7.78497295309796e-16,
 "90","Def./Pur.","Terminated","Population","0 - <100k",1.86747640443563e-06,11,NA,NA,NA,NA,0.0115667718191377,NA,"Sample Too
 Small to Test",8.1489879466282e-06,48,7.95956416413658,"1",0.00478339310903436,"Chi-squared test for given probabilities",0.0188161505292042,NA,"<0.01",0.00408994309629625,24091,0.0125884854365787,NA,-0.330974451068493,0.0883317863805814,NA,NA
 "91","Def./Pur.","Average Number of Offers for Competed Contracts","2+ Year Dur.","75m+",8.48852911107105e-07,5,NA,NA,NA,NA,1,1.9,"Sample Too
-Small to Test",2.20701756887847e-06,13,4.74641608391608,NA,0.16191904047976,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",2.20701756887847e-06,13,4.74641608391608,NA,0.170914542728636,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,3.19230769230769,"Not Signif.
 (>0.05)",1.25630230843851e-05,74,1,3.60810810810811,0,0,0.130250732660373,0.899004267425321
 "92","Def./Pur.","Average Number of Offers for Competed Contracts","2+ Year Dur.","10m - <75m",4.0744939733141e-06,24,NA,NA,NA,NA,1,1.83333333333333,"Sample Too
@@ -232,7 +232,7 @@ Small to Test",0.00031424534769185,1851,285.566004034112,"3",1.32262381773258e-6
 "95","Def./Pur.","Average Number of Offers for Competed Contracts","2+ Year Dur.","0 - <100k",3.73495280887126e-06,22,NA,NA,NA,NA,1,2.06818181818182,"Sample Too
 Small to Test",7.63967619996394e-06,45,29.3347538169588,"3",1.9045095622924e-06,"Chi-squared test for given probabilities",1,2.94444444444445,"<0.01",0.000572636173832853,3373,1,2.59576045063741,0,0,-0.118420979028806,0.255092965143362
 "96","Def./Pur.","Average Number of Offers for Competed Contracts","Population","75m+",3.56518222664984e-06,21,NA,NA,NA,NA,1,2.88095238095238,"Sample Too
-Small to Test",5.26288804886405e-06,31,19.4140583533541,NA,0.000999500249875062,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",5.26288804886405e-06,31,19.4140583533541,NA,0.000499750124937531,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,2.93548387096774,"<0.01",2.83516872309773e-05,167,1,3.79041916167665,0,0,0.291241692439299,0.315682684218342
 "97","Def./Pur.","Average Number of Offers for Competed Contracts","Population","10m - <75m",2.35981109287775e-05,139,NA,NA,NA,NA,1,2.94964028776978,"Sample Too
 Small to Test",4.73659924397764e-05,279,35.1605371085735,"3",1.12672395274046e-07,"Chi-squared test for given probabilities",1,3.21326164874552,"<0.01",0.000305417277416336,1799,1,3.57226236798221,0,0,0.111724707938691,0.211084071096409
@@ -243,7 +243,7 @@ Small to Test",0.00114255601835016,6730,1004.1100126671,"3",2.30963695800965e-21
 "100","Def./Pur.","Average Number of Offers for Competed Contracts","Population","0 - <100k",8.25085029596106e-05,486,NA,NA,NA,NA,1,2.29320987654321,"Sample Too
 Small to Test",0.000236490421034439,1393,125.802218223591,"3",4.34101782391245e-27,"Chi-squared test for given probabilities",1,2.60265613783202,"<0.01",0.245082170659501,1443608,1,2.96087511291154,0,0,0.137635921193151,0.291148770637064
 "101","Def./Pur.","% Single Offer Competition","2+ Year Dur.","75m+",3.39541164442842e-07,2,NA,NA,NA,NA,0.4,NA,"Sample Too
-Small to Test",1.69770582221421e-07,1,4.74641608391608,NA,0.171414292853573,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",1.69770582221421e-07,1,4.74641608391608,NA,0.178410794602699,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0.0769230769230769,NA,"Not Signif.
 (>0.05)",1.69770582221421e-06,10,0.135135135135135,NA,0.756756756756756,-0.662162162162163,NA,NA
 "102","Def./Pur.","% Single Offer Competition","2+ Year Dur.","10m - <75m",2.20701756887847e-06,13,NA,NA,NA,NA,0.541666666666667,NA,"Sample Too
@@ -266,7 +266,7 @@ Small to Test",0.000393528209589254,2318,1004.1100126671,"3",2.30963695800965e-2
 "110","Def./Pur.","% Single Offer Competition","Population","0 - <100k",3.81983809998197e-05,225,NA,NA,NA,NA,0.462962962962963,NA,"Sample Too
 Small to Test",9.71087730306528e-05,572,125.802218223591,"3",4.34101782391245e-27,"Chi-squared test for given probabilities",0.410624551328069,NA,"<0.01",0.0694764037565476,409237,0.283482081008141,NA,-0.309631925097307,-0.387678705022416,NA,NA
 "111","Def./Pur.","Average Number of Change Orders","2+ Year Dur.","75m+",2.20701756887847e-06,13,NA,NA,NA,NA,1,1.84615384615385,"Sample Too
-Small to Test",3.73495280887126e-06,22,20.136322011322,NA,0.000499750124937531,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",3.73495280887126e-06,22,20.136322011322,NA,0.00199900049975012,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.954545454545455,"<0.01",1.85049934621349e-05,109,1,1.64220183486239,0,0,0.720401922236789,-0.110474006116207
 "112","Def./Pur.","Average Number of Change Orders","2+ Year Dur.","10m - <75m",7.46990561774252e-06,44,NA,NA,NA,NA,1,0.659090909090909,"Sample Too
 Small to Test",2.32585697643347e-05,137,59.4717550956937,"3",7.62244994386985e-13,"Chi-squared test for given probabilities",1,0.518248175182482,"<0.01",7.21524974441039e-05,425,1,1.42588235294118,0,0,1.75135045567523,1.16340770791076
@@ -275,8 +275,9 @@ Small to Test",0.000147021324203751,866,139.478325970668,"3",4.89711902143328e-3
 "114","Def./Pur.","Average Number of Change Orders","2+ Year Dur.","100k - <1m",1.79956817154706e-05,106,NA,NA,NA,NA,1,0.273584905660377,"Sample Too
 Small to Test",0.000321885023891814,1896,33.0965175229133,"3",3.0731727593769e-07,"Chi-squared test for given probabilities",1,0.109177215189873,"<0.01",0.000441912825522359,2603,1,0.167499039569727,0,0,0.534194101566201,-0.387762131227894
 "115","Def./Pur.","Average Number of Change Orders","2+ Year Dur.","0 - <100k",6.28151154219257e-06,37,NA,NA,NA,NA,1,0.27027027027027,"Sample Too
-Small to Test",1.20537113377209e-05,71,9.5480356630516,NA,0.0474762618690655,"Chi-squared test for given probabilities with simulated p-value
-	 (based on 2000 replicates)",1,0.126760563380282,"<0.05",0.000867527675151461,5110,1,0.0743639921722113,0,0,-0.413350728419223,-0.724853228962818
+Small to Test",1.20537113377209e-05,71,9.5480356630516,NA,0.0514742628685657,"Chi-squared test for given probabilities with simulated p-value
+	 (based on 2000 replicates)",1,0.126760563380282,"Not Signif.
+(>0.05)",0.000867527675151461,5110,1,0.0743639921722113,0,0,-0.413350728419223,-0.724853228962818
 "116","Def./Pur.","Average Number of Change Orders","Population","75m+",6.79082328885684e-06,40,NA,NA,NA,NA,1,1.35,"Sample Too
 Small to Test",1.20537113377209e-05,71,26.2812023657094,"3",8.328042542744e-06,"Chi-squared test for given probabilities",1,0.802816901408451,"<0.01",3.98960868220339e-05,235,1,1.60425531914894,0,0,0.998282941396047,0.188337273443659
 "117","Def./Pur.","Average Number of Change Orders","Population","10m - <75m",3.73495280887126e-05,220,NA,NA,NA,NA,1,0.790909090909091,"Sample Too
@@ -289,7 +290,7 @@ Small to Test",0.00126750716686513,7466,17.9136515509233,"3",0.00045825881769944
 Small to Test",0.000433084755246845,2551,253.578855770442,NA,0.000499750124937531,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0862406899255194,"<0.01",0.324895565626347,1913733,1,0.0269290439157396,0,0,-0.687745495322492,-0.878627863678349
 "121","Def./Pur.","Ceiling Raising Change Orders %","2+ Year Dur.","75m+",2.20701756887847e-06,13,NA,NA,NA,NA,1,0.000384615384615385,"Sample Too
-Small to Test",3.73495280887126e-06,22,6.05347522847523,NA,0.0944527736131934,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",3.73495280887126e-06,22,6.05347522847523,NA,0.0939530234882559,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0137272727272727,"Not Signif.
 (>0.05)",1.85049934621349e-05,109,1,0.00992660550458716,0,0,-0.27686979767908,24.8091743119266
 "122","Def./Pur.","Ceiling Raising Change Orders %","2+ Year Dur.","10m - <75m",7.46990561774252e-06,44,NA,NA,NA,NA,1,0.0103181818181818,"Sample Too
@@ -299,7 +300,7 @@ Small to Test",0.000147021324203751,866,126.46278406355,"3",3.1280315284408e-27,
 "124","Def./Pur.","Ceiling Raising Change Orders %","2+ Year Dur.","100k - <1m",1.79956817154706e-05,106,NA,NA,NA,NA,1,0.00565094339622641,"Sample Too
 Small to Test",0.000321885023891814,1896,90.6120588656092,"3",1.618417065007e-19,"Chi-squared test for given probabilities",1,0.00197995780590717,"<0.01",0.000441912825522359,2603,1,0.00281790242028429,0,0,0.423213369435009,-0.501339471535668
 "125","Def./Pur.","Ceiling Raising Change Orders %","2+ Year Dur.","0 - <100k",6.28151154219257e-06,37,NA,NA,NA,NA,1,0.0122162162162162,"Sample Too
-Small to Test",1.20537113377209e-05,71,0.881400893470621,NA,0.87456271864068,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",1.20537113377209e-05,71,0.881400893470621,NA,0.878060969515242,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.00422535211267606,"Not Signif.
 (>0.05)",0.000867527675151461,5110,1,0.00234324853228963,0,0,-0.445431180691455,-0.808185407755052
 "126","Def./Pur.","Ceiling Raising Change Orders %","Population","75m+",6.79082328885684e-06,40,NA,NA,NA,NA,1,0.000225,"Sample Too
@@ -313,7 +314,7 @@ Small to Test",0.00126750716686513,7466,179.124158252681,"3",1.36334242960961e-3
 "130","Def./Pur.","Ceiling Raising Change Orders %","Population","0 - <100k",0.000161451823692571,951,NA,NA,NA,NA,1,0.00931335436382755,"Sample Too
 Small to Test",0.000433084755246845,2551,151.064984688692,"3",1.55247353864957e-32,"Chi-squared test for given probabilities",1,0.00357938063504508,"<0.01",0.324895565626346,1913733,1,0.000880647927375449,0,0,-0.753966393304701,-0.90544245467607
 "131","Other IDV","Terminated","2+ Year Dur.","75m+",1.69770582221421e-07,1,NA,NA,NA,NA,0.1,NA,"Sample Too
-Small to Test",0,0,1.36363636363636,NA,0.384807596201899,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",0,0,1.36363636363636,NA,0.393303348325837,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0,NA,"Not Signif.
 (>0.05)",5.09311746664263e-07,3,0.0833333333333333,NA,Inf,-0.166666666666667,NA,NA
 "132","Other IDV","Terminated","2+ Year Dur.","10m - <75m",1.69770582221421e-07,1,NA,NA,NA,NA,0.024390243902439,NA,"Sample Too
@@ -323,7 +324,7 @@ Small to Test",6.79082328885684e-07,4,30.6290428525723,"1",3.12382552817811e-08,
 "134","Other IDV","Terminated","2+ Year Dur.","100k - <1m",0,0,NA,NA,NA,NA,0,NA,"Sample Too
 Small to Test",6.79082328885684e-07,4,11.5676587993846,"1",0.000671088615411947,"Chi-squared test for given probabilities",0.0150375939849624,NA,"<0.01",1.37514171599351e-05,81,0.0672757475083056,NA,3.47383720930232,Inf,NA,NA
 "135","Other IDV","Terminated","2+ Year Dur.","0 - <100k",0,0,NA,NA,NA,NA,0,NA,"Sample Too
-Small to Test",0,0,1.89505247376312,NA,0.273863068465767,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",0,0,1.89505247376312,NA,0.270364817591204,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0,NA,"Not Signif.
 (>0.05)",1.34118759954923e-05,79,0.0379807692307692,NA,Inf,Inf,NA,NA
 "136","Other IDV","Terminated","Population","75m+",1.69770582221421e-07,1,NA,NA,NA,NA,0.027027027027027,NA,"Sample Too
@@ -337,7 +338,7 @@ Small to Test",9.16761143995673e-06,54,124.951839181324,"1",5.21450215889963e-29
 "140","Other IDV","Terminated","Population","0 - <100k",8.48852911107105e-07,5,NA,NA,NA,NA,0.0013262599469496,NA,"Sample Too
 Small to Test",3.56518222664984e-06,21,401.594036005249,"1",2.47704990990493e-89,"Chi-squared test for given probabilities",0.000472972972972973,NA,"<0.01",0.000899614315191309,5299,0.00987885860871964,NA,19.8867296298644,6.44865939097462,NA,NA
 "141","Other IDV","Average Number of Offers for Competed Contracts","2+ Year Dur.","75m+",1.69770582221421e-06,10,NA,NA,NA,NA,1,3.05,"Sample Too
-Small to Test",2.54655873332131e-06,15,11.4717948717949,NA,0.0079960019990005,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",2.54655873332131e-06,15,11.4717948717949,NA,0.00899550224887556,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,2.36666666666667,"<0.01",4.92334688442121e-06,29,1,3.36206896551724,0,0,0.420592520641086,0.10231769361221
 "142","Other IDV","Average Number of Offers for Competed Contracts","2+ Year Dur.","10m - <75m",5.60242921330689e-06,33,NA,NA,NA,NA,1,2.36363636363636,"Sample Too
 Small to Test",2.4616734422106e-05,145,168.718235243281,"3",2.40643076026407e-36,"Chi-squared test for given probabilities",1,2.26206896551724,"<0.01",2.88609989776416e-05,170,1,3.33823529411765,0,0,0.475744261119084,0.412330316742085
@@ -358,8 +359,8 @@ Small to Test",0.00143099623754436,8429,1774.65728667375,"3",0,"Chi-squared test
 "150","Other IDV","Average Number of Offers for Competed Contracts","Population","0 - <100k",0.000592159790788316,3488,NA,NA,NA,NA,1,2.00917431192661,"Sample Too
 Small to Test",0.00682562625821223,40205,97914.0294033343,"3",0,"Chi-squared test for given probabilities",1,2.12020892923766,"<0.01",0.0746742696724209,439854,1,2.54485692979943,0,0,0.200285922158839,0.266618289260901
 "151","Other IDV","% Single Offer Competition","2+ Year Dur.","75m+",5.09311746664263e-07,3,NA,NA,NA,NA,0.3,NA,"Sample Too
-Small to Test",8.48852911107105e-07,5,11.4717948717949,NA,0.00999500249875063,"Chi-squared test for given probabilities with simulated p-value
-	 (based on 2000 replicates)",0.333333333333333,NA,"<0.01",6.79082328885684e-07,4,0.137931034482759,NA,-0.586206896551723,-0.54022988505747,NA,NA
+Small to Test",8.48852911107105e-07,5,11.4717948717949,NA,0.0134932533733133,"Chi-squared test for given probabilities with simulated p-value
+	 (based on 2000 replicates)",0.333333333333333,NA,"<0.05",6.79082328885684e-07,4,0.137931034482759,NA,-0.586206896551723,-0.54022988505747,NA,NA
 "152","Other IDV","% Single Offer Competition","2+ Year Dur.","10m - <75m",1.52793523999279e-06,9,NA,NA,NA,NA,0.272727272727273,NA,"Sample Too
 Small to Test",1.13746290088352e-05,67,168.718235243281,"3",2.40643076026407e-36,"Chi-squared test for given probabilities",0.462068965517241,NA,"<0.01",3.39541164442842e-06,20,0.117647058823529,NA,-0.74539069359087,-0.568627450980394,NA,NA
 "153","Other IDV","% Single Offer Competition","2+ Year Dur.","1m - <10m",5.43265863108547e-06,32,NA,NA,NA,NA,0.336842105263158,NA,"Sample Too
@@ -379,7 +380,7 @@ Small to Test",0.000496918494162099,2927,1774.65728667375,"3",0,"Chi-squared tes
 "160","Other IDV","% Single Offer Competition","Population","0 - <100k",8.2678273541832e-05,487,NA,NA,NA,NA,0.139621559633028,NA,"Sample Too
 Small to Test",0.000307624294985215,1812,97914.0294033343,"3",0,"Chi-squared test for given probabilities",0.0450690212660117,NA,"<0.01",0.024037816736731,141590,0.321902267570603,NA,6.1424286245453,1.30553410531059,NA,NA
 "161","Other IDV","Average Number of Change Orders","2+ Year Dur.","75m+",1.69770582221421e-06,10,NA,NA,NA,NA,1,1.3,"Sample Too
-Small to Test",2.54655873332131e-06,15,8.07087719298246,NA,0.0499750124937531,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",2.54655873332131e-06,15,8.07087719298246,NA,0.0379810094952524,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,1.13333333333333,"<0.05",6.11174095997115e-06,36,1,0.777777777777778,0,0,-0.313725490196076,-0.401709401709402
 "162","Other IDV","Average Number of Change Orders","2+ Year Dur.","10m - <75m",6.96059387107826e-06,41,NA,NA,NA,NA,1,0.975609756097561,"Sample Too
 Small to Test",2.5805128497656e-05,152,22.8594348659004,"3",4.32010357542883e-05,"Chi-squared test for given probabilities",1,0.394736842105263,"<0.01",3.5482051684277e-05,209,1,0.856459330143541,0,0,1.16969696969697,-0.12212918660287
@@ -389,7 +390,7 @@ Small to Test",6.62105270663541e-05,390,18.3548411478812,"3",0.00037160972825924
 Small to Test",4.5158974870898e-05,266,6.66945826865736,"3",0.0832137846958289,"Chi-squared test for given probabilities",1,0.278195488721805,"Not Signif.
 (>0.05)",0.000204403780994591,1204,1,0.246677740863787,0,0,-0.113293526084227,-0.494897959183674
 "165","Other IDV","Average Number of Change Orders","2+ Year Dur.","0 - <100k",1.35816465777137e-06,8,NA,NA,NA,NA,1,0.375,"Sample Too
-Small to Test",8.1489879466282e-06,48,15.5395469080088,NA,0.0154922538730635,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",8.1489879466282e-06,48,15.5395469080088,NA,0.0174912543728136,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.270833333333333,"<0.05",0.000353122811020555,2080,1,0.0841346153846154,0,0,-0.689349112426035,-0.775641025641026
 "166","Other IDV","Average Number of Change Orders","Population","75m+",6.28151154219257e-06,37,NA,NA,NA,NA,1,0.837837837837838,"Sample Too
 Small to Test",9.93157905995312e-05,585,326.234178187404,"3",2.08534666139834e-70,"Chi-squared test for given probabilities",1,0.176068376068376,"<0.01",3.78588398353769e-05,223,1,0.914798206278027,0,0,4.19569855021986,0.091855923622161
@@ -425,7 +426,7 @@ Small to Test",0.00183691769963577,10820,193.285947414286,"3",1.19058313127187e-
 "180","Other IDV","Ceiling Raising Change Orders %","Population","0 - <100k",0.000640035094974757,3770,NA,NA,NA,NA,1,0.00187055702917772,"Sample Too
 Small to Test",0.00753781385063109,44400,834.133477325025,"3",1.71117478155457e-180,"Chi-squared test for given probabilities",1,0.000428265765765766,"<0.01",0.0910646007624057,536398,1,0.00127288692351575,0,0,1.97218929287927,-0.319514506288376
 "181","Single-Award IDV","Terminated","2+ Year Dur.","75m+",1.69770582221421e-07,1,NA,NA,NA,NA,0.1,NA,"Sample Too
-Small to Test",0,0,2.05940594059406,NA,0.257871064467766,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",0,0,2.05940594059406,NA,0.247876061969015,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0,NA,"Not Signif.
 (>0.05)",2.20701756887847e-06,13,0.114035087719298,NA,Inf,0.14035087719298,NA,NA
 "182","Single-Award IDV","Terminated","2+ Year Dur.","10m - <75m",0,0,NA,NA,NA,NA,0,NA,"Sample Too
@@ -448,7 +449,7 @@ Small to Test",1.9353846373242e-05,114,165.520578401714,"1",7.04031077819019e-38
 "190","Single-Award IDV","Terminated","Population","0 - <100k",5.77219979552831e-06,34,NA,NA,NA,NA,0.00109868803722614,NA,"Sample Too
 Small to Test",2.30887991821132e-05,136,44.6166235390128,"1",2.39648251568853e-11,"Chi-squared test for given probabilities",0.00180412029237361,NA,"<0.01",0.00138821405082456,8177,0.00317216224929075,NA,0.758287550281507,1.88722744019268,NA,NA
 "191","Single-Award IDV","Average Number of Offers for Competed Contracts","2+ Year Dur.","75m+",8.48852911107105e-07,5,NA,NA,NA,NA,1,3.3,"Sample Too
-Small to Test",1.52793523999279e-06,9,19.4271284271284,NA,0.00149925037481259,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",1.52793523999279e-06,9,19.4271284271284,NA,0.000499750124937531,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,2.11111111111111,"<0.01",1.01862349332853e-05,60,1,3.85833333333333,0,0,0.827631578947368,0.169191919191918
 "192","Single-Award IDV","Average Number of Offers for Competed Contracts","2+ Year Dur.","10m - <75m",2.54655873332131e-06,15,NA,NA,NA,NA,1,3.46666666666667,"Sample Too
 Small to Test",4.80450747686621e-05,283,351.833603373941,"3",5.97917999698057e-76,"Chi-squared test for given probabilities",1,1.8904593639576,"<0.01",5.3647503981969e-05,316,1,3.41455696202532,0,0,0.806204897669466,-0.0150316455696201
@@ -471,7 +472,7 @@ Small to Test",0.00471503838003552,27773,8305.27763167212,"3",0,"Chi-squared tes
 "200","Single-Award IDV","Average Number of Offers for Competed Contracts","Population","0 - <100k",0.00387891826259503,22848,NA,NA,NA,NA,1,3.07250087535014,"Sample Too
 Small to Test",0.00851586217480869,50161,5690.08977669349,"3",0,"Chi-squared test for given probabilities",1,3.69832140507566,"<0.01",0.372223359685123,2192508,1,3.60695331556373,0,0,-0.0247052864000772,0.173947042456964
 "201","Single-Award IDV","% Single Offer Competition","2+ Year Dur.","75m+",1.69770582221421e-07,1,NA,NA,NA,NA,0.2,NA,"Sample Too
-Small to Test",8.48852911107105e-07,5,19.4271284271284,NA,0.000999500249875062,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",8.48852911107105e-07,5,19.4271284271284,NA,0.000499750124937531,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0.555555555555556,NA,"<0.01",1.18839407554995e-06,7,0.116666666666667,NA,-0.789999999999999,-0.416666666666665,NA,NA
 "202","Single-Award IDV","% Single Offer Competition","2+ Year Dur.","10m - <75m",3.39541164442842e-07,2,NA,NA,NA,NA,0.133333333333333,NA,"Sample Too
 Small to Test",1.64677464754778e-05,97,351.833603373941,"3",5.97917999698057e-76,"Chi-squared test for given probabilities",0.342756183745583,NA,"<0.01",1.01862349332853e-05,60,0.189873417721519,NA,-0.446039410152682,0.424050632911396,NA,NA
@@ -494,7 +495,7 @@ Small to Test",0.00138057437462459,8132,8305.27763167212,"3",0,"Chi-squared test
 "210","Single-Award IDV","% Single Offer Competition","Population","0 - <100k",0.000155509853314822,916,NA,NA,NA,NA,0.0400910364145658,NA,"Sample Too
 Small to Test",0.00119891985164767,7062,5690.08977669349,"3",0,"Chi-squared test for given probabilities",0.140786666932477,NA,"<0.01",0.0361242937968206,212783,0.0970500449713296,NA,-0.310658835201518,1.420741733084,NA,NA
 "211","Single-Award IDV","Average Number of Change Orders","2+ Year Dur.","75m+",1.69770582221421e-06,10,NA,NA,NA,NA,1,1.3,"Sample Too
-Small to Test",2.71632931554273e-06,16,1.48518907563025,NA,0.730134932533733,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",2.71632931554273e-06,16,1.48518907563025,NA,0.729135432283858,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.6875,"Not Signif.
 (>0.05)",1.9353846373242e-05,114,1,0.780701754385965,0,0,0.135566188197767,-0.399460188933873
 "212","Single-Award IDV","Average Number of Change Orders","2+ Year Dur.","10m - <75m",8.1489879466282e-06,48,NA,NA,NA,NA,1,0.8125,"Sample Too
@@ -504,7 +505,7 @@ Small to Test",0.000194557087225748,1146,39.2415886253429,"3",1.54270480003238e-
 "214","Single-Award IDV","Average Number of Change Orders","2+ Year Dur.","100k - <1m",1.6128205311035e-05,95,NA,NA,NA,NA,1,0.231578947368421,"Sample Too
 Small to Test",0.000180635899483592,1064,10.2042355297073,"3",0.0169075034014326,"Chi-squared test for given probabilities",1,0.130639097744361,"<0.05",0.00088535358628471,5215,1,0.137104506232023,0,0,0.0494906088551969,-0.407957813998082
 "215","Single-Award IDV","Average Number of Change Orders","2+ Year Dur.","0 - <100k",9.67692318662099e-06,57,NA,NA,NA,NA,1,0.175438596491228,"Sample Too
-Small to Test",4.77055336042193e-05,281,0.836094968495006,NA,0.87656171914043,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",4.77055336042193e-05,281,0.836094968495006,NA,0.868565717141429,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0854092526690391,"Not Signif.
 (>0.05)",0.00195745481301298,11530,1,0.0840416305290546,0,0,-0.0160125758889853,-0.520962705984389
 "216","Single-Award IDV","Average Number of Change Orders","Population","75m+",7.97921736440678e-06,47,NA,NA,NA,NA,1,1.04255319148936,"Sample Too
@@ -519,7 +520,7 @@ Small to Test",0.0069466726833361,40918,251.932153450854,"3",2.49990519372348e-5
 "220","Single-Award IDV","Average Number of Change Orders","Population","0 - <100k",0.00525372043742409,30946,NA,NA,NA,NA,1,0.0172558650552575,"Sample Too
 Small to Test",0.0127978157995974,75383,430.380272266146,"3",5.80741895841851e-93,"Chi-squared test for given probabilities",1,0.0377406046456098,"<0.01",0.437623911303699,2577737,1,0.0238430064820422,0,0,-0.368239944591991,0.38173348051176
 "221","Single-Award IDV","Ceiling Raising Change Orders %","2+ Year Dur.","75m+",1.69770582221421e-06,10,NA,NA,NA,NA,1,0.0151,"Sample Too
-Small to Test",2.71632931554273e-06,16,2.42672413793103,NA,0.505247376311844,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",2.71632931554273e-06,16,2.42672413793103,NA,0.471764117941029,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.000125,"Not Signif.
 (>0.05)",1.9353846373242e-05,114,1,0.00659649122807018,0,0,51.7719298245614,-0.563146276286743
 "222","Single-Award IDV","Ceiling Raising Change Orders %","2+ Year Dur.","10m - <75m",8.1489879466282e-06,48,NA,NA,NA,NA,1,0.0124791666666667,"Sample Too
@@ -529,8 +530,8 @@ Small to Test",0.000194557087225748,1146,26.6389296501379,"3",7.00808043712111e-
 "224","Single-Award IDV","Ceiling Raising Change Orders %","2+ Year Dur.","100k - <1m",1.6128205311035e-05,95,NA,NA,NA,NA,1,0.00632631578947368,"Sample Too
 Small to Test",0.000180635899483592,1064,36.4534050720818,"3",6.00497128358009e-08,"Chi-squared test for given probabilities",1,0.00380639097744361,"<0.01",0.00088535358628471,5215,1,0.00204161073825503,0,0,-0.463636092468308,-0.677282828395627
 "225","Single-Award IDV","Ceiling Raising Change Orders %","2+ Year Dur.","0 - <100k",9.67692318662099e-06,57,NA,NA,NA,NA,1,0.0105087719298246,"Sample Too
-Small to Test",4.77055336042193e-05,281,13.2275378547214,NA,0.00999500249875063,"Chi-squared test for given probabilities with simulated p-value
-	 (based on 2000 replicates)",1,0.0031779359430605,"<0.01",0.00195745481301298,11530,1,0.000973547267996531,0,0,-0.693654219141069,-0.907358607219028
+Small to Test",4.77055336042193e-05,281,13.2275378547214,NA,0.0114942528735632,"Chi-squared test for given probabilities with simulated p-value
+	 (based on 2000 replicates)",1,0.0031779359430605,"<0.05",0.00195745481301298,11530,1,0.000973547267996531,0,0,-0.693654219141069,-0.907358607219028
 "226","Single-Award IDV","Ceiling Raising Change Orders %","Population","75m+",7.97921736440678e-06,47,NA,NA,NA,NA,1,0.0128936170212766,"Sample Too
 Small to Test",2.85214578131987e-05,168,10.776795005843,"3",0.0129961353543022,"Chi-squared test for given probabilities",1,0.00536904761904762,"<0.05",0.000195745481301298,1153,1,0.00616305290546401,0,0,0.147885685274893,-0.522007447926059
 "227","Single-Award IDV","Ceiling Raising Change Orders %","Population","10m - <75m",7.33408915196538e-05,432,NA,NA,NA,NA,1,0.0104513888888889,"Sample Too
@@ -656,7 +657,7 @@ Small to Test",0.00216236790575424,12737,3174.81734181883,"3",0,"Chi-squared tes
 "310","Not UCA","% Single Offer Competition","Population","0 - <100k",0.000272991096212045,1608,NA,NA,NA,NA,0.060076216095046,NA,"Sample Too
 Small to Test",0.00151961648146394,8951,54804.3202221668,"3",0,"Chi-squared test for given probabilities",0.0982471160284061,NA,"<0.01",0.129143463272342,760694,0.186998085509955,NA,0.903344271763544,2.11268081888026,NA,NA
 "311","Not UCA","Average Number of Change Orders","2+ Year Dur.","75m+",5.26288804886405e-06,31,NA,NA,NA,NA,1,1.51612903225806,"Sample Too
-Small to Test",8.99784085773531e-06,53,2.22264560887806,NA,0.529735132433783,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",8.99784085773531e-06,53,2.22264560887806,NA,0.510744627686157,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.924528301886792,"Not Signif.
 (>0.05)",4.1933333808691e-05,247,1,1.17813765182186,0,0,0.2743121540114,-0.222930484968558
 "312","Not UCA","Average Number of Change Orders","2+ Year Dur.","10m - <75m",2.1391093359899e-05,126,NA,NA,NA,NA,1,0.841269841269841,"Sample Too
@@ -666,7 +667,7 @@ Small to Test",0.000401337656371439,2364,131.314566671988,"3",2.81689703316874e-
 "314","Not UCA","Average Number of Change Orders","2+ Year Dur.","100k - <1m",4.10844808975839e-05,242,NA,NA,NA,NA,1,0.297520661157025,"Sample Too
 Small to Test",0.000542756551361883,3197,14.8070989815023,"3",0.00198914128939443,"Chi-squared test for given probabilities",1,0.128245229903034,"<0.01",0.0015011114880018,8842,1,0.160257860212622,0,0,0.249620436828666,-0.461355525396465
 "315","Not UCA","Average Number of Change Orders","2+ Year Dur.","0 - <100k",1.73165993865849e-05,102,NA,NA,NA,NA,1,0.225490196078431,"Sample Too
-Small to Test",6.14569507641544e-05,362,7.39479105957139,NA,0.0624687656171914,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",6.14569507641544e-05,362,7.39479105957139,NA,0.0649675162418791,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.121546961325967,"Not Signif.
 (>0.05)",0.00308558033187432,18175,1,0.0830261348005502,0,0,-0.316921345504565,-0.631797141319299
 "316","Not UCA","Average Number of Change Orders","Population","75m+",1.88445346265777e-05,111,NA,NA,NA,NA,1,1.07207207207207,"Sample Too
@@ -680,7 +681,7 @@ Small to Test",0.00982343519907808,57863,8.68935922332525,"3",0.0337192574670318
 "320","Not UCA","Average Number of Change Orders","Population","0 - <100k",0.0060336464921493,35540,NA,NA,NA,NA,1,0.0247889701744513,"Sample Too
 Small to Test",0.0205846830943473,121250,162.031634626079,"3",6.67841628757009e-35,"Chi-squared test for given probabilities",1,0.0279505154639175,"<0.01",0.84986440423598,5005958,1,0.0267199604950741,0,0,-0.0440261994606853,0.0778971577695055
 "321","Not UCA","Ceiling Raising Change Orders %","2+ Year Dur.","75m+",5.26288804886405e-06,31,NA,NA,NA,NA,1,0.00493548387096774,"Sample Too
-Small to Test",8.99784085773531e-06,53,6.66256547830952,NA,0.0904547726136932,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",8.99784085773531e-06,53,6.66256547830952,NA,0.0779610194902549,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0113584905660377,"Not Signif.
 (>0.05)",4.1933333808691e-05,247,1,0.0074331983805668,0,0,-0.345582202375346,0.506072874493927
 "322","Not UCA","Ceiling Raising Change Orders %","2+ Year Dur.","10m - <75m",2.1391093359899e-05,126,NA,NA,NA,NA,1,0.0131507936507936,"Sample Too
@@ -690,7 +691,7 @@ Small to Test",0.000401337656371439,2364,136.62874668241,"3",2.01511664586952e-2
 "324","Not UCA","Ceiling Raising Change Orders %","2+ Year Dur.","100k - <1m",4.10844808975839e-05,242,NA,NA,NA,NA,1,0.00680165289256198,"Sample Too
 Small to Test",0.000542756551361883,3197,120.16931114711,"3",7.09532740182911e-26,"Chi-squared test for given probabilities",1,0.00304942133249922,"<0.01",0.0015011114880018,8842,1,0.00283114679936666,0,0,-0.0715790011718939,-0.583756059874403
 "325","Not UCA","Ceiling Raising Change Orders %","2+ Year Dur.","0 - <100k",1.73165993865849e-05,102,NA,NA,NA,NA,1,0.0117745098039216,"Sample Too
-Small to Test",6.14569507641544e-05,362,25.4107819489441,NA,0.000999500249875062,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",6.14569507641544e-05,362,25.4107819489441,NA,0.000499750124937531,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.00537292817679558,"<0.01",0.00308558033187432,18175,1,0.00150613480055021,0,0,-0.719680823753637,-0.872085137671839
 "326","Not UCA","Ceiling Raising Change Orders %","Population","75m+",1.88445346265777e-05,111,NA,NA,NA,NA,1,0.00556756756756757,"Sample Too
 Small to Test",0.000138193253928237,814,152.617913459466,"3",7.17797874980116e-33,"Chi-squared test for given probabilities",1,0.0025970515970516,"<0.01",0.000266539814087631,1570,1,0.00707070063694267,0,0,1.72258766247461,0.269980211489702
@@ -709,7 +710,7 @@ Small to Test",0,0,NA,NA,NA,"Chi-squared test for given probabilities with simul
 	 (based on 2000 replicates)",0,NA,"Sample Too
 Small to Test",0,0,0,NA,NA,NA,NA,NA
 "333","UCA","Terminated","2+ Year Dur.","1m - <10m",0,0,NA,NA,NA,NA,0,NA,"Sample Too
-Small to Test",0,0,1.16326530612245,NA,0.43728135932034,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",0,0,1.16326530612245,NA,0.420789605197401,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0,NA,"Not Signif.
 (>0.05)",5.09311746664263e-07,3,0.0297029702970297,NA,Inf,Inf,NA,NA
 "334","UCA","Terminated","2+ Year Dur.","100k - <1m",0,0,NA,NA,NA,NA,0,NA,"Sample Too
@@ -734,15 +735,15 @@ Small to Test",5.09311746664263e-07,3,26.2379193300621,"1",3.01837100966556e-07,
 "340","UCA","Terminated","Population","0 - <100k",0,0,NA,NA,NA,NA,0,NA,"Sample Too
 Small to Test",5.09311746664263e-07,3,67.2741615438394,"1",2.36257559438979e-16,"Chi-squared test for given probabilities",0.00276752767527675,NA,"<0.01",0.000236320650452218,1392,0.0635326335006846,NA,21.9564582382474,Inf,NA,NA
 "341","UCA","Average Number of Offers for Competed Contracts","2+ Year Dur.","75m+",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,1.69770582221421e-07,1,1,1,NA,NA,NA,NA
-"342","UCA","Average Number of Offers for Competed Contracts","2+ Year Dur.","10m - <75m",NA,NA,NA,NA,NA,NA,NA,NA,NA,1.35816465777137e-06,8,7.33333333333333,NA,0.056471764117941,"Chi-squared test for given probabilities with simulated p-value
+"342","UCA","Average Number of Offers for Competed Contracts","2+ Year Dur.","10m - <75m",NA,NA,NA,NA,NA,NA,NA,NA,NA,1.35816465777137e-06,8,7.33333333333333,NA,0.0569715142428786,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,2.0625,"Not Signif.
 (>0.05)",3.90472339109268e-06,23,1,3.41304347826087,0,NA,0.654808959156785,NA
 "343","UCA","Average Number of Offers for Competed Contracts","2+ Year Dur.","1m - <10m",3.39541164442842e-07,2,NA,NA,NA,NA,1,2.75,"Sample Too
 Small to Test",3.73495280887126e-06,22,49.2012987012987,NA,0.000499750124937531,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,1.95454545454545,"<0.01",5.77219979552831e-06,34,1,3.60294117647059,0,0,0.843365253077981,0.310160427807487
-"344","UCA","Average Number of Offers for Competed Contracts","2+ Year Dur.","100k - <1m",NA,NA,NA,NA,NA,NA,NA,NA,NA,2.71632931554273e-06,16,10.28125,NA,0.0164917541229385,"Chi-squared test for given probabilities with simulated p-value
+"344","UCA","Average Number of Offers for Competed Contracts","2+ Year Dur.","100k - <1m",NA,NA,NA,NA,NA,NA,NA,NA,NA,2.71632931554273e-06,16,10.28125,NA,0.0119940029985007,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,2.625,"<0.05",5.09311746664263e-06,30,1,3.76666666666667,0,NA,0.434920634920636,NA
-"345","UCA","Average Number of Offers for Competed Contracts","2+ Year Dur.","0 - <100k",NA,NA,NA,NA,NA,NA,NA,NA,NA,1.69770582221421e-07,1,12.1,NA,0.0794602698650675,"Chi-squared test for given probabilities with simulated p-value
+"345","UCA","Average Number of Offers for Competed Contracts","2+ Year Dur.","0 - <100k",NA,NA,NA,NA,NA,NA,NA,NA,NA,1.69770582221421e-07,1,12.1,NA,0.0839580209895052,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,5,"Not Signif.
 (>0.05)",2.22399462710061e-05,131,1,1.83587786259542,0,NA,-0.632824427480916,NA
 "346","UCA","Average Number of Offers for Competed Contracts","Population","75m+",6.79082328885684e-07,4,NA,NA,NA,NA,1,3.875,"Sample Too
@@ -758,15 +759,14 @@ Small to Test",0.000156358706225929,921,953.566023487763,"3",2.12735078699656e-2
 "350","UCA","Average Number of Offers for Competed Contracts","Population","0 - <100k",9.50715260439957e-06,56,NA,NA,NA,NA,1,2.5,"Sample Too
 Small to Test",0.000110690419608366,652,479.142028183959,"3",1.58017916233059e-103,"Chi-squared test for given probabilities",1,1.45475460122699,"<0.01",0.00136597410455355,8046,1,2.65902311707681,0,0,0.827815574416536,0.063609246830724
 "351","UCA","% Single Offer Competition","2+ Year Dur.","75m+",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,1.69770582221421e-07,1,1,NA,NA,NA,NA,NA
-"352","UCA","% Single Offer Competition","2+ Year Dur.","10m - <75m",NA,NA,NA,NA,NA,NA,NA,NA,NA,6.79082328885684e-07,4,7.33333333333333,NA,0.0504747626186907,"Chi-squared test for given probabilities with simulated p-value
-	 (based on 2000 replicates)",0.5,NA,"Not Signif.
-(>0.05)",8.48852911107105e-07,5,0.217391304347826,NA,-0.565217391304348,NA,NA,NA
+"352","UCA","% Single Offer Competition","2+ Year Dur.","10m - <75m",NA,NA,NA,NA,NA,NA,NA,NA,NA,6.79082328885684e-07,4,7.33333333333333,NA,0.0464767616191904,"Chi-squared test for given probabilities with simulated p-value
+	 (based on 2000 replicates)",0.5,NA,"<0.05",8.48852911107105e-07,5,0.217391304347826,NA,-0.565217391304348,NA,NA,NA
 "353","UCA","% Single Offer Competition","2+ Year Dur.","1m - <10m",0,0,NA,NA,NA,NA,0,NA,"Sample Too
 Small to Test",2.20701756887847e-06,13,49.2012987012987,NA,0.000499750124937531,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0.590909090909091,NA,"<0.01",6.79082328885684e-07,4,0.117647058823529,NA,-0.800904977375566,Inf,NA,NA
-"354","UCA","% Single Offer Competition","2+ Year Dur.","100k - <1m",NA,NA,NA,NA,NA,NA,NA,NA,NA,8.48852911107105e-07,5,10.28125,NA,0.0154922538730635,"Chi-squared test for given probabilities with simulated p-value
+"354","UCA","% Single Offer Competition","2+ Year Dur.","100k - <1m",NA,NA,NA,NA,NA,NA,NA,NA,NA,8.48852911107105e-07,5,10.28125,NA,0.0174912543728136,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0.3125,NA,"<0.05",6.79082328885684e-07,4,0.133333333333333,NA,-0.573333333333334,NA,NA,NA
-"355","UCA","% Single Offer Competition","2+ Year Dur.","0 - <100k",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,0,12.1,NA,0.0754622688655672,"Chi-squared test for given probabilities with simulated p-value
+"355","UCA","% Single Offer Competition","2+ Year Dur.","0 - <100k",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,0,12.1,NA,0.0809595202398801,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0,NA,"Not Signif.
 (>0.05)",1.40909583243779e-05,83,0.633587786259542,NA,Inf,NA,NA,NA
 "356","UCA","% Single Offer Competition","Population","75m+",0,0,NA,NA,NA,NA,0,NA,"Sample Too
@@ -784,21 +784,21 @@ Small to Test",8.40364381996033e-05,495,479.142028183959,"3",1.58017916233059e-1
 "361","UCA","Average Number of Change Orders","2+ Year Dur.","75m+",3.39541164442842e-07,2,NA,NA,NA,NA,1,1.5,"Sample Too
 Small to Test",NA,NA,NA,NA,NA,NA,NA,NA,NA,2.03724698665705e-06,12,1,0.416666666666667,NA,0,NA,-0.722222222222222
 "362","UCA","Average Number of Change Orders","2+ Year Dur.","10m - <75m",1.18839407554995e-06,7,NA,NA,NA,NA,1,0.285714285714286,"Sample Too
-Small to Test",2.20701756887847e-06,13,6.37809487809488,NA,0.0984507746126937,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",2.20701756887847e-06,13,6.37809487809488,NA,0.0964517741129435,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.846153846153846,"Not Signif.
 (>0.05)",9.84669376884241e-06,58,1,0.603448275862069,0,0,-0.286833855799373,1.11206896551724
 "363","UCA","Average Number of Change Orders","2+ Year Dur.","1m - <10m",6.79082328885684e-07,4,NA,NA,NA,NA,1,1.75,"Sample Too
-Small to Test",6.45128212441399e-06,38,3.65589412126808,NA,0.288855572213893,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",6.45128212441399e-06,38,3.65589412126808,NA,0.289355322338831,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.5,"Not Signif.
 (>0.05)",1.71468288043635e-05,101,1,0.465346534653465,0,0,-0.06930693069307,-0.734087694483734
 "364","UCA","Average Number of Change Orders","2+ Year Dur.","100k - <1m",3.39541164442842e-07,2,NA,NA,NA,NA,1,0,"Sample Too
-Small to Test",4.92334688442121e-06,29,14.3364746198329,NA,0.0079960019990005,"Chi-squared test for given probabilities with simulated p-value
-	 (based on 2000 replicates)",1,0.344827586206897,"<0.01",3.05587047998558e-05,180,1,0.172222222222222,0,0,-0.500555555555557,Inf
-"365","UCA","Average Number of Change Orders","2+ Year Dur.","0 - <100k",NA,NA,NA,NA,NA,NA,NA,NA,NA,6.45128212441399e-06,38,3.97885866351271,NA,0.251374312843578,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",4.92334688442121e-06,29,14.3364746198329,NA,0.0214892553723138,"Chi-squared test for given probabilities with simulated p-value
+	 (based on 2000 replicates)",1,0.344827586206897,"<0.05",3.05587047998558e-05,180,1,0.172222222222222,0,0,-0.500555555555557,Inf
+"365","UCA","Average Number of Change Orders","2+ Year Dur.","0 - <100k",NA,NA,NA,NA,NA,NA,NA,NA,NA,6.45128212441399e-06,38,3.97885866351271,NA,0.258870564717641,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0526315789473684,"Not Signif.
 (>0.05)",9.25249673106744e-05,545,1,0.0275229357798165,0,NA,-0.477064220183486,NA
 "366","UCA","Average Number of Change Orders","Population","75m+",2.20701756887847e-06,13,NA,NA,NA,NA,1,1.15384615384615,"Sample Too
-Small to Test",1.69770582221421e-06,10,1.42409090909091,NA,0.766116941529235,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",1.69770582221421e-06,10,1.42409090909091,NA,0.768115942028985,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,1.1,"Not Signif.
 (>0.05)",6.96059387107826e-06,41,1,1.04878048780488,0,0,-0.0465631929046545,-0.0910569105691009
 "367","UCA","Average Number of Change Orders","Population","10m - <75m",7.13036445329968e-06,42,NA,NA,NA,NA,1,0.857142857142857,"Sample Too
@@ -814,26 +814,26 @@ Small to Test",0.00018403131112802,1084,455.868555242639,NA,0.000499750124937531
 "371","UCA","Ceiling Raising Change Orders %","2+ Year Dur.","75m+",3.39541164442842e-07,2,NA,NA,NA,NA,1,5e-04,"Sample Too
 Small to Test",NA,NA,NA,NA,NA,NA,NA,NA,NA,2.03724698665705e-06,12,1,0,NA,0,NA,-1
 "372","UCA","Ceiling Raising Change Orders %","2+ Year Dur.","10m - <75m",1.18839407554995e-06,7,NA,NA,NA,NA,1,0.000285714285714286,"Sample Too
-Small to Test",2.20701756887847e-06,13,2.11080586080586,NA,0.531234382808596,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",2.20701756887847e-06,13,2.11080586080586,NA,0.519240379810095,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0117692307692308,"Not Signif.
 (>0.05)",9.84669376884241e-06,58,1,0.00781034482758621,0,0,-0.336375929682219,26.3362068965517
 "373","UCA","Ceiling Raising Change Orders %","2+ Year Dur.","1m - <10m",6.79082328885684e-07,4,NA,NA,NA,NA,1,0.038,"Sample Too
-Small to Test",6.45128212441399e-06,38,1.83114569961489,NA,0.591204397801099,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",6.45128212441399e-06,38,1.83114569961489,NA,0.59320339830085,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.00784210526315789,"Not Signif.
 (>0.05)",1.71468288043635e-05,101,1,0.0074059405940594,0,0,-0.0556183135092034,-0.805106826472121
 "374","UCA","Ceiling Raising Change Orders %","2+ Year Dur.","100k - <1m",3.39541164442842e-07,2,NA,NA,NA,NA,1,0,"Sample Too
-Small to Test",4.92334688442121e-06,29,2.29153605015674,NA,0.456771614192904,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",4.92334688442121e-06,29,2.29153605015674,NA,0.447776111944028,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0103103448275862,"Not Signif.
 (>0.05)",3.05587047998558e-05,180,1,0.00751111111111111,0,0,-0.271497584541062,Inf
-"375","UCA","Ceiling Raising Change Orders %","2+ Year Dur.","0 - <100k",NA,NA,NA,NA,NA,NA,NA,NA,NA,6.45128212441399e-06,38,5.8022879025923,NA,0.165417291354323,"Chi-squared test for given probabilities with simulated p-value
+"375","UCA","Ceiling Raising Change Orders %","2+ Year Dur.","0 - <100k",NA,NA,NA,NA,NA,NA,NA,NA,NA,6.45128212441399e-06,38,5.8022879025923,NA,0.181909045477261,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.00394736842105263,"Not Signif.
 (>0.05)",9.25249673106744e-05,545,1,0.000548623853211009,0,NA,-0.861015290519878,NA
 "376","UCA","Ceiling Raising Change Orders %","Population","75m+",2.20701756887847e-06,13,NA,NA,NA,NA,1,7.69230769230769e-05,"Sample Too
-Small to Test",1.69770582221421e-06,10,1.51416666666667,NA,0.746126936531734,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",1.69770582221421e-06,10,1.51416666666667,NA,0.729135432283858,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,1e-04,"Not Signif.
 (>0.05)",6.96059387107826e-06,41,1,0.0035609756097561,0,0,34.609756097561,45.2926829268293
 "377","UCA","Ceiling Raising Change Orders %","Population","10m - <75m",7.13036445329968e-06,42,NA,NA,NA,NA,1,0.0143095238095238,"Sample Too
-Small to Test",1.62979758932564e-05,96,2.74647066803929,NA,0.43728135932034,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",1.62979758932564e-05,96,2.74647066803929,NA,0.43528235882059,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.00625,"Not Signif.
 (>0.05)",4.46496631242337e-05,263,1,0.00744106463878327,0,0,0.190570342205323,-0.479992155026793
 "378","UCA","Ceiling Raising Change Orders %","Population","1m - <10m",2.4616734422106e-05,145,NA,NA,NA,NA,1,0.0145103448275862,"Sample Too
@@ -843,7 +843,7 @@ Small to Test",0.000227662350758925,1341,147.543244593218,"3",8.92699705804653e-
 "380","UCA","Ceiling Raising Change Orders %","Population","0 - <100k",2.15608639421205e-05,127,NA,NA,NA,NA,1,0.0246929133858268,"Sample Too
 Small to Test",0.00018403131112802,1084,20.8396427478194,"3",0.000113665006142219,"Chi-squared test for given probabilities",1,0.00905073800738007,"<0.01",0.00371967345647133,21910,1,0.00657183934276586,0,0,-0.273889119604709,-0.733857271514265
 "381","Not Aircraft","Terminated","2+ Year Dur.","75m+",5.09311746664263e-07,3,NA,NA,NA,NA,0.111111111111111,NA,"Sample Too
-Small to Test",3.39541164442842e-07,2,1.28042328042328,NA,0.312343828085957,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",3.39541164442842e-07,2,1.28042328042328,NA,0.315342328835582,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0.0476190476190476,NA,"Not Signif.
 (>0.05)",3.90472339109268e-06,23,0.1,NA,1.1,-0.099999999999999,NA,NA
 "382","Not Aircraft","Terminated","2+ Year Dur.","10m - <75m",3.39541164442842e-07,2,NA,NA,NA,NA,0.018348623853211,NA,"Sample Too
@@ -908,7 +908,7 @@ Small to Test",0.00220345238665182,12979,4094.87412386798,"3",0,"Chi-squared tes
 "410","Not Aircraft","% Single Offer Competition","Population","0 - <100k",0.000203385157501262,1198,NA,NA,NA,NA,0.0495737813456923,NA,"Sample Too
 Small to Test",0.00158378976154364,9329,57342.1133455055,"3",0,"Chi-squared test for given probabilities",0.102114757328313,NA,"<0.01",0.116828475008582,688155,0.183342991307823,NA,0.79546028512167,2.69838625037133,NA,NA
 "411","Not Aircraft","Average Number of Change Orders","2+ Year Dur.","75m+",4.58380571997836e-06,27,NA,NA,NA,NA,1,1.74074074074074,"Sample Too
-Small to Test",7.13036445329968e-06,42,3.22634466259693,NA,0.35632183908046,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",7.13036445329968e-06,42,3.22634466259693,NA,0.36431784107946,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.880952380952381,"Not Signif.
 (>0.05)",3.90472339109268e-05,230,1,1.2304347826087,0,0,0.396709753231497,-0.293154486586491
 "412","Not Aircraft","Average Number of Change Orders","2+ Year Dur.","10m - <75m",1.85049934621349e-05,109,NA,NA,NA,NA,1,0.788990825688073,"Sample Too
@@ -918,7 +918,7 @@ Small to Test",0.000368232392838262,2169,242.732031181887,"3",2.44169273222842e-
 "414","Not Aircraft","Average Number of Change Orders","2+ Year Dur.","100k - <1m",3.68402163420483e-05,217,NA,NA,NA,NA,1,0.304147465437788,"Sample Too
 Small to Test",0.000467717954020015,2755,49.9035944821297,"3",8.37593154907271e-11,"Chi-squared test for given probabilities",1,0.139019963702359,"<0.01",0.00110452740793256,6506,1,0.210113741162004,0,0,0.511392576765855,-0.309171487391593
 "415","Not Aircraft","Average Number of Change Orders","2+ Year Dur.","0 - <100k",1.20537113377209e-05,71,NA,NA,NA,NA,1,0.309859154929577,"Sample Too
-Small to Test",5.89103920308331e-05,347,3.75404709628376,NA,0.27536231884058,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",5.89103920308331e-05,347,3.75404709628376,NA,0.265867066466767,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.132564841498559,"Not Signif.
 (>0.05)",0.00239291635641093,14095,1,0.105498403689252,0,0,-0.204175085213686,-0.659527879002868
 "416","Not Aircraft","Average Number of Change Orders","Population","75m+",1.57886641465921e-05,93,NA,NA,NA,NA,1,1.24731182795699,"Sample Too
@@ -932,7 +932,7 @@ Small to Test",0.00958592615455031,56464,9.47495036844828,"3",0.0235993450591675
 "420","Not Aircraft","Average Number of Change Orders","Population","0 - <100k",0.00472115012099549,27809,NA,NA,NA,NA,1,0.032903017008882,"Sample Too
 Small to Test",0.0205335821490986,120949,192.401666748212,"3",1.84838857840311e-41,"Chi-squared test for given probabilities",1,0.0298224871640113,"<0.01",0.766002659965482,4511987,1,0.0295601472256015,0,0,-0.00879671561151279,-0.101597667544533
 "421","Not Aircraft","Ceiling Raising Change Orders %","2+ Year Dur.","75m+",4.58380571997836e-06,27,NA,NA,NA,NA,1,0.00566666666666667,"Sample Too
-Small to Test",7.13036445329968e-06,42,7.1390306122449,NA,0.0769615192403798,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",7.13036445329968e-06,42,7.1390306122449,NA,0.0659670164917541,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0107142857142857,"Not Signif.
 (>0.05)",3.90472339109268e-05,230,1,0.00799130434782609,0,0,-0.254144927536231,0.410230179028133
 "422","Not Aircraft","Ceiling Raising Change Orders %","2+ Year Dur.","10m - <75m",1.85049934621349e-05,109,NA,NA,NA,NA,1,0.0124862385321101,"Sample Too
@@ -955,11 +955,11 @@ Small to Test",0.00958592615455031,56464,681.096147116101,"3",2.63652167668545e-
 "430","Not Aircraft","Ceiling Raising Change Orders %","Population","0 - <100k",0.00472115012099549,27809,NA,NA,NA,NA,1,0.00136222086374915,"Sample Too
 Small to Test",0.0205335821490986,120949,492.194953267103,"3",2.3448346153086e-106,"Chi-squared test for given probabilities",1,0.000979536829572795,"<0.01",0.766002659965482,4511987,1,0.000856639657871355,0,0,-0.125464574675604,-0.37114481163232
 "431","Aircraft","Terminated","2+ Year Dur.","75m+",1.69770582221421e-07,1,NA,NA,NA,NA,0.166666666666667,NA,"Sample Too
-Small to Test",0,0,1.26923076923077,NA,0.401299350324838,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",0,0,1.26923076923077,NA,0.385807096451774,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0,NA,"Not Signif.
 (>0.05)",5.09311746664263e-07,3,0.103448275862069,NA,Inf,-0.379310344827587,NA,NA
 "432","Aircraft","Terminated","2+ Year Dur.","10m - <75m",1.69770582221421e-07,1,NA,NA,NA,NA,0.0416666666666667,NA,"Sample Too
-Small to Test",0,0,3.46613545816733,NA,0.0759620189905048,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",0,0,3.46613545816733,NA,0.0729635182408796,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0,NA,"Not Signif.
 (>0.05)",2.54655873332131e-06,15,0.056390977443609,NA,Inf,0.353383458646615,NA,NA
 "433","Aircraft","Terminated","2+ Year Dur.","1m - <10m",3.39541164442842e-07,2,NA,NA,NA,NA,0.0526315789473684,NA,"Sample Too
@@ -967,11 +967,11 @@ Small to Test",1.69770582221421e-07,1,10.6618505513008,"1",0.00109367916181562,"
 "434","Aircraft","Terminated","2+ Year Dur.","100k - <1m",3.39541164442842e-07,2,NA,NA,NA,NA,0.0740740740740741,NA,"Sample Too
 Small to Test",3.39541164442842e-07,2,15.5519873173887,"1",8.02672283482043e-05,"Chi-squared test for given probabilities",0.00424628450106157,NA,"<0.01",1.69770582221421e-05,100,0.0397456279809221,NA,8.36009538950716,-0.463434022257552,NA,NA
 "435","Aircraft","Terminated","2+ Year Dur.","0 - <100k",0,0,NA,NA,NA,NA,0,NA,"Sample Too
-Small to Test",0,0,1.75206611570248,NA,0.276361819090455,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",0,0,1.75206611570248,NA,0.264367816091954,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0,NA,"Not Signif.
 (>0.05)",2.51260461687703e-05,148,0.032,NA,Inf,Inf,NA,NA
 "436","Aircraft","Terminated","Population","75m+",3.39541164442842e-07,2,NA,NA,NA,NA,0.0645161290322581,NA,"Sample Too
-Small to Test",0,0,1.23333333333333,NA,0.438280859570215,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",0,0,1.23333333333333,NA,0.417291354322839,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0,NA,"Not Signif.
 (>0.05)",8.48852911107105e-07,5,0.032258064516129,NA,Inf,-0.500000000000001,NA,NA
 "437","Aircraft","Terminated","Population","10m - <75m",1.35816465777137e-06,8,NA,NA,NA,NA,0.0615384615384615,NA,"Sample Too
@@ -987,7 +987,7 @@ Small to Test",6.79082328885684e-07,4,Inf,NA,NA,"Chi-squared test for given prob
 	 (based on 2000 replicates)",1,3.25,"Sample Too
 Small to Test",1.69770582221421e-06,10,1,2.4,0,0,-0.261538461538462,-0.52
 "442","Aircraft","Average Number of Offers for Competed Contracts","2+ Year Dur.","10m - <75m",5.09311746664263e-07,3,NA,NA,NA,NA,1,3.66666666666667,"Sample Too
-Small to Test",2.37678815109989e-06,14,1.7609022556391,NA,0.620689655172414,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",2.37678815109989e-06,14,1.7609022556391,NA,0.592703648175912,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,2.67857142857143,"Not Signif.
 (>0.05)",7.46990561774252e-06,44,1,2.21590909090909,0,0,-0.172727272727274,-0.395661157024794
 "443","Aircraft","Average Number of Offers for Competed Contracts","2+ Year Dur.","1m - <10m",1.69770582221421e-06,10,NA,NA,NA,NA,1,2.9,"Sample Too
@@ -995,11 +995,11 @@ Small to Test",2.34283403465561e-05,138,28.2435567843594,"3",3.22865689232629e-0
 "444","Aircraft","Average Number of Offers for Competed Contracts","2+ Year Dur.","100k - <1m",1.18839407554995e-06,7,NA,NA,NA,NA,1,1.57142857142857,"Sample Too
 Small to Test",6.82477740530112e-05,402,314.739303037671,"3",6.41974259705229e-68,"Chi-squared test for given probabilities",1,2.6865671641791,"<0.01",0.000123423213274973,727,1,2.23727647867951,0,0,-0.167235977380403,0.423721395523326
 "445","Aircraft","Average Number of Offers for Competed Contracts","2+ Year Dur.","0 - <100k",3.39541164442842e-07,2,NA,NA,NA,NA,1,1,"Sample Too
-Small to Test",2.88609989776416e-06,17,1.95970471678117,NA,0.571714142928536,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",2.88609989776416e-06,17,1.95970471678117,NA,0.606196901549225,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,2.11764705882353,"Not Signif.
 (>0.05)",0.000223757627367833,1318,1,2.56069802731411,0,0,0.209218512898329,1.56069802731411
 "446","Aircraft","Average Number of Offers for Competed Contracts","Population","75m+",3.05587047998558e-06,18,NA,NA,NA,NA,1,4.19444444444444,"Sample Too
-Small to Test",1.35816465777137e-06,8,6.31964285714286,NA,0.0934532733633183,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",1.35816465777137e-06,8,6.31964285714286,NA,0.0979510244877561,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,2.625,"Not Signif.
 (>0.05)",4.58380571997836e-06,27,1,3.2037037037037,0,0,0.220458553791886,-0.236203090507726
 "447","Aircraft","Average Number of Offers for Competed Contracts","Population","10m - <75m",7.97921736440678e-06,47,NA,NA,NA,NA,1,3.57446808510638,"Sample Too
@@ -1016,7 +1016,7 @@ Small to Test",1.69770582221421e-07,1,Inf,NA,NA,"Chi-squared test for given prob
 	 (based on 2000 replicates)",0.25,NA,"Sample Too
 Small to Test",3.39541164442842e-07,2,0.2,NA,-0.2,Inf,NA,NA
 "452","Aircraft","% Single Offer Competition","2+ Year Dur.","10m - <75m",1.69770582221421e-07,1,NA,NA,NA,NA,0.333333333333333,NA,"Sample Too
-Small to Test",6.79082328885684e-07,4,1.7609022556391,NA,0.63968015992004,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",6.79082328885684e-07,4,1.7609022556391,NA,0.647176411794103,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0.285714285714286,NA,"Not Signif.
 (>0.05)",3.225641062207e-06,19,0.431818181818182,NA,0.511363636363636,0.295454545454547,NA,NA
 "453","Aircraft","% Single Offer Competition","2+ Year Dur.","1m - <10m",5.09311746664263e-07,3,NA,NA,NA,NA,0.3,NA,"Sample Too
@@ -1024,11 +1024,11 @@ Small to Test",5.60242921330689e-06,33,28.2435567843594,"3",3.22865689232629e-06
 "454","Aircraft","% Single Offer Competition","2+ Year Dur.","100k - <1m",1.01862349332853e-06,6,NA,NA,NA,NA,0.857142857142857,NA,"Sample Too
 Small to Test",1.22234819199423e-05,72,314.739303037671,"3",6.41974259705229e-68,"Chi-squared test for given probabilities",0.17910447761194,NA,"<0.01",5.14404864130905e-05,303,0.416781292984869,NA,1.32702888583219,-0.513755158184319,NA,NA
 "455","Aircraft","% Single Offer Competition","2+ Year Dur.","0 - <100k",3.39541164442842e-07,2,NA,NA,NA,NA,1,NA,"Sample Too
-Small to Test",1.18839407554995e-06,7,1.95970471678117,NA,0.583708145927036,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",1.18839407554995e-06,7,1.95970471678117,NA,0.591704147926037,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0.411764705882353,NA,"Not Signif.
 (>0.05)",7.36804326840967e-05,434,0.329286798179059,NA,-0.200303490136571,-0.670713201820941,NA,NA
 "456","Aircraft","% Single Offer Competition","Population","75m+",1.69770582221421e-07,1,NA,NA,NA,NA,0.0555555555555556,NA,"Sample Too
-Small to Test",6.79082328885684e-07,4,6.31964285714286,NA,0.0889555222388806,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",6.79082328885684e-07,4,6.31964285714286,NA,0.0934532733633183,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0.5,NA,"Not Signif.
 (>0.05)",8.48852911107105e-07,5,0.185185185185185,NA,-0.62962962962963,2.33333333333333,NA,NA
 "457","Aircraft","% Single Offer Competition","Population","10m - <75m",1.69770582221421e-06,10,NA,NA,NA,NA,0.212765957446809,NA,"Sample Too
@@ -1041,27 +1041,26 @@ Small to Test",6.75686917241255e-05,398,68.5021331093341,"3",8.93201505076103e-1
 "460","Aircraft","% Single Offer Competition","Population","0 - <100k",7.3001350355211e-05,430,NA,NA,NA,NA,0.161897590361446,NA,"Sample Too
 Small to Test",1.98631581199062e-05,117,78.3555106227829,"3",6.91404339444444e-17,"Chi-squared test for given probabilities",0.291770573566085,NA,"<0.01",0.0128100392815173,75455,0.233900091445931,NA,-0.198342421625485,0.4447410299544,NA,NA
 "461","Aircraft","Average Number of Change Orders","2+ Year Dur.","75m+",1.01862349332853e-06,6,NA,NA,NA,NA,1,0.5,"Sample Too
-Small to Test",1.86747640443563e-06,11,8.83549783549783,NA,0.0544727636181909,"Chi-squared test for given probabilities with simulated p-value
-	 (based on 2000 replicates)",1,1.09090909090909,"Not Signif.
-(>0.05)",4.92334688442121e-06,29,1,0.448275862068966,0,0,-0.589080459770114,-0.103448275862068
+Small to Test",1.86747640443563e-06,11,8.83549783549783,NA,0.0474762618690655,"Chi-squared test for given probabilities with simulated p-value
+	 (based on 2000 replicates)",1,1.09090909090909,"<0.05",4.92334688442121e-06,29,1,0.448275862068966,0,0,-0.589080459770114,-0.103448275862068
 "462","Aircraft","Average Number of Change Orders","2+ Year Dur.","10m - <75m",4.0744939733141e-06,24,NA,NA,NA,NA,1,0.916666666666667,"Sample Too
-Small to Test",9.84669376884241e-06,58,4.13803021055844,NA,0.24087956021989,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",9.84669376884241e-06,58,4.13803021055844,NA,0.225887056471764,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.258620689655172,"Not Signif.
 (>0.05)",4.5158974870898e-05,266,1,0.255639097744361,0,0,-0.0115288220551358,-0.721120984278879
 "463","Aircraft","Average Number of Change Orders","2+ Year Dur.","1m - <10m",6.45128212441399e-06,38,NA,NA,NA,NA,1,0.236842105263158,"Sample Too
-Small to Test",3.95565456575911e-05,233,7.85704402348067,NA,0.0539730134932534,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",3.95565456575911e-05,233,7.85704402348067,NA,0.055472263868066,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.120171673819742,"Not Signif.
 (>0.05)",0.000203894469247926,1201,1,0.0849292256452956,0,0,-0.29326751516593,-0.641409936164308
 "464","Aircraft","Average Number of Change Orders","2+ Year Dur.","100k - <1m",4.58380571997836e-06,27,NA,NA,NA,NA,1,0.222222222222222,"Sample Too
-Small to Test",7.99619442262892e-05,471,27.321939874794,NA,0.000999500249875062,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",7.99619442262892e-05,471,27.321939874794,NA,0.00149925037481259,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0785562632696391,"<0.01",0.000427142784869095,2516,1,0.0321939586645469,0,0,-0.590179607270228,-0.855127186009539
 "465","Aircraft","Average Number of Change Orders","2+ Year Dur.","0 - <100k",5.26288804886405e-06,31,NA,NA,NA,NA,1,0.032258064516129,"Sample Too
 Small to Test",8.99784085773531e-06,53,0.369257565861093,NA,1,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0,"Not Signif.
 (>0.05)",0.000785188942774072,4625,1,0.008,0,0,Inf,-0.752
 "466","Aircraft","Average Number of Change Orders","Population","75m+",5.26288804886405e-06,31,NA,NA,NA,NA,1,0.580645161290323,"Sample Too
-Small to Test",6.28151154219257e-06,37,15.7869100443727,NA,0.0104947526236882,"Chi-squared test for given probabilities with simulated p-value
-	 (based on 2000 replicates)",1,0.513513513513513,"<0.05",2.63144402443202e-05,155,1,0.212903225806452,0,0,-0.585398981324277,-0.633333333333333
+Small to Test",6.28151154219257e-06,37,15.7869100443727,NA,0.00899550224887556,"Chi-squared test for given probabilities with simulated p-value
+	 (based on 2000 replicates)",1,0.513513513513513,"<0.01",2.63144402443202e-05,155,1,0.212903225806452,0,0,-0.585398981324277,-0.633333333333333
 "467","Aircraft","Average Number of Change Orders","Population","10m - <75m",2.20701756887847e-05,130,NA,NA,NA,NA,1,0.446153846153846,"Sample Too
 Small to Test",4.77055336042193e-05,281,14.0639945058375,"3",0.00281932678767014,"Chi-squared test for given probabilities",1,0.270462633451957,"<0.01",0.000187426722772449,1104,1,0.210144927536232,0,0,-0.223016781083141,-0.528985507246376
 "468","Aircraft","Average Number of Change Orders","Population","1m - <10m",7.77549266574108e-05,458,NA,NA,NA,NA,1,0.150655021834061,"Sample Too
@@ -1077,15 +1076,15 @@ Small to Test",1.86747640443563e-06,11,Inf,NA,NA,"Chi-squared test for given pro
 	 (based on 2000 replicates)",1,0.0138181818181818,"Sample Too
 Small to Test",4.92334688442121e-06,29,1,-6.89655172413793e-05,0,0,-1.00499092558984,-1.41379310344827
 "472","Aircraft","Ceiling Raising Change Orders %","2+ Year Dur.","10m - <75m",4.0744939733141e-06,24,NA,NA,NA,NA,1,0.0124166666666667,"Sample Too
-Small to Test",9.84669376884241e-06,58,2.87991711315657,NA,0.343828085957021,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",9.84669376884241e-06,58,2.87991711315657,NA,0.354822588705647,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.00258620689655172,"Not Signif.
 (>0.05)",4.5158974870898e-05,266,1,0.00227443609022556,0,0,-0.120551378446115,-0.816823939042237
 "473","Aircraft","Ceiling Raising Change Orders %","2+ Year Dur.","1m - <10m",6.45128212441399e-06,38,NA,NA,NA,NA,1,0,"Sample Too
-Small to Test",3.95565456575911e-05,233,2.95343964571432,NA,0.365317341329335,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",3.95565456575911e-05,233,2.95343964571432,NA,0.390304847576212,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.00192703862660944,"Not Signif.
 (>0.05)",0.000203894469247926,1201,1,0.0011240632805995,0,0,-0.416688765301372,Inf
 "474","Aircraft","Ceiling Raising Change Orders %","2+ Year Dur.","100k - <1m",4.58380571997836e-06,27,NA,NA,NA,NA,1,0.00555555555555555,"Sample Too
-Small to Test",7.99619442262892e-05,471,11.4182526827158,NA,0.0279860069965017,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",7.99619442262892e-05,471,11.4182526827158,NA,0.0274862568715642,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.00127176220806794,"<0.05",0.000427142784869095,2516,1,0.000298092209856916,0,0,-0.765606960195981,-0.946343402225755
 "475","Aircraft","Ceiling Raising Change Orders %","2+ Year Dur.","0 - <100k",5.26288804886405e-06,31,NA,NA,NA,NA,1,0.00483870967741935,"Sample Too
 Small to Test",8.99784085773531e-06,53,0.253313056702151,NA,1,"Chi-squared test for given probabilities with simulated p-value
@@ -1095,7 +1094,7 @@ Small to Test",8.99784085773531e-06,53,0.253313056702151,NA,1,"Chi-squared test 
 Small to Test",6.28151154219257e-06,37,30.2516222516223,NA,0.000499750124937531,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0162702702702703,"<0.01",2.63144402443202e-05,155,1,0.00190967741935484,0,0,-0.882627799807095,13.8
 "477","Aircraft","Ceiling Raising Change Orders %","Population","10m - <75m",2.20701756887847e-05,130,NA,NA,NA,NA,1,0.00807692307692308,"Sample Too
-Small to Test",4.77055336042193e-05,281,9.03843416370107,NA,0.0304847576211894,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",4.77055336042193e-05,281,9.03843416370107,NA,0.0264867566216892,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.00266903914590747,"<0.05",0.000187426722772449,1104,1,0.00204347826086956,0,0,-0.234376811594204,-0.746997929606626
 "478","Aircraft","Ceiling Raising Change Orders %","Population","1m - <10m",7.77549266574108e-05,458,NA,NA,NA,NA,1,0.00393668122270742,"Sample Too
 Small to Test",0.000248713902954382,1465,34.9431038642615,"3",1.25243882928588e-07,"Chi-squared test for given probabilities",1,0.0031740614334471,"<0.01",0.00123032740935864,7247,1,0.00117938457292673,0,0,-0.628430451755342,-0.700411461785667
@@ -1127,7 +1126,7 @@ Small to Test",3.66704457598269e-05,216,447.838892585858,"1",2.13027092921215e-9
 "490","Overall","Terminated","Population","0 - <100k",8.48852911107105e-06,50,NA,NA,NA,NA,0.00140185605742002,NA,"Sample Too
 Small to Test",3.48029693553913e-05,205,554.167039415379,"1",1.5613342836455e-122,"Chi-squared test for given probabilities",0.00167574018670198,NA,"<0.01",0.00637777146231212,37567,0.00747175542396897,NA,3.45877916115034,4.32990201413404,NA,NA
 "491","Overall","Average Number of Offers for Competed Contracts","2+ Year Dur.","75m+",3.39541164442842e-06,20,NA,NA,NA,NA,1,2.825,"Sample Too
-Small to Test",6.28151154219257e-06,37,22.597979584281,NA,0.00149925037481259,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",6.28151154219257e-06,37,22.597979584281,NA,0.000499750124937531,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,2.59459459459459,"<0.01",2.76726049020916e-05,163,1,3.65644171779141,0,0,0.409253578732108,0.294315652315543
 "492","Overall","Average Number of Offers for Competed Contracts","2+ Year Dur.","10m - <75m",1.22234819199423e-05,72,NA,NA,NA,NA,1,2.41666666666667,"Sample Too
 Small to Test",8.94690968306888e-05,527,458.874623143258,"3",3.89378603336414e-99,"Chi-squared test for given probabilities",1,2.24952561669829,"<0.01",0.000137174630434908,808,1,3.56064356435644,0,0,0.582841972514421,0.47336975076818
@@ -1148,7 +1147,7 @@ Small to Test",0.00728859063593004,42932,3552.97058282853,"3",0,"Chi-squared tes
 "500","Overall","Average Number of Offers for Competed Contracts","Population","0 - <100k",0.00455358655634295,26822,NA,NA,NA,NA,1,2.92010290060398,"Sample Too
 Small to Test",0.0155779788540554,91759,54212.1860513748,"3",0,"Chi-squared test for given probabilities",1,2.99022439215772,"<0.01",0.691979800017045,4075970,1,3.26351334774299,0,0,0.09139412958506,0.11760217322067
 "501","Overall","% Single Offer Competition","2+ Year Dur.","75m+",1.01862349332853e-06,6,NA,NA,NA,NA,0.3,NA,"Sample Too
-Small to Test",1.86747640443563e-06,11,22.597979584281,NA,0.000499750124937531,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",1.86747640443563e-06,11,22.597979584281,NA,0.00149925037481259,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",0.297297297297297,NA,"<0.01",3.56518222664984e-06,21,0.128834355828221,NA,-0.566648075850529,-0.570552147239263,NA,NA
 "502","Overall","% Single Offer Competition","2+ Year Dur.","10m - <75m",4.0744939733141e-06,24,NA,NA,NA,NA,0.333333333333333,NA,"Sample Too
 Small to Test",3.19168694576271e-05,188,458.874623143258,"3",3.89378603336414e-99,"Chi-squared test for given probabilities",0.35673624288425,NA,"<0.01",1.8165452297692e-05,107,0.132425742574257,NA,-0.628785285443439,-0.602722772277229,NA,NA
@@ -1169,7 +1168,7 @@ Small to Test",0.00227102107837595,13377,3552.97058282853,"3",0,"Chi-squared tes
 "510","Overall","% Single Offer Competition","Population","0 - <100k",0.000276386507856473,1628,NA,NA,NA,NA,0.0606964432182537,NA,"Sample Too
 Small to Test",0.00160365291966354,9446,54212.1860513748,"3",0,"Chi-squared test for given probabilities",0.102943580466221,NA,"<0.01",0.129638514290099,763610,0.187344362200899,NA,0.81987416167609,2.0865789207325,NA,NA
 "511","Overall","Average Number of Change Orders","2+ Year Dur.","75m+",5.60242921330689e-06,33,NA,NA,NA,NA,1,1.51515151515152,"Sample Too
-Small to Test",8.99784085773531e-06,53,1.70485565107131,NA,0.658170914542729,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",8.99784085773531e-06,53,1.70485565107131,NA,0.642178910544728,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.924528301886792,"Not Signif.
 (>0.05)",4.3970580795348e-05,259,1,1.14285714285714,0,0,0.23615160349854,-0.24571428571429
 "512","Overall","Average Number of Change Orders","2+ Year Dur.","10m - <75m",2.2579487435449e-05,133,NA,NA,NA,NA,1,0.81203007518797,"Sample Too
@@ -1179,7 +1178,7 @@ Small to Test",0.000407788938495853,2402,127.785652068113,"3",1.62270256357168e-
 "514","Overall","Average Number of Change Orders","2+ Year Dur.","100k - <1m",4.14240220620267e-05,244,NA,NA,NA,NA,1,0.295081967213115,"Sample Too
 Small to Test",0.000547679898246304,3226,14.7539242276984,"3",0.00203948253698444,"Chi-squared test for given probabilities",1,0.130192188468692,"<0.01",0.00153167019280166,9022,1,0.160496563954777,0,0,0.232766465043119,-0.456094977708812
 "515","Overall","Average Number of Change Orders","2+ Year Dur.","0 - <100k",1.73165993865849e-05,102,NA,NA,NA,NA,1,0.225490196078431,"Sample Too
-Small to Test",6.79082328885684e-05,400,6.42327197743882,NA,0.0904547726136932,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",6.79082328885684e-05,400,6.42327197743882,NA,0.0839580209895052,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.115,"Not Signif.
 (>0.05)",0.003178105299185,18720,1,0.0814102564102564,0,0,-0.292084726867336,-0.638963210702341
 "516","Overall","Average Number of Change Orders","Population","75m+",2.10515521954562e-05,124,NA,NA,NA,NA,1,1.08064516129032,"Sample Too
@@ -1193,7 +1192,7 @@ Small to Test",0.010051097549837,59204,36.9382448447612,"3",4.74191209794875e-08
 "520","Overall","Average Number of Change Orders","Population","0 - <100k",0.00605520735609142,35667,NA,NA,NA,NA,1,0.0260745226680125,"Sample Too
 Small to Test",0.0207687144054753,122334,206.983292849679,"3",1.30659187838616e-44,"Chi-squared test for given probabilities",1,0.0302205437572547,"<0.01",0.853584077692451,5027868,1,0.0272777646509415,0,0,-0.0973767755455015,0.0461462707582029
 "521","Overall","Ceiling Raising Change Orders %","2+ Year Dur.","75m+",5.60242921330689e-06,33,NA,NA,NA,NA,1,0.00466666666666667,"Sample Too
-Small to Test",8.99784085773531e-06,53,6.36107405949282,NA,0.0914542728635682,"Chi-squared test for given probabilities with simulated p-value
+Small to Test",8.99784085773531e-06,53,6.36107405949282,NA,0.0859570214892554,"Chi-squared test for given probabilities with simulated p-value
 	 (based on 2000 replicates)",1,0.0113584905660377,"Not Signif.
 (>0.05)",4.3970580795348e-05,259,1,0.00708880308880309,0,0,-0.375902718095407,0.519029233314947
 "522","Overall","Ceiling Raising Change Orders %","2+ Year Dur.","10m - <75m",2.2579487435449e-05,133,NA,NA,NA,NA,1,0.0124736842105263,"Sample Too
