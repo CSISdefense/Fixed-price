@@ -8,13 +8,13 @@ output:
 ---
 
 ```{r hiddensetup, echo = FALSE}
-legend.text.size<-5
-axis.text.size<-5
-strip.text.size<-5
-legend.text.size<-5
+legend.text.size<-10
+axis.text.size<-9
+strip.text.size<-10
+legend.text.size<-10
 
-table.text.size<-5.75
-title.text.size<-6
+table.text.size<-11
+title.text.size<-12
 geom.text.size<-1.5
 
 
@@ -444,7 +444,10 @@ ggplot(
 ```
 
 ```{r CompVehicle, echo = FALSE}
-
+if (levels(CompleteModelAndDetail$Veh) %in% c("SINGLE AWARD",
+                                            "MULTIPLE AWARD" ,
+                                            "Other IDV"  ,
+                                            "Def/Pur"    )){
 CompleteModelAndDetail$Veh[CompleteModelAndDetail$Veh=="MULTIPLE AWARD"]<-"Other IDV"
 CompleteModelAndDetail$Veh<-factor(CompleteModelAndDetail$Veh,
                                    levels=c("SINGLE AWARD",
@@ -454,7 +457,8 @@ CompleteModelAndDetail$Veh<-factor(CompleteModelAndDetail$Veh,
                                    labels=c("Single Award IDV" ,
                                             "MULTIPLE AWARD" ,
                                             "Other IDV",
-                                            "Definitive Con,/Pur. Order"      ))
+                                            "Definitive Contract\n/Purchase Order"      ))
+}
 
 VehBox<-BoxplotWrapper(
     "Box plot of number of offers received by Ceiling and Contract Vehicle",

@@ -252,7 +252,7 @@ PopulationLongDF<-FixedPriceComparisonTable(ModelSummary,"Population")
 
 
 
-
+# debug(PointRowWrapper)
 #Single Offer Competition
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,

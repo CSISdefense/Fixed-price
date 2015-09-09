@@ -28,7 +28,7 @@ require(scales)
 # biocLite("RBGL")
 options(error=recover)
 
-setwd("K:\\Development\\Fixed-price")
+# setwd("K:\\Development\\Fixed-price")
 # setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
 Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 # Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
@@ -251,7 +251,7 @@ PopulationLongDF<-FixedPriceComparisonTable(ModelSummary,"Population")
 
 
 
-
+# debug(PointRowWrapper)
 #Single Offer Competition
 PointRowWrapper(NULL,#VAR.main.label,
                 "All Contracts\n(Overall and Controls)",          #VAR.row.label,

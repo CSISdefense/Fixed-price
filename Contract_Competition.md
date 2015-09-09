@@ -101,11 +101,9 @@ ContractSample<-apply_lookups(Path,ContractSample)
 ```
 
 ```
-## Joining by: ContractingOfficeID, MajorCommandID
 ## Joining by: Contracting.Agency.ID
 ## Joining by: SubCustomer, Customer
 ## Joining by: systemequipmentcode
-## Joining by: Fiscal.Year
 ```
 
 ```
@@ -440,6 +438,11 @@ summary(subset(uncompeted.sample,select=c(
 
 ![](Contract_Competition_files/figure-html/CompPSR-1.png) ![](Contract_Competition_files/figure-html/CompPSR-2.png) ![](Contract_Competition_files/figure-html/CompPSR-3.png) ![](Contract_Competition_files/figure-html/CompPSR-4.png) ![](Contract_Competition_files/figure-html/CompPSR-5.png) ![](Contract_Competition_files/figure-html/CompPSR-6.png) 
 
+
+```
+## Warning in if (levels(CompleteModelAndDetail$Veh) %in% c("SINGLE AWARD", :
+## the condition has length > 1 and only the first element will be used
+```
 
 ```
 ## [1] 136.6631
