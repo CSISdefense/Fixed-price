@@ -6,3 +6,4 @@ Data/defense_contract_CSIScontractID_detail.zip
 .RData
 Data/defense_contract_CSIScontractID_detail.csv
 Data/defense_contract_CSIScontractID_model.csv
+*.db
