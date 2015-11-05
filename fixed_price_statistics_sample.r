@@ -32,7 +32,6 @@ set.seed(1)
 
 source(paste(Path,"helper.r",sep=""))
 source(paste(Path,"lookups.r",sep=""))
-source(paste(Path,"helper.r",sep=""))
 source(paste(Path,"statistics_aggregators.r",sep=""))
 
 options(error=recover)

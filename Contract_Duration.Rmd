@@ -15,10 +15,10 @@ require(plyr)
 require(Hmisc)
 require(lubridate)
 options(error=recover)
-setwd("K:\\Development\\Fixed-price")
+# setwd("K:\\Development\\Fixed-price")
 # setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
-Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
-# Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
+# Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
+Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
 source(paste(Path,"lookups.r",sep=""))
 
 ```
@@ -53,6 +53,35 @@ ContractSample  <- read.csv(
 #These will probably be moved into apply_lookups at some point
 ContractSample<-apply_lookups(Path,ContractSample)
 
+# 
+# as.numeric(as.duration(
+#     ymd(ContractSample$SignedMonth)-ContractSample$StartFiscalYear)
+#     /dyears(1)
+#     )
+
+
+
+min(strptime(ContractSample$MinOfEffectiveDate[!is.na(ContractSample$MinOfEffectiveDate)],"%Y-%m-%d"))
+max(strptime(ContractSample$UnmodifiedCurrentCompletionDate[!is.na(ContractSample$UnmodifiedCurrentCompletionDate)],"%Y-%m-%d"))
+
+
+ContractSample$UnmodifiedDays<-as.numeric(difftime(strptime(ContractSample$UnmodifiedCurrentCompletionDate,"%Y-%m-%d")
+                                                     , strptime(ContractSample$MinOfEffectiveDate,"%Y-%m-%d")
+                                                     , unit="days"
+        ))+1
+
+ContractComplete  <- read.csv(
+    paste(Path,"data\\defense_contract_SP_ContractSampleCriteriaDetailsCustomer.csv", sep = ""),
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+
+
+```
+
+
+```{r DataExploration}
 summary(subset(ContractSample,
                select=c(LastSignedLastDateToOrder,
       LastUltimateCompletionDate,
@@ -66,25 +95,6 @@ summary(subset(ContractSample,
                                 ))
         )
 
-
-
-as.numeric(as.duration(
-    ymd(Policy$SignedMonth)-Policy$StartFiscalYear)
-    /dyears(1)
-    )
-
-
-
-min(strptime(ContractSample$MinOfEffectiveDate[!is.na(ContractSample$MinOfEffectiveDate)],"%Y-%m-%d"))
-max(strptime(ContractSample$UnmodifiedCurrentCompletionDate[!is.na(ContractSample$UnmodifiedCurrentCompletionDate)],"%Y-%m-%d"))
-
-
-ContractSample$UnmodifiedDays<-as.numeric(difftime(strptime(ContractSample$UnmodifiedCurrentCompletionDate,"%Y-%m-%d")
-                                                     , strptime(ContractSample$MinOfEffectiveDate,"%Y-%m-%d")
-                                                     , unit="days"
-        ))+1
-
-
 daysquantile<-quantile(ContractSample$UnmodifiedDays,c(0.25,0.5,0.75),na.rm=TRUE)
 exp(quantile(log(ContractSample$UnmodifiedDays),c(0.25,0.5,0.75),na.rm=TRUE))
 mean(ContractSample$UnmodifiedDays,na.rm=TRUE)
@@ -95,12 +105,6 @@ roundedcutoffs<-c(61,214,364,365,366,367,368,729,730,731,732,733,734)
 ecdf(ContractSample$UnmodifiedDays)(roundedcutoffs)
 
 
-ContractComplete  <- read.csv(
-    paste(Path,"data\\defense_contract_SP_ContractSampleCriteriaDetailsCustomer.csv", sep = ""),
-    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
-    na.strings = c("NULL","NA",""),
-    stringsAsFactors = TRUE
-    )
 # ContractComplete$LastCurrentCompletionDate<-strptime(ContractComplete$LastCurrentCompletionDate,"%Y-%m-%d") 
 # # as.Date(sample.criteria$LastCurrentCompletionDate)
 # ContractComplete<-subset(ContractComplete,StartFiscal_Year>=2007 & (LastCurrentCompletionDate<=strptime("2013-09-30","%Y-%m-%d") | IsClosed==1))
@@ -127,7 +131,9 @@ dSeconds<-as.duration(strptime(ContractSample$UnmodifiedCurrentCompletionDate,"%
 
 summary(dSeconds%/%dyears(1))
 summary(dSeconds/years(1))
+```
 
+```{r Graphs}
 
 ggplot(
     data = ContractSample,
