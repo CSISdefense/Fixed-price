@@ -17,8 +17,8 @@ require(lubridate)
 options(error=recover)
 # setwd("K:\\Development\\Fixed-price")
 # setwd("C:\\Users\\Greg Sanders\\Documents\\Development\\Fixed-price")
-# Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
-Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
+Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
+# Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
 source(paste(Path,"lookups.r",sep=""))
 
 ```
@@ -120,8 +120,8 @@ dayscompletequantile<-quantile(ContractSample$UnmodifiedDays,c(0.25,0.5,0.75,0.9
 span <- new_interval(as.POSIXct(ContractSample$UnmodifiedCurrentCompletionDate), 
                      as.POSIXct(ContractSample$MinOfEffectiveDate)) #interval
 
-eyears(as.period(span))
-as.period(span, units ="years")
+# summary(eyears(as.period(span)))
+# as.period(span, units ="years")
 # 2009-01-01 CST--2010-02-02 01:01:01 CST
 as.period(span)
 
@@ -130,7 +130,19 @@ dSeconds<-as.duration(strptime(ContractSample$UnmodifiedCurrentCompletionDate,"%
                 strptime(ContractSample$MinOfEffectiveDate,"%Y-%m-%d"))
 
 summary(dSeconds%/%dyears(1))
-summary(dSeconds/years(1))
+# summary(dSeconds/years(1))
+
+
+
+#Break the count of days into four categories.
+ContractComplete$qDuration<-cut2(ContractComplete$UnmodifiedDays,cuts=c(61,214,366,732))
+lowroundedcutoffs<-c(15000,100000,1000000,30000000)
+highroundedcutoffs<-c(15000,100000,1000000,10000000,75000000)
+ContractComplete$qLowCeiling <- cut2(ContractComplete$UnmodifiedContractBaseAndAllOptionsValue,cuts=lowroundedcutoffs)
+ContractComplete$qHighCeiling <- cut2(ContractComplete$UnmodifiedContractBaseAndAllOptionsValue,cuts=highroundedcutoffs)
+rm(lowroundedcutoffs,highroundedcutoffs)
+
+
 ```
 
 ```{r Graphs}
