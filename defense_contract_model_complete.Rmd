@@ -894,6 +894,7 @@ CompleteModelAndDetail<-subset(CompleteContracts,select=c(CSIScontractID,
     pChangeOrderUnmodifiedBaseAndAll,
     pChangeOrderObligated,
     UnmodifiedDays,
+    MinOfEffectiveDate,
     Action.Obligation
     )
     )

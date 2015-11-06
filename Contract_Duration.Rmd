@@ -71,7 +71,7 @@ ContractSample$UnmodifiedDays<-as.numeric(difftime(strptime(ContractSample$Unmod
         ))+1
 
 CompleteContract  <- read.csv(
-    paste("data\\defense_contract_SP_ContractSampleCriteriaDetailsCustomer.csv", sep = ""),
+    paste("data\\defense_contract_CSIScontractID_detail.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
     na.strings = c("NULL","NA",""),
     stringsAsFactors = TRUE
@@ -87,13 +87,45 @@ RawContract  <- read.csv(
     stringsAsFactors = TRUE
     )
 
-ContractSurvival<-ddply(RawContract,.(StartFiscal_Year,
-                      IsClosed,
-                    LastSignedLastDateToOrder,
-                    LastUltimateCompletionDate,
-                    LastCurrentCompletionDate),
-      SumofObligatedAmount=sum(SumofObligatedAmount)
-      )
+CompleteContract$qDuration<-factor(CompleteContract$qDuration,
+                                   levels=c("[0 months,~2 months)",
+                                               "[~2 months,~7 months)",
+                                               "[~7 months-~1 year]",
+                                               "(~1 year,~2 years]",
+                                               "(~2 years+]"),
+         labels=c("[0 months,~2 months)",
+                                               "[~2 months,~7 months)",
+                                               "[~7 months-~1 year]",
+                                               "(~1 year,~2 years]",
+                                               "(~2 years+]"),
+                                   ordered=TRUE
+                                   )
+
+
+RawContract$UnmodifiedCurrentCompletionDate<-
+    strptime(RawContract$UnmodifiedCurrentCompletionDate,"%Y-%m-%d") 
+
+#Calculate the number of days the contract lasts.
+CompleteContracts$UnmodifiedDays<-as.numeric(
+    difftime(strptime(CompleteContracts$UnmodifiedCurrentCompletionDate,"%Y-%m-%d")
+             , strptime(CompleteContracts$MinOfEffectiveDate,"%Y-%m-%d")
+             , unit="days"
+             ))+1
+
+
+
+ContractSurvival<-ddply(CompleteContract,
+                        .(#StartFiscal_Year,
+                            qDuration,
+                            IsTerminated,
+                            UnmodifiedDays),
+                        summarise,
+                        SumofObligatedAmount=sum(Action.Obligation),
+                        ContractCount=length(CSIScontractID)
+)
+
+
+
 
 ```
 
@@ -166,24 +198,46 @@ rm(lowroundedcutoffs,highroundedcutoffs)
 
 names(CompleteContract)
 
-
-ggplot(
-    data = ContractSample,
-    aes_string(x = "UnmodifiedDays",
-               fill = "qDuration")
-    ) +     geom_bar(binwidth=7)  +scale_x_continuous(limits=c(0, 2000))
-
-
-ggplot(
-    data = ContractSample,
-    aes_string(x = "log(UnmodifiedDays)",
-                fill = "qDuration")
-    ) +     geom_bar(binwidth=0.1)  #+scale_x_continuous(limits=c(0, 2000))
-
-
+# 
+# ggplot(
+#     data = ContractSample,
+#     aes_string(x = "UnmodifiedDays",
+#                fill = "qDuration")
+#     ) +     geom_bar(binwidth=7)  +scale_x_continuous(limits=c(0, 2000))
+# 
+# 
+# ggplot(
+#     data = ContractSample,
+#     aes_string(x = "log(UnmodifiedDays)",
+#                 fill = "qDuration")
+#     ) +     geom_bar(binwidth=0.1)  #+scale_x_continuous(limits=c(0, 2000))
 
 
+ContractSurvival$SumofObligatedAmount[is.na(ContractSurvival$SumofObligatedAmount)]<-0
+ContractSurvival$IsTerminated[is.na(ContractSurvival$IsTerminated)]<-"Unterminated"
 
+
+ggplot(data = ContractSurvival,
+       aes(x=qDuration,
+           y=SumofObligatedAmount,
+           fill=IsTerminated)
+       )+ geom_bar(stat="identity",subset=.(IsTerminated=="Unterminated")) + 
+    geom_bar(stat="identity",subset=.(IsTerminated=="Terminated"),aes(y=SumofObligatedAmount*(-1)))+
+    coord_flip()
+    
+    # geom_bar(stat="identity",aes(fill=IsTerminated))+
+    
+
+ggplot(data = ContractSurvival,
+       aes(x=qDuration,
+           y=ContractCount,
+           fill=IsTerminated)
+       )+ geom_bar(stat="identity",subset=.(IsTerminated=="Unterminated")) + 
+    geom_bar(stat="identity",subset=.(IsTerminated=="Terminated"),aes(y=ContractCount*(-1)))+
+    coord_flip()
+    
+    # geom_bar(stat="identity",aes(fill=IsTerminated))+
+    
 
 
 ```
