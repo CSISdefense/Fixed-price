@@ -79,15 +79,15 @@ CompleteContract  <- read.csv(
 
 
 
+# 
+# RawContract  <- read.csv(
+#     paste(Path,"data\\defense_contract_SP_ContractSampleCriteriaDetailsCustomer.csv", sep = ""),
+#     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+#     na.strings = c("NULL","NA",""),
+#     stringsAsFactors = TRUE
+#     )
 
-RawContract  <- read.csv(
-    paste(Path,"data\\defense_contract_SP_ContractSampleCriteriaDetailsCustomer.csv", sep = ""),
-    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
-    na.strings = c("NULL","NA",""),
-    stringsAsFactors = TRUE
-    )
-
-CompleteContract$qDuration<-factor(CompleteContract$qDuration,
+CompleteContract$Dur<-factor(CompleteContract$Dur,
                                    levels=c("[0 months,~2 months)",
                                                "[~2 months,~7 months)",
                                                "[~7 months-~1 year]",
@@ -101,24 +101,29 @@ CompleteContract$qDuration<-factor(CompleteContract$qDuration,
                                    ordered=TRUE
                                    )
 
+CompleteContract$StartFiscalYear<-DateToFiscalYear(CompleteContract$MinOfEffectiveDate)
 
-RawContract$UnmodifiedCurrentCompletionDate<-
-    strptime(RawContract$UnmodifiedCurrentCompletionDate,"%Y-%m-%d") 
+
+# RawContract$UnmodifiedCurrentCompletionDate<-
+#     strptime(RawContract$UnmodifiedCurrentCompletionDate,"%Y-%m-%d") 
 
 #Calculate the number of days the contract lasts.
-CompleteContracts$UnmodifiedDays<-as.numeric(
-    difftime(strptime(CompleteContracts$UnmodifiedCurrentCompletionDate,"%Y-%m-%d")
-             , strptime(CompleteContracts$MinOfEffectiveDate,"%Y-%m-%d")
-             , unit="days"
-             ))+1
-
-
+# RawContract$UnmodifiedDays<-as.numeric(
+#     difftime(strptime(RawContract$UnmodifiedCurrentCompletionDate,"%Y-%m-%d")
+#              , strptime(RawContract$MinOfEffectiveDate,"%Y-%m-%d")
+#              , unit="days"
+#              ))+1
+# 
 
 ContractSurvival<-ddply(CompleteContract,
-                        .(#StartFiscal_Year,
-                            qDuration,
-                            IsTerminated,
-                            UnmodifiedDays),
+                        .(Dur,
+                            Term,
+                            UnmodifiedDays,
+                            StartFiscalYear,
+                            PSR,
+                            Who,
+                            What,
+                            Intl),
                         summarise,
                         SumofObligatedAmount=sum(Action.Obligation),
                         ContractCount=length(CSIScontractID)
@@ -184,7 +189,7 @@ summary(dSeconds%/%dyears(1))
 
 
 #Break the count of days into four categories.
-ContractComplete$qDuration<-cut2(ContractComplete$UnmodifiedDays,cuts=c(61,214,366,732))
+ContractComplete$Dur<-cut2(ContractComplete$UnmodifiedDays,cuts=c(61,214,366,732))
 lowroundedcutoffs<-c(15000,100000,1000000,30000000)
 highroundedcutoffs<-c(15000,100000,1000000,10000000,75000000)
 ContractComplete$qLowCeiling <- cut2(ContractComplete$UnmodifiedContractBaseAndAllOptionsValue,cuts=lowroundedcutoffs)
@@ -202,34 +207,92 @@ names(CompleteContract)
 # ggplot(
 #     data = ContractSample,
 #     aes_string(x = "UnmodifiedDays",
-#                fill = "qDuration")
+#                fill = "Dur")
 #     ) +     geom_bar(binwidth=7)  +scale_x_continuous(limits=c(0, 2000))
 # 
 # 
 # ggplot(
 #     data = ContractSample,
 #     aes_string(x = "log(UnmodifiedDays)",
-#                 fill = "qDuration")
+#                 fill = "Dur")
 #     ) +     geom_bar(binwidth=0.1)  #+scale_x_continuous(limits=c(0, 2000))
 
 
 ContractSurvival$SumofObligatedAmount[is.na(ContractSurvival$SumofObligatedAmount)]<-0
 ContractSurvival$IsTerminated[is.na(ContractSurvival$IsTerminated)]<-"Unterminated"
 
-
+#Overall
 ggplot(data = ContractSurvival,
-       aes(x=qDuration,
+       aes(x=Dur,
            y=SumofObligatedAmount,
-           fill=IsTerminated)
-       )+ geom_bar(stat="identity",subset=.(IsTerminated=="Unterminated")) + 
-    geom_bar(stat="identity",subset=.(IsTerminated=="Terminated"),aes(y=SumofObligatedAmount*(-1)))+
+           fill=Term)
+       )+ geom_bar(stat="identity",subset=.(Term=="Unterminated")) + 
+    geom_bar(stat="identity",subset=.(Term=="Terminated"),aes(y=SumofObligatedAmount*(-1)))+
     coord_flip()
     
     # geom_bar(stat="identity",aes(fill=IsTerminated))+
-    
+
+#PSR
+ggplot(data = subset(ContractSurvival,PSR!="Mixed or Unlabeled"),
+       aes(x=Dur,
+           y=SumofObligatedAmount,
+           fill=Term)
+       )+ geom_bar(stat="identity",subset=.(Term=="Unterminated")) + 
+    geom_bar(stat="identity",subset=.(Term=="Terminated"),aes(y=SumofObligatedAmount*(-1)))+
+    coord_flip()+facet_wrap( ~ PSR)
+
+
+#What
+ggplot(data = ContractSurvival,
+       aes(x=Dur,
+           y=SumofObligatedAmount,
+           fill=Term)
+       )+ geom_bar(stat="identity",subset=.(Term=="Unterminated")) + 
+    geom_bar(stat="identity",subset=.(Term=="Terminated"),aes(y=SumofObligatedAmount*(-1)))+
+    coord_flip()+facet_wrap( ~ What)
+
+# 
+# #Who - Not that useful because a lot of big joint contracts get shunted into other DoD
+# ggplot(data = ContractSurvival,
+#        aes(x=Dur,
+#            y=SumofObligatedAmount,
+#            fill=Term)
+#        )+ geom_bar(stat="identity",subset=.(Term=="Unterminated")) + 
+#     geom_bar(stat="identity",subset=.(Term=="Terminated"),aes(y=SumofObligatedAmount*(-1)))+
+#     coord_flip()+facet_wrap( ~ Who)
+
+#When
+ggplot(data = subset(ContractSurvival,StartFiscalYear>=2007 & StartFiscalYear<=2013),
+       aes(x=Dur,
+           y=SumofObligatedAmount,
+           fill=Term)
+       )+ geom_bar(stat="identity",subset=.(Term=="Unterminated")) + 
+    geom_bar(stat="identity",subset=.(Term=="Terminated"),aes(y=SumofObligatedAmount*(-1)))+
+    coord_flip()+facet_wrap( ~ StartFiscalYear)
+
+
+#What
+ggplot(data = subset(ContractSurvival,StartFiscalYear==2011& What=="Other" & PSR=="Services"&Who=="Other DoD"),
+       aes(x=Dur,
+           y=SumofObligatedAmount,
+           fill=Term)
+       )+ geom_bar(stat="identity",subset=.(Term=="Unterminated")) + 
+    geom_bar(stat="identity",subset=.(Term=="Terminated"),aes(y=SumofObligatedAmount*(-1)))+
+    coord_flip()+facet_wrap( ~ Who)
+
+
+#Intl
+ggplot(data = ContractSurvival,
+       aes(x=Dur,
+           y=SumofObligatedAmount,
+           fill=Term)
+       )+ geom_bar(stat="identity",subset=.(Term=="Unterminated")) + 
+    geom_bar(stat="identity",subset=.(Term=="Terminated"),aes(y=SumofObligatedAmount*(-1)))+
+    coord_flip()+facet_wrap( ~ Intl)
+
 
 ggplot(data = ContractSurvival,
-       aes(x=qDuration,
+       aes(x=Dur,
            y=ContractCount,
            fill=IsTerminated)
        )+ geom_bar(stat="identity",subset=.(IsTerminated=="Unterminated")) + 
@@ -240,6 +303,14 @@ ggplot(data = ContractSurvival,
     
 
 
+TerminationSample<-subset(CompleteContract,StartFiscalYear==2011& What=="Other" & PSR=="Services"&Who=="Other DoD"&Term=="Terminated")
+
+write.csv(TerminationSample,paste("Output\\TerminationSample.csv",
+                                  sep=""))
+
+
+
 ```
 
 
+[](http://www.law360.com/articles/228410/humana-wins-back-24b-tricare-contract)
