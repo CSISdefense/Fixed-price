@@ -49,6 +49,7 @@ require(Hmisc)
 #install.packages("ggplot2")
 #library("ggplot2")
 
+setwd("K:\\Development\\Fixed-price")
 
 Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 source(paste(Path,"lookups.r",sep=""))
@@ -102,8 +103,6 @@ In addition, there are a number of other modifications that may be undertaken ba
 
 
 ```r
-setwd("K:\\Development\\Fixed-price")
-
 ContractWeighted  <- read.csv(
     paste("data\\defense_contract_CSIScontractID_sample_15000_SumofObligatedAmount.csv", sep = ""),
     header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
@@ -211,6 +210,7 @@ CompleteModelAndDetail$Graph[CompleteModelAndDetail$SumOfisChangeOrder==0]<-FALS
 CompleteModelAndDetail$ContractCount<-1
 CompleteModelAndDetail<-ddply(CompleteModelAndDetail, .(Ceil), transform, pContract=ContractCount/sum(ContractCount))
 CompleteModelAndDetail<-ddply(CompleteModelAndDetail, .(Ceil), transform, pObligation=Action.Obligation/sum(Action.Obligation))
+CompleteModelAndDetail$pTotalObligation<-CompleteModelAndDetail$Action.Obligation/sum(CompleteModelAndDetail$Action.Obligation,na.rm=TRUE)
 
 
 ggplot(
@@ -428,14 +428,15 @@ ggplot(
 ```r
 ggplot(
   data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
-  aes_string(x = "pChangeOrderUnmodifiedBaseAndAll"),
+  aes_string(x = "pChangeOrderUnmodifiedBaseAndAll")
   ) + geom_bar(binwidth=0.01) + 
     facet_grid( Ceil ~ .,
                 scales = "free_y",
                 space = "free_y") +   
     scale_y_continuous("Number of Contracts with Change Orders")+
     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)",
-                       limits=c(-1.25,1.25), labels=percent)+theme(axis.text.x=element_text(angle=90,size=1))
+                       limits=c(-1.25,1.25), labels=percent)+
+    theme(axis.text.x=element_text(angle=90,size=1))
 ```
 
 ```
@@ -478,17 +479,21 @@ ggplot(
 #     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)")
     scale_y_continuous("Number of Contracts with Change Orders")+
         facet_grid( . ~ Ceil ) +
-    scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)", limits=c(-1.25,1.25), labels=percent)+theme(axis.title.x=element_text(angle=90))
+    scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)", limits=c(-1.25,1.25), labels=percent)+
+    theme(axis.title.x=element_text(angle=90))
 ```
 
 ![](Contract_ChangeOrders_files/figure-html/CeilingBreachDetailed-2.png) 
 
 ```r
-BreachSummary<-ddply(CompleteModelAndDetail,.(Ceil,pChangeOrderUnmodifiedBaseAndAll,SumOfisChangeOrder,CRai),
+BreachSummary<-ddply(CompleteModelAndDetail,.(Ceil,pChangeOrderUnmodifiedBaseAndAll,SumOfisChangeOrder,CRai,Term),
                      summarise,
-                     pContract=sum(pContract))
+                     pContract=sum(pContract),
+                     pObligation=sum(pObligation),
+                     pTotalObligation=sum(pTotalObligation))
 
 
+# Percent of Contracts breakdown
 ggplot(
   data = subset(BreachSummary,SumOfisChangeOrder>0),
   aes_string(x = "pChangeOrderUnmodifiedBaseAndAll",weight="pContract",fill="CRai")#
@@ -504,6 +509,33 @@ ggplot(
 ```
 
 ![](Contract_ChangeOrders_files/figure-html/CeilingBreachDetailed-3.png) 
+
+
+```r
+#Percent of obligations breakdown
+ggplot(
+  data = subset(BreachSummary,SumOfisChangeOrder>0),
+  aes_string(x = "pChangeOrderUnmodifiedBaseAndAll",weight="pTotalObligation",fill="CRai")#
+  )+ geom_bar(binwidth=0.01)+
+#     scale_x_continuous("Percentage of Obligations  by\nInitial Cost Ceiling (Base and All Options Value)")
+    scale_y_continuous("Percent of Completed Contracts\n(Weighted by Total Obligations)", labels=percent)+
+       # facet_grid( . ~ Term )+
+    scale_x_continuous("Extent of Ceiling Breach in 1% Increments",labels=percent,limits=c(-0.5,1))+
+    coord_cartesian(xlim=c(-0.5,1))+ theme(axis.text.x=element_text(angle=90),legend.position="bottom")+
+    scale_fill_discrete(name="Extent of Ceiling Breach")
+```
+
+```
+## Warning in loop_apply(n, do.ply): Removed 152 rows containing missing
+## values (position_stack).
+```
+
+```
+## Warning in loop_apply(n, do.ply): position_stack requires constant width:
+## output may be incorrect
+```
+
+![](Contract_ChangeOrders_files/figure-html/CeilingBreachObligations-1.png) 
 
 ```r
 tapply(CompleteModelAndDetail$CRai, CompleteModelAndDetail$Ceil, summary)
@@ -538,36 +570,89 @@ tapply(CompleteModelAndDetail$CRai, CompleteModelAndDetail$Ceil, summary)
 ```r
 ddply(subset(CompleteModelAndDetail,SumOfisChangeOrder>0),.(Ceil,CRai),
                      summarise,
-                     pContract=sum(pContract))
+                     pContract=sum(pContract), 
+      pObligation=sum(pObligation),
+                     pTotalObligation=sum(pTotalObligation))
 ```
 
 ```
-##           Ceil          CRai    pContract
-## 1         75m+       < -0.1% 0.0418181818
-## 2         75m+ -0.1% - <0.1% 0.0898181818
-## 3         75m+   0.1% - <15% 0.1094545455
-## 4         75m+          15%+ 0.0349090909
-## 5   10m - <75m       < -0.1% 0.0423413096
-## 6   10m - <75m -0.1% - <0.1% 0.0904857429
-## 7   10m - <75m   0.1% - <15% 0.1189998567
-## 8   10m - <75m          15%+ 0.0332425849
-## 9    1m - <10m       < -0.1% 0.0297418050
-## 10   1m - <10m -0.1% - <0.1% 0.0570568593
-## 11   1m - <10m   0.1% - <15% 0.0604806471
-## 12   1m - <10m          15%+ 0.0276442647
-## 13  100k - <1m       < -0.1% 0.0167536881
-## 14  100k - <1m -0.1% - <0.1% 0.0277760304
-## 15  100k - <1m   0.1% - <15% 0.0204346030
-## 16  100k - <1m          15%+ 0.0149412839
-## 17 15k - <100k       < -0.1% 0.0111542701
-## 18 15k - <100k -0.1% - <0.1% 0.0091257239
-## 19 15k - <100k   0.1% - <15% 0.0061769505
-## 20 15k - <100k          15%+ 0.0071955978
-## 21    0 - <15k       < -0.1% 0.0063460347
-## 22    0 - <15k -0.1% - <0.1% 0.0032260050
-## 23    0 - <15k   0.1% - <15% 0.0028392677
-## 24    0 - <15k          15%+ 0.0045792954
-## 25    0 - <15k          <NA> 0.0000589397
+##           Ceil          CRai    pContract pObligation pTotalObligation
+## 1         75m+       < -0.1% 0.0418181818 0.076246814     1.730144e-02
+## 2         75m+ -0.1% - <0.1% 0.0898181818 0.142456141     3.232525e-02
+## 3         75m+   0.1% - <15% 0.1094545455 0.193303999     4.386332e-02
+## 4         75m+          15%+ 0.0349090909 0.093398436     2.119338e-02
+## 5   10m - <75m       < -0.1% 0.0423413096 0.045992161     1.182855e-02
+## 6   10m - <75m -0.1% - <0.1% 0.0904857429 0.107488716     2.764461e-02
+## 7   10m - <75m   0.1% - <15% 0.1189998567 0.142548521     3.666150e-02
+## 8   10m - <75m          15%+ 0.0332425849 0.077241986     1.986557e-02
+## 9    1m - <10m       < -0.1% 0.0297418050 0.032694853     8.813019e-03
+## 10   1m - <10m -0.1% - <0.1% 0.0570568593 0.066206722     1.784627e-02
+## 11   1m - <10m   0.1% - <15% 0.0604806471 0.072071252     1.942707e-02
+## 12   1m - <10m          15%+ 0.0276442647 0.069945757     1.885414e-02
+## 13  100k - <1m       < -0.1% 0.0167536881 0.021146067     3.401042e-03
+## 14  100k - <1m -0.1% - <0.1% 0.0277760304 0.035840928     5.764500e-03
+## 15  100k - <1m   0.1% - <15% 0.0204346030 0.026494018     4.261183e-03
+## 16  100k - <1m          15%+ 0.0149412839 0.049240388     7.919611e-03
+## 17 15k - <100k       < -0.1% 0.0111542701 0.008911954     5.598989e-04
+## 18 15k - <100k -0.1% - <0.1% 0.0091257239 0.013607160     8.548779e-04
+## 19 15k - <100k   0.1% - <15% 0.0061769505 0.007298691     4.585446e-04
+## 20 15k - <100k          15%+ 0.0071955978 0.027092441     1.702099e-03
+## 21    0 - <15k       < -0.1% 0.0063460347 0.005085892     1.153745e-04
+## 22    0 - <15k -0.1% - <0.1% 0.0032260050 0.003999081     9.071998e-05
+## 23    0 - <15k   0.1% - <15% 0.0028392677 0.002750817     6.240284e-05
+## 24    0 - <15k          15%+ 0.0045792954 0.046141024     1.046719e-03
+## 25    0 - <15k          <NA> 0.0000589397 0.039779742     9.024116e-04
+```
+
+```r
+ddply(subset(CompleteModelAndDetail,SumOfisChangeOrder>0),.(Term,CRai),
+                     summarise,
+                     pTotalObligation=sum(pTotalObligation))
+```
+
+```
+##            Term          CRai pTotalObligation
+## 1    Terminated       < -0.1%     2.264074e-03
+## 2    Terminated -0.1% - <0.1%     4.862842e-03
+## 3    Terminated   0.1% - <15%     8.401980e-03
+## 4    Terminated          15%+     4.070941e-03
+## 5    Terminated          <NA>     8.118037e-04
+## 6  Unterminated       < -0.1%     3.975525e-02
+## 7  Unterminated -0.1% - <0.1%     7.966338e-02
+## 8  Unterminated   0.1% - <15%     9.633205e-02
+## 9  Unterminated          15%+     6.651058e-02
+## 10 Unterminated          <NA>     9.060788e-05
+```
+
+```r
+ddply(subset(CompleteModelAndDetail,SumOfisChangeOrder>0),.(CRai),
+                     summarise,
+                     pTotalObligation=sum(pTotalObligation))
+```
+
+```
+##            CRai pTotalObligation
+## 1       < -0.1%     0.0420193254
+## 2 -0.1% - <0.1%     0.0845262194
+## 3   0.1% - <15%     0.1047340284
+## 4          15%+     0.0705815169
+## 5          <NA>     0.0009024116
+```
+
+```r
+sum(subset(CompleteModelAndDetail,SumOfisChangeOrder>0)$pTotalObligation)
+```
+
+```
+## [1] 0.3027635
+```
+
+```r
+sum(subset(CompleteModelAndDetail,pChangeOrderUnmodifiedBaseAndAll>0)$pTotalObligation)
+```
+
+```
+## [1] 0.1892945
 ```
 
 

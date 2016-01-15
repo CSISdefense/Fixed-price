@@ -20,6 +20,7 @@ options(error=recover)
 Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 # Path<-"C:\\Users\\Greg Sanders\\SkyDrive\\Documents\\R Scripts and Data SkyDrive\\"
 source(paste(Path,"lookups.r",sep=""))
+source(paste(Path,"helper.r",sep=""))
 
 ```
 
@@ -189,11 +190,11 @@ summary(dSeconds%/%dyears(1))
 
 
 #Break the count of days into four categories.
-ContractComplete$Dur<-cut2(ContractComplete$UnmodifiedDays,cuts=c(61,214,366,732))
+CompleteContract$Dur<-cut2(CompleteContract$UnmodifiedDays,cuts=c(61,214,366,732))
 lowroundedcutoffs<-c(15000,100000,1000000,30000000)
 highroundedcutoffs<-c(15000,100000,1000000,10000000,75000000)
-ContractComplete$qLowCeiling <- cut2(ContractComplete$UnmodifiedContractBaseAndAllOptionsValue,cuts=lowroundedcutoffs)
-ContractComplete$qHighCeiling <- cut2(ContractComplete$UnmodifiedContractBaseAndAllOptionsValue,cuts=highroundedcutoffs)
+CompleteContract$qLowCeiling <- cut2(CompleteContract$UnmodifiedContractBaseAndAllOptionsValue,cuts=lowroundedcutoffs)
+CompleteContract$qHighCeiling <- cut2(CompleteContract$UnmodifiedContractBaseAndAllOptionsValue,cuts=highroundedcutoffs)
 rm(lowroundedcutoffs,highroundedcutoffs)
 
 
@@ -219,7 +220,7 @@ names(CompleteContract)
 
 
 ContractSurvival$SumofObligatedAmount[is.na(ContractSurvival$SumofObligatedAmount)]<-0
-ContractSurvival$IsTerminated[is.na(ContractSurvival$IsTerminated)]<-"Unterminated"
+ContractSurvival$Term[is.na(ContractSurvival$Term)]<-"Unterminated"
 
 #Overall
 ggplot(data = ContractSurvival,
@@ -230,7 +231,7 @@ ggplot(data = ContractSurvival,
     geom_bar(stat="identity",subset=.(Term=="Terminated"),aes(y=SumofObligatedAmount*(-1)))+
     coord_flip()
     
-    # geom_bar(stat="identity",aes(fill=IsTerminated))+
+    # geom_bar(stat="identity",aes(fill=Term))+
 
 #PSR
 ggplot(data = subset(ContractSurvival,PSR!="Mixed or Unlabeled"),
@@ -294,12 +295,12 @@ ggplot(data = ContractSurvival,
 ggplot(data = ContractSurvival,
        aes(x=Dur,
            y=ContractCount,
-           fill=IsTerminated)
-       )+ geom_bar(stat="identity",subset=.(IsTerminated=="Unterminated")) + 
-    geom_bar(stat="identity",subset=.(IsTerminated=="Terminated"),aes(y=ContractCount*(-1)))+
+           fill=Term)
+       )+ geom_bar(stat="identity",subset=.(Term=="Unterminated")) + 
+    geom_bar(stat="identity",subset=.(Term=="Terminated"),aes(y=ContractCount*(-1)))+
     coord_flip()
     
-    # geom_bar(stat="identity",aes(fill=IsTerminated))+
+    # geom_bar(stat="identity",aes(fill=Term))+
     
 
 
