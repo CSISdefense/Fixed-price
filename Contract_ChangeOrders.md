@@ -229,7 +229,7 @@ ggplot(
   data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
   aes_string(x = "Ceil")
   )+ geom_bar()+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+scale_y_continuous("Number of Contracts with Change Orders")+theme(axis.text.x=element_text(angle=90))
+    scale_x_discrete("Initial Cost Ceiling (Current $ Value)")+scale_y_continuous("Number of Contracts with Change Orders")+theme(axis.text.x=element_text(angle=90))
 ```
 
 ![](Contract_ChangeOrders_files/figure-html/ChangeOrders-3.png) 
@@ -240,7 +240,7 @@ ggplot(
   aes_string(x = "Ceil",weight="pContract")
 #   main="Percentage of Contracts going to Partially or Completely Terminated Contracts\nBy Initial Contract Ceiling"
   )+ geom_bar()+ scale_y_continuous("Percent of Contracts with Change Orders", labels=percent)+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+theme(axis.text.x=element_text(angle=90))
+    scale_x_discrete("Initial Cost Ceiling (Current $ Value)")+theme(axis.text.x=element_text(angle=90))
 ```
 
 ![](Contract_ChangeOrders_files/figure-html/ChangeOrders-4.png) 
@@ -251,7 +251,7 @@ ggplot(
   aes_string(x = "Ceil",weight="pObligation"),
   main="Percentage of Contract Obligations going to Contracts with Change Orders\nBy Initial Contract Ceiling"
   )+ geom_bar()+ scale_y_continuous("Percent of Obligations in Cost Ceiling Category", labels=percent)+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+theme(axis.text.x=element_text(angle=90))
+    scale_x_discrete("Initial Cost Ceiling (Current $ Value)")+theme(axis.text.x=element_text(angle=90))
 ```
 
 ![](Contract_ChangeOrders_files/figure-html/ChangeOrders-5.png) 
@@ -261,7 +261,7 @@ ggplot(
   data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
   aes_string(x = "Ceil",weight="Action.Obligation")
   )+ geom_bar()+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+scale_y_continuous("Total Obligated Value of Contracts with Change Orders")+theme(axis.text.x=element_text(angle=90))
+    scale_x_discrete("Initial Cost Ceiling (Current $ Value)")+scale_y_continuous("Total Obligated Value of Contracts with Change Orders")+theme(axis.text.x=element_text(angle=90))
 ```
 
 ![](Contract_ChangeOrders_files/figure-html/ChangeOrders-6.png) 
@@ -398,7 +398,7 @@ ggplot(
   aes_string(x = "Ceil",weight="pContract")
 #   main="Percentage of Contracts going to Partially or Completely Terminated Contracts\nBy Initial Contract Ceiling"
   )+ geom_bar()+ scale_y_continuous("Percent of Contracts with Change Orders", labels=percent)+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")
+    scale_x_discrete("Initial Cost Ceiling (Current $ Value)")
 ```
 
 ![](Contract_ChangeOrders_files/figure-html/CeilBreachSummary-1.png) 
@@ -409,7 +409,7 @@ ggplot(
   aes_string(x = "Ceil",weight="pObligation"),
   main="Percentage of Contract Obligations going to Contracts with Change Orders\nBy Initial Contract Ceiling"
   )+ geom_bar()+ scale_y_continuous("Percent of Obligations in Cost Ceiling Category", labels=percent)+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")
+    scale_x_discrete("Initial Cost Ceiling (Current $ Value)")
 ```
 
 ![](Contract_ChangeOrders_files/figure-html/CeilBreachSummary-2.png) 
@@ -419,7 +419,7 @@ ggplot(
   data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
   aes_string(x = "Ceil",weight="Action.Obligation")
   )+ geom_bar()+
-    scale_x_discrete("Initial Cost Ceiling (Base and All Options Value)")+scale_y_continuous("Total Obligated Value of Contracts with Change Orders")
+    scale_x_discrete("Initial Cost Ceiling (Current $ Value)")+scale_y_continuous("Total Obligated Value of Contracts with Change Orders")
 ```
 
 ![](Contract_ChangeOrders_files/figure-html/CeilBreachSummary-3.png) 
@@ -434,7 +434,7 @@ ggplot(
                 scales = "free_y",
                 space = "free_y") +   
     scale_y_continuous("Number of Contracts with Change Orders")+
-    scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)",
+    scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Current $ Value)",
                        limits=c(-1.25,1.25), labels=percent)+
     theme(axis.text.x=element_text(angle=90,size=1))
 ```
@@ -476,10 +476,10 @@ ggplot(
   data = subset(CompleteModelAndDetail,SumOfisChangeOrder>0),
   aes_string(x = "pChangeOrderUnmodifiedBaseAndAll")
   )+ geom_bar()+
-#     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)")
+#     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Current $ Value)")
     scale_y_continuous("Number of Contracts with Change Orders")+
         facet_grid( . ~ Ceil ) +
-    scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)", limits=c(-1.25,1.25), labels=percent)+
+    scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Current $ Value)", limits=c(-1.25,1.25), labels=percent)+
     theme(axis.title.x=element_text(angle=90))
 ```
 
@@ -498,7 +498,7 @@ ggplot(
   data = subset(BreachSummary,SumOfisChangeOrder>0),
   aes_string(x = "pChangeOrderUnmodifiedBaseAndAll",weight="pContract",fill="CRai")#
   )+ geom_bar(binwidth=0.05)+
-#     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Base and All Options Value)")
+#     scale_x_continuous("Percentage of Cost-Ceiling-Raising Change Orders by\nInitial Cost Ceiling (Current $ Value)")
     scale_y_continuous("Percent of Contracts", labels=percent)+
         facet_grid( . ~ Ceil )+scale_x_continuous("Extent of Ceiling Breach in 5% Increments",limits=c(-0.5,1), labels=percent)+theme(axis.text.x=element_text(angle=90),legend.position="bottom")+scale_fill_discrete(name="Extent of Ceiling Breach")
 ```
@@ -517,10 +517,10 @@ ggplot(
   data = subset(BreachSummary,SumOfisChangeOrder>0),
   aes_string(x = "pChangeOrderUnmodifiedBaseAndAll",weight="pTotalObligation",fill="CRai")#
   )+ geom_bar(binwidth=0.01)+
-#     scale_x_continuous("Percentage of Obligations  by\nInitial Cost Ceiling (Base and All Options Value)")
-    scale_y_continuous("Percent of Completed Contracts\n(Weighted by Total Obligations)", labels=percent)+
+#     scale_x_continuous("Percentage of Obligations  by\nInitial Cost Ceiling (Current $ Value)")
+    scale_y_continuous("Percent of Completed Contracts\n(Weighted by Current $ Obligations)", labels=percent)+
        # facet_grid( . ~ Term )+
-    scale_x_continuous("Extent of Ceiling Breach in 1% Increments",labels=percent,limits=c(-0.5,1))+
+    scale_x_continuous("Extent of Ceiling Breach \n(Percent Change in Current $ Value in 1% Increments)",labels=percent,limits=c(-0.5,1))+
     coord_cartesian(xlim=c(-0.5,1))+ theme(axis.text.x=element_text(angle=90),legend.position="bottom")+
     scale_fill_discrete(name="Extent of Ceiling Breach")
 ```

@@ -162,7 +162,7 @@ ggplot(
   data = subset(CompleteModelAndDetail,Term=="Terminated"),
   aes_string(x = "Ceil")
   )+ geom_bar()+
-    scale_x_discrete("Original Ceiling (Base and All Options Value)")+scale_y_continuous("Number of Partially or Completely \nTerminated Contracts",labels = comma)+theme(axis.text.x=element_text(angle=90,size=12))
+    scale_x_discrete("Original Ceiling (Current $ Value)")+scale_y_continuous("Number of Partially or Completely \nTerminated Contracts",labels = comma)+theme(axis.text.x=element_text(angle=90,size=12))
 ```
 
 ![](Contract_Termination_files/figure-html/ContractTerminationGraphs-3.png) 
@@ -229,13 +229,20 @@ head(CompleteModelAndDetail)
 ## 4                                0                     0       307.0000
 ## 5                                0                     0       129.0417
 ## 6                                0                     0        44.0000
-##   Action.Obligation Graph ContractCount    pContract  pObligation
-## 1         139164420 FALSE             1 0.0003636364 5.031861e-04
-## 2          77538428 FALSE             1 0.0003636364 2.803609e-04
-## 3              8964 FALSE             1 0.0003636364 3.241173e-08
-## 4                 0 FALSE             1 0.0003636364 0.000000e+00
-## 5            490000 FALSE             1 0.0003636364 1.771726e-06
-## 6             45000 FALSE             1 0.0003636364 1.627095e-07
+##   MinOfEffectiveDate Action.Obligation Graph ContractCount    pContract
+## 1         2010-05-20         139164420 FALSE             1 0.0003636364
+## 2         2007-09-28          77538428 FALSE             1 0.0003636364
+## 3         2006-11-06              8964 FALSE             1 0.0003636364
+## 4         2008-05-29                 0 FALSE             1 0.0003636364
+## 5         2007-09-25            490000 FALSE             1 0.0003636364
+## 6         2007-09-18             45000 FALSE             1 0.0003636364
+##    pObligation
+## 1 5.031861e-04
+## 2 2.803609e-04
+## 3 3.241173e-08
+## 4 0.000000e+00
+## 5 1.771726e-06
+## 6 1.627095e-07
 ```
 
 ```r
@@ -243,7 +250,7 @@ ggplot(
   data = subset(CompleteModelAndDetail,Term=="Terminated"),
   aes(x = Ceil,weight=Action.Obligation/1000000000)
   )+ geom_bar()+
-    scale_x_discrete("Original Ceiling (Base and All Options Value)")+scale_y_continuous("Total Obligations Going to Partially or Completely\nTerminated Contracts ($ Billions)",labels = comma)+theme(axis.text.x=element_text(angle=90,size=12))
+    scale_x_discrete("Original Ceiling (Current $ Value)")+scale_y_continuous("Obligations to Partially or Completely\nTerminated Contracts (Current $ Billions)",labels = comma)+theme(axis.text.x=element_text(angle=90,size=12))
 ```
 
 ![](Contract_Termination_files/figure-html/ContractTerminationGraphs-4.png) 
@@ -254,7 +261,7 @@ ggplot(
   aes_string(x = "Ceil",weight="pContract")
 #   main="Percentage of Contracts going to Partially or Completely Terminated Contracts\nBy Initial Contract Ceiling"
   )+ geom_bar()+ scale_y_continuous("Percent of Contracts Partially or Completely Terminated\nby Original Ceiling Category", labels=percent)+
-    scale_x_discrete("Original Ceiling (Base and All Options Value)")+theme(axis.text.x=element_text(angle=90,size=12))
+    scale_x_discrete("Original Ceiling (Current $ Value)")+theme(axis.text.x=element_text(angle=90,size=12))
 ```
 
 ![](Contract_Termination_files/figure-html/ContractTerminationGraphs-5.png) 
@@ -264,8 +271,8 @@ ggplot(
   data = subset(CompleteModelAndDetail,Term=="Terminated"),
   aes_string(x = "Ceil",weight="pObligation"),
   main="Percentage of Contract Obligations going to Partially or Completely Terminated Contracts\nBy Initial Contract Ceiling"
-  )+ geom_bar()+ scale_y_continuous("Percent of Obligations to Terminated Contracts in Original Ceiling Category", labels=percent)+
-    scale_x_discrete("Original Ceiling (Base and All Options Value)")+theme(axis.text.x=element_text(angle=90,size=12))
+  )+ geom_bar()+ scale_y_continuous("Percent of Obligations to Terminated Contracts \nin Original Ceiling Category", labels=percent)+
+    scale_x_discrete("Original Ceiling (Current $ Value)")+theme(axis.text.x=element_text(angle=90,size=12))
 ```
 
 ![](Contract_Termination_files/figure-html/ContractTerminationGraphs-6.png) 
@@ -346,13 +353,20 @@ head(CompleteModelAndDetail)
 ## 4                                0                     0       307.0000
 ## 5                                0                     0       129.0417
 ## 6                                0                     0        44.0000
-##   Action.Obligation Graph ContractCount    pContract  pObligation
-## 1         139164420 FALSE             1 0.0003636364 5.031861e-04
-## 2          77538428 FALSE             1 0.0003636364 2.803609e-04
-## 3              8964 FALSE             1 0.0003636364 3.241173e-08
-## 4                 0 FALSE             1 0.0003636364 0.000000e+00
-## 5            490000 FALSE             1 0.0003636364 1.771726e-06
-## 6             45000 FALSE             1 0.0003636364 1.627095e-07
+##   MinOfEffectiveDate Action.Obligation Graph ContractCount    pContract
+## 1         2010-05-20         139164420 FALSE             1 0.0003636364
+## 2         2007-09-28          77538428 FALSE             1 0.0003636364
+## 3         2006-11-06              8964 FALSE             1 0.0003636364
+## 4         2008-05-29                 0 FALSE             1 0.0003636364
+## 5         2007-09-25            490000 FALSE             1 0.0003636364
+## 6         2007-09-18             45000 FALSE             1 0.0003636364
+##    pObligation
+## 1 5.031861e-04
+## 2 2.803609e-04
+## 3 3.241173e-08
+## 4 0.000000e+00
+## 5 1.771726e-06
+## 6 1.627095e-07
 ```
 
 
