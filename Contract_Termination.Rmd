@@ -15,13 +15,16 @@ Dod Fixed-Price Study: Is Terminated exploration
 
 ##library("ggplot2")
 # 
-# setwd("K:\\Development\\Fixed-price")
+setwd("K:\\Development\\Fixed-price")
 
 Path<-"K:\\2007-01 PROFESSIONAL SERVICES\\R scripts and data\\"
 source(paste(Path,"lookups.r",sep=""))
+source(paste(Path,"helper.r",sep=""))
+source("ContractCleanup.r")
 
-
-
+require(ggplot2)
+require(scales)
+require(Hmisc)
 Coloration<-read.csv(
     paste(Path,"Lookups\\","lookup_coloration.csv",sep=""),
     header=TRUE, sep=",", na.strings="", dec=".", strip.white=TRUE, 
@@ -72,44 +75,7 @@ CompleteModelAndDetail  <- read.csv(
     stringsAsFactors = TRUE
     )
 
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SubCustomer.sum"]<-"Who"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="UnmodifiedIsSomeCompetition"]<-"Comp"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="PlatformPortfolio.sum"]<-"What"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsIDV"]<-"IDV"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="FixedOrCost"]<-"FxCb"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="AnyInternational"]<-"Intl"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleArea"]<-"PSR"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qLowCeiling"]<-"LowCeil"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qHighCeiling"]<-"Ceil"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qLinked"]<-"Link"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qDuration"]<-"Dur"
-# colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SingleOffer"]<-"One"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qOffers"]<-"Offr"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="IsTerminated"]<-"Term"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SoftwareEng"]<-"Soft"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="SimpleVehicle"]<-"Veh"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="LabeledMDAP"]<-"MDAP"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qNChg"]<-"NChg"
-colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qCRais"]<-"CRai"
-
-    CompleteModelAndDetail$Ceil<-factor(CompleteModelAndDetail$Ceil,
-                                levels=c("[75m+]",
-                                         "[10m,75m)",
-                                         "[1m,10m)", 
-                                         "[100k,1m)",
-                                         "[15k,100k)",
-                                         "[0,15k)"
-                                ),
-                                labels=c("75m+",
-                                         "10m - <75m",
-                                         "1m - <10m", 
-                                         "100k - <1m",
-                                         "15k - <100k",
-                                         "0 - <15k"
-                                ),
-                                ordered=TRUE
-                                
-    )
+CompleteModelAndDetail<-FormatContractModel(CompleteModelAndDetail)
 
 #ContractWeighted <- apply_lookups(Path,ContractWeighted)
 
@@ -119,10 +85,10 @@ colnames(CompleteModelAndDetail)[colnames(CompleteModelAndDetail)=="qCRais"]<-"C
 
 ```{r ContractTerminationGraphs, echo = TRUE, fig.width=4.5,fig.height=6}
 
-require("ggplot2")
-require(scales)
+
 
 ContractWeighted<-subset(ContractWeighted, StartFiscal_Year>=2007)
+
 
 ggplot(
   data = ContractWeighted,
@@ -159,9 +125,6 @@ CompleteModelAndDetail$Graph[CompleteModelAndDetail$Term=="Terminated"]<-TRUE
 
 CompleteModelAndDetail$Graph[CompleteModelAndDetail$Term=="Unterminated"]<-FALSE
 
-CompleteModelAndDetail$ContractCount<-1
-CompleteModelAndDetail<-ddply(CompleteModelAndDetail, .(Ceil), transform, pContract=ContractCount/sum(ContractCount))
-CompleteModelAndDetail<-ddply(CompleteModelAndDetail, .(Ceil), transform, pObligation=Action.Obligation/sum(Action.Obligation))
 
 head(CompleteModelAndDetail)
 
@@ -213,5 +176,134 @@ ggplot(
 head(CompleteModelAndDetail)
 ```
 
+
+```{r ImportanceOfEndOfPeriod}
+
+
+
+
+TerminatedEndSummary<-ddply(subset(CompleteModelAndDetail,StartFiscalYear>=2007 & 
+                  StartFiscalYear<2014 &
+                  !is.na(Ceil)&
+                  !is.na(EndAfterPeriod)),
+                            .(Ceil,
+                                                  EndAfterPeriod,
+                                                  Term,
+                                                  StartFiscalYear
+                                             ),plyr::summarise,
+      Action.Obligation=sum(Action.Obligation),
+      Count=length(CSIScontractID)
+      )
+
+TerminatedEndSummary<-ddply(TerminatedEndSummary,.(Ceil,
+                                                  EndAfterPeriod,
+                                             StartFiscalYear
+                                             ),transform,
+                      pContractCeilDurStart=Count/sum(Count),
+                      pObligationCeilDurStart=Action.Obligation/sum(Action.Obligation)
+      )
+
+
+
+ggplot(TerminatedEndSummary,
+       aes(x=StartFiscalYear,
+           y=Count,
+           color=Term))+geom_line()+geom_point()+facet_grid(Ceil ~ EndAfterPeriod ) +scale_y_log10()
+
+```
+
+
+```{r AnnualTerminationRate}
+
+CompleteModelAndDetail$TermNum<-as.integer(as.character(factor(CompleteModelAndDetail$Term,
+                                  levels=c("Terminated","Unterminated"),
+                                  labels=c(1,0))))
+
+
+
+TerminatedDurSummary<-ddply(subset(CompleteModelAndDetail,StartFiscalYear>=2007 & 
+                  StartFiscalYear<2014 &
+                  !is.na(Ceil)&
+                  UnmodifiedCompletionDate<as.Date("2013-09-30")&
+                      !is.na(Term)),
+                            .(Ceil,
+                              Dur,
+                              StartFiscalYear,
+                              Term
+                            ),
+                            plyr::summarise,
+                            Action.Obligation=sum(Action.Obligation),
+                            Count=length(CSIScontractID)
+                  )
+
+
+TerminatedDurSummary<-ddply(TerminatedDurSummary,.(Ceil,
+                                                  Dur,
+                                             StartFiscalYear
+                                             ),transform,
+                      pContractCeilDurStart=Count/sum(Count),
+                      pObligationCeilDurStart=Action.Obligation/sum(Action.Obligation)
+      )
+
+
+ggplot(TerminatedDurSummary,
+       aes(x=StartFiscalYear,
+           y=Count,
+           color=Term))+geom_line()+geom_point()+facet_grid(Ceil ~ Dur ) +scale_y_log10(labels=scales::comma)
+
+
+
+TerminatedDurStat<-ddply(subset(CompleteModelAndDetail,
+                                StartFiscalYear>=2007 & 
+                                    StartFiscalYear<2014 &
+                                    !is.na(Ceil) &
+                                    UnmodifiedCompletionDate<as.Date("2013-09-30")&
+                                    !is.na(Term)),
+                         .(Ceil,
+                           Dur,
+                           StartFiscalYear
+                         ),
+                         
+                         plyr::summarise,
+                         Action.Obligation=sum(Action.Obligation),
+                         Count=length(CSIScontractID),
+                         N    = length(TermNum),
+                         mean = mean(TermNum),
+                         sd   = sd(TermNum),
+                         se   = sd / sqrt(N),
+                         obl.mean = wtd.mean(TermNum,Action.Obligation),
+                         ceil.mean = wtd.mean(TermNum,UnmodifiedContractBaseAndAllOptionsValue)
+)
+# 
+# pd <- position_dodge(0.1) # move them .05 to the left and right
+# 
+# ggplot(tgc, aes(x=dose, y=len, colour=supp)) + 
+#     geom_errorbar(aes(ymin=len-se, ymax=len+se), width=.1, position=pd) 
+
+ggplot(TerminatedDurStat,aes(x=StartFiscalYear))+
+    geom_line(aes(y=mean))+
+    # geom_line(aes(y=ceil.mean))+
+    geom_line(aes(y=obl.mean))+
+    geom_point(aes(y=mean))+
+    facet_grid(Ceil ~ Dur ) +
+    scale_y_continuous(label=percent)+
+    geom_errorbar(aes(ymin=mean-se, ymax=mean+se), width=.1) #, position=pd
+
+
+ggplot(TerminatedDurStat,
+       aes(x=StartFiscalYear,
+           y=obl.mean))+geom_line()+geom_point()+facet_grid(Ceil ~ Dur ) +
+    scale_y_continuous(label=percent)
+         # geom_errorbar(aes(ymin=mean-se, ymax=mean+se), width=.1) #, position=pd
+
+
+ggplot(TerminatedDurStat,
+       aes(x=StartFiscalYear,
+           y=ceil.mean))+geom_line()+geom_point()+facet_grid(Ceil ~ Dur ) +
+    scale_y_continuous(label=percent)
+         # geom_errorbar(aes(ymin=mean-se, ymax=mean+se), width=.1) #, position=pd
+
+
+```
 
 

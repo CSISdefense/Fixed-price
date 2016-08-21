@@ -54,6 +54,12 @@ contract.sample<-apply_lookups(Path,contract.sample)
 ```
 
 ```
+## Joining by: Customer, SubCustomer
+## Joining by: ProductOrServiceArea
+## Joining by: PlatformPortfolio
+```
+
+```
 ## Warning in apply_lookups(Path, contract.sample): NaNs produced
 ```
 
@@ -129,19 +135,19 @@ summary(subset(contract.sample,select=c(#TypeOfContractPricing#Pricing.Mechanism
 ##                                     NA's   :7683          
 ##  ObligatedAmountIsFixedPrice pIsFixedPrice      IsCostBased   
 ##  Min.   : -15295131          Min.   :-7.7918   Min.   :0.000  
-##  1st Qu.:    165320          1st Qu.: 0.9932   1st Qu.:0.000  
+##  1st Qu.:    165320          1st Qu.: 1.0000   1st Qu.:0.000  
 ##  Median :    945852          Median : 1.0000   Median :0.000  
-##  Mean   :   7301084          Mean   : 0.7786   Mean   :0.165  
+##  Mean   :   7301084          Mean   : 0.7776   Mean   :0.165  
 ##  3rd Qu.:   4278188          3rd Qu.: 1.0000   3rd Qu.:0.000  
-##  Max.   :4087745756          Max.   :70.3245   Max.   :1.000  
-##  NA's   :20820                                 NA's   :7525   
+##  Max.   :4087745756          Max.   : 7.4847   Max.   :1.000  
+##  NA's   :20820               NA's   :17        NA's   :7525   
 ##  UnmodifiedIsCostBased ObligatedAmountIsCostBased  pIsCostBased    
 ##  Min.   :0.000         Min.   : -15813292         Min.   :-2.5512  
 ##  1st Qu.:0.000         1st Qu.:    693686         1st Qu.: 0.0000  
 ##  Median :0.000         Median :   2424353         Median : 0.0000  
-##  Mean   :0.163         Mean   :  12901095         Mean   : 0.1524  
+##  Mean   :0.163         Mean   :  12901095         Mean   : 0.1525  
 ##  3rd Qu.:0.000         3rd Qu.:   8049682         3rd Qu.: 0.0000  
-##  Max.   :1.000         Max.   :8949412758         Max.   : 3.4990  
+##  Max.   :1.000         Max.   :8949412758         Max.   : 2.7897  
 ##  NA's   :7688          NA's   :82574                               
 ##  IsCombination   UnmodifiedIsCombination ObligatedAmountIsCombination
 ##  Min.   :1       Min.   :1               Min.   : -20068122          
@@ -155,7 +161,7 @@ summary(subset(contract.sample,select=c(#TypeOfContractPricing#Pricing.Mechanism
 ##  Min.   :-6.48473   Min.   :0.000   Min.   :0.000        
 ##  1st Qu.: 0.00000   1st Qu.:0.000   1st Qu.:0.000        
 ##  Median : 0.00000   Median :0.000   Median :0.000        
-##  Mean   : 0.02587   Mean   :0.005   Mean   :0.006        
+##  Mean   : 0.02596   Mean   :0.005   Mean   :0.006        
 ##  3rd Qu.: 0.00000   3rd Qu.:0.000   3rd Qu.:0.000        
 ##  Max.   : 8.79180   Max.   :1.000   Max.   :1.000        
 ##                     NA's   :5610    NA's   :6537         
@@ -163,9 +169,9 @@ summary(subset(contract.sample,select=c(#TypeOfContractPricing#Pricing.Mechanism
 ##  Min.   :  -1020232         Min.   :-0.056137  
 ##  1st Qu.:    731441         1st Qu.: 0.000000  
 ##  Median :   3593983         Median : 0.000000  
-##  Mean   :  43478374         Mean   : 0.006826  
+##  Mean   :  43478374         Mean   : 0.006778  
 ##  3rd Qu.:  15311724         3rd Qu.: 0.000000  
-##  Max.   :2870976999         Max.   : 3.060888  
+##  Max.   :2870976999         Max.   : 1.724314  
 ##  NA's   :99187
 ```
 
@@ -174,8 +180,8 @@ contract.sample$FixedOrCost[contract.sample$pIsFixedPrice>0  |
                                       contract.sample$pIsCostBased>0 | 
                                           contract.sample$pIsCombination>0]<-"Combination \nor Other"
 
-contract.sample$FixedOrCost[contract.sample$pIsFixedPrice>=0.95|(contract.sample$IsFixedPrice=="Fixed Price" & contract.sample$pIsCombination==0)]<-"Fixed-Price"
-contract.sample$FixedOrCost[contract.sample$pIsCostBased>=0.95|(contract.sample$IsCostBased==1 & contract.sample$pIsCombination==0)]<-"Cost-Based"
+contract.sample$FixedOrCost[contract.sample$pIsFixedPrice>=0.95|(contract.sample$IsFixedPrice=="Fixed Price" & contract.sample$pIsCombination<0.05)]<-"Fixed-Price"
+contract.sample$FixedOrCost[contract.sample$pIsCostBased>=0.95|(contract.sample$IsCostBased==1 & contract.sample$pIsCombination<0.05)]<-"Cost-Based"
 contract.sample$FixedOrCost<-factor(contract.sample$FixedOrCost,levels=c("Fixed-Price","Cost-Based","Combination \nor Other"))
 
 ggplot(
@@ -188,7 +194,7 @@ ggplot(
     )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))
 ```
 
-![](contract_pricing_exploration_files/figure-html/overallvars-1.png) 
+![](Contract_Pricing_files/figure-html/Samplevars-1.png) 
 
 ```r
 ggplot(
@@ -201,7 +207,7 @@ ggplot(
     )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))
 ```
 
-![](contract_pricing_exploration_files/figure-html/overallvars-2.png) 
+![](Contract_Pricing_files/figure-html/Samplevars-2.png) 
 
 ```r
 ggplot(
@@ -212,11 +218,7 @@ ggplot(
     ) +geom_bar()+scale_x_continuous(limits = c(-0.25, 1.25))
 ```
 
-```
-## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
-```
-
-![](contract_pricing_exploration_files/figure-html/overallvars-3.png) 
+![](Contract_Pricing_files/figure-html/Samplevars-3.png) 
 
 ```r
 ggplot(
@@ -229,4 +231,197 @@ ggplot(
     )+geom_bar(binwidth=0.025)+scale_x_continuous(limits = c(-0.25, 1.25))
 ```
 
-![](contract_pricing_exploration_files/figure-html/overallvars-4.png) 
+![](Contract_Pricing_files/figure-html/Samplevars-4.png) 
+
+
+
+```r
+#defense_contract_SP_ContractPricingCustomer
+CompleteContracts  <- read.csv(
+    paste("data\\defense_contract_CSIScontractID_detail.csv", sep = ""),
+    header = TRUE, sep = ",", dec = ".", strip.white = TRUE, 
+    na.strings = c("NULL","NA",""),
+    stringsAsFactors = TRUE
+    )
+
+CompleteContracts<-read_and_join(Path
+                                 ,"defense_contract_SP_ContractPricingCustomer.csv"
+                                 ,CompleteContracts
+                                 ,"data\\"
+                                 ,by="CSIScontractID"
+                                 )
+CompleteContracts<-standardize_variable_names(Path,CompleteContracts)
+
+#IsLabeledPricing Can drop this the next time we download, as there's an Isnull(,0 there now)
+CompleteContracts$IsLabeledPricing[is.nan(CompleteContracts$IsLabeledPricing)|is.na(CompleteContracts$IsLabeledPricing)] <- 0
+
+
+CompleteContracts$ObligatedAmountIsFixedPrice<-FactorToNumber(CompleteContracts$ObligatedAmountIsFixedPrice)
+CompleteContracts$pIsFixedPrice <- CompleteContracts$ObligatedAmountIsFixedPrice/CompleteContracts$Action.Obligation
+CompleteContracts$pIsFixedPrice[is.nan(CompleteContracts$ObligatedAmountIsFixedPrice)|is.na(CompleteContracts$ObligatedAmountIsFixedPrice)] <- 0
+
+
+CompleteContracts$ObligatedAmountIsCostBased<-FactorToNumber(CompleteContracts$ObligatedAmountIsCostBased)
+CompleteContracts$pIsCostBased <- CompleteContracts$ObligatedAmountIsCostBased/CompleteContracts$Action.Obligation
+CompleteContracts$pIsCostBased[is.nan(CompleteContracts$ObligatedAmountIsCostBased)|is.na(CompleteContracts$ObligatedAmountIsCostBased)] <- 0
+    
+CompleteContracts$ObligatedAmountIsCombination<-FactorToNumber(CompleteContracts$ObligatedAmountIsCombination)
+CompleteContracts$pIsCombination <- CompleteContracts$ObligatedAmountIsCombination/CompleteContracts$Action.Obligation
+CompleteContracts$pIsCombination[is.nan(CompleteContracts$ObligatedAmountIsCombination)|is.na(CompleteContracts$ObligatedAmountIsCombination)] <- 0
+
+#Assign FixedOrCost
+CompleteContracts$FixedOrCost[CompleteContracts$pIsFixedPrice>0  |
+                                  CompleteContracts$pIsCostBased>0 | 
+                                  CompleteContracts$pIsCombination>0]<-"Combination or Other"
+
+CompleteContracts$FixedOrCost[CompleteContracts$pIsFixedPrice>=0.95|(CompleteContracts$IsFixedPrice==1 & (CompleteContracts$pIsCombination<=0.05))]<-"Fixed-Price"
+CompleteContracts$FixedOrCost[CompleteContracts$pIsCostBased>=0.95|(CompleteContracts$IsCostBased==1 & (CompleteContracts$pIsCombination<=0.05))]<-"Cost-Based"
+CompleteContracts$FixedOrCost<-factor(CompleteContracts$FixedOrCost,levels=c("Fixed-Price","Cost-Based","Combination or Other"))
+```
+
+
+
+```r
+CompleteContracts$ObligatedAmountIsIncentive<-FactorToNumber(CompleteContracts$ObligatedAmountIsIncentive)
+CompleteContracts$pIsIncentive <- CompleteContracts$ObligatedAmountIsIncentive/CompleteContracts$Action.Obligation
+CompleteContracts$pIsIncentive[is.nan(CompleteContracts$ObligatedAmountIsIncentive)|is.na(CompleteContracts$ObligatedAmountIsIncentive)] <- 0
+
+CompleteContracts$ObligatedAmountIsAwardFee<-FactorToNumber(CompleteContracts$ObligatedAmountIsAwardFee)
+CompleteContracts$pIsAwardFee <- CompleteContracts$ObligatedAmountIsAwardFee/CompleteContracts$Action.Obligation
+CompleteContracts$pIsAwardFee[is.nan(CompleteContracts$ObligatedAmountIsAwardFee)|is.na(CompleteContracts$ObligatedAmountIsAwardFee)] <- 0
+
+CompleteContracts$ObligatedAmountIsFFPorNoFee<-FactorToNumber(CompleteContracts$ObligatedAmountIsFFPorNoFee)
+CompleteContracts$pIsFFPorNoFee <- CompleteContracts$ObligatedAmountIsFFPorNoFee/CompleteContracts$Action.Obligation
+CompleteContracts$pIsFFPorNoFee[is.nan(CompleteContracts$ObligatedAmountIsFFPorNoFee)|is.na(CompleteContracts$ObligatedAmountIsFFPorNoFee)] <- 0
+
+
+CompleteContracts$ObligatedAmountIsFixedFee<-FactorToNumber(CompleteContracts$ObligatedAmountIsFixedFee)
+CompleteContracts$pIsFixedFee <- CompleteContracts$ObligatedAmountIsFixedFee/CompleteContracts$Action.Obligation
+CompleteContracts$pIsFixedFee[is.nan(CompleteContracts$ObligatedAmountIsFixedFee)|is.na(CompleteContracts$ObligatedAmountIsFixedFee)] <- 0
+
+CompleteContracts$ObligatedAmountIsOtherFee<-FactorToNumber(CompleteContracts$ObligatedAmountIsOtherFee)
+CompleteContracts$pIsOtherFee <- CompleteContracts$ObligatedAmountIsOtherFee/CompleteContracts$Action.Obligation
+CompleteContracts$pIsOtherFee[is.nan(CompleteContracts$ObligatedAmountIsOtherFee)|is.na(CompleteContracts$ObligatedAmountIsOtherFee)] <- 0
+
+
+#AssignFee
+CompleteContracts$Fee<-NA
+CompleteContracts$Fee[CompleteContracts$pIsAwardFee>=0.9|(CompleteContracts$IsAwardFee==1
+                      & CompleteContracts$pIsCombination<=0.05)]<-"Award Fee"
+CompleteContracts$Fee[CompleteContracts$pIsIncentive>=0.9|(CompleteContracts$IsIncentive==1
+                      & CompleteContracts$pIsCombination<=0.05)]<-"Incentive"
+CompleteContracts$Fee[CompleteContracts$pIsFFPorNoFee>=0.9|(CompleteContracts$IsFFPorNoFee==1
+                      & CompleteContracts$pIsCombination<=0.05)]<-"FFP or No Fee"
+CompleteContracts$Fee[CompleteContracts$pIsFixedFee>=0.9|(CompleteContracts$IsFixedFee==1
+                      & CompleteContracts$pIsCombination<=0.05)]<-"Fixed Fee"
+
+CompleteContracts$Fee[CompleteContracts$pIsOtherFee>=0.9|
+                          CompleteContracts$IsOtherFee==1 | 
+                          CompleteContracts$pIsCombination>0.1|
+                          (is.na(CompleteContracts$Fee) & CompleteContracts$IsLabeledPricing==1)]<-
+    "Combination or Other Fee"
+
+
+PricingSummary<-ddply(CompleteContracts,.(IsIncentive,
+                                          pIsIncentive,                                          
+                                          UnmodifiedIsIncentive,
+                                          IsAwardFee,
+                                          pIsAwardFee,
+                                          UnmodifiedIsAwardFee,
+                                          IsFixedFee,
+                                          pIsFixedFee,
+                                          UnmodifiedIsFixedFee,
+                                          IsFFPorNoFee,
+                                          pIsFFPorNoFee,
+                                          UnmodifiedIsFFPorNoFee,
+                                          IsOtherFee,
+                                          pIsOtherFee,
+                                          UnmodifiedIsOtherFee,
+                                          IsCombination,
+                                          Ceil,
+                                          Fee),summarise,
+      Action.Obligation=sum(Action.Obligation),
+      ObligatedAmountIsIncentive=sum(ObligatedAmountIsIncentive),
+      Count=length(CSIScontractID)
+      )
+PricingSummary<-ddply(PricingSummary,.(Ceil),mutate,
+      pCount=Count/sum(Count,na.rm=TRUE)
+      )
+
+
+
+ ggplot(subset(PricingSummary,(is.na(IsIncentive)&pIsIncentive>0) ), #!is.na(Ac)
+            aes(x = pIsIncentive,
+                weight = Count,
+                fill=Fee
+                )) +
+    geom_histogram(alpha = 1,  colour = "black",binwidth=0.025)+
+    scale_x_continuous(limits=c(-0.05,1.05))+
+    facet_grid(.  ~ UnmodifiedIsIncentive)
+```
+
+![](Contract_Pricing_files/figure-html/CompleteFee-1.png) 
+
+```r
+ ggplot(subset(PricingSummary,(is.na(IsAwardFee)&pIsAwardFee>0) ), #!is.na(Ac)
+            aes(x = pIsAwardFee,
+                weight = Count,
+                fill=Fee
+                )) +
+    geom_histogram(alpha =1,  colour = "black",binwidth=0.025)+
+    scale_x_continuous(limits=c(-0.05,1.05))+
+    facet_grid(.  ~ UnmodifiedIsAwardFee)
+```
+
+![](Contract_Pricing_files/figure-html/CompleteFee-2.png) 
+
+```r
+ ggplot(subset(PricingSummary,(is.na(IsFFPorNoFee)&pIsFFPorNoFee>0) ), #!is.na(Ac)
+            aes(x = pIsFFPorNoFee,
+                weight = Count,
+                fill=Fee
+                )) +
+    geom_histogram(  colour = "black", binwidth=0.025)+
+    scale_x_continuous(limits=c(-0.05,1.05))+
+    facet_grid(.  ~ UnmodifiedIsFFPorNoFee)
+```
+
+![](Contract_Pricing_files/figure-html/CompleteFee-3.png) 
+
+```r
+ ggplot(subset(PricingSummary,(is.na(IsFixedFee)&pIsFixedFee>0) ), #!is.na(Ac)
+            aes(x = pIsFixedFee,
+                weight = Count,
+                fill=Fee
+                )) +
+    geom_histogram(colour = "black",binwidth=0.025)+
+    scale_x_continuous(limits=c(-0.05,1.05))+
+    facet_grid(.  ~ UnmodifiedIsFixedFee)
+```
+
+![](Contract_Pricing_files/figure-html/CompleteFee-4.png) 
+
+```r
+ ggplot(subset(PricingSummary,(is.na(IsOtherFee)&pIsOtherFee>0) ), #!is.na(Ac)
+            aes(x = pIsOtherFee,
+                weight = Count,
+                fill=Fee
+                )) +
+    geom_histogram(colour = "black",binwidth=0.025)+
+    scale_x_continuous(limits=c(-0.05,1.05))+
+    facet_grid(.  ~ UnmodifiedIsOtherFee)
+```
+
+![](Contract_Pricing_files/figure-html/CompleteFee-5.png) 
+
+```r
+ ggplot(data=PricingSummary,
+            aes(x = Fee   ,
+                weight = pCount,
+                fill=Fee
+                )) +
+    geom_histogram( colour = "black")+
+    facet_grid(.  ~ Ceil)
+```
+
+![](Contract_Pricing_files/figure-html/CompleteFee-6.png) 
